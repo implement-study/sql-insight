@@ -1,5 +1,8 @@
 package org.gongxuanzhang.mysql.service.executor;
 
+import org.gongxuanzhang.mysql.core.Where;
+import org.gongxuanzhang.mysql.entity.DatabaseInfo;
+import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.service.MetaData;
 import org.gongxuanzhang.mysql.service.Result;
 import org.gongxuanzhang.mysql.service.SelectResult;
@@ -17,10 +20,21 @@ import java.util.Map;
  **/
 public class SelectExecutor implements Executor {
 
+
     /**
-     * 要查询的表名
+     * 查询的数据库信息
      **/
-    private String tableName;
+    private DatabaseInfo databaseInfo;
+
+    /**
+     * 要查询的表信息
+     **/
+    private TableInfo tableInfo;
+
+    /**
+     * 查询的where条件
+     **/
+    private Where where;
 
     /**
      * 查询目标字段
@@ -31,7 +45,6 @@ public class SelectExecutor implements Executor {
      * 别名
      **/
     private Map<String, String> alias;
-
 
     @Override
     public Result doExecute(StorageEngine storageEngine) {

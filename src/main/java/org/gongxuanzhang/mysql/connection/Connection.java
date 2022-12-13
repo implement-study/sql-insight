@@ -3,7 +3,7 @@ package org.gongxuanzhang.mysql.connection;
 import org.gongxuanzhang.mysql.service.Result;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.parser.SqlParser;
-import org.gongxuanzhang.mysql.storage.InnoDb;
+import org.gongxuanzhang.mysql.storage.innodb.InnoDb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

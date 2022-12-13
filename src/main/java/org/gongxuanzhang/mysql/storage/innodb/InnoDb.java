@@ -1,4 +1,6 @@
-package org.gongxuanzhang.mysql.storage;
+package org.gongxuanzhang.mysql.storage.innodb;
+
+import org.gongxuanzhang.mysql.storage.StorageEngine;
 
 /**
  * InnoDB引擎实现
