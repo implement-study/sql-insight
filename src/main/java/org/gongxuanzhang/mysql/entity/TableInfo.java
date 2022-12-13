@@ -5,5 +5,5 @@ package org.gongxuanzhang.mysql.entity;
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class TableInfo implements ExecuteInfo{
+public class TableInfo implements ExecuteInfo {
 }

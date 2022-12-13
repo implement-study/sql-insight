@@ -1,7 +1,6 @@
 package org.gongxuanzhang.mysql.connection;
 
 import org.gongxuanzhang.mysql.exception.MySQLException;
-import org.gongxuanzhang.mysql.exception.SqlParseException;
 import org.gongxuanzhang.mysql.service.Result;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.parser.SqlParser;

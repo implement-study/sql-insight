@@ -1,6 +1,5 @@
 package org.gongxuanzhang.mysql.service.executor;
 
-import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.service.Result;
 
 /**
@@ -16,5 +15,5 @@ public interface Executor {
      *
      * @return 返回执行结果
      **/
-    Result doExecute() ;
+    Result doExecute();
 }

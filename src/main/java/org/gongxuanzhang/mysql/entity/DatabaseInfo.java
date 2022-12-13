@@ -8,10 +8,9 @@ import lombok.Data;
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Data
-public class DatabaseInfo implements ExecuteInfo{
+public class DatabaseInfo implements ExecuteInfo {
 
     private String databaseName;
-
 
 
 }

@@ -1,7 +1,6 @@
 package org.gongxuanzhang.mysql.core;
 
 /**
- *
  * 常量
  *
  * @author gxz gongxuanzhang@foxmail.com

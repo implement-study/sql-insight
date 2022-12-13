@@ -1,7 +1,6 @@
 package org.gongxuanzhang.mysql.service.executor;
 
 import lombok.extern.slf4j.Slf4j;
-import org.gongxuanzhang.mysql.entity.ExecuteInfo;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
 import org.gongxuanzhang.mysql.service.Result;
@@ -26,7 +25,7 @@ public class TableCreator extends AbstractInfoExecutor<TableInfo> {
     @Override
     public TableInfo analysisInfo(String[] split) {
         // todo
-            return null;
+        return null;
     }
 
 
