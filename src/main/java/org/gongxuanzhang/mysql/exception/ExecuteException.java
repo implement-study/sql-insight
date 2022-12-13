@@ -1,13 +1,13 @@
 package org.gongxuanzhang.mysql.exception;
 
 /**
- * 解析Sql错误
  *
+ * 执行异常
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class SqlParseException extends MySQLException {
+public class ExecuteException extends MySQLException{
 
-    public SqlParseException(String message) {
+    public ExecuteException(String message) {
         super(message);
     }
 }

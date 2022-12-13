@@ -7,9 +7,8 @@ import org.gongxuanzhang.mysql.storage.innodb.InnoDb;
  * 默认实现有Innodb
  * 可以自定义
  *
- *
- * @see InnoDb
  * @author gxz gongxuanzhang@foxmail.com
+ * @see InnoDb
  **/
 public interface StorageEngine {
 

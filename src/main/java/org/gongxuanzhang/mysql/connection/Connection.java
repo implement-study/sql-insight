@@ -1,9 +1,10 @@
 package org.gongxuanzhang.mysql.connection;
 
+import org.gongxuanzhang.mysql.exception.MySQLException;
+import org.gongxuanzhang.mysql.exception.SqlParseException;
 import org.gongxuanzhang.mysql.service.Result;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.parser.SqlParser;
-import org.gongxuanzhang.mysql.storage.innodb.InnoDb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,8 +22,14 @@ public class Connection {
 
     @GetMapping("/execute")
     public Result execute(String sql) {
+
         sql = sql.trim();
-        Executor parse = smartSqlParser.parse(sql);
-        return parse.doExecute(new InnoDb());
+        try {
+            Executor parse = smartSqlParser.parse(sql);
+            return parse.doExecute();
+        } catch (MySQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

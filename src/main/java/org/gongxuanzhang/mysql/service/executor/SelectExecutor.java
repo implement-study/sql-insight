@@ -6,7 +6,6 @@ import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.service.MetaData;
 import org.gongxuanzhang.mysql.service.Result;
 import org.gongxuanzhang.mysql.service.SelectResult;
-import org.gongxuanzhang.mysql.storage.StorageEngine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,7 +46,7 @@ public class SelectExecutor implements Executor {
     private Map<String, String> alias;
 
     @Override
-    public Result doExecute(StorageEngine storageEngine) {
+    public Result doExecute() {
         SelectResult result = new SelectResult(200, null);
         List<MetaData> list = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
