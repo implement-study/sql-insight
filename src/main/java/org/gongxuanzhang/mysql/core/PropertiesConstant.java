@@ -8,9 +8,14 @@ package org.gongxuanzhang.mysql.core;
 public interface PropertiesConstant {
 
     /**
-     * 全局属性常量
+     * 文件根目录
      **/
     String DATA_DIR = "dataDir";
+
+    /**
+     * 默认存储引擎
+     **/
+    String DEFAULT_STORAGE_ENGINE = "default-storage-engine";
 
 
 }

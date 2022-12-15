@@ -33,10 +33,11 @@ public interface SmartSqlParser extends SqlParser {
      * 把sql通过空格切割之后 更容易解析
      *
      * @param split 通过空格切割之后的数组
+     * @param sql 原sql
      * @return 返回执行器
      * @throws SqlParseException sql解析错误异常
      **/
-    Executor parse(String[] split) throws SqlParseException;
+    Executor parse(String[] split, String sql) throws SqlParseException;
 
     /**
      * 默认实现父接口的解析方法，改变参数为字符串数组
@@ -47,7 +48,7 @@ public interface SmartSqlParser extends SqlParser {
      **/
     @Override
     default Executor parse(String sql) throws SqlParseException {
-        String[] split = sql.trim().split("\\s+");
-        return parse(split);
+        String[] split = sql.split(" ");
+        return parse(split, sql);
     }
 }

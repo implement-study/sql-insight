@@ -16,7 +16,7 @@ public class SelectParser implements DMLSqlParser {
     private static final String PREFIX = "select";
 
     @Override
-    public Executor parse(String[] split) throws SqlParseException {
+    public Executor parse(String[] split, String sql) throws SqlParseException {
         return new SelectExecutor();
     }
 

@@ -2,6 +2,7 @@ package org.gongxuanzhang.mysql.entity;
 
 import lombok.Data;
 
+
 /**
  * 数据库信息
  *

@@ -22,7 +22,6 @@ public class Connection {
     @GetMapping("/execute")
     public Result execute(String sql) {
 
-        sql = sql.trim();
         try {
             Executor parse = smartSqlParser.parse(sql);
             return parse.doExecute();

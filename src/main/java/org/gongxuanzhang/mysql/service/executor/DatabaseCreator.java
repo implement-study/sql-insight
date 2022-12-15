@@ -23,12 +23,9 @@ public class DatabaseCreator extends AbstractInfoExecutor<DatabaseInfo> {
         super(sql);
     }
 
-    public DatabaseCreator(String[] split) throws SqlParseException {
-        super(split);
-    }
-
     @Override
-    public DatabaseInfo analysisInfo(String[] split) throws SqlParseException {
+    public DatabaseInfo analysisInfo(String sql) throws SqlParseException {
+        String[] split = sql.split(" ");
         if (split.length > 4) {
             throw new SqlParseException(split[4] + "解析失败");
         }

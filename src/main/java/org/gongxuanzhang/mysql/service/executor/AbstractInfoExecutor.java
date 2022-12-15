@@ -14,23 +14,22 @@ public abstract class AbstractInfoExecutor<INFO extends ExecuteInfo> implements 
 
     protected final INFO info;
 
+    protected final String sql;
+
     public AbstractInfoExecutor(String sql) throws SqlParseException {
-        this(sql.split("\\s+"));
+        this.sql = sql;
+        this.info = analysisInfo(sql);
     }
 
-
-    public AbstractInfoExecutor(String[] split) throws SqlParseException {
-        this.info = analysisInfo(split);
-    }
 
     /**
      * 解析sql变成执行信息
      *
-     * @param split sql通过空格切割之后的内容
+     * @param sql sql通过空格切割之后的内容
      * @return 执行信息
      * @throws SqlParseException 解析失败抛异常
      **/
-    public abstract INFO analysisInfo(String[] split) throws SqlParseException;
+    public abstract INFO analysisInfo(String sql) throws SqlParseException;
 
     public INFO getInfo() {
         return info;

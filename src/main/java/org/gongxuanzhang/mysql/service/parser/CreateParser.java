@@ -21,16 +21,16 @@ public class CreateParser implements DDLSqlParser {
 
 
     @Override
-    public Executor parse(String[] split) throws SqlParseException {
+    public Executor parse(String[] split, String sql) throws SqlParseException {
         if (split.length < 2) {
             throw new SqlParseException("语法错误，无法解析");
         }
         String action = split[1];
         switch (action.toLowerCase()) {
             case "database":
-                return new DatabaseCreator(split);
+                return new DatabaseCreator(sql);
             case "table":
-                return new TableCreator(split);
+                return new TableCreator(sql);
             default:
                 throw new SqlParseException(action + "不支持，你可以自定义功能来实现DDL");
         }
