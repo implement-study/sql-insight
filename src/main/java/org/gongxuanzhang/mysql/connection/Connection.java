@@ -27,7 +27,7 @@ public class Connection {
             return parse.doExecute();
         } catch (MySQLException e) {
             e.printStackTrace();
+            return Result.error(e.getMessage());
         }
-        return null;
     }
 }

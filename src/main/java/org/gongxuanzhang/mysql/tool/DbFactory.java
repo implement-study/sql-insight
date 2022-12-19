@@ -45,6 +45,9 @@ public class DbFactory {
 
     public static File getGfrmFile(String database, String tableName) throws ExecuteException {
         File db = ContextSupport.getHome();
+        if (database == null) {
+            database = SessionManager.currentSession().getDatabase();
+        }
         checkDatabase(database);
         File dataBaseDir = new File(db, database);
         return new File(dataBaseDir, tableName + GFRM_SUFFIX);

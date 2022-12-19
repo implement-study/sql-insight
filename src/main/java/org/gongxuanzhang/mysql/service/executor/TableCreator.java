@@ -46,6 +46,7 @@ public class TableCreator extends AbstractInfoExecutor<TableInfo> {
                 return Result.error("创建表" + this.getInfo().getTableName() + "失败");
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return Result.error(e.getMessage());
         }
 
@@ -160,6 +161,9 @@ public class TableCreator extends AbstractInfoExecutor<TableInfo> {
         }
 
         String tableName = formatSql.substring("create table ".length(), leftIndex);
+        if (!StringUtils.hasText(tableName)) {
+            throw new SqlParseException("表名不能为空");
+        }
         if (tableName.contains(".")) {
             String[] split = tableName.split("\\.");
             tableName = split[1];
