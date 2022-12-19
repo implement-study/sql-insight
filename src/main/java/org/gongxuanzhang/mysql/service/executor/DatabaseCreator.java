@@ -2,11 +2,11 @@ package org.gongxuanzhang.mysql.service.executor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.mysql.core.PropertiesConstant;
+import org.gongxuanzhang.mysql.core.Result;
 import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
-import org.gongxuanzhang.mysql.service.Result;
 
 import java.io.File;
 

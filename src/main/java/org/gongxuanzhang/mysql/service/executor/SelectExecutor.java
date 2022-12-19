@@ -1,14 +1,11 @@
 package org.gongxuanzhang.mysql.service.executor;
 
+import org.gongxuanzhang.mysql.core.Result;
+import org.gongxuanzhang.mysql.core.SelectResult;
 import org.gongxuanzhang.mysql.core.Where;
 import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.entity.TableInfo;
-import org.gongxuanzhang.mysql.service.MetaData;
-import org.gongxuanzhang.mysql.service.Result;
-import org.gongxuanzhang.mysql.service.SelectResult;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,16 +44,16 @@ public class SelectExecutor implements Executor {
 
     @Override
     public Result doExecute() {
-        SelectResult result = new SelectResult(200, null);
-        List<MetaData> list = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            Map<String, String> stringStringMap = new HashMap<>();
-            stringStringMap.put("id", i + "");
-            MetaData metaData = new MetaData();
-            metaData.setMap(stringStringMap);
-            list.add(metaData);
-        }
-        result.setData(list);
+        SelectResult result = new SelectResult(null, null);
+//        List<MetaData> list = new ArrayList<>();
+//        for (int i = 0; i < 10; i++) {
+//            Map<String, String> stringStringMap = new HashMap<>();
+//            stringStringMap.put("id", i + "");
+//            MetaData metaData = new MetaData();
+//            metaData.setMap(stringStringMap);
+//            list.add(metaData);
+//        }
+//        result.setData(list);
         return result;
     }
 }

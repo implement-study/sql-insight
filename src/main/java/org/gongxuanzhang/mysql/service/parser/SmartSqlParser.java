@@ -33,7 +33,7 @@ public interface SmartSqlParser extends SqlParser {
      * 把sql通过空格切割之后 更容易解析
      *
      * @param split 通过空格切割之后的数组
-     * @param sql 原sql
+     * @param sql   原sql
      * @return 返回执行器
      * @throws SqlParseException sql解析错误异常
      **/

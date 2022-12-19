@@ -1,6 +1,6 @@
 package org.gongxuanzhang.mysql.service.executor;
 
-import org.gongxuanzhang.mysql.service.Result;
+import org.gongxuanzhang.mysql.core.Result;
 
 /**
  * 执行器，一般是解析Sql得到的

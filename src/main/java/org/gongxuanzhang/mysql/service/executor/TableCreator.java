@@ -1,13 +1,18 @@
 package org.gongxuanzhang.mysql.service.executor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.gongxuanzhang.mysql.core.Result;
 import org.gongxuanzhang.mysql.entity.ColumnInfo;
 import org.gongxuanzhang.mysql.entity.ColumnType;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
-import org.gongxuanzhang.mysql.service.Result;
+import org.gongxuanzhang.mysql.tool.DbFactory;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -31,8 +36,28 @@ public class TableCreator extends AbstractInfoExecutor<TableInfo> {
 
     @Override
     public Result doExecute() {
-        // todo
-        return null;
+        File gfrmFile;
+        try {
+            gfrmFile = DbFactory.getGfrmFile(this.getInfo());
+            if (gfrmFile.exists()) {
+                return Result.error("表" + this.getInfo().getTableName() + "已经存在");
+            }
+            if (!gfrmFile.createNewFile()) {
+                return Result.error("创建表" + this.getInfo().getTableName() + "失败");
+            }
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+
+        try (FileOutputStream fileOutputStream = new FileOutputStream(gfrmFile);
+             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
+            objectOutputStream.writeObject(this.getInfo());
+            return Result.success();
+        } catch (IOException e) {
+            e.printStackTrace();
+            gfrmFile.delete();
+            return Result.error(e.getMessage());
+        }
     }
 
     @Override
@@ -135,7 +160,7 @@ public class TableCreator extends AbstractInfoExecutor<TableInfo> {
         }
 
         String tableName = formatSql.substring("create table ".length(), leftIndex);
-        if(tableName.contains(".")){
+        if (tableName.contains(".")) {
             String[] split = tableName.split("\\.");
             tableName = split[1];
             tableInfo.setDatabase(split[0]);
