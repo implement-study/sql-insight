@@ -112,9 +112,13 @@
             methods: {
                 doSql() {
                     $.get(`/execute?sql=${this.sql}`).then(res => {
-                        console.log(res)
-                        this.tableCols = res.head;
-                        this.tableData = res.data
+                        if(res.code === 200){
+                            this.tableCols = res.head;
+                            this.tableData = res.data
+                        }else{
+                            alert(res.errorMessage)
+                        }
+
                     })
                 }
             },

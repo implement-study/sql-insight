@@ -34,6 +34,9 @@ public class DescTable implements Executor {
             } else {
                 gfrmFile = DbFactory.getGfrmFile(tableName);
             }
+            if (!gfrmFile.exists()) {
+                return Result.error("表" + tableName + "不存在");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
