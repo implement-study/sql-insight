@@ -33,6 +33,8 @@ public class GlobalProperties implements EnvironmentAware {
 
     static {
         READONLY.add(PropertiesConstant.DATA_DIR);
+        READONLY.add(PropertiesConstant.MAX_SESSION_COUNT);
+        READONLY.add(PropertiesConstant.SESSION_DURATION);
     }
 
 

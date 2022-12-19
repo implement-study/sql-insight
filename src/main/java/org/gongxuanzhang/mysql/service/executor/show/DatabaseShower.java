@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * show databases
@@ -20,13 +21,13 @@ public class DatabaseShower implements Shower {
 
     @Override
     public Result show() {
-        File home = ContextSupport.getHome();
-        File[] dbs = home.listFiles(File::isDirectory);
-        if (dbs == null) {
+        Set<String> databases = ContextSupport.getDatabases();
+
+        if (databases.isEmpty()) {
             return Result.select(new String[]{"database"},null);
         }
         List<Map<String, String>> data = new ArrayList<>();
-        Arrays.stream(dbs).map(File::getName).forEach((db) -> {
+        databases.forEach((db) -> {
             Map<String, String> item = new HashMap<>();
             item.put("database", db);
             data.add(item);

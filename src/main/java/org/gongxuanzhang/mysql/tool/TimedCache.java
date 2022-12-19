@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 支持超时的缓存
+ * 只是容量超过阈值的时候才会触发清理
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
@@ -23,8 +24,11 @@ public class TimedCache<K, V> implements Runnable {
     });
 
     private final Map<K, TimeOutNode<V>> cache = new ConcurrentHashMap<>();
+    private final int capacity;
 
-    public TimedCache() {
+
+    public TimedCache(int capacity) {
+        this.capacity = capacity;
         MYSQL_CACHE_CLEAR.schedule(this, 1, TimeUnit.SECONDS);
     }
 
@@ -44,13 +48,20 @@ public class TimedCache<K, V> implements Runnable {
      *
      * @param duration 持续时间 毫秒
      **/
-    public void put(K key, V value, long duration) {
+    public boolean put(K key, V value, long duration) {
+        if (this.cache.size() >= this.capacity) {
+            return false;
+        }
         cache.put(key, new TimeOutNode<>(value, duration));
+        return true;
     }
 
 
     @Override
     public void run() {
+        if (cache.size() < capacity) {
+            return;
+        }
         List<K> removedKeys = new ArrayList<>();
         long now = System.currentTimeMillis();
         cache.forEach((key, node) -> {

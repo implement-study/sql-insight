@@ -19,7 +19,6 @@ public class MySqlSession {
     }
 
 
-
     public void useDatabase(String database) {
         attr.put("database", database);
     }

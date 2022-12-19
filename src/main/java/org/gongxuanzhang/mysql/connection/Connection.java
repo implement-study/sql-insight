@@ -1,6 +1,8 @@
 package org.gongxuanzhang.mysql.connection;
 
+import org.gongxuanzhang.mysql.core.MySqlSession;
 import org.gongxuanzhang.mysql.core.Result;
+import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.parser.SqlParser;
@@ -30,4 +32,10 @@ public class Connection {
             return Result.error(e.getMessage());
         }
     }
+
+//    @GetMapping("/openSession")
+//    public Result openSession(){
+//        MySqlSession mySqlSession = SessionManager.currentSession();
+//    }
+
 }

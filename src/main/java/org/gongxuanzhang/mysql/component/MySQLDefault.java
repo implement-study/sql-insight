@@ -2,7 +2,9 @@ package org.gongxuanzhang.mysql.component;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.env.EnvironmentPostProcessor;
+import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
@@ -11,9 +13,12 @@ import org.springframework.util.Assert;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.gongxuanzhang.mysql.core.PropertiesConstant.DATA_DIR;
 import static org.gongxuanzhang.mysql.core.PropertiesConstant.DEFAULT_STORAGE_ENGINE;
+import static org.gongxuanzhang.mysql.core.PropertiesConstant.MAX_SESSION_COUNT;
+import static org.gongxuanzhang.mysql.core.PropertiesConstant.SESSION_DURATION;
 
 /**
  * 如果没配置 就给默认值
@@ -22,13 +27,15 @@ import static org.gongxuanzhang.mysql.core.PropertiesConstant.DEFAULT_STORAGE_EN
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Slf4j
-public class MySQLInit implements EnvironmentPostProcessor {
+public class MySQLDefault implements EnvironmentPostProcessor, ApplicationListener<ApplicationStartedEvent> {
 
-    private static Map<String, String> DEFAULT_PROPERTIES = new HashMap<>();
+    private static final Map<String, String> DEFAULT_PROPERTIES = new HashMap<>();
 
     static {
         DEFAULT_PROPERTIES.put(DATA_DIR, new File("db").getAbsolutePath());
         DEFAULT_PROPERTIES.put(DEFAULT_STORAGE_ENGINE, "json");
+        DEFAULT_PROPERTIES.put(MAX_SESSION_COUNT, "10");
+        DEFAULT_PROPERTIES.put(SESSION_DURATION, Long.toString(TimeUnit.MINUTES.toMillis(10)));
     }
 
     @Override
@@ -50,5 +57,10 @@ public class MySQLInit implements EnvironmentPostProcessor {
         if (!db.exists()) {
             db.mkdirs();
         }
+    }
+
+    @Override
+    public void onApplicationEvent(ApplicationStartedEvent event) {
+        System.out.println(1);
     }
 }
