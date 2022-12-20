@@ -2,6 +2,7 @@ package org.gongxuanzhang.mysql.tool;
 
 import org.gongxuanzhang.mysql.core.MySqlProperties;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 
 import java.io.File;
 import java.util.HashSet;
@@ -45,6 +46,21 @@ public class ContextSupport {
         GlobalProperties properties = GlobalProperties.getInstance();
         String dataDir = properties.get(MySqlProperties.DATA_DIR);
         return new File(dataDir);
+    }
+
+    /**
+     * 拿到数据库目录
+     *
+     * @param database 数据库名
+     * @return 数据库目录
+     * @throws MySQLException 数据库不存在或者文件异常会抛出异常
+     **/
+    public static File getDatabaseHome(String database) throws MySQLException {
+        File file = new File(getHome(), database);
+        if (!file.exists() || !file.isDirectory()) {
+            throw new MySQLException("数据库[" + database + "]有问题");
+        }
+        return file;
     }
 
 

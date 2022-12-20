@@ -6,6 +6,7 @@ import org.gongxuanzhang.mysql.exception.SqlParseException;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.executor.TableCreator;
 import org.gongxuanzhang.mysql.service.executor.show.DatabaseShower;
+import org.gongxuanzhang.mysql.service.executor.show.TableShower;
 import org.gongxuanzhang.mysql.service.executor.show.VariablesShower;
 
 /**
@@ -30,8 +31,8 @@ public class ShowParser implements DDLSqlParser {
         switch (action.toLowerCase()) {
             case "databases":
                 return new DatabaseShower();
-            case "table":
-                return new TableCreator(sql);
+            case "tables":
+                return new TableShower();
             case "global":
             case "session":
             case "variables":

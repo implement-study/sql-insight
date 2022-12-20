@@ -1,6 +1,7 @@
 package org.gongxuanzhang.mysql.core;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +55,20 @@ public interface Result {
      **/
     static Result select(String[] head, List<Map<String, String>> dataList) {
         return new SelectResult(head, dataList);
+    }
+
+    /**
+     * 返回单列结果
+     *
+     * @param head     列标题
+     * @param dataList 列数据
+     * @return 结果
+     **/
+    static Result singleRow(String head, List<String> dataList) {
+        if (dataList == null) {
+            dataList = new ArrayList<>();
+        }
+        return new SingleRowResult(head, dataList);
     }
 
 

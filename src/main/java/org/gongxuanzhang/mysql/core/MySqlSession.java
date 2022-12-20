@@ -1,5 +1,7 @@
 package org.gongxuanzhang.mysql.core;
 
+import org.gongxuanzhang.mysql.exception.MySQLException;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +16,8 @@ public class MySqlSession {
     private final String id;
 
     private final Map<String, String> attr = new HashMap<>();
+
+    private String database;
 
     public MySqlSession(String id) {
         this.id = id;
@@ -32,12 +36,15 @@ public class MySqlSession {
     }
 
     public void useDatabase(String database) {
-        attr.put("database", database);
+        this.database = database;
     }
 
 
-    public String getDatabase() {
-        return attr.get("database");
+    public String getDatabase() throws MySQLException {
+        if (this.database == null) {
+            throw new MySQLException("无法获取 database");
+        }
+        return this.database;
     }
 
 
