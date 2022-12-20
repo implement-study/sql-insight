@@ -1,8 +1,8 @@
 package org.gongxuanzhang.mysql.tool;
 
 
-import org.gongxuanzhang.mysql.core.MySqlSession;
 import org.gongxuanzhang.mysql.core.MySqlProperties;
+import org.gongxuanzhang.mysql.core.MySqlSession;
 import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
 import org.gongxuanzhang.mysql.entity.TableInfo;

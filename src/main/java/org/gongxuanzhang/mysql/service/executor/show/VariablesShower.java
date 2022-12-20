@@ -49,10 +49,10 @@ public class VariablesShower implements Shower {
     }
 
     private Result defaultShow() {
-        try{
+        try {
             MySqlSession mySqlSession = SessionManager.currentSession();
             GlobalProperties instance = GlobalProperties.getInstance();
-            Map<String,String> attr = new HashMap<>(mySqlSession.getAllAttr());
+            Map<String, String> attr = new HashMap<>(mySqlSession.getAllAttr());
             instance.getAllAttr().forEach(attr::putIfAbsent);
             return returnVar(attr);
         } catch (Exception e) {

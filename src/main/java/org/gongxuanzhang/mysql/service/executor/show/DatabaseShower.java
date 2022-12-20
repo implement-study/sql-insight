@@ -3,9 +3,7 @@ package org.gongxuanzhang.mysql.service.executor.show;
 import org.gongxuanzhang.mysql.core.Result;
 import org.gongxuanzhang.mysql.tool.ContextSupport;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +22,7 @@ public class DatabaseShower implements Shower {
         Set<String> databases = ContextSupport.getDatabases();
 
         if (databases.isEmpty()) {
-            return Result.select(new String[]{"database"},null);
+            return Result.select(new String[]{"database"}, null);
         }
         List<Map<String, String>> data = new ArrayList<>();
         databases.forEach((db) -> {

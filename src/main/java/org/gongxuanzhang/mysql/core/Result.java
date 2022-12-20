@@ -52,7 +52,7 @@ public interface Result {
      * @param dataList 元数据
      * @return 结果
      **/
-    static Result select(String[] head, List<Map<String,String>> dataList) {
+    static Result select(String[] head, List<Map<String, String>> dataList) {
         return new SelectResult(head, dataList);
     }
 
