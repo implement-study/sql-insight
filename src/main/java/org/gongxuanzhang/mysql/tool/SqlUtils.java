@@ -23,6 +23,7 @@ public class SqlUtils {
      * 格式化包括 去掉前后空格，
      * 所有连续空格变成一个
      * 等号两边加一个空格
+     * 括号左右加一个空格
      *
      * @param sql 用户输入的sql
      * @return 格式化之后的sql
@@ -30,10 +31,14 @@ public class SqlUtils {
     public static String formatSql(String sql) {
         StringBuilder stringBuilder = new StringBuilder();
         for (char c : sql.trim().toCharArray()) {
-            if (c == '=') {
-                stringBuilder.append(" ").append(c).append(" ");
-            } else {
-                stringBuilder.append(c);
+            switch (c) {
+                case '=':
+                case '(':
+                case ')':
+                    stringBuilder.append(" ").append(c).append(" ");
+                    break;
+                default:
+                    stringBuilder.append(c);
             }
         }
         return stringBuilder.toString().replaceAll("\\s+", " ");

@@ -1,19 +1,19 @@
 package org.gongxuanzhang.mysql.service.executor;
 
+import org.gongxuanzhang.mysql.core.MySqlSession;
 import org.gongxuanzhang.mysql.core.Result;
+import org.gongxuanzhang.mysql.core.SessionManager;
+import org.gongxuanzhang.mysql.entity.GlobalProperties;
 import org.gongxuanzhang.mysql.entity.VariableInfo;
-import org.gongxuanzhang.mysql.entity.VariableUpdateInfo;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.gongxuanzhang.mysql.tool.SqlUtils;
 
 /**
  * 设置变量的执行器
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class SetExecutor extends AbstractInfoExecutor<VariableUpdateInfo> {
+public class SetExecutor extends AbstractInfoExecutor<VariableInfo> {
 
 
     public SetExecutor(String sql) throws SqlParseException {
@@ -21,57 +21,54 @@ public class SetExecutor extends AbstractInfoExecutor<VariableUpdateInfo> {
     }
 
     @Override
-    public VariableUpdateInfo analysisInfo(String sql) throws SqlParseException {
-        List<VariableInfo> infoList = new ArrayList<>();
-        boolean global = sql.startsWith("set global");
-        sql = sql.substring("set ".length());
-        String[] split = sql.split(",");
-        for (String varStr : split) {
-            VariableInfo variableInfo = varStrToInfo(varStr);
-            if (global) {
-                variableInfo.setGlobal(true);
-            }
-            infoList.add(variableInfo);
-        }
-        VariableUpdateInfo result = new VariableUpdateInfo();
-        result.setVariableInfos(infoList);
-        return result;
-    }
-
-    private VariableInfo varStrToInfo(String varStr) throws SqlParseException {
-        VariableInfo variableInfo = new VariableInfo();
-        String[] split = varStr.split("=");
+    public VariableInfo analysisInfo(String sql) throws SqlParseException {
+        String[] split = sql.split("=");
         if (split.length != 2) {
-            throw new SqlParseException(varStr + "无法解析");
+            throw new SqlParseException(sql + "无法解析");
         }
-        String varName = split[0];
-        varName = varName.trim();
-        boolean global = false;
-        if (varName.startsWith("global ")) {
-            global = true;
-            varName = varName.substring("global ".length());
+        VariableInfo info = new VariableInfo();
+        String prefix = split[0];
+        String value = split[1];
+        info.setValue(value.trim());
+        String[] prefixStr = prefix.trim().split(" ");
+        String varName;
+        switch (prefixStr.length) {
+            case 2:
+                varName = prefixStr[1];
+                break;
+            case 3:
+                if (prefixStr[1].equals("global")) {
+                    info.setGlobal(true);
+                } else if (prefixStr[1].equals("session")) {
+                    info.setGlobal(false);
+                } else {
+                    throw new SqlParseException(sql + "无法解析");
+                }
+                varName = prefixStr[2];
+                break;
+            default:
+                throw new SqlParseException(sql + "无法解析");
         }
-        if(varName.startsWith("global.")){
-            global = true;
-            varName = varName.substring("global.".length());
-        }
-
-        String[] nameCombination = varName.trim().split(" ");
-        if (nameCombination.length > 2) {
-            throw new SqlParseException(varStr + "无法解析");
-        }
-        if (nameCombination.length == 2) {
-        }
-
-
-        variableInfo.setValue(split[1].trim());
-        return variableInfo;
+        SqlUtils.checkVarName(varName);
+        info.setName(varName);
+        return info;
     }
 
 
     @Override
     public Result doExecute() {
-
-        return Result.success();
+        VariableInfo info = getInfo();
+        try {
+            if (info.isGlobal()) {
+                GlobalProperties.getInstance().set(info.getName(), info.getValue());
+            } else {
+                MySqlSession mySqlSession = SessionManager.currentSession();
+                mySqlSession.set(info.getName(), info.getValue());
+            }
+            return Result.success();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error(e.getMessage());
+        }
     }
 }

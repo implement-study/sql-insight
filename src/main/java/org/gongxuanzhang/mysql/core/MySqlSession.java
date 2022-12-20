@@ -19,6 +19,14 @@ public class MySqlSession {
     }
 
 
+    public void set(String key, String value) {
+        attr.put(key, value);
+    }
+
+    public String get(String key) {
+        return attr.get(key);
+    }
+
     public void useDatabase(String database) {
         attr.put("database", database);
     }
