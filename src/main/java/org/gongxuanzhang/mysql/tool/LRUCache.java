@@ -38,14 +38,11 @@ public class LRUCache<K, V> {
     public void put(K key, V value) {
         Node<K, V> node = new Node<>(key, value);
         if (cache.containsKey(key)) {
-            //  以前有 删除以前的  然后把自己加入
             Node<K, V> oldNode = cache.get(key);
             removeNode(oldNode);
             addToTail(node);
         } else {
-            //  以前没有  看满没满
             if (capacity == cache.size()) {
-                //  满了 删除一个
                 Node<K, V> deleted = head.next;
                 removeNode(deleted);
                 cache.remove(deleted.key);
