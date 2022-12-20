@@ -6,6 +6,7 @@ import org.gongxuanzhang.mysql.exception.SqlParseException;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.executor.TableCreator;
 import org.gongxuanzhang.mysql.service.executor.show.DatabaseShower;
+import org.gongxuanzhang.mysql.service.executor.show.VariablesShower;
 
 /**
  * show 的解析器
@@ -31,6 +32,10 @@ public class ShowParser implements DDLSqlParser {
                 return new DatabaseShower();
             case "table":
                 return new TableCreator(sql);
+            case "global":
+            case "session":
+            case "variables":
+                return new VariablesShower(sql);
             default:
                 throw new SqlParseException(action + "不支持，你可以自定义功能来实现DDL");
         }

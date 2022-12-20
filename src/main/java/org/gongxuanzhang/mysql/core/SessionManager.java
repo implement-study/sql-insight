@@ -6,7 +6,7 @@ import org.gongxuanzhang.mysql.tool.TimedCache;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
-import static org.gongxuanzhang.mysql.core.PropertiesConstant.SESSION_DURATION;
+import static org.gongxuanzhang.mysql.core.MySqlProperties.SESSION_DURATION;
 
 
 /**
@@ -24,7 +24,7 @@ public class SessionManager {
 
     public static void init() {
         GlobalProperties global = GlobalProperties.getInstance();
-        String sessionCount = global.get(PropertiesConstant.MAX_SESSION_COUNT);
+        String sessionCount = global.get(MySqlProperties.MAX_SESSION_COUNT);
         SESSION_BOX = new TimedCache<>(Integer.parseInt(sessionCount));
     }
 

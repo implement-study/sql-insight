@@ -1,6 +1,6 @@
 package org.gongxuanzhang.mysql.tool;
 
-import org.gongxuanzhang.mysql.core.PropertiesConstant;
+import org.gongxuanzhang.mysql.core.MySqlProperties;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
 
 import java.io.File;
@@ -43,7 +43,7 @@ public class ContextSupport {
      **/
     public static File getHome() {
         GlobalProperties properties = GlobalProperties.getInstance();
-        String dataDir = properties.get(PropertiesConstant.DATA_DIR);
+        String dataDir = properties.get(MySqlProperties.DATA_DIR);
         return new File(dataDir);
     }
 

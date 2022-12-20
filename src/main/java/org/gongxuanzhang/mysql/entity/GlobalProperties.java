@@ -1,11 +1,13 @@
 package org.gongxuanzhang.mysql.entity;
 
-import org.gongxuanzhang.mysql.core.PropertiesConstant;
+import org.gongxuanzhang.mysql.core.MySqlProperties;
 import org.gongxuanzhang.mysql.exception.VariableException;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,10 +33,15 @@ public class GlobalProperties implements EnvironmentAware {
 
     private static final Set<String> READONLY = new HashSet<>();
 
-    static {
-        READONLY.add(PropertiesConstant.DATA_DIR);
-        READONLY.add(PropertiesConstant.MAX_SESSION_COUNT);
-        READONLY.add(PropertiesConstant.SESSION_DURATION);
+
+    @PostConstruct
+    public void init() {
+        for (MySqlProperties key : MySqlProperties.values()) {
+            if (key.readonly) {
+                READONLY.add(key.key);
+            }
+            properties.put(key.key, environment.getProperty(key.key));
+        }
     }
 
 
@@ -61,6 +68,13 @@ public class GlobalProperties implements EnvironmentAware {
         return environment.getProperty(key);
     }
 
+    public String get(MySqlProperties key) {
+        return get(key.key);
+    }
+
+    public Map<String, String> getAllAttr() {
+        return Collections.unmodifiableMap(properties);
+    }
 
     @Override
     public void setEnvironment(Environment environment) {

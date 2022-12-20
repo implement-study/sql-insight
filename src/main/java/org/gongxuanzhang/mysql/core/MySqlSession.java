@@ -1,5 +1,8 @@
 package org.gongxuanzhang.mysql.core;
 
+import org.springframework.util.CollectionUtils;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +21,9 @@ public class MySqlSession {
         this.id = id;
     }
 
+    public Map<String, String> getAllAttr(){
+        return Collections.unmodifiableMap(attr);
+    }
 
     public void set(String key, String value) {
         attr.put(key, value);

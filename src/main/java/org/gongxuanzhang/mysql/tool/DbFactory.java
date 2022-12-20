@@ -2,7 +2,7 @@ package org.gongxuanzhang.mysql.tool;
 
 
 import org.gongxuanzhang.mysql.core.MySqlSession;
-import org.gongxuanzhang.mysql.core.PropertiesConstant;
+import org.gongxuanzhang.mysql.core.MySqlProperties;
 import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
 import org.gongxuanzhang.mysql.entity.TableInfo;
@@ -60,7 +60,7 @@ public class DbFactory {
             throw new ExecuteException("获取不到database，请先使用use database");
         }
         GlobalProperties properties = GlobalProperties.getInstance();
-        String dataDir = properties.get(PropertiesConstant.DATA_DIR);
+        String dataDir = properties.get(MySqlProperties.DATA_DIR);
         File dataBaseDir = new File(dataDir, database);
         if (!dataBaseDir.exists()) {
             throw new ExecuteException("数据库[" + database + "]不存在");

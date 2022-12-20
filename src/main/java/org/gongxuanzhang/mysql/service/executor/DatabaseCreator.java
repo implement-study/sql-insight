@@ -1,7 +1,7 @@
 package org.gongxuanzhang.mysql.service.executor;
 
 import lombok.extern.slf4j.Slf4j;
-import org.gongxuanzhang.mysql.core.PropertiesConstant;
+import org.gongxuanzhang.mysql.core.MySqlProperties;
 import org.gongxuanzhang.mysql.core.Result;
 import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
@@ -39,7 +39,7 @@ public class DatabaseCreator extends AbstractInfoExecutor<DatabaseInfo> {
     @Override
     public Result doExecute() {
         try {
-            String dataDir = GlobalProperties.getInstance().get(PropertiesConstant.DATA_DIR);
+            String dataDir = GlobalProperties.getInstance().get(MySqlProperties.DATA_DIR);
             File db = new File(dataDir);
             String databaseName = getInfo().getDatabaseName();
             File file = new File(db, databaseName);
