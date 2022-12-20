@@ -7,6 +7,7 @@ import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
+import org.gongxuanzhang.mysql.tool.SqlUtils;
 
 import java.io.File;
 
@@ -31,6 +32,7 @@ public class DatabaseCreator extends AbstractInfoExecutor<DatabaseInfo> {
         }
         DatabaseInfo databaseInfo = new DatabaseInfo();
         databaseInfo.setDatabaseName(split[2]);
+        SqlUtils.checkVarName(databaseInfo.getDatabaseName());
         return databaseInfo;
     }
 
@@ -44,14 +46,12 @@ public class DatabaseCreator extends AbstractInfoExecutor<DatabaseInfo> {
             if (file.exists()) {
                 throw new ExecuteException("数据库" + databaseName + "已经存在");
             }
-            file.mkdirs();
-            log.info("创建数据库{}", databaseName);
+            log.info("创建数据库{}{}", databaseName, file.mkdirs() ? "成功" : "失败");
+            return Result.success();
         } catch (ExecuteException e) {
             e.printStackTrace();
-            //  todo
-            return null;
+            return Result.error(e.getMessage());
         }
-        return null;
     }
 
 

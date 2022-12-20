@@ -1,5 +1,10 @@
 package org.gongxuanzhang.mysql.tool;
 
+import org.gongxuanzhang.mysql.exception.SqlParseException;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * sql解析相关的工具类
  *
@@ -11,6 +16,7 @@ public class SqlUtils {
 
     }
 
+    private static final Pattern ILLEGAL_PATTERN = Pattern.compile("[^\\w]+");
 
     /**
      * 此方法会把sql格式化
@@ -31,5 +37,17 @@ public class SqlUtils {
             }
         }
         return stringBuilder.toString().replaceAll("\\s+", " ");
+    }
+
+    /**
+     * 校验变量名的合法行
+     *
+     * @param varName 变量名  可以是表名，变量名，数据库名等
+     **/
+    public static void checkVarName(String varName) throws SqlParseException {
+        Matcher matcher = ILLEGAL_PATTERN.matcher(varName);
+        if (matcher.find()) {
+            throw new SqlParseException("变量名[" + varName + "]非法,只能有字母数字下划线");
+        }
     }
 }

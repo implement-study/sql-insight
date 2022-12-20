@@ -7,6 +7,7 @@ import org.gongxuanzhang.mysql.entity.ColumnType;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
 import org.gongxuanzhang.mysql.tool.DbFactory;
+import org.gongxuanzhang.mysql.tool.SqlUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -16,8 +17,6 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 建表执行器
@@ -26,8 +25,6 @@ import java.util.regex.Pattern;
  **/
 @Slf4j
 public class TableCreator extends AbstractInfoExecutor<TableInfo> {
-
-    private static final Pattern TABLE_NAME_ILLEGAL_PATTERN = Pattern.compile("[^\\w]+");
 
     public TableCreator(String sql) throws SqlParseException {
         super(sql);
@@ -169,10 +166,7 @@ public class TableCreator extends AbstractInfoExecutor<TableInfo> {
             tableName = split[1];
             tableInfo.setDatabase(split[0]);
         }
-        Matcher matcher = TABLE_NAME_ILLEGAL_PATTERN.matcher(tableName);
-        if (matcher.find()) {
-            throw new SqlParseException("表名[" + tableName + "]非法,只能有字母数字下划线");
-        }
+        SqlUtils.checkVarName(tableName);
         tableInfo.setTableName(tableName);
     }
 
