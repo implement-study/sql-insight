@@ -26,4 +26,14 @@ public class ErrorResult implements Result {
     public String getErrorMessage() {
         return errorMessage;
     }
+
+    @Override
+    public String getSqlTime() {
+        return null;
+    }
+
+    @Override
+    public void setSqlTime(String sqlTime) {
+
+    }
 }

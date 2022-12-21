@@ -55,4 +55,16 @@ public class SqlUtils {
             throw new SqlParseException("变量名[" + varName + "]非法,只能有字母数字下划线");
         }
     }
+
+
+    /**
+     * 计算器执行时间
+     *
+     * @param startTime 开始时间
+     * @return double小数的秒
+     **/
+    public static String sqlTime(long startTime) {
+        long endTime = System.currentTimeMillis();
+        return String.format("%.3f s", (System.currentTimeMillis() - endTime) / 1000.0);
+    }
 }

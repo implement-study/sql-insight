@@ -28,6 +28,22 @@ public interface Result {
 
 
     /**
+     * sql执行时间
+     *
+     * @return 格式化之后的内容 用于显示
+     **/
+    String getSqlTime();
+
+
+    /**
+     * 设置sql时间
+     *
+     * @param sqlTime
+     **/
+    void setSqlTime(String sqlTime);
+
+
+    /**
      * 返回简单成功
      *
      * @return 成功且没有信息

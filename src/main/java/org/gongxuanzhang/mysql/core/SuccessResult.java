@@ -8,17 +8,27 @@ package org.gongxuanzhang.mysql.core;
 public class SuccessResult implements Result {
 
 
-    SuccessResult() {
+    private String sqlTime;
 
-    }
 
     @Override
     public int getCode() {
-        return 200;
+        return 100;
     }
 
     @Override
     public String getErrorMessage() {
         return null;
     }
+
+    @Override
+    public String getSqlTime() {
+        return sqlTime;
+    }
+
+    @Override
+    public void setSqlTime(String sqlTime) {
+        this.sqlTime = sqlTime;
+    }
+
 }

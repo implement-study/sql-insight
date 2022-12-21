@@ -17,6 +17,8 @@ public class SelectResult implements Result {
 
     private final List<Map<String, String>> data;
 
+    private String sqlTime;
+
     @Override
     public int getCode() {
         return 200;
@@ -25,5 +27,15 @@ public class SelectResult implements Result {
     @Override
     public String getErrorMessage() {
         return null;
+    }
+
+    @Override
+    public String getSqlTime() {
+        return sqlTime;
+    }
+
+    @Override
+    public void setSqlTime(String sqlTime) {
+        this.sqlTime = sqlTime;
     }
 }
