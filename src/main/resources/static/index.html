@@ -27,13 +27,11 @@
                         </el-input>
                     </el-col>
                 </el-row>
-                <el-row>
-                    <el-col :span="3">
-                        <i class="el-icon-success" style="color:green"></i>
-                        执行成功，没有信息 执行时间{{ sqlTime}}
-                    </el-col>
+                <el-row v-if="type==1||type==2">
+                    <i class="el-icon-success" style="color:green"></i>
+                    执行成功 执行时间{{ sqlTime}}
                 </el-row>
-                <el-row>
+                <el-row v-if="type==1">
                     <el-col :span="18">
                         <el-table :data="tableData" border>
                             <el-table-column
@@ -43,7 +41,11 @@
                         </el-table>
                     </el-col>
                 </el-row>
-                <el-footer>Footer</el-footer>
+                <el-row v-if="type==3">
+                    <i class="el-icon-error" style="color:red"></i>
+                    执行失败,错误信息:{{errorMessage}}
+                </el-row>
+                <el-footer></el-footer>
             </el-container>
         </el-container>
     </el-container>
@@ -68,22 +70,27 @@
                 tableData: [],
                 tableCols: [],
                 sql: '',
-                errorMessage: ''
+                errorMessage: '',
+                loading: false
             },
             watch: {},
             methods: {
                 doSql() {
                     $.get(`/execute?sql=${this.sql}`).then(res => {
+                        this.loading = true;
                         if (res.code === 200) {
+                            this.type = 1;
                             this.tableCols = res.head;
                             this.tableData = res.data;
+                            this.sqlTime = res.sqlTime;
                         } else if (res.code === 100) {
-
+                            this.type = 2;
+                            this.sqlTime = res.sqlTime;
                         } else {
+                            this.type = 3;
                             this.errorMessage = res.errorMessage
                         }
-                        this.sqlTime = res.sqlTime;
-
+                        this.loading = false;
                     })
                 }
             },
