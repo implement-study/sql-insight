@@ -157,7 +157,7 @@ public class TableCreator extends AbstractInfoExecutor<TableInfo> {
             throw new SqlParseException("找不到表结构");
         }
 
-        String tableName = formatSql.substring("create table ".length(), leftIndex);
+        String tableName = formatSql.substring("create table ".length(), leftIndex).trim();
         if (!StringUtils.hasText(tableName)) {
             throw new SqlParseException("表名不能为空");
         }

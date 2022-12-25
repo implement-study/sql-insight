@@ -38,6 +38,13 @@ public class ContextSupport {
     }
 
     /**
+     * 当数据库数据更新的时候 重新加载缓存
+     **/
+    public static void refreshDatabases() {
+        databases = null;
+    }
+
+    /**
      * 获得数据库根目录
      *
      * @return 返回个啥
