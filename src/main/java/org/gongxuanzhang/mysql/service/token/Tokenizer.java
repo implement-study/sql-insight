@@ -5,6 +5,7 @@ import org.gongxuanzhang.mysql.exception.SqlParseException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.WeakHashMap;
 
 
 /**
@@ -79,31 +80,44 @@ public class Tokenizer {
     }
 
     private void appendLtOrLte() {
-        //  todo
+        if (nextChar() == '=') {
+            pushTwoToken(TokenKind.LTE);
+        }else{
+            pushOneToken(TokenKind.LTE);
+        }
     }
 
     private void appendGtOrGte() {
-//   todo
+        if (nextChar() == '=') {
+            pushTwoToken(TokenKind.GTE);
+        }else{
+            pushOneToken(TokenKind.GT);
+        }
     }
 
     private void appendDigit() {
         int start = offset;
         do {
             offset++;
-
         } while (TokenSupport.isDigit(currentChar()));
         String data = new String(charArray, start, offset);
         this.tokenList.add(new Token(TokenKind.INTEGER, data));
     }
 
-    private void appendString() {
+    private void appendString() throws SqlParseException {
         int start = offset;
-        do {
+        boolean found = false;
+        while (!isFinish()) {
             offset++;
+            if (currentChar() != '\'') {
+                found = true;
+                break;
+            }
         }
-        //  todo  无法拿到结尾的情况
-        while (currentChar() != '\'');
         String data = new String(charArray, start, offset);
+        if (!found) {
+            throw new SqlParseException(data + "无法解析");
+        }
         this.tokenList.add(new Token(TokenKind.LITERACY, data));
     }
 
@@ -123,6 +137,11 @@ public class Tokenizer {
         offset++;
     }
 
+    private void pushTwoToken(TokenKind tokenKind) {
+        this.tokenList.add(new Token(tokenKind, new String(charArray, offset, offset + 1)));
+        offset += 2;
+    }
+
     private boolean isFinish() {
         return this.offset >= this.length;
     }
@@ -131,5 +150,8 @@ public class Tokenizer {
         return charArray[offset];
     }
 
+    private char nextChar() {
+        return charArray[offset + 1];
+    }
 
 }

@@ -23,7 +23,12 @@ public enum TokenKind {
 
     LEFT_PAREN,
 
-    RIGHT_PAREN
+    RIGHT_PAREN,
+
+    GT,
+    GTE,
+    LT,
+    LTE,
 
 
 }
