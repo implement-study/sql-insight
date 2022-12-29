@@ -19,6 +19,8 @@ public enum TokenKind {
      **/
     VAR,
 
+    INTEGER,
+
     LEFT_PAREN,
 
     RIGHT_PAREN

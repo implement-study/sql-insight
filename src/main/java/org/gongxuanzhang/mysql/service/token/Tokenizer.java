@@ -42,9 +42,10 @@ public class Tokenizer {
     public List<Token> process() throws SqlParseException {
         while (offset < length) {
             char c = charArray[offset];
-            //  字母直接输出
             if (TokenSupport.isAlphabet(c)) {
                 appendLiteracy();
+            } else if (TokenSupport.isDigit(c)) {
+                appendDigit();
             } else {
                 switch (c) {
                     case '\'':
@@ -55,6 +56,12 @@ public class Tokenizer {
                         break;
                     case ')':
                         pushOneToken(TokenKind.RIGHT_PAREN);
+                        break;
+                    case '>':
+                        appendGtOrGte();
+                        break;
+                    case '<':
+                        appendLtOrLte();
                         break;
                     case ' ':
                     case '\t':
@@ -67,10 +74,26 @@ public class Tokenizer {
                         throw new SqlParseException(c + "不能解析");
                 }
             }
-
-
         }
         return this.tokenList;
+    }
+
+    private void appendLtOrLte() {
+        //  todo
+    }
+
+    private void appendGtOrGte() {
+//   todo
+    }
+
+    private void appendDigit() {
+        int start = offset;
+        do {
+            offset++;
+
+        } while (TokenSupport.isDigit(currentChar()));
+        String data = new String(charArray, start, offset);
+        this.tokenList.add(new Token(TokenKind.INTEGER, data));
     }
 
     private void appendString() {
@@ -78,7 +101,8 @@ public class Tokenizer {
         do {
             offset++;
         }
-        while (isFinish() || currentChar() == '\'');
+        //  todo  无法拿到结尾的情况
+        while (currentChar() != '\'');
         String data = new String(charArray, start, offset);
         this.tokenList.add(new Token(TokenKind.LITERACY, data));
     }
