@@ -5,7 +5,6 @@ import org.gongxuanzhang.mysql.exception.SqlParseException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.WeakHashMap;
 
 
 /**
@@ -64,6 +63,30 @@ public class Tokenizer {
                     case '<':
                         appendLtOrLte();
                         break;
+                    case '=':
+                        pushOneToken(TokenKind.EQUALS);
+                        break;
+                    case '+':
+                        pushOneToken(TokenKind.PLUS);
+                        break;
+                    case '-':
+                        pushOneToken(TokenKind.MINUS);
+                        break;
+                    case '*':
+                        pushOneToken(TokenKind.MULTI);
+                        break;
+                    case '/':
+                        pushOneToken(TokenKind.DIVIDE);
+                        break;
+                    case '%':
+                        pushOneToken(TokenKind.MOL);
+                        break;
+                    case '!':
+                        appendNe();
+                        break;
+                    case '@':
+                        appendAt();
+                        break;
                     case ' ':
                     case '\t':
                     case '\r':
@@ -79,10 +102,26 @@ public class Tokenizer {
         return this.tokenList;
     }
 
+    private void appendAt() {
+        if (nextChar() == '@') {
+            pushTwoToken(TokenKind.DOUBLE_AT);
+        } else {
+            pushOneToken(TokenKind.AT);
+        }
+    }
+
+    private void appendNe() throws SqlParseException {
+        if (nextChar() == '=') {
+            pushTwoToken(TokenKind.NE);
+        } else {
+            throw new SqlParseException(currentChar() + "不能解析");
+        }
+    }
+
     private void appendLtOrLte() {
         if (nextChar() == '=') {
             pushTwoToken(TokenKind.LTE);
-        }else{
+        } else {
             pushOneToken(TokenKind.LTE);
         }
     }
@@ -90,7 +129,7 @@ public class Tokenizer {
     private void appendGtOrGte() {
         if (nextChar() == '=') {
             pushTwoToken(TokenKind.GTE);
-        }else{
+        } else {
             pushOneToken(TokenKind.GT);
         }
     }

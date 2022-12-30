@@ -18,17 +18,26 @@ public enum TokenKind {
      * 一个变量
      **/
     VAR,
-
     INTEGER,
-
     LEFT_PAREN,
-
     RIGHT_PAREN,
-
     GT,
     GTE,
     LT,
     LTE,
+    PLUS,
+    MINUS,
+    MULTI,
+    DIVIDE,
+    NE,
+    EQUALS,
+    MOL,
+    AT,
+    DOUBLE_AT
+
+
+
+
 
 
 }
