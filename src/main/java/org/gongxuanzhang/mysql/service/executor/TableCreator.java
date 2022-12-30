@@ -6,23 +6,17 @@ import org.gongxuanzhang.mysql.entity.ColumnInfo;
 import org.gongxuanzhang.mysql.entity.ColumnType;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
+import org.gongxuanzhang.mysql.service.token.Token;
+import org.gongxuanzhang.mysql.service.token.SqlTokenizer;
 import org.gongxuanzhang.mysql.tool.DbFactory;
 import org.gongxuanzhang.mysql.tool.SqlUtils;
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,14 +32,6 @@ public class TableCreator extends AbstractInfoExecutor<TableInfo> {
         super(sql);
     }
 
-    public static void main(String[] args) {
-        String ex = "(#a1)";
-        ExpressionParser parser = new SpelExpressionParser();
-        SpelExpression exp = (SpelExpression)parser.parseExpression(ex);
-        EvaluationContext evaluationContext = exp.getEvaluationContext();
-        evaluationContext.setVariable("a1",1);
-        System.out.println(exp.getValue());
-    }
 
 
 

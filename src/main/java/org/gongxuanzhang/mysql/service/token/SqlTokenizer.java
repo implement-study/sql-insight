@@ -8,14 +8,12 @@ import java.util.List;
 
 
 /**
- * 词法分析器
+ * sql 词法分析器
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class Tokenizer {
+public class SqlTokenizer {
 
-
-    private final String expressionString;
 
     private final char[] charArray;
 
@@ -29,8 +27,7 @@ public class Tokenizer {
     /**
      * 给表达式加最后一个字符保证在查看next偏移的时候不会出现数组溢出
      **/
-    public Tokenizer(String expression) {
-        this.expressionString = expression;
+    public SqlTokenizer(String expression) {
         this.charArray = (expression + "\0").toCharArray();
         this.length = this.charArray.length;
         this.offset = 0;
@@ -52,9 +49,11 @@ public class Tokenizer {
                         appendString();
                         break;
                     case '(':
+                    case '（':
                         pushOneToken(TokenKind.LEFT_PAREN);
                         break;
                     case ')':
+                    case '）':
                         pushOneToken(TokenKind.RIGHT_PAREN);
                         break;
                     case '>':
@@ -166,7 +165,7 @@ public class Tokenizer {
             offset++;
         }
         while (TokenSupport.isIdentifier(currentChar()));
-        String data = new String(charArray, start, offset);
+        String data = new String(charArray, start, offset - start);
         this.tokenList.add(new Token(TokenKind.VAR, data));
     }
 
