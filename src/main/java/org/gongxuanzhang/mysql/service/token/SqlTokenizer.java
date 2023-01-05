@@ -5,6 +5,7 @@ import org.gongxuanzhang.mysql.exception.SqlParseException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -21,7 +22,7 @@ public class SqlTokenizer {
 
     private final int length;
 
-    private final List<Token> tokenList = new ArrayList<>();
+    private final List<SqlToken> sqlTokenList = new ArrayList<>();
 
 
     /**
@@ -36,7 +37,7 @@ public class SqlTokenizer {
     /**
      * 执行词法分析
      **/
-    public List<Token> process() throws SqlParseException {
+    public List<SqlToken> process() throws SqlParseException {
         while (offset < length) {
             char c = charArray[offset];
             if (TokenSupport.isAlphabet(c)) {
@@ -80,9 +81,16 @@ public class SqlTokenizer {
                     case '%':
                         pushOneToken(TokenKind.MOL);
                         break;
+                    case ',':
+                        pushOneToken(TokenKind.COMMA);
+                        break;
+                    case '.':
+                        pushOneToken(TokenKind.DOT);
+                        break;
                     case '!':
                         appendNe();
                         break;
+                    //  todo  下划线 和$
                     case '@':
                         appendAt();
                         break;
@@ -98,7 +106,7 @@ public class SqlTokenizer {
                 }
             }
         }
-        return this.tokenList;
+        return this.sqlTokenList.stream().map(TokenSupport::swapKeyword).collect(Collectors.toList());
     }
 
     private void appendAt() {
@@ -139,7 +147,7 @@ public class SqlTokenizer {
             offset++;
         } while (TokenSupport.isDigit(currentChar()));
         String data = new String(charArray, start, offset);
-        this.tokenList.add(new Token(TokenKind.INTEGER, data));
+        this.sqlTokenList.add(new SqlToken(TokenKind.INT, data));
     }
 
     private void appendString() throws SqlParseException {
@@ -156,7 +164,7 @@ public class SqlTokenizer {
         if (!found) {
             throw new SqlParseException(data + "无法解析");
         }
-        this.tokenList.add(new Token(TokenKind.LITERACY, data));
+        this.sqlTokenList.add(new SqlToken(TokenKind.LITERACY, data));
     }
 
     private void appendLiteracy() {
@@ -166,17 +174,17 @@ public class SqlTokenizer {
         }
         while (TokenSupport.isIdentifier(currentChar()));
         String data = new String(charArray, start, offset - start);
-        this.tokenList.add(new Token(TokenKind.VAR, data));
+        this.sqlTokenList.add(new SqlToken(TokenKind.VAR, data));
     }
 
 
     private void pushOneToken(TokenKind tokenKind) {
-        this.tokenList.add(new Token(tokenKind, currentChar() + ""));
+        this.sqlTokenList.add(new SqlToken(tokenKind, currentChar() + ""));
         offset++;
     }
 
     private void pushTwoToken(TokenKind tokenKind) {
-        this.tokenList.add(new Token(tokenKind, new String(charArray, offset, offset + 1)));
+        this.sqlTokenList.add(new SqlToken(tokenKind, new String(charArray, offset, offset + 1)));
         offset += 2;
     }
 
