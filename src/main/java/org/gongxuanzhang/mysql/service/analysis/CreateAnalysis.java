@@ -19,6 +19,7 @@ import static org.gongxuanzhang.mysql.service.token.TokenSupport.isTokenKind;
 import static org.gongxuanzhang.mysql.service.token.TokenSupport.mustString;
 import static org.gongxuanzhang.mysql.service.token.TokenSupport.varString;
 import static org.gongxuanzhang.mysql.tool.ExceptionThrower.expectToken;
+import static org.gongxuanzhang.mysql.tool.ExceptionThrower.ifNotThrow;
 import static org.gongxuanzhang.mysql.tool.ExceptionThrower.throwSqlAnalysis;
 
 /**
@@ -98,14 +99,14 @@ public class CreateAnalysis implements TokenAnalysis {
             if (end()) {
                 return;
             }
-            if (isTokenKind(sqlTokenList.get(offset), TokenKind.COMMENT) &&
-                    isTokenKind(sqlTokenList.get(offset + 1), TokenKind.EQUALS) &&
-                    isTokenKind(sqlTokenList.get(offset + 2), TokenKind.LITERACY)) {
-                this.info.setComment(mustString(sqlTokenList.get(offset + 2)));
-                offset += 2;
-            } else {
-                throwSqlAnalysis(this.sqlTokenList.get(offset).getValue());
-            }
+            boolean isComment = isTokenKind(sqlTokenList.get(offset), TokenKind.COMMENT);
+            ifNotThrow(isComment, sqlTokenList.get(offset).getValue() + "解析错误");
+            boolean isEquals = isTokenKind(sqlTokenList.get(offset + 1), TokenKind.EQUALS);
+            ifNotThrow(isEquals, sqlTokenList.get(offset + 1).getValue() + "解析错误");
+            boolean legal = isTokenKind(sqlTokenList.get(offset + 2), TokenKind.LITERACY);
+            ifNotThrow(legal,sqlTokenList.get(offset + 2).getValue()+"解析错误，可能是备注没有加单引号");
+            this.info.setComment(mustString(sqlTokenList.get(offset + 2)));
+            offset += 3;
             if (!end()) {
                 throwSqlAnalysis(this.sqlTokenList.get(offset).getValue());
             }
@@ -114,7 +115,7 @@ public class CreateAnalysis implements TokenAnalysis {
         private void analysisCol() throws SqlAnalysisException {
             List<ColumnInfo> columnInfos = new ArrayList<>();
             this.info.setColumnInfos(columnInfos);
-            while (!end() || !isTokenKind(sqlTokenList.get(offset), TokenKind.RIGHT_PAREN)) {
+            while (!end() && !isTokenKind(sqlTokenList.get(offset), TokenKind.RIGHT_PAREN)) {
                 ColumnInfo columnInfo = new ColumnInfo();
                 String colName = varString(sqlTokenList.get(offset));
                 columnInfo.setName(colName);
@@ -136,6 +137,7 @@ public class CreateAnalysis implements TokenAnalysis {
                 throwSqlAnalysis(candidate.getValue());
             }
             if (!isTokenKind(sqlTokenList.get(offset + 1), TokenKind.DOT)) {
+                this.info.setTableName(candidate.getValue());
                 offset++;
                 return;
             }
@@ -144,7 +146,7 @@ public class CreateAnalysis implements TokenAnalysis {
             }
             this.info.setDatabase(candidate.getValue());
             this.info.setTableName(sqlTokenList.get(offset + 2).getValue());
-            offset += 2;
+            offset += 3;
         }
 
         private ColumnType analysisType() throws SqlAnalysisException {
@@ -167,7 +169,14 @@ public class CreateAnalysis implements TokenAnalysis {
         }
 
         private void fillExtra(ColumnInfo columnInfo) throws SqlAnalysisException {
-            while (!isTokenKind(this.sqlTokenList.get(offset), TokenKind.COMMA, TokenKind.RIGHT_PAREN)) {
+            while (true) {
+                if (isTokenKind(this.sqlTokenList.get(offset), TokenKind.COMMA)) {
+                    offset++;
+                    break;
+                }
+                if (isTokenKind(this.sqlTokenList.get(offset), TokenKind.RIGHT_PAREN)) {
+                    break;
+                }
                 SqlToken extraToken = this.sqlTokenList.get(offset);
                 switch (extraToken.getTokenKind()) {
                     case PRIMARY:

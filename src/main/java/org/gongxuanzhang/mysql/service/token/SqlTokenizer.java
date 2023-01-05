@@ -164,7 +164,7 @@ public class SqlTokenizer {
         if (!found) {
             throw new SqlParseException("\"'\"无法解析");
         }
-        String data = new String(charArray, start + 1, offset - start);
+        String data = new String(charArray, start + 1, offset - start - 2);
         this.sqlTokenList.add(new SqlToken(TokenKind.LITERACY, data));
     }
 

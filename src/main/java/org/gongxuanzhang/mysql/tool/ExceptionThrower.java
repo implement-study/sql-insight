@@ -42,4 +42,10 @@ public class ExceptionThrower {
             throw new SqlAnalysisException(sqlToken.getValue() + "解析异常");
         }
     }
+
+    public static void ifNotThrow(boolean expression, String message) throws SqlAnalysisException {
+        if (!expression) {
+            throw new SqlAnalysisException(message);
+        }
+    }
 }

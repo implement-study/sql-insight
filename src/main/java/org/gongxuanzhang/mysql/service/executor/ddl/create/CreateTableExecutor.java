@@ -41,6 +41,7 @@ public class CreateTableExecutor implements Executor {
         try (FileOutputStream fileOutputStream = new FileOutputStream(gfrmFile);
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
             objectOutputStream.writeObject(this.tableInfo);
+            log.info("创建表{}.{}",tableInfo.getDatabase(),tableInfo.getTableName());
             return Result.success();
         } catch (IOException e) {
             e.printStackTrace();
