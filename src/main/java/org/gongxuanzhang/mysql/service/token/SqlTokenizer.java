@@ -102,7 +102,7 @@ public class SqlTokenizer {
                         this.offset++;
                         break;
                     default:
-                        throw new SqlParseException(c + "不能解析");
+                        throw new SqlParseException(c + "不能解析,请注意字符串需要用单引号");
                 }
             }
         }
@@ -146,7 +146,7 @@ public class SqlTokenizer {
         do {
             offset++;
         } while (TokenSupport.isDigit(currentChar()));
-        String data = new String(charArray, start, offset);
+        String data = new String(charArray, start, offset - start);
         this.sqlTokenList.add(new SqlToken(TokenKind.INT, data));
     }
 
@@ -155,15 +155,16 @@ public class SqlTokenizer {
         boolean found = false;
         while (!isFinish()) {
             offset++;
-            if (currentChar() != '\'') {
+            if (currentChar() == '\'') {
+                offset++;
                 found = true;
                 break;
             }
         }
-        String data = new String(charArray, start, offset);
         if (!found) {
-            throw new SqlParseException(data + "无法解析");
+            throw new SqlParseException("\"'\"无法解析");
         }
+        String data = new String(charArray, start + 1, offset - start);
         this.sqlTokenList.add(new SqlToken(TokenKind.LITERACY, data));
     }
 
@@ -184,7 +185,7 @@ public class SqlTokenizer {
     }
 
     private void pushTwoToken(TokenKind tokenKind) {
-        this.sqlTokenList.add(new SqlToken(tokenKind, new String(charArray, offset, offset + 1)));
+        this.sqlTokenList.add(new SqlToken(tokenKind, new String(charArray, offset, 2)));
         offset += 2;
     }
 

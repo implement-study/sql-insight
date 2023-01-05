@@ -1,4 +1,4 @@
-package org.gongxuanzhang.mysql.service.executor.show;
+package org.gongxuanzhang.mysql.service.executor.session.show;
 
 import org.gongxuanzhang.mysql.core.Result;
 import org.gongxuanzhang.mysql.service.executor.Executor;

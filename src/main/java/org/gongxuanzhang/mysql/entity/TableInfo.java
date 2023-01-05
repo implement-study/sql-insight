@@ -42,4 +42,11 @@ public class TableInfo implements ExecuteInfo {
     }
 
 
+    public void addPrimaryKey(String primaryKey) {
+        if (this.primaryKey == null) {
+            this.primaryKey = new ArrayList<>();
+        }
+        this.primaryKey.add(primaryKey);
+    }
+
 }

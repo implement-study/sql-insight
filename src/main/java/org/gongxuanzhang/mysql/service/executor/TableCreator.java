@@ -6,10 +6,10 @@ import org.gongxuanzhang.mysql.entity.ColumnInfo;
 import org.gongxuanzhang.mysql.entity.ColumnType;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
-import org.gongxuanzhang.mysql.service.token.Token;
-import org.gongxuanzhang.mysql.service.token.SqlTokenizer;
 import org.gongxuanzhang.mysql.tool.DbFactory;
 import org.gongxuanzhang.mysql.tool.SqlUtils;
+import org.springframework.expression.Expression;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -32,7 +32,12 @@ public class TableCreator extends AbstractInfoExecutor<TableInfo> {
         super(sql);
     }
 
-
+    public static void main(String[] args) {
+        String ex =  "(1+1)+(2+2)";
+        SpelExpressionParser spelExpressionParser = new SpelExpressionParser();
+        Expression expression = spelExpressionParser.parseExpression(ex);
+        System.out.println(expression.getValue());
+    }
 
 
     @Override

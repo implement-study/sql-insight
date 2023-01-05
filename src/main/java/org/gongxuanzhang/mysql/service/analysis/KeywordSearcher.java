@@ -1,9 +1,9 @@
-package org.gongxuanzhang.mysql.service.token;
+package org.gongxuanzhang.mysql.service.analysis;
 
-import java.util.ArrayList;
+import org.gongxuanzhang.mysql.service.token.TokenKind;
+
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

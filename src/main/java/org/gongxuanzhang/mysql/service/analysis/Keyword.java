@@ -1,6 +1,7 @@
-package org.gongxuanzhang.mysql.service.token;
+package org.gongxuanzhang.mysql.service.analysis;
 
 /**
+ * 关键字
  * @author gxz gongxuanzhang@foxmail.com
  **/
 public enum Keyword {

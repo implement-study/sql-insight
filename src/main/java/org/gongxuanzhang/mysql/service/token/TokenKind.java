@@ -36,7 +36,6 @@ public enum TokenKind implements SqlAstNode {
     ALTER,
     DROP,
     TRUNCATE,
-    COMMENT,
     RENAME,
 
     //  DML
@@ -61,7 +60,12 @@ public enum TokenKind implements SqlAstNode {
     //  table special
     DEFAULT,
     AUTO_INCREMENT,
-    NOT_NULL,
+    NOT,
+    NULL,
+    UNIQUE,
+    COMMENT,
+    PRIMARY,
+    KEY,
 
 
     /**

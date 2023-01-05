@@ -18,6 +18,7 @@ import java.io.File;
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Slf4j
+@Deprecated
 public class DatabaseCreator extends AbstractInfoExecutor<DatabaseInfo> {
 
 

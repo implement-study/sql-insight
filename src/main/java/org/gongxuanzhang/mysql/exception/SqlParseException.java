@@ -1,7 +1,7 @@
 package org.gongxuanzhang.mysql.exception;
 
 /**
- * 解析Sql错误
+ * Sql 词法分析错误
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/

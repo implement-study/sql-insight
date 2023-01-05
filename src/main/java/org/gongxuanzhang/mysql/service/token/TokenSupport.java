@@ -1,5 +1,11 @@
 package org.gongxuanzhang.mysql.service.token;
 
+import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * token 辅助类
  *
@@ -17,6 +23,8 @@ public class TokenSupport {
 
     private static final byte IDENTIFIER = 0x04;
 
+    private static final Map<String, TokenKind> SWAP_TOKEN_KIND = new HashMap<>();
+
 
     static {
         for (int ch = '0'; ch <= '9'; ch++) {
@@ -30,6 +38,9 @@ public class TokenSupport {
         }
         FLAGS['_'] |= IDENTIFIER;
         FLAGS['$'] |= IDENTIFIER;
+        Arrays.stream(TokenKind.values()).filter(TokenKind::canSwap).forEach((kind) -> {
+            SWAP_TOKEN_KIND.put(kind.toString(), kind);
+        });
     }
 
     /**
@@ -60,14 +71,83 @@ public class TokenSupport {
 
     /**
      * 是否是标识符
+     *
      * @param c char
      * @return true是标识符
      **/
-    public static boolean isIdentifier(char c){
+    public static boolean isIdentifier(char c) {
         if (c >= FLAG_LENGTH) {
             return false;
         }
         return (FLAGS[c] & IDENTIFIER) != 0;
+    }
+
+
+    /**
+     * 尝试交换关键字
+     *
+     * @param sqlToken var sql token
+     * @return 如果可以交换，返回交换之后的关键字 sql token 如果不能交换，返回原token
+     **/
+    public static SqlToken swapKeyword(SqlToken sqlToken) {
+        if (sqlToken.getTokenKind() != TokenKind.VAR) {
+            return sqlToken;
+        }
+        TokenKind tokenKind = SWAP_TOKEN_KIND.get(sqlToken.getValue().toUpperCase());
+        if (tokenKind == null) {
+            return sqlToken;
+        }
+        return new SqlToken(tokenKind, tokenKind.toString());
+    }
+
+    /**
+     * 判断token类型是否是目标类型
+     *
+     * @param tokenKind token类型
+     * @param target    目标类型
+     * @return true是目标类型  false不是目标类型
+     **/
+    public static boolean isTokenKind(TokenKind tokenKind, TokenKind... target) {
+        if (target == null || target.length == 0) {
+            throw new NullPointerException("目标类型不能为空");
+        }
+        for (TokenKind kind : target) {
+            if (kind == tokenKind) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isTokenKind(SqlToken sqlToken, TokenKind... target) {
+        return isTokenKind(sqlToken.getTokenKind(), target);
+    }
+
+    /**
+     * 通过一个sql token var 拿到一个结果 要求token必须是var
+     *
+     * @return token的值
+     * @throws SqlAnalysisException 如果不是 var token 抛出异常
+     **/
+    public static String varString(SqlToken sqlToken) throws SqlAnalysisException {
+        if (!isTokenKind(sqlToken, TokenKind.VAR)) {
+            throw new SqlAnalysisException(sqlToken.getValue() + "解析错误");
+        }
+        return sqlToken.getValue();
+    }
+
+    /**
+     * 通过一个sql token  拿到一个结果  要求token必须是LITERACY
+     *
+     * @param sqlToken sql token
+     * @return token的值
+     * @throws SqlAnalysisException 如果不是 LITERACY token 抛出异常
+     **/
+    public static String mustString(SqlToken sqlToken) throws SqlAnalysisException {
+        if (!isTokenKind(sqlToken, TokenKind.LITERACY)) {
+            throw new SqlAnalysisException(sqlToken.getValue() + "解析错误");
+        }
+        return sqlToken.getValue();
     }
 
 }

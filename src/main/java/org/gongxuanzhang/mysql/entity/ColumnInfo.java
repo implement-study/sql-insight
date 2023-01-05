@@ -19,4 +19,6 @@ public class ColumnInfo implements ExecuteInfo {
     private String defaultValue;
 
 
+
+
 }

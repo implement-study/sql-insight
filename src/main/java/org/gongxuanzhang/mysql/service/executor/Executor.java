@@ -1,6 +1,7 @@
 package org.gongxuanzhang.mysql.service.executor;
 
 import org.gongxuanzhang.mysql.core.Result;
+import org.gongxuanzhang.mysql.exception.ExecuteException;
 
 /**
  * 执行器，一般是解析Sql得到的
@@ -15,5 +16,5 @@ public interface Executor {
      *
      * @return 返回执行结果
      **/
-    Result doExecute();
+    Result doExecute() throws ExecuteException;
 }

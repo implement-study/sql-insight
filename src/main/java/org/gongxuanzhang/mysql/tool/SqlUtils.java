@@ -28,6 +28,7 @@ public class SqlUtils {
      * @param sql 用户输入的sql
      * @return 格式化之后的sql
      **/
+    @Deprecated
     public static String formatSql(String sql) {
         StringBuilder stringBuilder = new StringBuilder();
         for (char c : sql.trim().toCharArray()) {
@@ -43,6 +44,8 @@ public class SqlUtils {
         }
         return stringBuilder.toString().replaceAll("\\s+", " ");
     }
+
+
 
     /**
      * 校验变量名的合法行
