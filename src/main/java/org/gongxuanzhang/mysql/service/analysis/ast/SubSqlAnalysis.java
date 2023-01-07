@@ -1,7 +1,9 @@
 package org.gongxuanzhang.mysql.service.analysis.ast;
 
+import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
 import org.gongxuanzhang.mysql.service.analysis.CreateAnalysis;
+import org.gongxuanzhang.mysql.service.analysis.SetAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.token.SqlToken;
@@ -23,11 +25,12 @@ import java.util.Map;
 @Component
 public class SubSqlAnalysis implements TokenAnalysis {
 
-    private Map<TokenKind, TokenAnalysis> analysisMap = new HashMap<>();
+    private final Map<TokenKind, TokenAnalysis> analysisMap = new HashMap<>();
 
     @PostConstruct
-    public void init(){
-        analysisMap.put(TokenKind.CREATE,new CreateAnalysis());
+    public void init() {
+        analysisMap.put(TokenKind.CREATE, new CreateAnalysis());
+        analysisMap.put(TokenKind.SET, new SetAnalysis());
     }
 
     @Override
@@ -40,7 +43,14 @@ public class SubSqlAnalysis implements TokenAnalysis {
         if (tokenAnalysis == null) {
             throw new SqlAnalysisException("[" + sqlToken.getValue() + "]无法解析");
         }
-        return tokenAnalysis.analysis(sqlTokenList);
+        try {
+            return tokenAnalysis.analysis(sqlTokenList);
+        } catch (MySQLException mysql) {
+            throw new SqlAnalysisException(mysql.getMessage());
+        } catch (Exception e) {
+            throw new SqlAnalysisException(String.format("sql解析出现问题,错误信息[%s]", e.getMessage()));
+        }
+
     }
 
 
