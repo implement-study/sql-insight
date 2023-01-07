@@ -16,7 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.gongxuanzhang.mysql.service.token.TokenSupport.isTokenKind;
-import static org.gongxuanzhang.mysql.service.token.TokenSupport.mustString;
+import static org.gongxuanzhang.mysql.service.token.TokenSupport.getMustString;
+import static org.gongxuanzhang.mysql.service.token.TokenSupport.mustTokenKind;
 import static org.gongxuanzhang.mysql.service.token.TokenSupport.varString;
 import static org.gongxuanzhang.mysql.tool.ExceptionThrower.expectToken;
 import static org.gongxuanzhang.mysql.tool.ExceptionThrower.ifNotThrow;
@@ -24,7 +25,8 @@ import static org.gongxuanzhang.mysql.tool.ExceptionThrower.throwSqlAnalysis;
 
 /**
  * create 解析器
- *
+ * create table
+ * create database
  * @author gxz gongxuanzhang@foxmail.com
  **/
 public class CreateAnalysis implements TokenAnalysis {
@@ -105,7 +107,7 @@ public class CreateAnalysis implements TokenAnalysis {
             ifNotThrow(isEquals, sqlTokenList.get(offset + 1).getValue() + "解析错误");
             boolean legal = isTokenKind(sqlTokenList.get(offset + 2), TokenKind.LITERACY);
             ifNotThrow(legal,sqlTokenList.get(offset + 2).getValue()+"解析错误，可能是备注没有加单引号");
-            this.info.setComment(mustString(sqlTokenList.get(offset + 2)));
+            this.info.setComment(getMustString(sqlTokenList.get(offset + 2)));
             offset += 3;
             if (!end()) {
                 throwSqlAnalysis(this.sqlTokenList.get(offset).getValue());
@@ -133,9 +135,7 @@ public class CreateAnalysis implements TokenAnalysis {
 
         private void analysisTableName() throws SqlAnalysisException {
             SqlToken candidate = sqlTokenList.get(offset);
-            if (!isTokenKind(candidate, TokenKind.VAR)) {
-                throwSqlAnalysis(candidate.getValue());
-            }
+            mustTokenKind(candidate, TokenKind.VAR);
             if (!isTokenKind(sqlTokenList.get(offset + 1), TokenKind.DOT)) {
                 this.info.setTableName(candidate.getValue());
                 offset++;
@@ -192,7 +192,7 @@ public class CreateAnalysis implements TokenAnalysis {
                             offset++;
                             break;
                         }
-                        String defaultValue = TokenSupport.mustString(this.sqlTokenList.get(offset + 1));
+                        String defaultValue = TokenSupport.getMustString(this.sqlTokenList.get(offset + 1));
                         columnInfo.setDefaultValue(defaultValue);
                         offset++;
                         break;
@@ -205,7 +205,7 @@ public class CreateAnalysis implements TokenAnalysis {
                             throw new SqlAnalysisException("not 无法解析");
                         }
                     case COMMENT:
-                        String comment = TokenSupport.mustString(this.sqlTokenList.get(offset + 1));
+                        String comment = TokenSupport.getMustString(this.sqlTokenList.get(offset + 1));
                         columnInfo.setComment(comment);
                         offset++;
                         break;

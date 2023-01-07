@@ -1,5 +1,6 @@
 package org.gongxuanzhang.mysql.tool;
 
+import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
 import org.gongxuanzhang.mysql.service.token.SqlToken;
@@ -46,6 +47,14 @@ public class ExceptionThrower {
     public static void ifNotThrow(boolean expression, String message) throws SqlAnalysisException {
         if (!expression) {
             throw new SqlAnalysisException(message);
+        }
+    }
+
+    public static void errorSwap(Exception e) throws MySQLException {
+        if (e instanceof MySQLException) {
+            throw (MySQLException) e;
+        } else {
+            throw new MySQLException(e.getMessage());
         }
     }
 }

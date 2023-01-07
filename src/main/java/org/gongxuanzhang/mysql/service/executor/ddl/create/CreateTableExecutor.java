@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.mysql.core.Result;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.tool.DbFactory;
 
@@ -12,8 +13,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
+import static org.gongxuanzhang.mysql.tool.ExceptionThrower.errorSwap;
+
 /**
- * 创建数据库
+ * 创建表
+ * create table
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
@@ -29,23 +33,23 @@ public class CreateTableExecutor implements Executor {
 
 
     @Override
-    public Result doExecute() throws ExecuteException {
+    public Result doExecute() throws MySQLException {
         File gfrmFile = DbFactory.getGfrmFile(this.tableInfo);
         try {
             if (gfrmFile.exists() || !gfrmFile.createNewFile()) {
                 throw new ExecuteException("表" + tableInfo.getTableName() + "已经存在");
             }
         } catch (IOException e) {
-            throw new ExecuteException(e.getMessage());
+            errorSwap(e);
         }
         try (FileOutputStream fileOutputStream = new FileOutputStream(gfrmFile);
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
             objectOutputStream.writeObject(this.tableInfo);
-            log.info("创建表{}.{}",tableInfo.getDatabase(),tableInfo.getTableName());
+            log.info("创建表{}.{}", tableInfo.getDatabase(), tableInfo.getTableName());
             return Result.success();
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new ExecuteException(e.getMessage());
+            errorSwap(e);
         }
+        return null;
     }
 }

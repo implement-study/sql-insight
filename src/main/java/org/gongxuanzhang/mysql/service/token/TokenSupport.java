@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.gongxuanzhang.mysql.tool.ExceptionThrower.throwSqlAnalysis;
+
 /**
  * token 辅助类
  *
@@ -143,11 +145,17 @@ public class TokenSupport {
      * @return token的值
      * @throws SqlAnalysisException 如果不是 LITERACY token 抛出异常
      **/
-    public static String mustString(SqlToken sqlToken) throws SqlAnalysisException {
+    public static String getMustString(SqlToken sqlToken) throws SqlAnalysisException {
         if (!isTokenKind(sqlToken, TokenKind.LITERACY)) {
             throw new SqlAnalysisException(sqlToken.getValue() + "解析错误");
         }
         return sqlToken.getValue();
     }
 
+    public static void mustTokenKind(SqlToken sqlToken, TokenKind... tokenKind) throws SqlAnalysisException {
+        if (!isTokenKind(sqlToken, tokenKind)) {
+            throwSqlAnalysis(sqlToken.getValue());
+        }
+
+    }
 }

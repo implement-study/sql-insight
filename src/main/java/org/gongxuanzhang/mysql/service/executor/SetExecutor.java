@@ -13,6 +13,7 @@ import org.gongxuanzhang.mysql.tool.SqlUtils;
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
+@Deprecated
 public class SetExecutor extends AbstractInfoExecutor<VariableInfo> {
 
 

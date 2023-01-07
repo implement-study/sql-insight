@@ -1,6 +1,7 @@
 package org.gongxuanzhang.mysql.service.analysis;
 
 import org.gongxuanzhang.mysql.exception.ExecuteException;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
 import org.gongxuanzhang.mysql.service.analysis.ast.SubSqlAnalysis;
@@ -27,7 +28,7 @@ class CreateAnalysisTest {
     }
 
     @Test
-    void analysis1(@Autowired SubSqlAnalysis subSqlAnalysis) throws SqlParseException, SqlAnalysisException, ExecuteException {
+    void analysis1(@Autowired SubSqlAnalysis subSqlAnalysis) throws MySQLException {
         String sql = "create table bbb.user(" +
                 "id int primary key auto_increment," +
                 "name varchar comment '名字' ) comment='zhangsan'";

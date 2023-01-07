@@ -5,6 +5,7 @@ import org.gongxuanzhang.mysql.core.MySqlProperties;
 import org.gongxuanzhang.mysql.core.Result;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.tool.ContextSupport;
@@ -29,7 +30,7 @@ public class CreateDatabaseExecutor implements Executor {
 
 
     @Override
-    public Result doExecute() throws ExecuteException {
+    public Result doExecute() throws MySQLException {
         try {
             SqlUtils.checkVarName(databaseName);
         } catch (SqlParseException e) {
@@ -38,10 +39,7 @@ public class CreateDatabaseExecutor implements Executor {
         String dataDir = GlobalProperties.getInstance().get(MySqlProperties.DATA_DIR);
         File db = new File(dataDir);
         File file = new File(db, databaseName);
-        if (file.exists()) {
-            throw new ExecuteException("数据库" + databaseName + "已经存在");
-        }
-        if (!file.mkdirs()) {
+        if (file.exists() || !file.mkdirs()) {
             throw new ExecuteException("数据库" + databaseName + "已经存在");
         }
         log.info("创建{}数据库", databaseName);
