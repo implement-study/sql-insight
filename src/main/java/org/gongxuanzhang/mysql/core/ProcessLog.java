@@ -1,6 +1,5 @@
 package org.gongxuanzhang.mysql.core;
 
-import java.util.concurrent.DelayQueue;
 
 /**
  * 记录执行的sql记录
@@ -15,7 +14,4 @@ public class ProcessLog {
         this.capacity = capacity <= 0 ? Integer.MAX_VALUE : capacity;
     }
 
-    public static void main(String[] args) {
-
-    }
 }

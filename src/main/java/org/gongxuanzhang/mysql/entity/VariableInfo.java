@@ -13,5 +13,6 @@ public class VariableInfo implements ExecuteInfo {
     private String name;
     private String value;
     private boolean global;
+    private boolean system;
 
 }
