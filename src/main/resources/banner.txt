@@ -8,4 +8,4 @@
                                                                    \|___|/        \|_________|     \|__|
 
 作者： 龚宣璋
-github: https://github.com/gongxuanzhang/java-mysql
+github: https://github.com/implement-study/java-mysql.git

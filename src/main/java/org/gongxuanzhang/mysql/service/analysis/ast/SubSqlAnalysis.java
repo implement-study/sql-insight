@@ -37,7 +37,7 @@ public class SubSqlAnalysis implements TokenAnalysis {
         analysisMap.put(TokenKind.USE, new UseAnalysis());
         analysisMap.put(TokenKind.DESC, new DescAnalysis());
         analysisMap.put(TokenKind.DESCRIBE, analysisMap.get(TokenKind.DESC));
-        analysisMap.put(TokenKind.SHOW,new ShowAnalysis());
+        analysisMap.put(TokenKind.SHOW, new ShowAnalysis());
     }
 
     @Override

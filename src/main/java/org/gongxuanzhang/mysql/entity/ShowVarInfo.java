@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 public class ShowVarInfo implements ExecuteInfo {
 
-   private boolean global;
-   private boolean session;
+    private boolean global;
+    private boolean session;
 
 }

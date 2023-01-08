@@ -15,8 +15,8 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.gongxuanzhang.mysql.service.token.TokenSupport.isTokenKind;
 import static org.gongxuanzhang.mysql.service.token.TokenSupport.getMustString;
+import static org.gongxuanzhang.mysql.service.token.TokenSupport.isTokenKind;
 import static org.gongxuanzhang.mysql.service.token.TokenSupport.mustTokenKind;
 import static org.gongxuanzhang.mysql.service.token.TokenSupport.varString;
 import static org.gongxuanzhang.mysql.tool.ExceptionThrower.expectToken;
@@ -27,6 +27,7 @@ import static org.gongxuanzhang.mysql.tool.ExceptionThrower.throwSqlAnalysis;
  * create 解析器
  * create table
  * create database
+ *
  * @author gxz gongxuanzhang@foxmail.com
  **/
 public class CreateAnalysis implements TokenAnalysis {
@@ -106,7 +107,7 @@ public class CreateAnalysis implements TokenAnalysis {
             boolean isEquals = isTokenKind(sqlTokenList.get(offset + 1), TokenKind.EQUALS);
             ifNotThrow(isEquals, sqlTokenList.get(offset + 1).getValue() + "解析错误");
             boolean legal = isTokenKind(sqlTokenList.get(offset + 2), TokenKind.LITERACY);
-            ifNotThrow(legal,sqlTokenList.get(offset + 2).getValue()+"解析错误，可能是备注没有加单引号");
+            ifNotThrow(legal, sqlTokenList.get(offset + 2).getValue() + "解析错误，可能是备注没有加单引号");
             this.info.setComment(getMustString(sqlTokenList.get(offset + 2)));
             offset += 3;
             if (!end()) {

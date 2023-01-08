@@ -33,7 +33,7 @@ public class SqlAnalysis {
      **/
     public SqlAstNode analysis() throws SqlAnalysisException {
         // todo
-            //  解析括号--> 解析sql ---> 解析头--->
+        //  解析括号--> 解析sql ---> 解析头--->
         if (checkKind(TokenKind.LEFT_PAREN)) {
             offset++;
             SqlAstNode node = analysisNode();
@@ -41,7 +41,7 @@ public class SqlAnalysis {
         return null;
     }
 
-    private SqlAstNode analysisNode(){
+    private SqlAstNode analysisNode() {
         return null;
     }
 
@@ -49,7 +49,6 @@ public class SqlAnalysis {
     private boolean checkKind(TokenKind tokenKind) {
         return tokenStream.get(this.offset).getTokenKind() == tokenKind;
     }
-
 
 
     private boolean finish() {

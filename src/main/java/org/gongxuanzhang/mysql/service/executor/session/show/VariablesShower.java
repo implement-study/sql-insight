@@ -5,7 +5,6 @@ import org.gongxuanzhang.mysql.core.Result;
 import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
 import org.gongxuanzhang.mysql.entity.ShowVarInfo;
-import org.gongxuanzhang.mysql.entity.VariableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 
 import java.util.ArrayList;
@@ -32,10 +31,10 @@ public class VariablesShower implements Shower {
 
     @Override
     public Result show() throws MySQLException {
-        if(info.isGlobal()){
+        if (info.isGlobal()) {
             return globalShow();
         }
-        if(info.isSession()){
+        if (info.isSession()) {
             return sessionShow();
         }
         return defaultShow();
