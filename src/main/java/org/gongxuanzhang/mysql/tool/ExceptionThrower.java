@@ -34,13 +34,13 @@ public class ExceptionThrower {
     }
 
 
-    public static void errorNext(SqlToken sqlToken) throws SqlAnalysisException {
+    public static void errorToken(SqlToken sqlToken) throws SqlAnalysisException {
         throw new SqlAnalysisException(sqlToken.getValue() + "解析异常");
     }
 
     public static void expectToken(SqlToken sqlToken, TokenKind expect) throws SqlAnalysisException {
         if (sqlToken.getTokenKind() != expect) {
-            throw new SqlAnalysisException(sqlToken.getValue() + "解析异常");
+            errorToken(sqlToken);
         }
     }
 
@@ -50,7 +50,21 @@ public class ExceptionThrower {
         }
     }
 
-    public static void errorSwap(Exception e) throws MySQLException {
+    public static void ifNotThrow(boolean expression, SqlToken sqlToken) throws SqlAnalysisException {
+        ifNotThrow(expression, String.format("sql有错误,%s无法解析", sqlToken.getValue()));
+    }
+
+    public static void ifNotThrow(boolean expression) throws SqlAnalysisException {
+        ifNotThrow(expression, "sql无法解析");
+    }
+
+    /**
+     * 异常转换
+     *
+     * @param e 异常
+     * @return 其实没有返回值，只是为了适配编译
+     **/
+    public static <V> V errorSwap(Exception e) throws MySQLException {
         if (e instanceof MySQLException) {
             throw (MySQLException) e;
         } else {

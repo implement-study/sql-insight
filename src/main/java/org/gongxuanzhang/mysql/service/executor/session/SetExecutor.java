@@ -34,8 +34,7 @@ public class SetExecutor implements Executor {
             }
             return Result.success();
         } catch (Exception e) {
-            errorSwap(e);
-            return null;
+            return errorSwap(e);
         }
     }
 }

@@ -26,17 +26,11 @@ import java.util.Objects;
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Slf4j
+@Deprecated
 public class TableCreator extends AbstractInfoExecutor<TableInfo> {
 
     public TableCreator(String sql) throws SqlParseException {
         super(sql);
-    }
-
-    public static void main(String[] args) {
-        String ex =  "(1+1)+(2+2)";
-        SpelExpressionParser spelExpressionParser = new SpelExpressionParser();
-        Expression expression = spelExpressionParser.parseExpression(ex);
-        System.out.println(expression.getValue());
     }
 
 

@@ -13,11 +13,11 @@ import java.util.Set;
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class UseDatabase implements Executor {
+public class UseDatabaseExecutor implements Executor {
 
     private final String database;
 
-    public UseDatabase(String database) {
+    public UseDatabaseExecutor(String database) {
         this.database = database;
     }
 

@@ -5,7 +5,7 @@ import org.gongxuanzhang.mysql.annotation.SQLParser;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.executor.session.show.DatabaseShower;
-import org.gongxuanzhang.mysql.service.executor.session.show.TableShower;
+import org.gongxuanzhang.mysql.service.executor.session.show.TablesShower;
 import org.gongxuanzhang.mysql.service.executor.session.show.VariablesShower;
 
 /**
@@ -16,6 +16,7 @@ import org.gongxuanzhang.mysql.service.executor.session.show.VariablesShower;
  **/
 @Slf4j
 @SQLParser
+@Deprecated
 public class ShowParser implements DDLSqlParser {
 
     private static final String PREFIX = "show";
@@ -31,11 +32,11 @@ public class ShowParser implements DDLSqlParser {
             case "databases":
                 return new DatabaseShower();
             case "tables":
-                return new TableShower();
+                return new TablesShower();
             case "global":
             case "session":
             case "variables":
-                return new VariablesShower(sql);
+                return new VariablesShower(null);
             default:
                 throw new SqlParseException(action + "不支持，你可以自定义功能来实现DDL");
         }

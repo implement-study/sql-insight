@@ -3,8 +3,11 @@ package org.gongxuanzhang.mysql.service.analysis.ast;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
 import org.gongxuanzhang.mysql.service.analysis.CreateAnalysis;
+import org.gongxuanzhang.mysql.service.analysis.DescAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.SetAnalysis;
+import org.gongxuanzhang.mysql.service.analysis.ShowAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
+import org.gongxuanzhang.mysql.service.analysis.UseAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.token.SqlToken;
 import org.gongxuanzhang.mysql.service.token.TokenKind;
@@ -31,6 +34,10 @@ public class SubSqlAnalysis implements TokenAnalysis {
     public void init() {
         analysisMap.put(TokenKind.CREATE, new CreateAnalysis());
         analysisMap.put(TokenKind.SET, new SetAnalysis());
+        analysisMap.put(TokenKind.USE, new UseAnalysis());
+        analysisMap.put(TokenKind.DESC, new DescAnalysis());
+        analysisMap.put(TokenKind.DESCRIBE, analysisMap.get(TokenKind.DESC));
+        analysisMap.put(TokenKind.SHOW,new ShowAnalysis());
     }
 
     @Override

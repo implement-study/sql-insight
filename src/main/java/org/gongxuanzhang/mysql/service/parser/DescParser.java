@@ -3,7 +3,7 @@ package org.gongxuanzhang.mysql.service.parser;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.mysql.annotation.SQLParser;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
-import org.gongxuanzhang.mysql.service.executor.DescTable;
+import org.gongxuanzhang.mysql.service.executor.DescTableExecutor;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 
 /**
@@ -14,6 +14,7 @@ import org.gongxuanzhang.mysql.service.executor.Executor;
  **/
 @Slf4j
 @SQLParser
+@Deprecated
 public class DescParser implements DDLSqlParser {
 
     private static final String PREFIX = "desc";
@@ -25,7 +26,7 @@ public class DescParser implements DDLSqlParser {
             throw new SqlParseException("语法错误，无法解析");
         }
         String action = split[1];
-        return new DescTable(action);
+        return new DescTableExecutor(null);
     }
 
 

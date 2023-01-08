@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.mysql.annotation.SQLParser;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
 import org.gongxuanzhang.mysql.service.executor.Executor;
-import org.gongxuanzhang.mysql.service.executor.UseDatabase;
+import org.gongxuanzhang.mysql.service.executor.UseDatabaseExecutor;
 
 /**
  * create 的解析器
@@ -25,7 +25,7 @@ public class UseParser implements DDLSqlParser {
             throw new SqlParseException("语法错误，无法解析");
         }
         String database = split[1];
-        return new UseDatabase(database);
+        return new UseDatabaseExecutor(database);
     }
 
 
