@@ -40,7 +40,7 @@ public class CreateTableExecutor implements Executor {
                 throw new ExecuteException("表" + tableInfo.getTableName() + "已经存在");
             }
         } catch (IOException e) {
-            errorSwap(e);
+            return errorSwap(e);
         }
         try (FileOutputStream fileOutputStream = new FileOutputStream(gfrmFile);
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
@@ -48,8 +48,7 @@ public class CreateTableExecutor implements Executor {
             log.info("创建表{}.{}", tableInfo.getDatabase(), tableInfo.getTableName());
             return Result.success();
         } catch (IOException e) {
-            errorSwap(e);
+            return errorSwap(e);
         }
-        return null;
     }
 }

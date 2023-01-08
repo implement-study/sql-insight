@@ -46,7 +46,6 @@ public class SqlUtils {
     }
 
 
-
     /**
      * 校验变量名的合法行
      *

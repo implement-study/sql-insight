@@ -4,12 +4,15 @@ import org.gongxuanzhang.mysql.core.MySqlSession;
 import org.gongxuanzhang.mysql.core.Result;
 import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
-import org.gongxuanzhang.mysql.exception.SqlParseException;
+import org.gongxuanzhang.mysql.entity.ShowVarInfo;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.gongxuanzhang.mysql.tool.ExceptionThrower.errorSwap;
 
 /**
  * show variables
@@ -20,35 +23,24 @@ public class VariablesShower implements Shower {
 
     private final static String[] HEAD = new String[]{"variable_name", "value"};
 
-    final int type;
+    private final ShowVarInfo info;
 
-    public VariablesShower(String sql) throws SqlParseException {
-        if (sql.startsWith("show session")) {
-            type = 1;
-        } else if (sql.startsWith("show global")) {
-            type = 2;
-        } else if (sql.startsWith("show variables")) {
-            type = 3;
-        } else {
-            throw new SqlParseException(sql + "无法解析");
-        }
+    public VariablesShower(ShowVarInfo info) {
+        this.info = info;
     }
 
     @Override
-    public Result show() {
-        switch (type) {
-            case 1:
-                return sessionShow();
-            case 2:
-                return globalShow();
-            case 3:
-                return defaultShow();
-            default:
-                throw new IllegalStateException("状态错误");
+    public Result show() throws MySQLException {
+        if (info.isGlobal()) {
+            return globalShow();
         }
+        if (info.isSession()) {
+            return sessionShow();
+        }
+        return defaultShow();
     }
 
-    private Result defaultShow() {
+    private Result defaultShow() throws MySQLException {
         try {
             MySqlSession mySqlSession = SessionManager.currentSession();
             GlobalProperties instance = GlobalProperties.getInstance();
@@ -56,28 +48,25 @@ public class VariablesShower implements Shower {
             instance.getAllAttr().forEach(attr::putIfAbsent);
             return returnVar(attr);
         } catch (Exception e) {
-            e.printStackTrace();
-            return Result.error(e.getMessage());
+            return errorSwap(e);
         }
     }
 
-    private Result globalShow() {
+    private Result globalShow() throws MySQLException {
         try {
             GlobalProperties instance = GlobalProperties.getInstance();
             return returnVar(instance.getAllAttr());
         } catch (Exception e) {
-            e.printStackTrace();
-            return Result.error(e.getMessage());
+            return errorSwap(e);
         }
     }
 
-    private Result sessionShow() {
+    private Result sessionShow() throws MySQLException {
         try {
             MySqlSession mySqlSession = SessionManager.currentSession();
             return returnVar(mySqlSession.getAllAttr());
         } catch (Exception e) {
-            e.printStackTrace();
-            return Result.error(e.getMessage());
+            return errorSwap(e);
         }
     }
 

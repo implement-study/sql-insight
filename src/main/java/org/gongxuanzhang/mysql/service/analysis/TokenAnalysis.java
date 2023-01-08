@@ -12,11 +12,12 @@ import java.util.List;
 public interface TokenAnalysis {
 
 
-
     /**
      * 解析成一个执行器
+     *
      * @param sqlTokenList tokens
-     * @return node
+     * @return 执行器
+     * @throws SqlAnalysisException 解析失败抛出异常
      **/
     Executor analysis(List<SqlToken> sqlTokenList) throws SqlAnalysisException;
 }

@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class TableShower implements Shower {
+public class TablesShower implements Shower {
 
 
     @Override

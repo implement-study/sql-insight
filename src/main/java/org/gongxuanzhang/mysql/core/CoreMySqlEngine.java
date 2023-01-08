@@ -1,9 +1,13 @@
 package org.gongxuanzhang.mysql.core;
 
+import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
-import org.gongxuanzhang.mysql.service.parser.SqlParser;
+import org.gongxuanzhang.mysql.service.token.SqlToken;
+import org.gongxuanzhang.mysql.service.token.SqlTokenizer;
 import org.gongxuanzhang.mysql.tool.SqlUtils;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * @author gxz gongxuanzhang@foxmail.com
@@ -11,17 +15,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class CoreMySqlEngine implements MySqlEngine {
 
-    private final SqlParser smartSqlParser;
+    private final TokenAnalysis tokenAnalysis;
 
-    public CoreMySqlEngine(SqlParser smartSqlParser) {
-        this.smartSqlParser = smartSqlParser;
+    public CoreMySqlEngine(TokenAnalysis tokenAnalysis) {
+        this.tokenAnalysis = tokenAnalysis;
     }
 
     @Override
     public Result doSql(String sql) {
         try {
             long startTime = System.currentTimeMillis();
-            Executor executor = smartSqlParser.parse(sql);
+            SqlTokenizer tokenizer = new SqlTokenizer(sql);
+            List<SqlToken> process = tokenizer.process();
+            Executor executor = tokenAnalysis.analysis(process);
             Result result = executor.doExecute();
             result.setSqlTime(SqlUtils.sqlTime(startTime));
             return result;

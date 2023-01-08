@@ -7,7 +7,8 @@ import org.gongxuanzhang.mysql.exception.MySQLException;
  * 执行器，一般是解析Sql得到的
  *
  * @author gxz gongxuanzhang@foxmail.com
- * @see org.gongxuanzhang.mysql.service.parser.SqlParser
+ * @see org.gongxuanzhang.mysql.service.analysis.SqlAnalysis
+ * @see org.gongxuanzhang.mysql.service.analysis.TokenAnalysis
  **/
 public interface Executor {
 

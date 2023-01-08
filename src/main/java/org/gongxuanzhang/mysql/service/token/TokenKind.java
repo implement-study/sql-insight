@@ -30,6 +30,7 @@ public enum TokenKind implements SqlAstNode {
     USE,
     GLOBAL,
     SESSION,
+    VARIABLES,
 
     //  DDL
     CREATE,
@@ -37,6 +38,8 @@ public enum TokenKind implements SqlAstNode {
     DROP,
     TRUNCATE,
     RENAME,
+    DESC,
+    DESCRIBE,
 
     //  DML
     SELECT,

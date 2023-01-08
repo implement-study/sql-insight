@@ -1,6 +1,7 @@
 package org.gongxuanzhang.mysql.service.executor.session.show;
 
 import org.gongxuanzhang.mysql.core.Result;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 
 /**
@@ -13,11 +14,20 @@ public interface Shower extends Executor {
 
     /**
      * 展示
+     *
+     * @return 同 executor
+     * @throws MySQLException 同executor
      **/
-    Result show();
+    Result show() throws MySQLException;
 
+    /**
+     * 委托为show
+     *
+     * @return 同executor
+     * @throws MySQLException 同executor
+     **/
     @Override
-    default Result doExecute() {
+    default Result doExecute() throws MySQLException {
         return show();
     }
 }
