@@ -76,7 +76,7 @@
             watch: {},
             methods: {
                 doSql() {
-                    $.get(`/execute?sql=${this.sql}`).then(res => {
+                    $.post(`/execute`, {sql: `${this.sql}`}).then(res => {
                         this.loading = true;
                         if (res.code === 200) {
                             this.type = 1;

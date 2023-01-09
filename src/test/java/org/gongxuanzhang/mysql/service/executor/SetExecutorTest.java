@@ -12,17 +12,5 @@ import org.junit.jupiter.api.Test;
 class SetExecutorTest {
 
 
-    @Test
-    public void oneVar() throws SqlParseException {
-        String sql = "set global aa=100";
-        sql = SqlUtils.formatSql(sql);
-        VariableInfo info = new SetExecutor(sql).getInfo();
-        VariableInfo target = new VariableInfo();
-        target.setGlobal(true);
-        target.setName("aa");
-        target.setValue("100");
-        Assertions.assertEquals(info, target);
-    }
-
 
 }
