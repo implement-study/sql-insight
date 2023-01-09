@@ -1,6 +1,7 @@
-package org.gongxuanzhang.mysql.service.analysis;
+package org.gongxuanzhang.mysql.service.analysis.session;
 
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
+import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.executor.UseDatabaseExecutor;
 import org.gongxuanzhang.mysql.service.token.SqlToken;

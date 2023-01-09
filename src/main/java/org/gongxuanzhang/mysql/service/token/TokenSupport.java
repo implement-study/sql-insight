@@ -1,9 +1,12 @@
 package org.gongxuanzhang.mysql.service.token;
 
+import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.gongxuanzhang.mysql.tool.ExceptionThrower.throwSqlAnalysis;
@@ -156,6 +159,35 @@ public class TokenSupport {
         if (!isTokenKind(sqlToken, tokenKind)) {
             throwSqlAnalysis(sqlToken.getValue());
         }
+    }
 
+
+    /**
+     * 分析token  解析出 数据库和表名
+     * 填充到表信息中
+     *
+     * @param tableInfo 表信息实体
+     * @param tokenList token 流
+     * @param offset    token流从哪开始解析
+     * @return 返回使用了多少个流
+     **/
+    public static int fillTableName(TableInfo tableInfo, List<SqlToken> tokenList, int offset) throws SqlAnalysisException {
+        String candidate = TokenSupport.varString(tokenList.get(offset));
+        if (tokenList.size() < offset + 3) {
+            tableInfo.setTableName(candidate);
+            return 1;
+        }
+        if (TokenSupport.isTokenKind(tokenList.get(offset + 1), TokenKind.DOT)) {
+            String tableName = TokenSupport.varString(tokenList.get(offset + 2));
+            tableInfo.setDatabase(candidate);
+            tableInfo.setTableName(tableName);
+            return 3;
+        }
+        tableInfo.setTableName(candidate);
+        return 1;
+    }
+
+    public static int fillTableName(TableInfo tableInfo, List<SqlToken> tokenList) throws SqlAnalysisException {
+        return fillTableName(tableInfo, tokenList, 0);
     }
 }

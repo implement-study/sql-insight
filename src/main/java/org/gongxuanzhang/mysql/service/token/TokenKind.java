@@ -22,6 +22,10 @@ public enum TokenKind implements SqlAstNode {
     TABLES,
     DATABASE,
     DATABASES,
+    VIEW,
+    FUNCTION,
+    PROCEDURE,
+
 
 
     //  Session
