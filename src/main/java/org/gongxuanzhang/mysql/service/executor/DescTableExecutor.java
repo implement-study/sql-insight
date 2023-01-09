@@ -31,7 +31,10 @@ public class DescTableExecutor implements Executor {
     public Result doExecute() throws MySQLException {
         String tableName = info.getTableName();
         String database = info.getDatabase();
-        File gfrmFile = DbFactory.getGfrmFile(database, tableName);
+        TableInfo info = new TableInfo();
+        info.setTableName(tableName);
+        info.setDatabase(database);
+        File gfrmFile = DbFactory.getGfrmFile(info);
         if (!gfrmFile.exists()) {
             throw new ExecuteException(String.format("表%s不存在", info.getTableName()));
         }

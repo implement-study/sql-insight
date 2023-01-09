@@ -1,9 +1,10 @@
-package org.gongxuanzhang.mysql.service.analysis;
+package org.gongxuanzhang.mysql.service.analysis.ddl;
 
 import org.gongxuanzhang.mysql.entity.ColumnInfo;
 import org.gongxuanzhang.mysql.entity.ColumnType;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
+import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.executor.ddl.create.CreateDatabaseExecutor;
 import org.gongxuanzhang.mysql.service.executor.ddl.create.CreateTableExecutor;
