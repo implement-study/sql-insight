@@ -9,6 +9,7 @@ public class SuccessResult implements Result {
 
 
     private String sqlTime;
+    private String sql;
 
 
     @Override
@@ -29,6 +30,16 @@ public class SuccessResult implements Result {
     @Override
     public void setSqlTime(String sqlTime) {
         this.sqlTime = sqlTime;
+    }
+
+    @Override
+    public void setSql(String sql) {
+        this.sql = sql;
+    }
+
+    @Override
+    public String getSql() {
+        return this.sql;
     }
 
 }

@@ -10,11 +10,14 @@ public class ErrorResult implements Result {
 
     private final String errorMessage;
 
-    ErrorResult(String errorMessage) {
+    private String sql;
+
+    ErrorResult(String errorMessage, String sql) {
         if (errorMessage == null) {
             throw new NullPointerException("错误信息不能为null");
         }
         this.errorMessage = errorMessage;
+        this.sql = sql;
     }
 
     @Override
@@ -35,5 +38,15 @@ public class ErrorResult implements Result {
     @Override
     public void setSqlTime(String sqlTime) {
 
+    }
+
+    @Override
+    public void setSql(String sql) {
+        this.sql = sql;
+    }
+
+    @Override
+    public String getSql() {
+        return this.sql;
     }
 }

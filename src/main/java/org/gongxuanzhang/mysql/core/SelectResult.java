@@ -19,6 +19,8 @@ public class SelectResult implements Result {
 
     private String sqlTime;
 
+    private String sql;
+
     @Override
     public int getCode() {
         return 200;
@@ -37,5 +39,15 @@ public class SelectResult implements Result {
     @Override
     public void setSqlTime(String sqlTime) {
         this.sqlTime = sqlTime;
+    }
+
+    @Override
+    public String getSql() {
+        return sql;
+    }
+
+    @Override
+    public void setSql(String sql) {
+        this.sql = sql;
     }
 }

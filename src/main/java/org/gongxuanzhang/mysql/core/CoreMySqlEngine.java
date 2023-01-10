@@ -25,6 +25,7 @@ public class CoreMySqlEngine implements MySqlEngine {
     public Result doSql(String sql) {
         try {
             long startTime = System.currentTimeMillis();
+            SessionManager.currentSession().setSql(sql);
             SqlTokenizer tokenizer = new SqlTokenizer(sql);
             List<SqlToken> process = tokenizer.process();
             Executor executor = tokenAnalysis.analysis(process);

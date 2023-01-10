@@ -1,6 +1,8 @@
 package org.gongxuanzhang.mysql.core;
 
 
+import org.gongxuanzhang.mysql.exception.SessionException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +44,18 @@ public interface Result {
      **/
     void setSqlTime(String sqlTime);
 
+    /**
+     * 设置sql
+     **/
+    void setSql(String sql);
+
+    /**
+     * 执行的sql
+     *
+     * @return sql
+     **/
+    String getSql();
+
 
     /**
      * 返回简单成功
@@ -49,7 +63,15 @@ public interface Result {
      * @return 成功且没有信息
      **/
     static Result success() {
-        return new SuccessResult();
+        try {
+            String sql = SessionManager.currentSession().getSql();
+            SuccessResult successResult = new SuccessResult();
+            successResult.setSql(sql);
+            return successResult;
+        } catch (SessionException e) {
+            return new ErrorResult("会话异常", "unknown");
+        }
+
     }
 
     /**
@@ -59,7 +81,13 @@ public interface Result {
      * @return 错误返回
      **/
     static Result error(String errorMessage) {
-        return new ErrorResult(errorMessage);
+        try {
+            String sql = SessionManager.currentSession().getSql();
+            return new ErrorResult(errorMessage, sql);
+        } catch (SessionException e) {
+            return new ErrorResult("会话异常", "unknown");
+        }
+
     }
 
     /**
@@ -70,7 +98,15 @@ public interface Result {
      * @return 结果
      **/
     static Result select(String[] head, List<Map<String, String>> dataList) {
-        return new SelectResult(head, dataList);
+        try {
+            String sql = SessionManager.currentSession().getSql();
+            SelectResult selectResult = new SelectResult(head, dataList);
+            selectResult.setSql(sql);
+            return selectResult;
+        } catch (SessionException e) {
+            return new ErrorResult("会话异常", "unknown");
+        }
+
     }
 
     /**
@@ -84,7 +120,14 @@ public interface Result {
         if (dataList == null) {
             dataList = new ArrayList<>();
         }
-        return new SingleRowResult(head, dataList);
+        SingleRowResult singleRowResult = new SingleRowResult(head, dataList);
+        try {
+            String sql = SessionManager.currentSession().getSql();
+            singleRowResult.setSql(sql);
+            return singleRowResult;
+        } catch (SessionException e) {
+            return new ErrorResult("会话异常", "unknown");
+        }
     }
 
 

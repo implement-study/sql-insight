@@ -19,6 +19,8 @@ public class MySqlSession {
 
     private String database;
 
+    private String sql;
+
     public MySqlSession(String id) {
         this.id = id;
     }
@@ -39,6 +41,13 @@ public class MySqlSession {
         this.database = database;
     }
 
+    public void setSql(String sql){
+        this.sql = sql;
+    }
+
+    public String getSql() {
+        return sql;
+    }
 
     public String getDatabase() throws MySQLException {
         if (this.database == null) {

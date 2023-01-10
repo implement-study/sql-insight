@@ -27,6 +27,9 @@
                         </el-input>
                     </el-col>
                 </el-row>
+                <el-row v-if="preSql">
+                    执行SQL :'{{preSql}}'
+                </el-row>
                 <el-row v-if="type==1||type==2">
                     <i class="el-icon-success" style="color:green"></i>
                     执行成功 执行时间{{ sqlTime}}
@@ -70,6 +73,7 @@
                 tableData: [],
                 tableCols: [],
                 sql: '',
+                preSql:'',
                 errorMessage: '',
                 loading: false
             },
@@ -90,6 +94,7 @@
                             this.type = 3;
                             this.errorMessage = res.errorMessage
                         }
+                        this.preSql = res.sql;
                         this.loading = false;
                     })
                 }
