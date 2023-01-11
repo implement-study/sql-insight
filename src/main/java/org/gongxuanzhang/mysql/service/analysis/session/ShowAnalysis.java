@@ -5,6 +5,7 @@ import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
 import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.executor.session.show.DatabaseShower;
+import org.gongxuanzhang.mysql.service.executor.session.show.EngineShower;
 import org.gongxuanzhang.mysql.service.executor.session.show.TablesShower;
 import org.gongxuanzhang.mysql.service.executor.session.show.VariablesShower;
 import org.gongxuanzhang.mysql.service.token.SqlToken;
@@ -42,6 +43,9 @@ public class ShowAnalysis implements TokenAnalysis {
             case DATABASES:
                 checkSize(2, sqlTokenList);
                 return new DatabaseShower();
+            case ENGINES:
+                checkSize(2, sqlTokenList);
+                return new EngineShower();
             case SESSION:
                 //  todo 变量相关是可以加where的 但是现在还不支持
                 return sessionShower(sqlTokenList);

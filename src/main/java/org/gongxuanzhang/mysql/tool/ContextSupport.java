@@ -1,11 +1,15 @@
 package org.gongxuanzhang.mysql.tool;
 
+import org.gongxuanzhang.mysql.annotation.Engine;
 import org.gongxuanzhang.mysql.core.MySqlProperties;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
 import org.gongxuanzhang.mysql.exception.MySQLException;
+import org.gongxuanzhang.mysql.storage.StorageEngine;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -20,6 +24,8 @@ public class ContextSupport {
     }
 
     private static Set<String> databases;
+
+    private static List<StorageEngine> engineList;
 
     public static Set<String> getDatabases() {
         if (databases != null) {
@@ -37,12 +43,24 @@ public class ContextSupport {
         return databases;
     }
 
+    public static void addEngine(StorageEngine engine){
+        if (engineList == null) {
+            engineList = new ArrayList<>();
+        }
+        engineList.add(engine);
+    }
+
+    public static List<StorageEngine> getEngineList() {
+        return engineList;
+    }
+
     /**
      * 当数据库数据更新的时候 重新加载缓存
      **/
     public static void refreshDatabases() {
         databases = null;
     }
+
 
     /**
      * 获得数据库根目录

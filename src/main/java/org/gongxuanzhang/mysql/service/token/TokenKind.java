@@ -73,6 +73,7 @@ public enum TokenKind implements SqlAstNode {
     COMMENT,
     PRIMARY,
     KEY,
+    ENGINES,
 
 
     /**
