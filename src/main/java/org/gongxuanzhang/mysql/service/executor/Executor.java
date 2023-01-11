@@ -1,6 +1,7 @@
 package org.gongxuanzhang.mysql.service.executor;
 
 import org.gongxuanzhang.mysql.core.Result;
+import org.gongxuanzhang.mysql.entity.ExecuteInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 
 /**

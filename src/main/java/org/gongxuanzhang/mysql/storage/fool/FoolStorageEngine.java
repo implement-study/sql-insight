@@ -1,6 +1,12 @@
 package org.gongxuanzhang.mysql.storage.fool;
 
 import org.gongxuanzhang.mysql.annotation.Engine;
+import org.gongxuanzhang.mysql.entity.DeleteInfo;
+import org.gongxuanzhang.mysql.entity.InsertInfo;
+import org.gongxuanzhang.mysql.entity.SelectInfo;
+import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.entity.UpdateInfo;
+import org.gongxuanzhang.mysql.exception.EngineException;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
 
 /**
@@ -14,6 +20,7 @@ import org.gongxuanzhang.mysql.storage.StorageEngine;
 public class FoolStorageEngine implements StorageEngine {
 
 
+
     @Override
     public String getEngineName() {
         return "fool";
@@ -23,5 +30,31 @@ public class FoolStorageEngine implements StorageEngine {
     public boolean supportTransaction() {
         return false;
     }
+
+    @Override
+    public void createTable(TableInfo info) throws EngineException {
+
+    }
+
+    @Override
+    public void insert(InsertInfo info) throws EngineException {
+
+    }
+
+    @Override
+    public void delete(DeleteInfo info) throws EngineException {
+
+    }
+
+    @Override
+    public void update(UpdateInfo info) throws EngineException {
+
+    }
+
+    @Override
+    public void select(SelectInfo info) throws EngineException {
+
+    }
+
 
 }
