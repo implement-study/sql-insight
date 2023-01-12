@@ -6,7 +6,6 @@ import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.executor.Executor;
-import org.gongxuanzhang.mysql.tool.DbFactory;
 
 import java.io.File;
 
@@ -29,8 +28,8 @@ public class DropTableExecutor implements Executor {
 
     @Override
     public Result doExecute() throws MySQLException {
-        File gfrmFile = DbFactory.getGfrmFile(this.tableInfo);
-        if (gfrmFile.exists()) {
+        File gfrmFile = this.tableInfo.getFile();
+        if (!gfrmFile.exists()) {
             String message = String.format("表%s.%s不存在", tableInfo.getDatabase(), tableInfo.getTableName());
             throw new ExecuteException(message);
         }
