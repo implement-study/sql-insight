@@ -69,8 +69,7 @@ public class CreateAnalysis implements TokenAnalysis {
         if (!isTokenKind(nameToken, TokenKind.VAR, TokenKind.LITERACY)) {
             throwSqlAnalysis(nameToken.getValue());
         }
-        DatabaseInfo databaseInfo = new DatabaseInfo();
-        databaseInfo.setDatabaseName(nameToken.getValue());
+        DatabaseInfo databaseInfo = new DatabaseInfo(nameToken.getValue());
         return new CreateDatabaseExecutor(databaseInfo);
     }
 
@@ -160,7 +159,7 @@ public class CreateAnalysis implements TokenAnalysis {
             if (!isTokenKind(sqlTokenList.get(offset + 2), TokenKind.VAR)) {
                 throwSqlAnalysis(candidate.getValue() + ".");
             }
-            this.info.setDatabase(candidate.getValue());
+            this.info.setDatabase(new DatabaseInfo(candidate.getValue()));
             this.info.setTableName(sqlTokenList.get(offset + 2).getValue());
             offset += 3;
         }

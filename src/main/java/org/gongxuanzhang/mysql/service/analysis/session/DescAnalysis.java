@@ -23,14 +23,9 @@ public class DescAnalysis implements TokenAnalysis {
 
     @Override
     public Executor analysis(List<SqlToken> sqlTokenList) throws MySQLException {
-        String candidate = TokenSupport.varString(sqlTokenList.get(1));
         TableInfo tableInfo = new TableInfo();
-        if (sqlTokenList.size() == 2) {
-            tableInfo.setTableName(candidate);
-            return new DescTableExecutor(tableInfo);
-        }
-        ExceptionThrower.ifNotThrow(sqlTokenList.size() == 4);
-        TokenSupport.fillTableName(tableInfo, sqlTokenList, 2);
+        int i = TokenSupport.fillTableName(tableInfo, sqlTokenList, 1);
+        ExceptionThrower.ifNotThrow(sqlTokenList.size() == i + 1);
         return new DescTableExecutor(tableInfo);
     }
 

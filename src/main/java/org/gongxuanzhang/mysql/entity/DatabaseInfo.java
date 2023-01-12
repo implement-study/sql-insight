@@ -1,6 +1,8 @@
 package org.gongxuanzhang.mysql.entity;
 
 import lombok.Data;
+import org.gongxuanzhang.mysql.annotation.DependOnContext;
+import org.gongxuanzhang.mysql.tool.Context;
 
 import java.io.File;
 
@@ -13,16 +15,21 @@ import java.io.File;
 @Data
 public class DatabaseInfo implements ExecuteInfo {
 
-    private String databaseName;
+
+    private final String databaseName;
+
+    public DatabaseInfo(String databaseName) {
+        this.databaseName = databaseName;
+    }
 
     /**
-     * 数据库文件夹
+     * 返回数据库目标位置文件夹
      **/
-    private File databaseDir;
-
-
-
-
+    @DependOnContext
+    public File sourceFile() {
+        File home = Context.getHome();
+        return new File(home, databaseName);
+    }
 
 
 }

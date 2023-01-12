@@ -33,6 +33,7 @@ public class CoreMySqlEngine implements MySqlEngine {
             result.setSqlTime(SqlUtils.sqlTime(startTime));
             return result;
         } catch (Exception e) {
+            e.printStackTrace();
             return Result.error(e.getMessage());
         }
 

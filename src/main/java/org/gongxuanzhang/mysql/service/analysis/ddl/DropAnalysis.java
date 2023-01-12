@@ -10,6 +10,7 @@ import org.gongxuanzhang.mysql.service.executor.ddl.drop.DropDatabaseExecutor;
 import org.gongxuanzhang.mysql.service.executor.ddl.drop.DropTableExecutor;
 import org.gongxuanzhang.mysql.service.token.SqlToken;
 import org.gongxuanzhang.mysql.service.token.TokenSupport;
+import org.gongxuanzhang.mysql.tool.Context;
 import org.gongxuanzhang.mysql.tool.ExceptionThrower;
 
 import java.util.List;
@@ -47,9 +48,8 @@ public class DropAnalysis implements TokenAnalysis {
 
     private Executor dropDataBase(List<SqlToken> sqlTokenList) throws SqlAnalysisException {
         ExceptionThrower.ifNotThrow(sqlTokenList.size() == 3);
-        DatabaseInfo databaseInfo = new DatabaseInfo();
         String database = TokenSupport.varString(sqlTokenList.get(2));
-        databaseInfo.setDatabaseName(database);
+        DatabaseInfo databaseInfo = new DatabaseInfo(database);
         return new DropDatabaseExecutor(databaseInfo);
     }
 
@@ -57,7 +57,8 @@ public class DropAnalysis implements TokenAnalysis {
         TableInfo tableInfo = new TableInfo();
         int i = TokenSupport.fillTableName(tableInfo, sqlTokenList, 2);
         ExceptionThrower.ifNotThrow(sqlTokenList.size() == i + 2);
-        return new DropTableExecutor(tableInfo);
+        TableInfo select = Context.getTableManager().select(tableInfo);
+        return new DropTableExecutor(select);
     }
 
 

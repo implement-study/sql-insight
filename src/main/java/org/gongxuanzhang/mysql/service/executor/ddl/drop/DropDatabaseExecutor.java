@@ -37,11 +37,12 @@ public class DropDatabaseExecutor implements Executor {
     public Result doExecute() throws MySQLException {
         DatabaseManager databaseManager = Context.getDatabaseManager();
         DatabaseInfo select = databaseManager.select(databaseInfo.getDatabaseName());
-        if (select == null) {
+        if (select == null || !select.sourceFile().exists()) {
             String message = String.format("数据库%s不存在", databaseInfo.getDatabaseName());
             throw new ExecuteException(message);
         }
-        try (Stream<Path> walk = Files.walk(select.getDatabaseDir().toPath())) {
+
+        try (Stream<Path> walk = Files.walk(select.sourceFile().toPath())) {
             walk.sorted(Comparator.reverseOrder())
                     .map(Path::toFile)
                     .forEach(File::delete);

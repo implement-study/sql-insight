@@ -31,6 +31,7 @@ public abstract class AbstractManager<T> implements MySQLManager<T> {
         return cache.get(name);
     }
 
+
     @Override
     public List<T> getAll() {
         return new ArrayList<>(cache.values());

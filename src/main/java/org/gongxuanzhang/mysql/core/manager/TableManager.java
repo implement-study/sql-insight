@@ -8,6 +8,10 @@ import org.gongxuanzhang.mysql.exception.MySQLException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
+import java.util.Objects;
+import java.util.stream.Stream;
+
+import static org.gongxuanzhang.mysql.entity.TableInfo.GFRM_SUFFIX;
 
 /**
  * 表管理
@@ -17,10 +21,6 @@ import java.io.ObjectInputStream;
 @Slf4j
 public class TableManager extends AbstractManager<TableInfo> {
 
-    /**
-     * 在mysql的frm文件上加了个我的姓 嘿嘿
-     **/
-    private final static String GFRM_SUFFIX = ".gfrm";
 
     private final DatabaseManager databaseManager;
 
@@ -32,9 +32,12 @@ public class TableManager extends AbstractManager<TableInfo> {
     @Override
     protected void init() throws MySQLException {
         databaseManager.getAll().stream()
-                .map(DatabaseInfo::getDatabaseDir)
-                .filter((file) -> file.getName().endsWith(GFRM_SUFFIX))
-                .map(this::gfrmToInfo).forEach(this::register);
+                .map(DatabaseInfo::sourceFile)
+                .map(dbDir -> dbDir.listFiles((file) -> file.getName().endsWith(GFRM_SUFFIX)))
+                .filter(Objects::nonNull)
+                .flatMap(Stream::of)
+                .map(this::gfrmToInfo)
+                .forEach(this::register);
     }
 
     private TableInfo gfrmToInfo(File gfrmFile) {

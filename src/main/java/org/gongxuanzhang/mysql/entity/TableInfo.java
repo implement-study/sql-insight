@@ -1,7 +1,12 @@
 package org.gongxuanzhang.mysql.entity;
 
 import lombok.Data;
+import org.gongxuanzhang.mysql.annotation.DependOnContext;
 import org.gongxuanzhang.mysql.core.EngineSelectable;
+import org.gongxuanzhang.mysql.core.SessionManager;
+import org.gongxuanzhang.mysql.exception.ExecuteException;
+import org.gongxuanzhang.mysql.exception.MySQLException;
+import org.gongxuanzhang.mysql.tool.Context;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -17,19 +22,42 @@ import java.util.Set;
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Data
+@DependOnContext
 public class TableInfo implements ExecuteInfo, EngineSelectable {
 
-    private String database;
+
+    /**
+     * 在mysql的frm文件上加了个我的姓 嘿嘿
+     **/
+    public final static String GFRM_SUFFIX = ".gfrm";
+
+    private DatabaseInfo database;
+
     private String tableName;
     private List<ColumnInfo> columnInfos;
     private List<String> primaryKey;
     private String comment;
     private String engineName;
+
+
     /**
      * 表结构文件
      **/
-    private File file;
-
+    @DependOnContext
+    public File sourceFile() throws MySQLException {
+        if (database == null) {
+            String sessionDb = SessionManager.currentSession().getDatabase();
+            this.database = Context.getDatabaseManager().select(sessionDb);
+        }
+        if(database == null){
+            throw new MySQLException("无法获取database");
+        }
+        File databaseDir = this.database.sourceFile();
+        if (!databaseDir.exists() || !databaseDir.isDirectory()) {
+            throw new ExecuteException("数据库[" + database + "]不存在");
+        }
+        return new File(databaseDir, this.tableName + GFRM_SUFFIX);
+    }
 
     public List<Map<String, String>> descTable() {
         List<Map<String, String>> result = new ArrayList<>();

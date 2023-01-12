@@ -27,30 +27,6 @@ public class DbFactory {
     }
 
 
-    /**
-     * 通过表信息拿到表信息文件
-     *
-     * @param tableInfo 表信息
-     * @return 表信息文件
-     * @throws ExecuteException 过程中出现问题会报错
-     **/
-    @Deprecated
-    public static File getGfrmFile(TableInfo tableInfo) throws ExecuteException {
-        File db = Context.getHome();
-        if (tableInfo.getDatabase() == null) {
-            try {
-                String database = SessionManager.currentSession().getDatabase();
-                tableInfo.setDatabase(database);
-            } catch (MySQLException e) {
-                e.printStackTrace();
-                throw new ExecuteException(e.getMessage());
-            }
-        }
-        checkDatabase(tableInfo.getDatabase());
-        File dataBaseDir = new File(db, tableInfo.getDatabase());
-        return new File(dataBaseDir, tableInfo.getTableName() + GFRM_SUFFIX);
-    }
-
 
     private static void checkDatabase(String database) throws ExecuteException {
         if (database == null) {

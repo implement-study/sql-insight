@@ -2,6 +2,7 @@ package org.gongxuanzhang.mysql.service.token;
 
 import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.core.TableInfoBox;
+import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
@@ -178,12 +179,12 @@ public class TokenSupport {
         if (tokenList.size() < offset + 3) {
             tableInfo.setTableName(candidate);
             String database = SessionManager.currentSession().getDatabase();
-            tableInfo.setDatabase(database);
+            tableInfo.setDatabase(new DatabaseInfo(database));
             return 1;
         }
         if (TokenSupport.isTokenKind(tokenList.get(offset + 1), TokenKind.DOT)) {
             String tableName = TokenSupport.varString(tokenList.get(offset + 2));
-            tableInfo.setDatabase(candidate);
+            tableInfo.setDatabase(new DatabaseInfo(candidate));
             tableInfo.setTableName(tableName);
             return 3;
         }

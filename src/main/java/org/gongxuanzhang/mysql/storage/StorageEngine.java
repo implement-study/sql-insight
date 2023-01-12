@@ -1,5 +1,6 @@
 package org.gongxuanzhang.mysql.storage;
 
+import org.gongxuanzhang.mysql.annotation.DependOnContext;
 import org.gongxuanzhang.mysql.core.Result;
 import org.gongxuanzhang.mysql.entity.DeleteInfo;
 import org.gongxuanzhang.mysql.entity.InsertInfo;
@@ -18,6 +19,7 @@ import org.gongxuanzhang.mysql.storage.fool.FoolStorageEngine;
  * @see FoolStorageEngine
  * @see InnoDb
  **/
+@DependOnContext
 public interface StorageEngine {
 
 

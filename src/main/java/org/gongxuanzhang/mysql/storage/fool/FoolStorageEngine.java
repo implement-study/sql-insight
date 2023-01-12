@@ -2,6 +2,7 @@ package org.gongxuanzhang.mysql.storage.fool;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.mysql.annotation.Engine;
+import org.gongxuanzhang.mysql.core.Condition;
 import org.gongxuanzhang.mysql.core.Result;
 import org.gongxuanzhang.mysql.entity.DeleteInfo;
 import org.gongxuanzhang.mysql.entity.InsertInfo;
@@ -11,6 +12,7 @@ import org.gongxuanzhang.mysql.entity.UpdateInfo;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
+import org.gongxuanzhang.mysql.tool.Context;
 import org.gongxuanzhang.mysql.tool.DbFactory;
 
 import java.io.File;
@@ -44,7 +46,7 @@ public class FoolStorageEngine implements StorageEngine {
 
     @Override
     public Result createTable(TableInfo tableInfo) throws MySQLException {
-        File gfrmFile = DbFactory.getGfrmFile(tableInfo);
+        File gfrmFile = tableInfo.sourceFile();
         try {
             if (gfrmFile.exists() || !gfrmFile.createNewFile()) {
                 throw new ExecuteException("表" + tableInfo.getTableName() + "已经存在");
@@ -56,6 +58,7 @@ public class FoolStorageEngine implements StorageEngine {
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
             objectOutputStream.writeObject(tableInfo);
             log.info("创建表{}.{}", tableInfo.getDatabase(), tableInfo.getTableName());
+            Context.getTableManager().register(tableInfo);
             return Result.success();
         } catch (IOException e) {
             return errorSwap(e);

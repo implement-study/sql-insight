@@ -27,6 +27,10 @@ public interface MySQLManager<T> {
      **/
     T select(String name);
 
+    default T select(T t) {
+        return select(toId(t));
+    }
+
 
     /**
      * 拿到所有的管理数据

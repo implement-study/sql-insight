@@ -22,9 +22,7 @@ public class DatabaseManager extends AbstractManager<DatabaseInfo> {
         File home = Context.getHome();
         File[] databases = home.listFiles(File::isDirectory);
         CollectionUtils.foreachIfNotEmpty(databases, databaseFile -> {
-            DatabaseInfo databaseInfo = new DatabaseInfo();
-            databaseInfo.setDatabaseDir(databaseFile);
-            databaseInfo.setDatabaseName(databaseFile.getName());
+            DatabaseInfo databaseInfo = new DatabaseInfo(databaseFile.getName());
             this.register(databaseInfo);
         });
     }

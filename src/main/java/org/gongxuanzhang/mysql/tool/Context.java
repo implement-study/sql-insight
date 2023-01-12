@@ -87,7 +87,8 @@ public class Context {
      **/
     public static TableInfo fillTableInfo(TableInfo info) throws MySQLException {
         if (info.getDatabase() == null) {
-            info.setDatabase(SessionManager.currentSession().getDatabase());
+            String database = SessionManager.currentSession().getDatabase();
+            info.setDatabase(Context.getDatabaseManager().select(database));
         }
         String key = info.getDatabase() + "." + info.getTableName();
         TableInfo select = TABLE_MANAGER.select(key);

@@ -44,7 +44,6 @@ public class CreateDatabaseExecutor implements Executor {
         if (file.exists() || !file.mkdirs()) {
             throw new ExecuteException("数据库" + databaseName + "已经存在");
         }
-        databaseInfo.setDatabaseDir(file);
         log.info("创建{}数据库", databaseName);
         Context.getDatabaseManager().register(databaseInfo);
         return Result.success();
