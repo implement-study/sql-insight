@@ -90,7 +90,7 @@ public class Context {
             String database = SessionManager.currentSession().getDatabase();
             info.setDatabase(Context.getDatabaseManager().select(database));
         }
-        String key = info.getDatabase() + "." + info.getTableName();
+        String key = info.absoluteName();
         TableInfo select = TABLE_MANAGER.select(key);
         if (select == null) {
             throw new MySQLException(key + "表不存在");

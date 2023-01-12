@@ -2,6 +2,7 @@ package org.gongxuanzhang.mysql.tool;
 
 import org.gongxuanzhang.mysql.exception.SqlParseException;
 
+import java.nio.file.Files;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,4 +69,6 @@ public class SqlUtils {
     public static String sqlTime(long startTime) {
         return String.format("%.3f s", (System.currentTimeMillis() - startTime) / 1000.0);
     }
+
+
 }

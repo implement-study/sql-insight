@@ -2,7 +2,6 @@ package org.gongxuanzhang.mysql.storage.fool;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.mysql.annotation.Engine;
-import org.gongxuanzhang.mysql.core.Condition;
 import org.gongxuanzhang.mysql.core.Result;
 import org.gongxuanzhang.mysql.entity.DeleteInfo;
 import org.gongxuanzhang.mysql.entity.InsertInfo;
@@ -13,7 +12,6 @@ import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
 import org.gongxuanzhang.mysql.tool.Context;
-import org.gongxuanzhang.mysql.tool.DbFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -46,24 +44,33 @@ public class FoolStorageEngine implements StorageEngine {
 
     @Override
     public Result createTable(TableInfo tableInfo) throws MySQLException {
-        File gfrmFile = tableInfo.sourceFile();
-        try {
-            if (gfrmFile.exists() || !gfrmFile.createNewFile()) {
-                throw new ExecuteException("表" + tableInfo.getTableName() + "已经存在");
-            }
-        } catch (IOException e) {
-            return errorSwap(e);
-        }
-        try (FileOutputStream fileOutputStream = new FileOutputStream(gfrmFile);
+        checkTableFile(tableInfo.structFile());
+        checkTableFile(tableInfo.dataFile());
+        try (FileOutputStream fileOutputStream = new FileOutputStream(tableInfo.structFile());
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
             objectOutputStream.writeObject(tableInfo);
             log.info("创建表{}.{}", tableInfo.getDatabase(), tableInfo.getTableName());
             Context.getTableManager().register(tableInfo);
+            if (!tableInfo.dataFile().createNewFile()) {
+                throw new MySQLException(tableInfo.absoluteName() + "无法创建");
+            }
             return Result.success();
         } catch (IOException e) {
             return errorSwap(e);
         }
     }
+
+    private void checkTableFile(File file) throws MySQLException {
+        try {
+            if (file.exists() || !file.createNewFile()) {
+                String name = file.getName();
+                throw new ExecuteException("表" + name.substring(0, name.indexOf(".")) + "已经存在");
+            }
+        } catch (IOException e) {
+            errorSwap(e);
+        }
+    }
+
 
     @Override
     public Result insert(InsertInfo info) throws MySQLException {

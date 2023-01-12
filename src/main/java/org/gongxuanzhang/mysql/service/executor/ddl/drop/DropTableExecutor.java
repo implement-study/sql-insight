@@ -28,7 +28,7 @@ public class DropTableExecutor implements Executor {
 
     @Override
     public Result doExecute() throws MySQLException {
-        File gfrmFile = this.tableInfo.sourceFile();
+        File gfrmFile = this.tableInfo.structFile();
         if (!gfrmFile.exists()) {
             String message = String.format("表%s.%s不存在", tableInfo.getDatabase(), tableInfo.getTableName());
             throw new ExecuteException(message);

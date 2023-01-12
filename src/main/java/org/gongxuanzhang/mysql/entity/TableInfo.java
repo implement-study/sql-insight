@@ -31,6 +31,8 @@ public class TableInfo implements ExecuteInfo, EngineSelectable {
      **/
     public final static String GFRM_SUFFIX = ".gfrm";
 
+    public final static String GIBD_SUFFIX = ".gibd";
+
     private DatabaseInfo database;
 
     private String tableName;
@@ -44,20 +46,48 @@ public class TableInfo implements ExecuteInfo, EngineSelectable {
      * 表结构文件
      **/
     @DependOnContext
-    public File sourceFile() throws MySQLException {
+    public File structFile() throws MySQLException {
+        File databaseDir = checkDatabase();
+        return new File(databaseDir, this.tableName + GFRM_SUFFIX);
+    }
+
+    /**
+     * 表数据文件
+     **/
+    @DependOnContext
+    public File dataFile() throws MySQLException {
+        File databaseDir = checkDatabase();
+        return new File(databaseDir, this.tableName + GFRM_SUFFIX);
+    }
+
+    /**
+     * 校验数据库信息
+     *
+     * @return 返回数据库文件夹
+     * @throws MySQLException 校验失败会抛出异常
+     **/
+    private File checkDatabase() throws MySQLException {
         if (database == null) {
             String sessionDb = SessionManager.currentSession().getDatabase();
             this.database = Context.getDatabaseManager().select(sessionDb);
         }
-        if(database == null){
+        if (database == null) {
             throw new MySQLException("无法获取database");
         }
         File databaseDir = this.database.sourceFile();
         if (!databaseDir.exists() || !databaseDir.isDirectory()) {
             throw new ExecuteException("数据库[" + database + "]不存在");
         }
-        return new File(databaseDir, this.tableName + GFRM_SUFFIX);
+        return databaseDir;
     }
+
+    /**
+     * 返回带数据库的完整表名
+     */
+    public String absoluteName() {
+        return database.getDatabaseName() + "." + this.tableName;
+    }
+
 
     public List<Map<String, String>> descTable() {
         List<Map<String, String>> result = new ArrayList<>();

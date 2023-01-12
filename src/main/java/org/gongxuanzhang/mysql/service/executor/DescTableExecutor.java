@@ -26,7 +26,7 @@ public class DescTableExecutor implements Executor {
     @Override
     public Result doExecute() throws MySQLException {
         TableManager tableManager = Context.getTableManager();
-        TableInfo select = tableManager.select(info.getDatabase() + "." + info.getTableName());
+        TableInfo select = tableManager.select(info.absoluteName());
         if (select == null) {
             throw new ExecuteException(String.format("表%s不存在", info.getTableName()));
         }

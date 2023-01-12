@@ -52,6 +52,6 @@ public class TableManager extends AbstractManager<TableInfo> {
 
     @Override
     public String toId(TableInfo info) {
-        return info.getDatabase() + "." + info.getTableName();
+        return info.absoluteName();
     }
 }
