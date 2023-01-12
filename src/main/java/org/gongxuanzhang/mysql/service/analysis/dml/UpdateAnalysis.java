@@ -10,7 +10,6 @@ import java.util.List;
 /**
  * update 解析器
  *
- *
  * @author gxz gongxuanzhang@foxmail.com
  **/
 public class UpdateAnalysis implements TokenAnalysis {
@@ -20,7 +19,6 @@ public class UpdateAnalysis implements TokenAnalysis {
     public Executor analysis(List<SqlToken> sqlTokenList) throws SqlAnalysisException {
         throw new UnsupportedOperationException("update 还没实现呐！");
     }
-
 
 
 }

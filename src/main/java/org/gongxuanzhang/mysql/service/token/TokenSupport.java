@@ -1,5 +1,7 @@
 package org.gongxuanzhang.mysql.service.token;
 
+import org.gongxuanzhang.mysql.core.SessionManager;
+import org.gongxuanzhang.mysql.core.TableInfoBox;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
@@ -171,10 +173,12 @@ public class TokenSupport {
      * @param offset    token流从哪开始解析
      * @return 返回使用了多少个流
      **/
-    public static int fillTableName(TableInfo tableInfo, List<SqlToken> tokenList, int offset) throws SqlAnalysisException {
+    public static int fillTableName(TableInfo tableInfo, List<SqlToken> tokenList, int offset) throws MySQLException {
         String candidate = TokenSupport.varString(tokenList.get(offset));
         if (tokenList.size() < offset + 3) {
             tableInfo.setTableName(candidate);
+            String database = SessionManager.currentSession().getDatabase();
+            tableInfo.setDatabase(database);
             return 1;
         }
         if (TokenSupport.isTokenKind(tokenList.get(offset + 1), TokenKind.DOT)) {
@@ -187,7 +191,15 @@ public class TokenSupport {
         return 1;
     }
 
-    public static int fillTableName(TableInfo tableInfo, List<SqlToken> tokenList) throws SqlAnalysisException {
+    public static int fillTableName(TableInfo tableInfo, List<SqlToken> tokenList) throws MySQLException {
         return fillTableName(tableInfo, tokenList, 0);
+    }
+
+    public static int fillTableName(TableInfoBox box, List<SqlToken> tokenList, int offset) throws MySQLException {
+        return fillTableName(box.getTableInfo(), tokenList, offset);
+    }
+
+    public static int fillTableName(TableInfoBox box, List<SqlToken> tokenList) throws MySQLException {
+        return fillTableName(box.getTableInfo(), tokenList, 0);
     }
 }

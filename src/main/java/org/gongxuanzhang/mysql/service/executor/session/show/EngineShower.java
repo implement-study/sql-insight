@@ -2,13 +2,11 @@ package org.gongxuanzhang.mysql.service.executor.session.show;
 
 import org.gongxuanzhang.mysql.core.Result;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
-import org.gongxuanzhang.mysql.tool.ContextSupport;
+import org.gongxuanzhang.mysql.tool.Context;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -25,7 +23,7 @@ public class EngineShower implements Shower {
     @Override
     public Result show() {
         List<Map<String, String>> data =
-                ContextSupport.getEngineList()
+                Context.getEngineList()
                         .stream()
                         .map(this::engineToResult)
                         .collect(Collectors.toList());

@@ -1,13 +1,24 @@
 package org.gongxuanzhang.mysql.storage.fool;
 
+import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.mysql.annotation.Engine;
+import org.gongxuanzhang.mysql.core.Result;
 import org.gongxuanzhang.mysql.entity.DeleteInfo;
 import org.gongxuanzhang.mysql.entity.InsertInfo;
 import org.gongxuanzhang.mysql.entity.SelectInfo;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.entity.UpdateInfo;
-import org.gongxuanzhang.mysql.exception.EngineException;
+import org.gongxuanzhang.mysql.exception.ExecuteException;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
+import org.gongxuanzhang.mysql.tool.DbFactory;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+import static org.gongxuanzhang.mysql.tool.ExceptionThrower.errorSwap;
 
 /**
  * 傻子引擎，只有功能完全没有性能。
@@ -17,8 +28,8 @@ import org.gongxuanzhang.mysql.storage.StorageEngine;
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Engine
+@Slf4j
 public class FoolStorageEngine implements StorageEngine {
-
 
 
     @Override
@@ -32,28 +43,43 @@ public class FoolStorageEngine implements StorageEngine {
     }
 
     @Override
-    public void createTable(TableInfo info) throws EngineException {
-
+    public Result createTable(TableInfo tableInfo) throws MySQLException {
+        File gfrmFile = DbFactory.getGfrmFile(tableInfo);
+        try {
+            if (gfrmFile.exists() || !gfrmFile.createNewFile()) {
+                throw new ExecuteException("表" + tableInfo.getTableName() + "已经存在");
+            }
+        } catch (IOException e) {
+            return errorSwap(e);
+        }
+        try (FileOutputStream fileOutputStream = new FileOutputStream(gfrmFile);
+             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
+            objectOutputStream.writeObject(tableInfo);
+            log.info("创建表{}.{}", tableInfo.getDatabase(), tableInfo.getTableName());
+            return Result.success();
+        } catch (IOException e) {
+            return errorSwap(e);
+        }
     }
 
     @Override
-    public void insert(InsertInfo info) throws EngineException {
-
+    public Result insert(InsertInfo info) throws MySQLException {
+        return null;
     }
 
     @Override
-    public void delete(DeleteInfo info) throws EngineException {
-
+    public Result delete(DeleteInfo info) throws MySQLException {
+        return null;
     }
 
     @Override
-    public void update(UpdateInfo info) throws EngineException {
-
+    public Result update(UpdateInfo info) throws MySQLException {
+        return null;
     }
 
     @Override
-    public void select(SelectInfo info) throws EngineException {
-
+    public Result select(SelectInfo info) throws MySQLException {
+        return null;
     }
 
 

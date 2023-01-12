@@ -3,7 +3,7 @@ package org.gongxuanzhang.mysql.component;
 import org.gongxuanzhang.mysql.annotation.Engine;
 import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
-import org.gongxuanzhang.mysql.tool.ContextSupport;
+import org.gongxuanzhang.mysql.tool.Context;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,7 @@ public class MySqlInitListener implements ApplicationListener<ApplicationStarted
 
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
-        engineMap.forEach((k, v) -> ContextSupport.addEngine(v));
+        engineMap.forEach((k, v) -> Context.registerEngine(v));
         SessionManager.init();
     }
 }

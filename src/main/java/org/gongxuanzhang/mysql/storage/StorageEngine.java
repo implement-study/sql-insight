@@ -1,13 +1,13 @@
 package org.gongxuanzhang.mysql.storage;
 
+import org.gongxuanzhang.mysql.core.Result;
 import org.gongxuanzhang.mysql.entity.DeleteInfo;
 import org.gongxuanzhang.mysql.entity.InsertInfo;
 import org.gongxuanzhang.mysql.entity.SelectInfo;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.entity.UpdateInfo;
-import org.gongxuanzhang.mysql.exception.EngineException;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.storage.fool.FoolStorageEngine;
-import org.gongxuanzhang.mysql.storage.innodb.InnoDb;
 
 /**
  * 存储引擎接口
@@ -39,42 +39,42 @@ public interface StorageEngine {
      * 建表
      *
      * @param info 表信息
-     * @throws EngineException 执行过程中出现问题抛出异常
+     * @throws MySQLException 执行过程中出现问题抛出异常
      **/
-    void createTable(TableInfo info) throws EngineException;
+    Result createTable(TableInfo info) throws MySQLException;
 
 
     /**
      * 插入数据
      *
      * @param info insert info
-     * @throws EngineException 执行过程中出现问题抛出异常
+     * @throws MySQLException 执行过程中出现问题抛出异常
      **/
-    void insert(InsertInfo info) throws EngineException;
+    Result insert(InsertInfo info) throws MySQLException;
 
     /**
      * 删除数据
      *
      * @param info delete info
-     * @throws EngineException 执行过程中出现问题抛出异常
+     * @throws MySQLException 执行过程中出现问题抛出异常
      **/
-    void delete(DeleteInfo info) throws EngineException;
+    Result delete(DeleteInfo info) throws MySQLException;
 
     /**
      * 修改数据
      *
      * @param info update info
-     * @throws EngineException 执行过程中出现问题抛出异常
+     * @throws MySQLException 执行过程中出现问题抛出异常
      **/
-    void update(UpdateInfo info) throws EngineException;
+    Result update(UpdateInfo info) throws MySQLException;
 
     /**
      * 查询数据数据
      *
      * @param info select info
-     * @throws EngineException 执行过程中出现问题抛出异常
+     * @throws MySQLException 执行过程中出现问题抛出异常
      **/
-    void select(SelectInfo info) throws EngineException;
+    Result select(SelectInfo info) throws MySQLException;
 
 
 }

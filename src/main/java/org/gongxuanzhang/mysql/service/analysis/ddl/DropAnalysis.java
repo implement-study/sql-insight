@@ -2,6 +2,7 @@ package org.gongxuanzhang.mysql.service.analysis.ddl;
 
 import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
 import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
@@ -27,7 +28,7 @@ public class DropAnalysis implements TokenAnalysis {
 
 
     @Override
-    public Executor analysis(List<SqlToken> sqlTokenList) throws SqlAnalysisException {
+    public Executor analysis(List<SqlToken> sqlTokenList) throws MySQLException {
         final int offset = 1;
         SqlToken sqlToken = sqlTokenList.get(offset);
         switch (sqlToken.getTokenKind()) {
@@ -52,7 +53,7 @@ public class DropAnalysis implements TokenAnalysis {
         return new DropDatabaseExecutor(databaseInfo);
     }
 
-    private Executor dropTable(List<SqlToken> sqlTokenList) throws SqlAnalysisException {
+    private Executor dropTable(List<SqlToken> sqlTokenList) throws MySQLException {
         TableInfo tableInfo = new TableInfo();
         int i = TokenSupport.fillTableName(tableInfo, sqlTokenList, 2);
         ExceptionThrower.ifNotThrow(sqlTokenList.size() == i + 2);

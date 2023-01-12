@@ -18,7 +18,7 @@ public enum MySqlProperties {
     /**
      * 默认存储引擎
      **/
-    DEFAULT_STORAGE_ENGINE("default-storage-engine", "json", true),
+    DEFAULT_STORAGE_ENGINE("default-storage-engine", "fool", true),
 
     /**
      * 最大会话数

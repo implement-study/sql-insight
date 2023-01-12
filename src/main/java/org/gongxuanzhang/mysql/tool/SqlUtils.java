@@ -66,7 +66,6 @@ public class SqlUtils {
      * @return double小数的秒
      **/
     public static String sqlTime(long startTime) {
-        long endTime = System.currentTimeMillis();
-        return String.format("%.3f s", (System.currentTimeMillis() - endTime) / 1000.0);
+        return String.format("%.3f s", (System.currentTimeMillis() - startTime) / 1000.0);
     }
 }

@@ -3,12 +3,13 @@ package org.gongxuanzhang.mysql.service.executor.ddl.create;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.mysql.core.MySqlProperties;
 import org.gongxuanzhang.mysql.core.Result;
+import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
 import org.gongxuanzhang.mysql.service.executor.Executor;
-import org.gongxuanzhang.mysql.tool.ContextSupport;
+import org.gongxuanzhang.mysql.tool.Context;
 import org.gongxuanzhang.mysql.tool.SqlUtils;
 
 import java.io.File;
@@ -22,15 +23,16 @@ import java.io.File;
 public class CreateDatabaseExecutor implements Executor {
 
 
-    private final String databaseName;
+    private final DatabaseInfo databaseInfo;
 
-    public CreateDatabaseExecutor(String databaseName) {
-        this.databaseName = databaseName;
+    public CreateDatabaseExecutor(DatabaseInfo databaseInfo) {
+        this.databaseInfo = databaseInfo;
     }
 
 
     @Override
     public Result doExecute() throws MySQLException {
+        String databaseName = databaseInfo.getDatabaseName();
         try {
             SqlUtils.checkVarName(databaseName);
         } catch (SqlParseException e) {
@@ -42,8 +44,9 @@ public class CreateDatabaseExecutor implements Executor {
         if (file.exists() || !file.mkdirs()) {
             throw new ExecuteException("数据库" + databaseName + "已经存在");
         }
+        databaseInfo.setDatabaseDir(file);
         log.info("创建{}数据库", databaseName);
-        ContextSupport.refreshDatabases();
+        Context.getDatabaseManager().register(databaseInfo);
         return Result.success();
     }
 }

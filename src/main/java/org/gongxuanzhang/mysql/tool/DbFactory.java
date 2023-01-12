@@ -34,8 +34,9 @@ public class DbFactory {
      * @return 表信息文件
      * @throws ExecuteException 过程中出现问题会报错
      **/
+    @Deprecated
     public static File getGfrmFile(TableInfo tableInfo) throws ExecuteException {
-        File db = ContextSupport.getHome();
+        File db = Context.getHome();
         if (tableInfo.getDatabase() == null) {
             try {
                 String database = SessionManager.currentSession().getDatabase();
@@ -49,8 +50,6 @@ public class DbFactory {
         File dataBaseDir = new File(db, tableInfo.getDatabase());
         return new File(dataBaseDir, tableInfo.getTableName() + GFRM_SUFFIX);
     }
-
-
 
 
     private static void checkDatabase(String database) throws ExecuteException {

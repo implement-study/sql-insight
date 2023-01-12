@@ -2,7 +2,11 @@ package org.gongxuanzhang.mysql.service.analysis.ddl;
 
 import org.gongxuanzhang.mysql.entity.ColumnInfo;
 import org.gongxuanzhang.mysql.entity.ColumnType;
+import org.gongxuanzhang.mysql.entity.DatabaseInfo;
+import org.gongxuanzhang.mysql.entity.GlobalProperties;
 import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.exception.EngineException;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
 import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
@@ -11,11 +15,15 @@ import org.gongxuanzhang.mysql.service.executor.ddl.create.CreateTableExecutor;
 import org.gongxuanzhang.mysql.service.token.SqlToken;
 import org.gongxuanzhang.mysql.service.token.TokenKind;
 import org.gongxuanzhang.mysql.service.token.TokenSupport;
+import org.gongxuanzhang.mysql.storage.StorageEngine;
+import org.gongxuanzhang.mysql.tool.Context;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.gongxuanzhang.mysql.core.MySqlProperties.DEFAULT_STORAGE_ENGINE;
 import static org.gongxuanzhang.mysql.service.token.TokenSupport.getMustString;
 import static org.gongxuanzhang.mysql.service.token.TokenSupport.isTokenKind;
 import static org.gongxuanzhang.mysql.service.token.TokenSupport.mustTokenKind;
@@ -35,7 +43,7 @@ public class CreateAnalysis implements TokenAnalysis {
 
 
     @Override
-    public Executor analysis(List<SqlToken> sqlTokenList) throws SqlAnalysisException {
+    public Executor analysis(List<SqlToken> sqlTokenList) throws MySQLException {
         if (sqlTokenList.size() < 3) {
             throw new SqlAnalysisException("无法解析");
         }
@@ -61,12 +69,15 @@ public class CreateAnalysis implements TokenAnalysis {
         if (!isTokenKind(nameToken, TokenKind.VAR, TokenKind.LITERACY)) {
             throwSqlAnalysis(nameToken.getValue());
         }
-        return new CreateDatabaseExecutor(nameToken.getValue());
+        DatabaseInfo databaseInfo = new DatabaseInfo();
+        databaseInfo.setDatabaseName(nameToken.getValue());
+        return new CreateDatabaseExecutor(databaseInfo);
     }
 
-    private Executor createTable(List<SqlToken> sqlTokenList) throws SqlAnalysisException {
-        TableInfo process = new TableInfoAnalysis(sqlTokenList).process();
-        return new CreateTableExecutor(process);
+    private Executor createTable(List<SqlToken> sqlTokenList) throws SqlAnalysisException, EngineException {
+        TableInfo tableInfo = new TableInfoAnalysis(sqlTokenList).process();
+        StorageEngine engine = Context.selectStorageEngine(tableInfo);
+        return new CreateTableExecutor(engine, tableInfo);
     }
 
 
@@ -95,6 +106,9 @@ public class CreateAnalysis implements TokenAnalysis {
             analysisExtra();
             if (CollectionUtils.isEmpty(this.info.getColumnInfos())) {
                 throw new SqlAnalysisException("创建表应该至少有一列");
+            }
+            if (!StringUtils.hasText(this.info.getEngineName())) {
+                this.info.setEngineName(GlobalProperties.getInstance().get(DEFAULT_STORAGE_ENGINE));
             }
             return this.info;
         }

@@ -1,7 +1,9 @@
 package org.gongxuanzhang.mysql.entity;
 
 import lombok.Data;
+import org.gongxuanzhang.mysql.core.EngineSelectable;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,14 +17,18 @@ import java.util.Set;
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Data
-public class TableInfo implements ExecuteInfo {
+public class TableInfo implements ExecuteInfo, EngineSelectable {
 
     private String database;
     private String tableName;
     private List<ColumnInfo> columnInfos;
     private List<String> primaryKey;
     private String comment;
-    private String engine;
+    private String engineName;
+    /**
+     * 表结构文件
+     **/
+    private File file;
 
 
     public List<Map<String, String>> descTable() {

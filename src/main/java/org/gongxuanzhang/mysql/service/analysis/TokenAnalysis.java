@@ -1,6 +1,6 @@
 package org.gongxuanzhang.mysql.service.analysis;
 
-import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.token.SqlToken;
 
@@ -17,7 +17,7 @@ public interface TokenAnalysis {
      *
      * @param sqlTokenList tokens
      * @return 执行器
-     * @throws SqlAnalysisException 解析失败抛出异常
+     * @throws MySQLException 解析失败抛出异常
      **/
-    Executor analysis(List<SqlToken> sqlTokenList) throws SqlAnalysisException;
+    Executor analysis(List<SqlToken> sqlTokenList) throws MySQLException;
 }

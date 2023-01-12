@@ -3,10 +3,10 @@ package org.gongxuanzhang.mysql.service.executor;
 import org.gongxuanzhang.mysql.core.MySqlSession;
 import org.gongxuanzhang.mysql.core.Result;
 import org.gongxuanzhang.mysql.core.SessionManager;
+import org.gongxuanzhang.mysql.core.manager.DatabaseManager;
+import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
-import org.gongxuanzhang.mysql.tool.ContextSupport;
-
-import java.util.Set;
+import org.gongxuanzhang.mysql.tool.Context;
 
 /**
  * 切换数据库
@@ -22,17 +22,14 @@ public class UseDatabaseExecutor implements Executor {
     }
 
     @Override
-    public Result doExecute() {
-        try {
-            MySqlSession mySqlSession = SessionManager.currentSession();
-            Set<String> databases = ContextSupport.getDatabases();
-            if (!databases.contains(database)) {
-                return Result.error("数据库" + database + "不存在");
-            }
-            mySqlSession.useDatabase(database);
-            return Result.success();
-        } catch (MySQLException e) {
-            return Result.error(e.getMessage());
+    public Result doExecute() throws MySQLException {
+        MySqlSession mySqlSession = SessionManager.currentSession();
+        DatabaseManager databaseManager = Context.getDatabaseManager();
+        DatabaseInfo select = databaseManager.select(this.database);
+        if (select == null) {
+            return Result.error("数据库" + database + "不存在");
         }
+        mySqlSession.useDatabase(database);
+        return Result.success();
     }
 }

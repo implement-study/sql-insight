@@ -11,11 +11,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
  * 存储引擎
+ *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-@Target({ElementType.TYPE,ElementType.FIELD,ElementType.PARAMETER})
+@Target({ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Component

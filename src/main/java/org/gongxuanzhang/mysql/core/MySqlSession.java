@@ -41,7 +41,7 @@ public class MySqlSession {
         this.database = database;
     }
 
-    public void setSql(String sql){
+    public void setSql(String sql) {
         this.sql = sql;
     }
 

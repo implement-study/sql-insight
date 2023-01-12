@@ -2,6 +2,7 @@ package org.gongxuanzhang.mysql.service.analysis.ast;
 
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
+import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.ddl.AlterAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.ddl.CreateAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.ddl.DropAnalysis;
@@ -13,7 +14,6 @@ import org.gongxuanzhang.mysql.service.analysis.dml.UpdateAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.session.DescAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.session.SetAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.session.ShowAnalysis;
-import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.session.UseAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.token.SqlToken;

@@ -4,9 +4,6 @@ import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
 import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.token.SqlToken;
-import org.gongxuanzhang.mysql.service.token.TokenKind;
-import org.gongxuanzhang.mysql.service.token.TokenSupport;
-import org.gongxuanzhang.mysql.tool.ExceptionThrower;
 
 import java.util.List;
 
@@ -23,7 +20,6 @@ public class AlterAnalysis implements TokenAnalysis {
     public Executor analysis(List<SqlToken> sqlTokenList) throws SqlAnalysisException {
         throw new UnsupportedOperationException("alter table 还没实现呐！");
     }
-
 
 
 }

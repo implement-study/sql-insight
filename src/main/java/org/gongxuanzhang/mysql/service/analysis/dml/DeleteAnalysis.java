@@ -10,7 +10,6 @@ import java.util.List;
 /**
  * delete 解析器
  *
- *
  * @author gxz gongxuanzhang@foxmail.com
  **/
 public class DeleteAnalysis implements TokenAnalysis {
@@ -20,7 +19,6 @@ public class DeleteAnalysis implements TokenAnalysis {
     public Executor analysis(List<SqlToken> sqlTokenList) throws SqlAnalysisException {
         throw new UnsupportedOperationException("delete  还没实现呐！");
     }
-
 
 
 }

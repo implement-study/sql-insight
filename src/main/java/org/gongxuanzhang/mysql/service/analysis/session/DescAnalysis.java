@@ -1,12 +1,11 @@
 package org.gongxuanzhang.mysql.service.analysis.session;
 
 import org.gongxuanzhang.mysql.entity.TableInfo;
-import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
 import org.gongxuanzhang.mysql.service.executor.DescTableExecutor;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.token.SqlToken;
-import org.gongxuanzhang.mysql.service.token.TokenKind;
 import org.gongxuanzhang.mysql.service.token.TokenSupport;
 import org.gongxuanzhang.mysql.tool.ExceptionThrower;
 
@@ -23,7 +22,7 @@ public class DescAnalysis implements TokenAnalysis {
 
 
     @Override
-    public Executor analysis(List<SqlToken> sqlTokenList) throws SqlAnalysisException {
+    public Executor analysis(List<SqlToken> sqlTokenList) throws MySQLException {
         String candidate = TokenSupport.varString(sqlTokenList.get(1));
         TableInfo tableInfo = new TableInfo();
         if (sqlTokenList.size() == 2) {
@@ -31,10 +30,7 @@ public class DescAnalysis implements TokenAnalysis {
             return new DescTableExecutor(tableInfo);
         }
         ExceptionThrower.ifNotThrow(sqlTokenList.size() == 4);
-        TokenSupport.mustTokenKind(sqlTokenList.get(2), TokenKind.DOT);
-        tableInfo.setDatabase(candidate);
-        String tableName = TokenSupport.varString(sqlTokenList.get(3));
-        tableInfo.setTableName(tableName);
+        TokenSupport.fillTableName(tableInfo, sqlTokenList, 2);
         return new DescTableExecutor(tableInfo);
     }
 
