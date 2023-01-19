@@ -173,7 +173,7 @@ public class TokenSupport {
 
     public static Cell<?> parseCell(SqlToken sqlToken) throws MySQLException {
         switch (sqlToken.getTokenKind()) {
-            case VAR:
+            case LITERACY:
                 return new VarcharCell(sqlToken.getValue());
             case INT:
                 return new IntCell(ConvertUtils.convert(ColumnType.INT, sqlToken.getValue()));

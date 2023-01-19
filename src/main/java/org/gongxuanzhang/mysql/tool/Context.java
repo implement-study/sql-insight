@@ -15,6 +15,8 @@ import org.gongxuanzhang.mysql.storage.StorageEngine;
 import java.io.File;
 import java.util.List;
 
+import static org.gongxuanzhang.mysql.core.MySqlProperties.DEFAULT_STORAGE_ENGINE;
+
 /**
  * 环境辅助类
  *
@@ -70,7 +72,7 @@ public class Context {
      **/
     public static StorageEngine selectStorageEngine(String engineName) throws EngineException {
         if (engineName == null) {
-            throw new EngineException("无法获取目标引擎");
+            engineName = GlobalProperties.instance.get(DEFAULT_STORAGE_ENGINE);
         }
         StorageEngine storageEngine = ENGINE_MANAGER.select(engineName);
         if (storageEngine == null) {

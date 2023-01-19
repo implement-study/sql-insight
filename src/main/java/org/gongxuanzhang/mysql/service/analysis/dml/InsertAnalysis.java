@@ -5,9 +5,12 @@ import org.gongxuanzhang.mysql.entity.InsertInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
+import org.gongxuanzhang.mysql.service.executor.dml.InsertExecutor;
 import org.gongxuanzhang.mysql.service.token.SqlToken;
 import org.gongxuanzhang.mysql.service.token.TokenKind;
 import org.gongxuanzhang.mysql.service.token.TokenSupport;
+import org.gongxuanzhang.mysql.storage.StorageEngine;
+import org.gongxuanzhang.mysql.tool.Context;
 import org.gongxuanzhang.mysql.tool.ExceptionThrower;
 
 import java.util.ArrayList;
@@ -34,8 +37,8 @@ public class InsertAnalysis implements TokenAnalysis {
                 .when(TokenKind.VALUES)
                 .then(() -> withoutColumns(info, sqlTokenList, finalOffset))
                 .get();
-
-        throw new UnsupportedOperationException("insert  还没实现呐！");
+        StorageEngine engine = Context.selectStorageEngine(info.getTableInfo());
+        return new InsertExecutor(engine, info);
     }
 
 
@@ -61,11 +64,11 @@ public class InsertAnalysis implements TokenAnalysis {
 
     private void withoutColumns(InsertInfo info, List<SqlToken> sqlTokenList, int offset) throws MySQLException {
         TokenSupport.mustTokenKind(sqlTokenList.get(offset), TokenKind.VALUES);
-        int subOffset;
+        int subOffset = 0;
         do {
-            subOffset = addValue(info, sqlTokenList, offset + 1);
+            subOffset += addValue(info, sqlTokenList, offset + subOffset + 1);
         }
-        while (subOffset + offset < sqlTokenList.size());
+        while (subOffset + offset + 1 < sqlTokenList.size());
     }
 
     /**
@@ -77,8 +80,8 @@ public class InsertAnalysis implements TokenAnalysis {
         List<Cell<?>> row = new ArrayList<>();
         TokenSupport.mustTokenKind(sqlTokenList.get(offset), TokenKind.LEFT_PAREN);
         int currentOffset = 1;
-        while (!TokenSupport.isTokenKind(sqlTokenList.get(offset), TokenKind.RIGHT_PAREN)) {
-            if (currentOffset % 2 == 0) {
+        while (!TokenSupport.isTokenKind(sqlTokenList.get(offset + currentOffset), TokenKind.RIGHT_PAREN)) {
+            if (currentOffset % 2 == 1) {
                 Cell<?> cell = TokenSupport.parseCell(sqlTokenList.get(offset + currentOffset));
                 row.add(cell);
             } else {
@@ -90,6 +93,13 @@ public class InsertAnalysis implements TokenAnalysis {
             info.setInsertData(new ArrayList<>());
         }
         info.getInsertData().add(row);
+        // 最后偏移 右括号
+        currentOffset++;
+        //  如果还没有结束 判断下一个token是不是 ","
+        if (currentOffset + offset + 1 < sqlTokenList.size()) {
+            TokenSupport.mustTokenKind(sqlTokenList.get(offset + currentOffset), TokenKind.COMMA);
+            currentOffset++;
+        }
         return currentOffset;
     }
 

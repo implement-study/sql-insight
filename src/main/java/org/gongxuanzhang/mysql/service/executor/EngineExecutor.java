@@ -38,4 +38,11 @@ public abstract class EngineExecutor<T extends ExecuteInfo> implements Executor 
     }
 
 
+    public StorageEngine getEngine() {
+        return engine;
+    }
+
+    public T getInfo() {
+        return info;
+    }
 }
