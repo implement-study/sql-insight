@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class JavaMySQL {
     public static void main(String[] args) {
+
         SpringApplication.run(JavaMySQL.class);
     }
 }
