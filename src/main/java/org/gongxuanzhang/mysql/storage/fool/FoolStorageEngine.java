@@ -1,13 +1,11 @@
 package org.gongxuanzhang.mysql.storage.fool;
 
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.mysql.annotation.Engine;
+import org.gongxuanzhang.mysql.core.ColumnAdjust;
 import org.gongxuanzhang.mysql.core.Result;
-import org.gongxuanzhang.mysql.entity.DeleteInfo;
-import org.gongxuanzhang.mysql.entity.InsertInfo;
-import org.gongxuanzhang.mysql.entity.SelectInfo;
-import org.gongxuanzhang.mysql.entity.TableInfo;
-import org.gongxuanzhang.mysql.entity.UpdateInfo;
+import org.gongxuanzhang.mysql.entity.*;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
@@ -17,8 +15,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.gongxuanzhang.mysql.tool.ExceptionThrower.errorSwap;
+import static org.gongxuanzhang.mysql.tool.ExceptionThrower.ifNotThrow;
 
 /**
  * 傻子引擎，只有功能完全没有性能。
@@ -71,8 +76,41 @@ public class FoolStorageEngine implements StorageEngine {
 
     @Override
     public Result insert(InsertInfo info) throws MySQLException {
+        List<JSONObject> insertData = analysisData(info);
+
+        //   todo insert data
         return null;
     }
+
+    /**
+     * 解析出需要插入的数据，如果有自增或者默认值直接计算出来
+     */
+    private List<JSONObject> analysisData(InsertInfo info) {
+        List<JSONObject> insertBox = new ArrayList<>();
+        TableInfo tableInfo = info.getTableInfo();
+        Map<String, ColumnInfo> colMap = tableInfo.getColumnInfos().stream().collect(Collectors.toMap(ColumnInfo::getName, Function.identity()));
+        List<List<Cell<?>>> allInputRow = info.getInsertData();
+        ColumnAdjust columnAdjust = new ColumnAdjust(tableInfo,info.getColumns());
+        //  填充用户内容
+        for (List<Cell<?>> inputRow : allInputRow) {
+            insertBox.add(columnAdjust.fillInputData(inputRow));
+        }
+        //  填充自增主键
+        if (columnAdjust.haveIncrementKey()) {
+            for (JSONObject row : insertBox) {
+                columnAdjust.incrementKey(row);
+            }
+        }
+        //  填充默认值
+        if (columnAdjust.haveDefaultValue()) {
+            for (JSONObject box : insertBox) {
+                columnAdjust.fillDefault(box);
+            }
+        }
+        return insertBox;
+    }
+
+
 
     @Override
     public Result delete(DeleteInfo info) throws MySQLException {

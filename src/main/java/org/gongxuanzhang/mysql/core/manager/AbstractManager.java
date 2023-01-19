@@ -27,9 +27,18 @@ public abstract class AbstractManager<T> implements MySQLManager<T> {
     }
 
     @Override
-    public T select(String name) {
-        return cache.get(name);
+    public T select(String name) throws MySQLException{
+        T t = cache.get(name);
+        if(t == null){
+            throw new MySQLException(String.format("不存在%s的[%s]",name,errorMessage()));
+        }
+        return t;
     }
+
+    /**
+     * 找不到内容的异常信息
+     */
+    protected abstract String errorMessage();
 
 
     @Override

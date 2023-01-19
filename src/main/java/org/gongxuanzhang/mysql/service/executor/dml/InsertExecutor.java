@@ -17,6 +17,6 @@ public class InsertExecutor extends EngineExecutor<InsertInfo> {
 
     @Override
     public Result doEngine(StorageEngine engine, InsertInfo info) throws MySQLException {
-        return null;
+        return engine.insert(info);
     }
 }

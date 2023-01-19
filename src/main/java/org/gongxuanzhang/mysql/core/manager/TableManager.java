@@ -28,6 +28,10 @@ public class TableManager extends AbstractManager<TableInfo> {
         this.databaseManager = databaseManager;
     }
 
+    @Override
+    protected String errorMessage() {
+        return "表";
+    }
 
     @Override
     protected void init() throws MySQLException {

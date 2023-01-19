@@ -19,11 +19,12 @@ import java.util.List;
 class CreateAnalysisTest {
 
     @Test
-    void analysis(@Autowired SubSqlAnalysis subSqlAnalysis) throws SqlParseException, SqlAnalysisException {
-        String sql = "create table user( id int primary key, name varchar)";
+    void analysis(@Autowired SubSqlAnalysis subSqlAnalysis) throws MySQLException {
+        String sql = "create table aa.user( id int primary key, name varchar)";
         SqlTokenizer sqlTokenizer = new SqlTokenizer(sql);
         List<SqlToken> process = sqlTokenizer.process();
         Executor analysis = subSqlAnalysis.analysis(process);
+        analysis.doExecute();
 
     }
 

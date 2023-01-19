@@ -73,7 +73,7 @@ public class CreateAnalysis implements TokenAnalysis {
         return new CreateDatabaseExecutor(databaseInfo);
     }
 
-    private Executor createTable(List<SqlToken> sqlTokenList) throws SqlAnalysisException, EngineException {
+    private Executor createTable(List<SqlToken> sqlTokenList) throws MySQLException {
         TableInfo tableInfo = new TableInfoAnalysis(sqlTokenList).process();
         StorageEngine engine = Context.selectStorageEngine(tableInfo);
         return new CreateTableExecutor(engine, tableInfo);

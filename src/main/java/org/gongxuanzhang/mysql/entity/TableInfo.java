@@ -41,6 +41,22 @@ public class TableInfo implements ExecuteInfo, EngineSelectable {
     private String comment;
     private String engineName;
 
+    /**
+     * 自增主键，只能有一个
+     */
+    private IncrementKey incrementKey;
+
+    public void transport(TableInfo tableInfo) {
+        this.tableName = tableInfo.tableName;
+        this.comment = tableInfo.comment;
+        this.database = tableInfo.database;
+        this.columnInfos = tableInfo.columnInfos;
+        this.primaryKey = tableInfo.primaryKey;
+        this.engineName = tableInfo.engineName;
+        this.incrementKey = tableInfo.incrementKey;
+
+    }
+
 
     /**
      * 表结构文件
@@ -112,5 +128,6 @@ public class TableInfo implements ExecuteInfo, EngineSelectable {
         }
         this.primaryKey.add(primaryKey);
     }
+
 
 }

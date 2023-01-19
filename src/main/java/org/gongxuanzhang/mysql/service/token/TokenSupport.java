@@ -1,5 +1,6 @@
 package org.gongxuanzhang.mysql.service.token;
 
+import org.gongxuanzhang.mysql.annotation.DependOnContext;
 import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.core.TableInfoBox;
 import org.gongxuanzhang.mysql.entity.Cell;
@@ -11,6 +12,7 @@ import org.gongxuanzhang.mysql.entity.TimeStampCell;
 import org.gongxuanzhang.mysql.entity.VarcharCell;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
+import org.gongxuanzhang.mysql.tool.Context;
 import org.gongxuanzhang.mysql.tool.ConvertUtils;
 import org.gongxuanzhang.mysql.tool.ThrowableRunnable;
 
@@ -194,21 +196,28 @@ public class TokenSupport {
      * @param offset    token流从哪开始解析
      * @return 返回使用了多少个流
      **/
+    @DependOnContext
     public static int fillTableName(TableInfo tableInfo, List<SqlToken> tokenList, int offset) throws MySQLException {
         String candidate = TokenSupport.getMustVar(tokenList.get(offset));
         if (tokenList.size() < offset + 3) {
             tableInfo.setTableName(candidate);
             String database = SessionManager.currentSession().getDatabase();
             tableInfo.setDatabase(new DatabaseInfo(database));
+            TableInfo realInfo = Context.getTableManager().select(tableInfo);
+            tableInfo.transport(realInfo);
             return 1;
         }
         if (TokenSupport.isTokenKind(tokenList.get(offset + 1), TokenKind.DOT)) {
             String tableName = TokenSupport.getMustVar(tokenList.get(offset + 2));
             tableInfo.setDatabase(new DatabaseInfo(candidate));
             tableInfo.setTableName(tableName);
+            TableInfo realInfo = Context.getTableManager().select(tableInfo);
+            tableInfo.transport(realInfo);
             return 3;
         }
         tableInfo.setTableName(candidate);
+        TableInfo realInfo = Context.getTableManager().select(tableInfo);
+        tableInfo.transport(realInfo);
         return 1;
     }
 

@@ -25,9 +25,9 @@ public interface MySQLManager<T> {
      * @param name 信息标识
      * @return null 或者是信息
      **/
-    T select(String name);
+    T select(String name) throws MySQLException;
 
-    default T select(T t) {
+    default T select(T t) throws MySQLException{
         return select(toId(t));
     }
 

@@ -70,15 +70,11 @@ public class Context {
     /**
      * 通过引擎名获取引擎
      **/
-    public static StorageEngine selectStorageEngine(String engineName) throws EngineException {
+    public static StorageEngine selectStorageEngine(String engineName) throws MySQLException {
         if (engineName == null) {
             engineName = GlobalProperties.instance.get(DEFAULT_STORAGE_ENGINE);
         }
-        StorageEngine storageEngine = ENGINE_MANAGER.select(engineName);
-        if (storageEngine == null) {
-            throw new EngineException(engineName + "引擎不存在");
-        }
-        return storageEngine;
+        return ENGINE_MANAGER.select(engineName);
     }
 
 
@@ -104,7 +100,7 @@ public class Context {
     /**
      * 通过选择器拿到目标引擎
      **/
-    public static StorageEngine selectStorageEngine(EngineSelectable engineSelectable) throws EngineException {
+    public static StorageEngine selectStorageEngine(EngineSelectable engineSelectable) throws MySQLException {
         return selectStorageEngine(engineSelectable.getEngineName());
     }
 

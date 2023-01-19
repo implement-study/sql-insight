@@ -18,6 +18,11 @@ public class DatabaseManager extends AbstractManager<DatabaseInfo> {
     }
 
     @Override
+    protected String errorMessage() {
+        return "数据库";
+    }
+
+    @Override
     protected void init() throws MySQLException {
         File home = Context.getHome();
         File[] databases = home.listFiles(File::isDirectory);

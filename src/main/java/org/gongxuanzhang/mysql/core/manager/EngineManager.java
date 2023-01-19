@@ -20,6 +20,11 @@ public class EngineManager extends AbstractManager<StorageEngine> {
     }
 
     @Override
+    protected String errorMessage() {
+        return "引擎";
+    }
+
+    @Override
     public String toId(StorageEngine engine) {
         return engine.getEngineName();
     }
