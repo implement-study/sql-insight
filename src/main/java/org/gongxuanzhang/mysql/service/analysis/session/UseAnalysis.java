@@ -22,7 +22,7 @@ public class UseAnalysis implements TokenAnalysis {
     @Override
     public Executor analysis(List<SqlToken> sqlTokenList) throws SqlAnalysisException {
         ExceptionThrower.ifNotThrow(sqlTokenList.size() == 2, "sql 无法解析");
-        String databaseName = TokenSupport.varString(sqlTokenList.get(1));
+        String databaseName = TokenSupport.getMustVar(sqlTokenList.get(1));
         return new UseDatabaseExecutor(databaseName);
     }
 

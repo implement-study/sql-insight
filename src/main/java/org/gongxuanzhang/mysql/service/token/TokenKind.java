@@ -56,6 +56,7 @@ public enum TokenKind implements SqlAstNode {
     ON,
     OR,
     AND,
+    VALUES,
 
 
     //  data type

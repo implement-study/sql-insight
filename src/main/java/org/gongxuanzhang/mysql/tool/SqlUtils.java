@@ -2,7 +2,6 @@ package org.gongxuanzhang.mysql.tool;
 
 import org.gongxuanzhang.mysql.exception.SqlParseException;
 
-import java.nio.file.Files;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

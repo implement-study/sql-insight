@@ -10,10 +10,10 @@ import org.gongxuanzhang.mysql.service.token.TokenKind;
 
 import java.util.List;
 
-import static org.gongxuanzhang.mysql.service.token.TokenSupport.getMustString;
+import static org.gongxuanzhang.mysql.service.token.TokenSupport.getMustLiteracy;
+import static org.gongxuanzhang.mysql.service.token.TokenSupport.getMustVar;
 import static org.gongxuanzhang.mysql.service.token.TokenSupport.isTokenKind;
 import static org.gongxuanzhang.mysql.service.token.TokenSupport.mustTokenKind;
-import static org.gongxuanzhang.mysql.service.token.TokenSupport.varString;
 
 /**
  * set 解析器
@@ -100,10 +100,10 @@ public class SetAnalysis implements TokenAnalysis {
         if (sqlTokenList.size() != offset + 3) {
             throw new SqlAnalysisException("sql解析失败");
         }
-        String var = varString(sqlTokenList.get(offset));
+        String var = getMustVar(sqlTokenList.get(offset));
         info.setName(var);
         mustTokenKind(sqlTokenList.get(offset + 1), TokenKind.EQUALS);
-        String value = getMustString(sqlTokenList.get(offset + 2));
+        String value = getMustLiteracy(sqlTokenList.get(offset + 2));
         info.setValue(value);
         return new SetExecutor(info);
     }

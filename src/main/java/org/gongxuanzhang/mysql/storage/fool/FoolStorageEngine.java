@@ -51,9 +51,6 @@ public class FoolStorageEngine implements StorageEngine {
             objectOutputStream.writeObject(tableInfo);
             log.info("创建表{}.{}", tableInfo.getDatabase(), tableInfo.getTableName());
             Context.getTableManager().register(tableInfo);
-            if (!tableInfo.dataFile().createNewFile()) {
-                throw new MySQLException(tableInfo.absoluteName() + "无法创建");
-            }
             return Result.success();
         } catch (IOException e) {
             return errorSwap(e);

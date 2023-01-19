@@ -2,8 +2,8 @@ package org.gongxuanzhang.mysql.entity;
 
 import lombok.Data;
 import org.gongxuanzhang.mysql.core.TableInfoBox;
-import org.gongxuanzhang.mysql.service.token.SqlToken;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -13,16 +13,16 @@ import java.util.List;
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Data
-public class InsertInfo implements ExecuteInfo , TableInfoBox {
+public class InsertInfo implements ExecuteInfo, TableInfoBox {
 
     private TableInfo tableInfo = new TableInfo();
 
     /**
      * 需要插入的列名
      **/
-    private List<String> columns;
+    private List<String> columns = new ArrayList<>();
 
-    private List<List<SqlToken>> insertData;
+    private List<List<Cell<?>>> insertData;
 
 
 }

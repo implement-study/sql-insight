@@ -23,7 +23,7 @@ public class TruncateAnalysis implements TokenAnalysis {
     public Executor analysis(List<SqlToken> sqlTokenList) throws SqlAnalysisException {
         ExceptionThrower.ifNotThrow(sqlTokenList.size() == 3);
         TokenSupport.mustTokenKind(sqlTokenList.get(1), TokenKind.TABLE);
-        String tableName = TokenSupport.varString(sqlTokenList.get(1));
+        String tableName = TokenSupport.getMustVar(sqlTokenList.get(1));
         throw new UnsupportedOperationException("truncate table 还没实现呐！");
     }
 

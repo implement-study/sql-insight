@@ -48,7 +48,7 @@ public class DropAnalysis implements TokenAnalysis {
 
     private Executor dropDataBase(List<SqlToken> sqlTokenList) throws SqlAnalysisException {
         ExceptionThrower.ifNotThrow(sqlTokenList.size() == 3);
-        String database = TokenSupport.varString(sqlTokenList.get(2));
+        String database = TokenSupport.getMustVar(sqlTokenList.get(2));
         DatabaseInfo databaseInfo = new DatabaseInfo(database);
         return new DropDatabaseExecutor(databaseInfo);
     }

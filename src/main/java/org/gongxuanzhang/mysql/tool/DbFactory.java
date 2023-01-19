@@ -2,11 +2,8 @@ package org.gongxuanzhang.mysql.tool;
 
 
 import org.gongxuanzhang.mysql.core.MySqlProperties;
-import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
-import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
-import org.gongxuanzhang.mysql.exception.MySQLException;
 
 import java.io.File;
 
@@ -25,7 +22,6 @@ public class DbFactory {
     private DbFactory() {
 
     }
-
 
 
     private static void checkDatabase(String database) throws ExecuteException {

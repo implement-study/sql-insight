@@ -57,7 +57,7 @@ public class TableInfo implements ExecuteInfo, EngineSelectable {
     @DependOnContext
     public File dataFile() throws MySQLException {
         File databaseDir = checkDatabase();
-        return new File(databaseDir, this.tableName + GFRM_SUFFIX);
+        return new File(databaseDir, this.tableName + GIBD_SUFFIX);
     }
 
     /**

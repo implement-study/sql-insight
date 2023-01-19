@@ -2,10 +2,17 @@ package org.gongxuanzhang.mysql.service.token;
 
 import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.core.TableInfoBox;
+import org.gongxuanzhang.mysql.entity.Cell;
+import org.gongxuanzhang.mysql.entity.ColumnType;
 import org.gongxuanzhang.mysql.entity.DatabaseInfo;
+import org.gongxuanzhang.mysql.entity.IntCell;
 import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.entity.TimeStampCell;
+import org.gongxuanzhang.mysql.entity.VarcharCell;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
+import org.gongxuanzhang.mysql.tool.ConvertUtils;
+import org.gongxuanzhang.mysql.tool.ThrowableRunnable;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -137,7 +144,7 @@ public class TokenSupport {
      * @return token的值
      * @throws SqlAnalysisException 如果不是 var token 抛出异常
      **/
-    public static String varString(SqlToken sqlToken) throws SqlAnalysisException {
+    public static String getMustVar(SqlToken sqlToken) throws SqlAnalysisException {
         if (!isTokenKind(sqlToken, TokenKind.VAR)) {
             throw new SqlAnalysisException(sqlToken.getValue() + "解析错误");
         }
@@ -151,7 +158,7 @@ public class TokenSupport {
      * @return token的值
      * @throws SqlAnalysisException 如果不是 LITERACY token 抛出异常
      **/
-    public static String getMustString(SqlToken sqlToken) throws SqlAnalysisException {
+    public static String getMustLiteracy(SqlToken sqlToken) throws SqlAnalysisException {
         if (!isTokenKind(sqlToken, TokenKind.LITERACY)) {
             throw new SqlAnalysisException(sqlToken.getValue() + "解析错误");
         }
@@ -161,6 +168,19 @@ public class TokenSupport {
     public static void mustTokenKind(SqlToken sqlToken, TokenKind... tokenKind) throws SqlAnalysisException {
         if (!isTokenKind(sqlToken, tokenKind)) {
             throwSqlAnalysis(sqlToken.getValue());
+        }
+    }
+
+    public static Cell<?> parseCell(SqlToken sqlToken) throws MySQLException {
+        switch (sqlToken.getTokenKind()) {
+            case VAR:
+                return new VarcharCell(sqlToken.getValue());
+            case INT:
+                return new IntCell(ConvertUtils.convert(ColumnType.INT, sqlToken.getValue()));
+            case TIMESTAMP:
+                return new TimeStampCell(ConvertUtils.convert(ColumnType.TIMESTAMP, sqlToken.getValue()));
+            default:
+                throw new MySQLException(sqlToken.getTokenKind() + "无法解析");
         }
     }
 
@@ -175,7 +195,7 @@ public class TokenSupport {
      * @return 返回使用了多少个流
      **/
     public static int fillTableName(TableInfo tableInfo, List<SqlToken> tokenList, int offset) throws MySQLException {
-        String candidate = TokenSupport.varString(tokenList.get(offset));
+        String candidate = TokenSupport.getMustVar(tokenList.get(offset));
         if (tokenList.size() < offset + 3) {
             tableInfo.setTableName(candidate);
             String database = SessionManager.currentSession().getDatabase();
@@ -183,7 +203,7 @@ public class TokenSupport {
             return 1;
         }
         if (TokenSupport.isTokenKind(tokenList.get(offset + 1), TokenKind.DOT)) {
-            String tableName = TokenSupport.varString(tokenList.get(offset + 2));
+            String tableName = TokenSupport.getMustVar(tokenList.get(offset + 2));
             tableInfo.setDatabase(new DatabaseInfo(candidate));
             tableInfo.setTableName(tableName);
             return 3;
@@ -202,5 +222,62 @@ public class TokenSupport {
 
     public static int fillTableName(TableInfoBox box, List<SqlToken> tokenList) throws MySQLException {
         return fillTableName(box.getTableInfo(), tokenList, 0);
+    }
+
+
+    public static TokenChain token(SqlToken token) {
+        return new TokenChain(token);
+
+    }
+
+    /**
+     * 辅助支持的链式调用的内部类
+     **/
+    public static class TokenChain {
+        final SqlToken token;
+        Map<TokenKind, ThrowableRunnable> actions;
+        ThrowableRunnable elseAction;
+
+        TokenChain(SqlToken token) {
+            this.token = token;
+            this.actions = new HashMap<>();
+        }
+
+        public When when(TokenKind tokenKind) {
+            return new When(this, tokenKind);
+        }
+
+        public TokenChain elseRun(ThrowableRunnable elseAction) {
+            this.elseAction = elseAction;
+            return this;
+        }
+
+        public void get() throws MySQLException {
+            ThrowableRunnable runnable = actions.get(token.getTokenKind());
+            if (runnable != null) {
+                runnable.run();
+                return;
+            }
+            if (elseAction != null) {
+                elseAction.run();
+            }
+        }
+
+    }
+
+    public static class When {
+        final TokenChain chain;
+        final TokenKind targetKind;
+
+        public When(TokenChain chain, TokenKind targetKind) {
+            this.chain = chain;
+            this.targetKind = targetKind;
+        }
+
+
+        public TokenChain then(ThrowableRunnable runnable) {
+            this.chain.actions.put(this.targetKind, runnable);
+            return chain;
+        }
     }
 }
