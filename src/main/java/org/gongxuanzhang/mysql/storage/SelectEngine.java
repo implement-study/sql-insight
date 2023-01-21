@@ -1,7 +1,7 @@
 package org.gongxuanzhang.mysql.storage;
 
 import org.gongxuanzhang.mysql.core.result.Result;
-import org.gongxuanzhang.mysql.entity.SelectInfo;
+import org.gongxuanzhang.mysql.entity.SingleSelectInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 
 /**
@@ -18,5 +18,5 @@ public interface SelectEngine {
      * @return 通用返回
      * @throws MySQLException 执行过程中出现问题抛出异常
      **/
-    Result select(SelectInfo info) throws MySQLException;
+    Result select(SingleSelectInfo info) throws MySQLException;
 }

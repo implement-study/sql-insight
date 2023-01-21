@@ -5,7 +5,7 @@ import org.gongxuanzhang.mysql.annotation.Engine;
 import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.entity.DeleteInfo;
 import org.gongxuanzhang.mysql.entity.InsertInfo;
-import org.gongxuanzhang.mysql.entity.SelectInfo;
+import org.gongxuanzhang.mysql.entity.SingleSelectInfo;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.entity.UpdateInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
@@ -76,7 +76,7 @@ public class FoolStorageEngine implements StorageEngine {
     }
 
     @Override
-    public Result select(SelectInfo info) throws MySQLException {
+    public Result select(SingleSelectInfo info) throws MySQLException {
         return foolSelect.select(info);
     }
 

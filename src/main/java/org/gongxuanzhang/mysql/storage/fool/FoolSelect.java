@@ -1,7 +1,7 @@
 package org.gongxuanzhang.mysql.storage.fool;
 
 import org.gongxuanzhang.mysql.core.result.Result;
-import org.gongxuanzhang.mysql.entity.SelectInfo;
+import org.gongxuanzhang.mysql.entity.SingleSelectInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.storage.SelectEngine;
 
@@ -14,7 +14,7 @@ public class FoolSelect implements SelectEngine {
 
 
     @Override
-    public Result select(SelectInfo info) throws MySQLException {
+    public Result select(SingleSelectInfo info) throws MySQLException {
         return null;
     }
 }
