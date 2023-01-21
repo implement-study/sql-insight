@@ -7,6 +7,7 @@ import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.tool.Context;
+import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 表信息
@@ -55,6 +57,23 @@ public class TableInfo implements ExecuteInfo, EngineSelectable {
         this.engineName = tableInfo.engineName;
         this.incrementKey = tableInfo.incrementKey;
 
+    }
+
+
+    /**
+     * 表中的唯一键
+     *
+     * @return 返回个啥
+     **/
+    public Set<String> uniqueKeys() {
+        Set<String> uniqueKey = this.columnInfos.stream()
+                .filter(ColumnInfo::isUnique)
+                .map(ColumnInfo::getName)
+                .collect(Collectors.toSet());
+        if (!CollectionUtils.isEmpty(primaryKey)) {
+            uniqueKey.addAll(primaryKey);
+        }
+        return uniqueKey;
     }
 
 

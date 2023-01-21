@@ -1,13 +1,15 @@
 package org.gongxuanzhang.mysql.core;
 
-import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import org.gongxuanzhang.mysql.annotation.DependOnContext;
 import org.gongxuanzhang.mysql.entity.Cell;
-import org.gongxuanzhang.mysql.entity.ColumnInfo;
 import org.gongxuanzhang.mysql.entity.IncrementKey;
+import org.gongxuanzhang.mysql.entity.InsertData;
+import org.gongxuanzhang.mysql.entity.InsertInfo;
 import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,21 +29,49 @@ public class ColumnAdjust {
 
     private final Map<String, Object> defaultValue;
 
+    private final InsertInfo insertInfo;
+
+    private final TableInfo tableInfo;
+
     /**
-     * @param tableInfo 表信息
-     * @param colList   用户输入的列名
+     * @param insertInfo 插入信息
      */
-    public ColumnAdjust(TableInfo tableInfo, List<String> colList) {
-        indexColMap = new HashMap<>(colList.size());
+    public ColumnAdjust(InsertInfo insertInfo) {
+        this.insertInfo = insertInfo;
+        this.tableInfo = insertInfo.getTableInfo();
+        List<String> colList = insertInfo.getColumns();
+        this.indexColMap = new HashMap<>(colList.size());
         for (int i = 0; i < colList.size(); i++) {
-            indexColMap.put(i, colList.get(i));
+            this.indexColMap.put(i, colList.get(i));
         }
-        incrementKey = tableInfo.getIncrementKey();
-        defaultValue = new HashMap<>();
+        this.incrementKey = tableInfo.getIncrementKey();
+        this.defaultValue = new HashMap<>();
         tableInfo.getColumnInfos().stream()
                 .filter(columnInfo -> columnInfo.getDefaultValue() != null)
                 .forEach((columnInfo -> defaultValue.put(columnInfo.getName(), columnInfo.getDefaultValue())));
 
+    }
+
+    public InsertData adjust() throws MySQLException {
+        List<JSONObject> insertBox = new ArrayList<>();
+        List<List<Cell<?>>> allInputRow = insertInfo.getInsertData();
+        //  填充用户内容
+        for (List<Cell<?>> inputRow : allInputRow) {
+            insertBox.add(fillInputData(inputRow));
+        }
+        //  填充自增主键
+        if (haveIncrementKey()) {
+            for (JSONObject row : insertBox) {
+                incrementKey(row);
+            }
+        }
+        //  填充默认值
+        if (haveDefaultValue()) {
+            for (JSONObject box : insertBox) {
+                fillDefault(box);
+            }
+        }
+        return new InsertData(insertBox, tableInfo.uniqueKeys());
     }
 
     /**
@@ -50,7 +80,7 @@ public class ColumnAdjust {
      * @param inputRow 输入数据
      * @return 返回填充之后的一行数据
      */
-    public JSONObject fillInputData(List<Cell<?>> inputRow) {
+    public JSONObject fillInputData(List<Cell<?>> inputRow) throws MySQLException {
         JSONObject rowData = new JSONObject();
         for (int i = 0; i < inputRow.size(); i++) {
             Cell<?> cell = inputRow.get(i);
@@ -68,7 +98,7 @@ public class ColumnAdjust {
         return incrementKey != null;
     }
 
-    public boolean haveDefaultValue(){
+    public boolean haveDefaultValue() {
         return !this.defaultValue.isEmpty();
     }
 

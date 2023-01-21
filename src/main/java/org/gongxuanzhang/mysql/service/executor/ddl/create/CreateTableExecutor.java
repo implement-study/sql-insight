@@ -1,7 +1,7 @@
 package org.gongxuanzhang.mysql.service.executor.ddl.create;
 
 import lombok.extern.slf4j.Slf4j;
-import org.gongxuanzhang.mysql.core.Result;
+import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.executor.EngineExecutor;

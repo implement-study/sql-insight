@@ -1,4 +1,4 @@
-package org.gongxuanzhang.mysql.core;
+package org.gongxuanzhang.mysql.core.result;
 
 import java.util.Collections;
 import java.util.List;

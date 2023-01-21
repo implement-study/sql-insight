@@ -15,7 +15,7 @@
             <el-aside width="15%" height="100%">Aside</el-aside>
             <el-container>
                 <el-row>
-                    <el-tooltip class="item" effect="dark"  placement="bottom-end" open-delay="500">
+                    <el-tooltip class="item" effect="dark" placement="bottom-end" open-delay="500">
                         <div slot="content">执行SQL<br/>快捷键：shift+enter</div>
                         <el-button @click="doSql" icon="el-icon-caret-right"></el-button>
                     </el-tooltip>
@@ -36,7 +36,7 @@
                 </el-row>
                 <el-row v-if="type==1||type==2">
                     <i class="el-icon-success" style="color:green"></i>
-                    执行成功 执行时间{{ sqlTime}}
+                    执行成功 {{ message }} 执行时间{{ sqlTime}}
                 </el-row>
                 <el-row v-if="type==1">
                     <el-col :span="18">
@@ -77,6 +77,8 @@
                 tableData: [],
                 tableCols: [],
                 sql: '',
+                sqlTime: '',
+                message: '',
                 preSql: '',
                 errorMessage: '',
                 loading: false
@@ -96,6 +98,7 @@
                             this.tableCols = res.head;
                             this.tableData = res.data;
                             this.sqlTime = res.sqlTime;
+                            this.message = res.message;
                         } else if (res.code === 100) {
                             this.type = 2;
                             this.sqlTime = res.sqlTime;

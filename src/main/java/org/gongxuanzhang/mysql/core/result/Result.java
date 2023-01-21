@@ -1,6 +1,8 @@
-package org.gongxuanzhang.mysql.core;
+package org.gongxuanzhang.mysql.core.result;
 
 
+import org.gongxuanzhang.mysql.core.ErrorResult;
+import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.exception.SessionException;
 
 import java.util.ArrayList;
@@ -71,7 +73,23 @@ public interface Result {
         } catch (SessionException e) {
             return new ErrorResult("会话异常", "unknown");
         }
+    }
 
+    /**
+     * 携带信息的返回值
+     * 如 插入 修改时
+     * @param message 信息内容
+     * @return 携带信息的返回值
+     **/
+    static Result info(String message){
+        try {
+            String sql = SessionManager.currentSession().getSql();
+            InfoResult infoResult = new InfoResult(message);
+            infoResult.setSql(sql);
+            return infoResult;
+        } catch (SessionException e) {
+            return new ErrorResult("会话异常", "unknown");
+        }
     }
 
     /**

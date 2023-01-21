@@ -1,6 +1,6 @@
 package org.gongxuanzhang.mysql.service.executor.session.show;
 
-import org.gongxuanzhang.mysql.core.Result;
+import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
 import org.gongxuanzhang.mysql.tool.Context;
 

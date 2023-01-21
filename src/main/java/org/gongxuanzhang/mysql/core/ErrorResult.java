@@ -1,5 +1,7 @@
 package org.gongxuanzhang.mysql.core;
 
+import org.gongxuanzhang.mysql.core.result.Result;
+
 /**
  * 错误返回
  *
@@ -12,7 +14,7 @@ public class ErrorResult implements Result {
 
     private String sql;
 
-    ErrorResult(String errorMessage, String sql) {
+    public ErrorResult(String errorMessage, String sql) {
         if (errorMessage == null) {
             throw new NullPointerException("错误信息不能为null");
         }
@@ -39,6 +41,8 @@ public class ErrorResult implements Result {
     public void setSqlTime(String sqlTime) {
 
     }
+
+
 
     @Override
     public void setSql(String sql) {

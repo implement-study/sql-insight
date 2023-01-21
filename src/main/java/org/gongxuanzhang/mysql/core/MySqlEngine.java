@@ -1,6 +1,8 @@
 package org.gongxuanzhang.mysql.core;
 
 
+import org.gongxuanzhang.mysql.core.result.Result;
+
 /**
  * 负责执行sql抽象接口
  *

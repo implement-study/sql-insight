@@ -1,7 +1,7 @@
 package org.gongxuanzhang.mysql.connection;
 
 import org.gongxuanzhang.mysql.core.MySqlEngine;
-import org.gongxuanzhang.mysql.core.Result;
+import org.gongxuanzhang.mysql.core.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;

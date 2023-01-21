@@ -1,29 +1,20 @@
 package org.gongxuanzhang.mysql.storage.fool;
 
-import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.mysql.annotation.Engine;
-import org.gongxuanzhang.mysql.core.ColumnAdjust;
-import org.gongxuanzhang.mysql.core.Result;
-import org.gongxuanzhang.mysql.entity.*;
-import org.gongxuanzhang.mysql.exception.ExecuteException;
+import org.gongxuanzhang.mysql.core.result.Result;
+import org.gongxuanzhang.mysql.entity.DeleteInfo;
+import org.gongxuanzhang.mysql.entity.InsertInfo;
+import org.gongxuanzhang.mysql.entity.SelectInfo;
+import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.entity.UpdateInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
+import org.gongxuanzhang.mysql.storage.CreateTableEngine;
+import org.gongxuanzhang.mysql.storage.DeleteEngine;
+import org.gongxuanzhang.mysql.storage.InsertEngine;
+import org.gongxuanzhang.mysql.storage.SelectEngine;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
-import org.gongxuanzhang.mysql.tool.Context;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static org.gongxuanzhang.mysql.tool.ExceptionThrower.errorSwap;
-import static org.gongxuanzhang.mysql.tool.ExceptionThrower.ifNotThrow;
+import org.gongxuanzhang.mysql.storage.UpdateEngine;
 
 /**
  * 傻子引擎，只有功能完全没有性能。
@@ -37,6 +28,16 @@ import static org.gongxuanzhang.mysql.tool.ExceptionThrower.ifNotThrow;
 public class FoolStorageEngine implements StorageEngine {
 
 
+    private final CreateTableEngine foolCreateTable = new FoolTableCreator();
+
+    private final InsertEngine foolInsert = new FoolInsert();
+
+    private final SelectEngine foolSelect = new FoolSelect();
+
+    private final UpdateEngine foolUpdate = new FoolUpdate();
+
+    private final DeleteEngine foolDelete = new FoolDelete();
+
     @Override
     public String getEngineName() {
         return "fool";
@@ -49,82 +50,34 @@ public class FoolStorageEngine implements StorageEngine {
 
     @Override
     public Result createTable(TableInfo tableInfo) throws MySQLException {
-        checkTableFile(tableInfo.structFile());
-        checkTableFile(tableInfo.dataFile());
-        try (FileOutputStream fileOutputStream = new FileOutputStream(tableInfo.structFile());
-             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
-            objectOutputStream.writeObject(tableInfo);
-            log.info("创建表{}.{}", tableInfo.getDatabase(), tableInfo.getTableName());
-            Context.getTableManager().register(tableInfo);
-            return Result.success();
-        } catch (IOException e) {
-            return errorSwap(e);
-        }
+        return foolCreateTable.createTable(tableInfo);
     }
 
-    private void checkTableFile(File file) throws MySQLException {
-        try {
-            if (file.exists() || !file.createNewFile()) {
-                String name = file.getName();
-                throw new ExecuteException("表" + name.substring(0, name.indexOf(".")) + "已经存在");
-            }
-        } catch (IOException e) {
-            errorSwap(e);
-        }
-    }
-
-
-    @Override
-    public Result insert(InsertInfo info) throws MySQLException {
-        List<JSONObject> insertData = analysisData(info);
-
-        //   todo insert data
-        return null;
-    }
 
     /**
-     * 解析出需要插入的数据，如果有自增或者默认值直接计算出来
-     */
-    private List<JSONObject> analysisData(InsertInfo info) {
-        List<JSONObject> insertBox = new ArrayList<>();
-        TableInfo tableInfo = info.getTableInfo();
-        Map<String, ColumnInfo> colMap = tableInfo.getColumnInfos().stream().collect(Collectors.toMap(ColumnInfo::getName, Function.identity()));
-        List<List<Cell<?>>> allInputRow = info.getInsertData();
-        ColumnAdjust columnAdjust = new ColumnAdjust(tableInfo,info.getColumns());
-        //  填充用户内容
-        for (List<Cell<?>> inputRow : allInputRow) {
-            insertBox.add(columnAdjust.fillInputData(inputRow));
-        }
-        //  填充自增主键
-        if (columnAdjust.haveIncrementKey()) {
-            for (JSONObject row : insertBox) {
-                columnAdjust.incrementKey(row);
-            }
-        }
-        //  填充默认值
-        if (columnAdjust.haveDefaultValue()) {
-            for (JSONObject box : insertBox) {
-                columnAdjust.fillDefault(box);
-            }
-        }
-        return insertBox;
+     * 如果有唯一键
+     * 要遍历全表
+     * 如果没有 直接插入
+     **/
+    @Override
+    public Result insert(InsertInfo info) throws MySQLException {
+        return foolInsert.insert(info);
     }
-
 
 
     @Override
     public Result delete(DeleteInfo info) throws MySQLException {
-        return null;
+        return foolDelete.delete(info);
     }
 
     @Override
     public Result update(UpdateInfo info) throws MySQLException {
-        return null;
+        return foolUpdate.update(info);
     }
 
     @Override
     public Result select(SelectInfo info) throws MySQLException {
-        return null;
+        return foolSelect.select(info);
     }
 
 

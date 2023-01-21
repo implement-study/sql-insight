@@ -1,29 +1,20 @@
-package org.gongxuanzhang.mysql.core;
-
-import lombok.Data;
-
-import java.util.List;
-import java.util.Map;
+package org.gongxuanzhang.mysql.core.result;
 
 /**
- * 查询结果返回实体
+ * 成功返回,没有任何信息
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-@Data
-public class SelectResult implements Result {
+public class SuccessResult implements Result {
 
-    private final String[] head;
-
-    private final List<Map<String, String>> data;
 
     private String sqlTime;
-
     private String sql;
+
 
     @Override
     public int getCode() {
-        return 200;
+        return 100;
     }
 
     @Override
@@ -42,12 +33,13 @@ public class SelectResult implements Result {
     }
 
     @Override
-    public String getSql() {
-        return sql;
-    }
-
-    @Override
     public void setSql(String sql) {
         this.sql = sql;
     }
+
+    @Override
+    public String getSql() {
+        return this.sql;
+    }
+
 }

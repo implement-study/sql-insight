@@ -1,5 +1,6 @@
 package org.gongxuanzhang.mysql.core;
 
+import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.token.SqlToken;
