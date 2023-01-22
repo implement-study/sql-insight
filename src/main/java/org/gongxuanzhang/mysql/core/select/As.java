@@ -12,6 +12,7 @@ import java.util.Map;
 @Data
 public class As {
 
+    private boolean all;
     private Map<String, String> as = new HashMap<>();
 
     public void addAlias(String colName, String alias) throws MySQLException {

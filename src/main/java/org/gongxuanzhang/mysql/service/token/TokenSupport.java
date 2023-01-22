@@ -167,6 +167,20 @@ public class TokenSupport {
         return sqlToken.getValue();
     }
 
+    /**
+     * 通过一个sql token  拿到一个结果  要求token必须是LITERACY或者是var
+     *
+     * @param sqlToken sql token
+     * @return token的值
+     * @throws SqlAnalysisException 如果不是 LITERACY或者var token 抛出异常
+     **/
+    public static String getString(SqlToken sqlToken) throws SqlAnalysisException {
+        if (!isTokenKind(sqlToken, TokenKind.LITERACY,TokenKind.VAR)) {
+            throw new SqlAnalysisException(sqlToken.getValue() + "解析错误");
+        }
+        return sqlToken.getValue();
+    }
+
     public static void mustTokenKind(SqlToken sqlToken, TokenKind... tokenKind) throws SqlAnalysisException {
         if (!isTokenKind(sqlToken, tokenKind)) {
             throwSqlAnalysis(sqlToken.getValue());
