@@ -1,9 +1,8 @@
 package org.gongxuanzhang.mysql.entity;
 
 import lombok.Data;
-import org.gongxuanzhang.mysql.core.Where;
-
-import java.util.Map;
+import org.gongxuanzhang.mysql.core.select.As;
+import org.gongxuanzhang.mysql.core.select.Where;
 
 /**
  * 单表查询信息
@@ -19,10 +18,11 @@ public class SingleSelectInfo implements ExecuteInfo {
      */
     private TableInfo mainTable;
 
-    private Map<String,String> as;
+    private As as;
+
     private Where where;
 
-    private
+
 
 
 }

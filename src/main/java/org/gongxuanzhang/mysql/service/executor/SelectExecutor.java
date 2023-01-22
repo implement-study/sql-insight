@@ -2,7 +2,7 @@ package org.gongxuanzhang.mysql.service.executor;
 
 import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.core.result.SelectResult;
-import org.gongxuanzhang.mysql.core.Where;
+import org.gongxuanzhang.mysql.core.select.Where;
 import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 
