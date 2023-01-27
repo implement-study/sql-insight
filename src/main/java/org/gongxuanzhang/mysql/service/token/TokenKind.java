@@ -80,37 +80,37 @@ public enum TokenKind implements SqlAstNode {
     /**
      * 一个变量
      **/
-    VAR(false),
+    VAR("${}"),
 
-    LEFT_PAREN(false),
-    RIGHT_PAREN(false),
-    GT(false),
-    GTE(false),
-    LT(false),
-    LTE(false),
-    PLUS(false),
-    MINUS(false),
-    MULTI(false),
-    COMMA(false),
-    DOT(false),
-    DIVIDE(false),
-    NE(false),
-    EQUALS(false),
-    MOL(false),
-    AT(false),
-    DOUBLE_AT(false);
+    LEFT_PAREN("("),
+    RIGHT_PAREN(")"),
+    GT(">"),
+    GTE(">="),
+    LT("<"),
+    LTE("<="),
+    PLUS("+"),
+    MINUS("-"),
+    MULTI("*"),
+    COMMA(","),
+    DOT("."),
+    DIVIDE("/"),
+    NE("!="),
+    EQUALS("="),
+    MOL("%"),
+    AT("@"),
+    DOUBLE_AT("@@");
 
-    private final boolean swap;
+    private final String symbol;
 
     TokenKind() {
-        this(true);
+        this("");
     }
 
-    TokenKind(boolean swap) {
-        this.swap = swap;
+    TokenKind(String symbol) {
+        this.symbol = symbol;
     }
 
     public boolean canSwap() {
-        return swap;
+        return this.symbol.isEmpty();
     }
 }

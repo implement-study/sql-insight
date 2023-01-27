@@ -175,7 +175,7 @@ public class TokenSupport {
      * @throws SqlAnalysisException 如果不是 LITERACY或者var token 抛出异常
      **/
     public static String getString(SqlToken sqlToken) throws SqlAnalysisException {
-        if (!isTokenKind(sqlToken, TokenKind.LITERACY,TokenKind.VAR)) {
+        if (!isTokenKind(sqlToken, TokenKind.LITERACY, TokenKind.VAR)) {
             throw new SqlAnalysisException(sqlToken.getValue() + "解析错误");
         }
         return sqlToken.getValue();
