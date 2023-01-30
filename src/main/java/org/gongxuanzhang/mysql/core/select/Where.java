@@ -1,7 +1,8 @@
 package org.gongxuanzhang.mysql.core.select;
 
-import org.gongxuanzhang.mysql.core.Condition;
+import com.alibaba.fastjson2.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,5 +12,30 @@ import java.util.List;
  **/
 public class Where {
 
-    private List<Condition> conditions;
+    private final List<Condition> andConditions = new ArrayList<>();
+
+    private final List<Condition> orConditions = new ArrayList<>();
+
+    public void addCondition(Condition condition) {
+        if (condition.isAnd()) {
+            andConditions.add(condition);
+        } else {
+            orConditions.add(condition);
+        }
+    }
+
+
+    public boolean getValue(JSONObject jsonObject) {
+        for (Condition orCondition : orConditions) {
+            if (orCondition.getValue(jsonObject)) {
+                return true;
+            }
+        }
+        for (Condition andCondition : andConditions) {
+            if (!andCondition.getValue(jsonObject)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

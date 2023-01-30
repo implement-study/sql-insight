@@ -5,7 +5,6 @@ import org.gongxuanzhang.mysql.entity.ColumnType;
 import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
 import org.gongxuanzhang.mysql.entity.TableInfo;
-import org.gongxuanzhang.mysql.exception.EngineException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
 import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;

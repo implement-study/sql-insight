@@ -27,10 +27,10 @@ public abstract class AbstractManager<T> implements MySQLManager<T> {
     }
 
     @Override
-    public T select(String name) throws MySQLException{
+    public T select(String name) throws MySQLException {
         T t = cache.get(name);
-        if(t == null){
-            throw new MySQLException(String.format("不存在%s的[%s]",name,errorMessage()));
+        if (t == null) {
+            throw new MySQLException(String.format("不存在%s的[%s]", name, errorMessage()));
         }
         return t;
     }

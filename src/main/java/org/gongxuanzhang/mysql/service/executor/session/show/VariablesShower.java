@@ -1,8 +1,8 @@
 package org.gongxuanzhang.mysql.service.executor.session.show;
 
 import org.gongxuanzhang.mysql.core.MySqlSession;
-import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.core.SessionManager;
+import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
 import org.gongxuanzhang.mysql.entity.ShowVarInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
@@ -71,7 +71,7 @@ public class VariablesShower implements Shower {
     }
 
     private Result returnVar(Map<String, String> allAttr) {
-        List<Map<String, String>> data = new ArrayList<>();
+        List<Map<String, ? extends Object>> data = new ArrayList<>();
         allAttr.forEach((k, v) -> {
             Map<String, String> map = new HashMap<>(4);
             map.put(HEAD[0], k);

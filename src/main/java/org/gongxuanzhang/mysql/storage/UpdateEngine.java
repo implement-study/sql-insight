@@ -6,11 +6,10 @@ import org.gongxuanzhang.mysql.exception.MySQLException;
 
 /**
  * 修改引擎
- * @author gxz gongxuanzhang@foxmail.com
  *
+ * @author gxz gongxuanzhang@foxmail.com
  **/
 public interface UpdateEngine {
-
 
 
     /**

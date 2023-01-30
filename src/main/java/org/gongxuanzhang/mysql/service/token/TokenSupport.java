@@ -140,6 +140,14 @@ public class TokenSupport {
         return isTokenKind(sqlToken.getTokenKind(), target);
     }
 
+    public static boolean isNotTokenKind(TokenKind tokenKind, TokenKind... target) {
+        return isTokenKind(tokenKind, target);
+    }
+
+    public static boolean isNotTokenKind(SqlToken sqlToken, TokenKind... target) {
+        return !isTokenKind(sqlToken, target);
+    }
+
     /**
      * 通过一个sql token var 拿到一个结果 要求token必须是var
      *

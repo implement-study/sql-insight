@@ -2,6 +2,7 @@ package org.gongxuanzhang.mysql.entity;
 
 import lombok.Data;
 import org.gongxuanzhang.mysql.core.select.As;
+import org.gongxuanzhang.mysql.core.select.From;
 import org.gongxuanzhang.mysql.core.select.Where;
 
 /**
@@ -13,16 +14,11 @@ import org.gongxuanzhang.mysql.core.select.Where;
 public class SingleSelectInfo implements ExecuteInfo {
 
 
-    /**
-     * 查询的主表
-     */
-    private TableInfo mainTable;
+    private From from;
 
     private As as;
 
     private Where where;
-
-
 
 
 }

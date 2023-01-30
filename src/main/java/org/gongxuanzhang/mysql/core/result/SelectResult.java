@@ -15,7 +15,7 @@ public class SelectResult implements Result {
 
     private final String[] head;
 
-    private final List<Map<String, String>> data;
+    private final List<Map<String, ? extends Object>> data;
 
     private String sqlTime;
 

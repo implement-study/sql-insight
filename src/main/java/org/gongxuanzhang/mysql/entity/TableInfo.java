@@ -4,6 +4,8 @@ import lombok.Data;
 import org.gongxuanzhang.mysql.annotation.DependOnContext;
 import org.gongxuanzhang.mysql.core.EngineSelectable;
 import org.gongxuanzhang.mysql.core.SessionManager;
+import org.gongxuanzhang.mysql.core.select.As;
+import org.gongxuanzhang.mysql.core.select.SelectCol;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.tool.Context;
@@ -124,8 +126,42 @@ public class TableInfo implements ExecuteInfo, EngineSelectable {
     }
 
 
-    public List<Map<String, String>> descTable() {
-        List<Map<String, String>> result = new ArrayList<>();
+    /**
+     * 根据as把所有需要解析的列都摆出
+     * '*' 和重复列都解析
+     * 如果别名重复 默认在后面添加(1) (2) 以此类推
+     **/
+    public List<SelectCol> scatterCol(As as) throws MySQLException {
+        List<SelectCol> result = new ArrayList<>();
+        Map<String, Integer> aliasCount = new HashMap<>();
+        as.forEach(col -> {
+            if (col.isAll()) {
+                fillAllCol(aliasCount, result);
+            } else {
+                fillSingleCol(col, aliasCount, result);
+            }
+        });
+        return result;
+    }
+
+    private void fillSingleCol(SelectCol col, Map<String, Integer> allCount, List<SelectCol> result) {
+        String alias = col.getAlias() == null ? col.getColName() : col.getAlias();
+        int count = allCount.merge(alias, 1, Integer::sum);
+        String colName = col.getColName();
+        if (count > 1) {
+            alias += "(" + (count - 1) + ")";
+        }
+        result.add(SelectCol.single(colName, alias));
+    }
+
+    private void fillAllCol(Map<String, Integer> allCount, List<SelectCol> result) {
+        for (ColumnInfo columnInfo : this.columnInfos) {
+            fillSingleCol(SelectCol.single(columnInfo.getName(), null), allCount, result);
+        }
+    }
+
+    public List<Map<String, ? extends Object>> descTable() {
+        List<Map<String, ? extends Object>> result = new ArrayList<>();
         Set<String> primary = primaryKey == null ? new HashSet<>() : new HashSet<>(primaryKey);
         for (ColumnInfo columnInfo : columnInfos) {
             Map<String, String> colInfo = new HashMap<>(8);

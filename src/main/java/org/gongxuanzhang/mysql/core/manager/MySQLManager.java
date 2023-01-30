@@ -27,7 +27,7 @@ public interface MySQLManager<T> {
      **/
     T select(String name) throws MySQLException;
 
-    default T select(T t) throws MySQLException{
+    default T select(T t) throws MySQLException {
         return select(toId(t));
     }
 

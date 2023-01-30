@@ -8,7 +8,6 @@ import org.gongxuanzhang.mysql.core.manager.EngineManager;
 import org.gongxuanzhang.mysql.core.manager.TableManager;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
 import org.gongxuanzhang.mysql.entity.TableInfo;
-import org.gongxuanzhang.mysql.exception.EngineException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
 

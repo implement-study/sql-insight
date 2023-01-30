@@ -1,6 +1,7 @@
 package org.gongxuanzhang.mysql;
 
 import org.gongxuanzhang.mysql.connection.Connection;
+import org.gongxuanzhang.mysql.core.result.Result;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +30,8 @@ public class Init {
 
     @Test
     public void select(@Autowired Connection connection){
-
+        String sql = "select * from aa.user";
+        Result execute = connection.execute(sql);
     }
 
 }

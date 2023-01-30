@@ -2,7 +2,6 @@ package org.gongxuanzhang.mysql.service.analysis.dml;
 
 import org.gongxuanzhang.mysql.entity.Cell;
 import org.gongxuanzhang.mysql.entity.InsertInfo;
-import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;

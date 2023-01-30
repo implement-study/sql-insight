@@ -78,10 +78,11 @@ public interface Result {
     /**
      * 携带信息的返回值
      * 如 插入 修改时
+     *
      * @param message 信息内容
      * @return 携带信息的返回值
      **/
-    static Result info(String message){
+    static Result info(String message) {
         try {
             String sql = SessionManager.currentSession().getSql();
             InfoResult infoResult = new InfoResult(message);
@@ -115,7 +116,7 @@ public interface Result {
      * @param dataList 元数据
      * @return 结果
      **/
-    static Result select(String[] head, List<Map<String, String>> dataList) {
+    static Result select(String[] head, List<Map<String, ? extends Object>> dataList) {
         try {
             String sql = SessionManager.currentSession().getSql();
             SelectResult selectResult = new SelectResult(head, dataList);

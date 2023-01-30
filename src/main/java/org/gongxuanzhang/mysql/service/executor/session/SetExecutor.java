@@ -1,8 +1,8 @@
 package org.gongxuanzhang.mysql.service.executor.session;
 
 import org.gongxuanzhang.mysql.core.MySqlSession;
-import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.core.SessionManager;
+import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
 import org.gongxuanzhang.mysql.entity.VariableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;

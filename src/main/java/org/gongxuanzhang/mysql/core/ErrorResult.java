@@ -43,7 +43,6 @@ public class ErrorResult implements Result {
     }
 
 
-
     @Override
     public void setSql(String sql) {
         this.sql = sql;

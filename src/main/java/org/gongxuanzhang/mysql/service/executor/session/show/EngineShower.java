@@ -22,7 +22,7 @@ public class EngineShower implements Shower {
 
     @Override
     public Result show() {
-        List<Map<String, String>> data =
+        List<Map<String, ? extends Object>> data =
                 Context.getEngineList()
                         .stream()
                         .map(this::engineToResult)

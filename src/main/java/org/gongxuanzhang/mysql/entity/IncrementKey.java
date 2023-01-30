@@ -17,6 +17,7 @@ public class IncrementKey {
 
     /**
      * 拿到自增主键的值
+     *
      * @return 拿到下一个应该获取的主键值
      */
 
