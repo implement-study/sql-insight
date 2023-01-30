@@ -129,7 +129,7 @@ public class SqlTokenizer {
         if (nextChar() == '=') {
             pushTwoToken(TokenKind.LTE);
         } else {
-            pushOneToken(TokenKind.LTE);
+            pushOneToken(TokenKind.LT);
         }
     }
 
