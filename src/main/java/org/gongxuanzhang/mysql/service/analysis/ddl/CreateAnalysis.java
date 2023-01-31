@@ -4,6 +4,7 @@ import org.gongxuanzhang.mysql.entity.ColumnInfo;
 import org.gongxuanzhang.mysql.entity.ColumnType;
 import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
+import org.gongxuanzhang.mysql.entity.IncrementKey;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
@@ -108,7 +109,23 @@ public class CreateAnalysis implements TokenAnalysis {
             if (!StringUtils.hasText(this.info.getEngineName())) {
                 this.info.setEngineName(GlobalProperties.getInstance().get(DEFAULT_STORAGE_ENGINE));
             }
+            IncrementKey incrementKey = checkIncrementKey();
+            this.info.setIncrementKey(incrementKey);
             return this.info;
+        }
+
+        private IncrementKey checkIncrementKey() throws SqlAnalysisException {
+            String incrementKey = null;
+            for (ColumnInfo columnInfo : this.info.getColumnInfos()) {
+                if (columnInfo.isAutoIncrement()) {
+                    if (info.getPrimaryKey().contains(columnInfo.getName()) && incrementKey == null) {
+                        incrementKey = columnInfo.getName();
+                    } else {
+                        throw new SqlAnalysisException("自增主键只能有一个");
+                    }
+                }
+            }
+            return new IncrementKey(incrementKey);
         }
 
         private void analysisExtra() throws SqlAnalysisException {

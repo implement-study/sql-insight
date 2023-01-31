@@ -1,5 +1,6 @@
 package org.gongxuanzhang.mysql.service.analysis.dml;
 
+import org.gongxuanzhang.mysql.connection.Connection;
 import org.gongxuanzhang.mysql.entity.Cell;
 import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.entity.InsertInfo;
@@ -13,6 +14,7 @@ import org.gongxuanzhang.mysql.service.token.SqlToken;
 import org.gongxuanzhang.mysql.service.token.SqlTokenizer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
@@ -67,6 +69,12 @@ class InsertAnalysisTest {
         SqlTokenizer sqlTokenizer = new SqlTokenizer(sql);
         List<SqlToken> process = sqlTokenizer.process();
         insertAnalysis.analysis(process);
+    }
+
+    @Test
+    public void insertAutoIncrement(@Autowired Connection connection) throws MySQLException {
+        String sql = "insert into aa.user (name) values('自增')";
+        connection.execute(sql);
     }
 
 }

@@ -22,4 +22,11 @@ public class From implements TableInfoBox {
     public TableInfo getTableInfo() {
         return this.main;
     }
+
+    @Override
+    public void setTableInfo(TableInfo tableInfo) {
+        this.main = tableInfo;
+    }
+
+
 }

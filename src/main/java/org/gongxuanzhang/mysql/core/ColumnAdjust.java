@@ -71,7 +71,7 @@ public class ColumnAdjust {
                 fillDefault(box);
             }
         }
-        return new InsertData(insertBox, tableInfo.uniqueKeys());
+        return new InsertData(insertBox, tableInfo);
     }
 
     /**

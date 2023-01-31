@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 public class InsertInfo implements ExecuteInfo, TableInfoBox {
 
-    private TableInfo tableInfo = new TableInfo();
+    private TableInfo tableInfo;
 
     /**
      * 需要插入的列名

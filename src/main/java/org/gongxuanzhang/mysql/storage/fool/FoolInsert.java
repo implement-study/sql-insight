@@ -47,6 +47,9 @@ public class FoolInsert implements InsertEngine {
             }
         });
         FileUtils.append(tableInfo.dataFile().toPath(), insertData.getInsertStr());
+        if (tableInfo.getIncrementKey() != null) {
+            tableInfo.refresh();
+        }
         return Result.info(String.format("成功插入%s条数据", insertData.getInsertStr().size()));
     }
 

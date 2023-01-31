@@ -68,6 +68,7 @@ public class ExceptionThrower {
         if (e instanceof MySQLException) {
             throw (MySQLException) e;
         } else {
+            e.printStackTrace();
             throw new MySQLException(e.getMessage());
         }
     }

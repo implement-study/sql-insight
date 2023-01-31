@@ -15,4 +15,11 @@ public interface TableInfoBox {
      * @return 不能为null
      **/
     TableInfo getTableInfo();
+
+    /**
+     * 设置表信息
+     *
+     * @param tableInfo 不会为null
+     **/
+    void setTableInfo(TableInfo tableInfo);
 }

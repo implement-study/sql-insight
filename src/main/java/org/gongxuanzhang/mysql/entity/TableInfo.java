@@ -1,8 +1,10 @@
 package org.gongxuanzhang.mysql.entity;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.mysql.annotation.DependOnContext;
 import org.gongxuanzhang.mysql.core.EngineSelectable;
+import org.gongxuanzhang.mysql.core.Refreshable;
 import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.core.select.As;
 import org.gongxuanzhang.mysql.core.select.SelectCol;
@@ -12,6 +14,9 @@ import org.gongxuanzhang.mysql.tool.Context;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +25,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.gongxuanzhang.mysql.tool.ExceptionThrower.errorSwap;
+
 /**
  * 表信息
  *
@@ -27,7 +34,8 @@ import java.util.stream.Collectors;
  **/
 @Data
 @DependOnContext
-public class TableInfo implements ExecuteInfo, EngineSelectable {
+@Slf4j
+public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
 
 
     /**
@@ -184,5 +192,17 @@ public class TableInfo implements ExecuteInfo, EngineSelectable {
         this.primaryKey.add(primaryKey);
     }
 
+    /**
+     * 更新TableInfo内容
+     **/
+    public void refresh() throws MySQLException {
+        try (FileOutputStream fileOutputStream = new FileOutputStream(this.structFile());
+             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
+            objectOutputStream.writeObject(this);
+            log.info("更新表{}", this.absoluteName());
+        } catch (IOException e) {
+            errorSwap(e);
+        }
+    }
 
 }

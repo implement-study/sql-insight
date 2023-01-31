@@ -12,6 +12,7 @@ import org.gongxuanzhang.mysql.service.token.SqlToken;
 import org.gongxuanzhang.mysql.service.token.TokenSupport;
 import org.gongxuanzhang.mysql.tool.Context;
 import org.gongxuanzhang.mysql.tool.ExceptionThrower;
+import org.gongxuanzhang.mysql.tool.Pair;
 
 import java.util.List;
 
@@ -54,10 +55,9 @@ public class DropAnalysis implements TokenAnalysis {
     }
 
     private Executor dropTable(List<SqlToken> sqlTokenList) throws MySQLException {
-        TableInfo tableInfo = new TableInfo();
-        int i = TokenSupport.fillTableName(tableInfo, sqlTokenList, 2);
-        ExceptionThrower.ifNotThrow(sqlTokenList.size() == i + 2);
-        TableInfo select = Context.getTableManager().select(tableInfo);
+        Pair<Integer, TableInfo> pair = TokenSupport.analysisTableInfo(sqlTokenList, 2);
+        ExceptionThrower.ifNotThrow(sqlTokenList.size() == pair.getKey() + 2);
+        TableInfo select = Context.getTableManager().select(pair.getValue());
         return new DropTableExecutor(select);
     }
 

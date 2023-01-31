@@ -3,6 +3,7 @@ package org.gongxuanzhang.mysql.entity;
 import lombok.Data;
 import org.gongxuanzhang.mysql.annotation.DependOnContext;
 
+import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -10,10 +11,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Data
 @DependOnContext
-public class IncrementKey {
-    private String colName;
+public class IncrementKey implements Serializable {
+    private final String colName;
     private AtomicInteger incrementValue = new AtomicInteger(0);
 
+    public IncrementKey(String colName) {
+        this.colName = colName;
+    }
 
     /**
      * 拿到自增主键的值
@@ -23,6 +27,12 @@ public class IncrementKey {
 
     public int nextKey() {
         return incrementValue.incrementAndGet();
+    }
+
+    public void check(int value) {
+        if (incrementValue.get() < value) {
+            incrementValue.set(value);
+        }
     }
 
 }

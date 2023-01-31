@@ -46,10 +46,9 @@ public class SelectAnalysis implements TokenAnalysis {
      **/
     private int fillFrom(SingleSelectInfo info, List<SqlToken> sqlTokenList) throws MySQLException {
         From from = new From();
-        from.setMain(new TableInfo());
         TokenSupport.mustTokenKind(sqlTokenList.get(0), TokenKind.FROM);
         info.setFrom(from);
-        int tableOffset = TokenSupport.fillTableName(from, sqlTokenList, 1);
+        int tableOffset = TokenSupport.fillTableInfo(from, sqlTokenList, 1);
         //  from
         return tableOffset + 1;
     }

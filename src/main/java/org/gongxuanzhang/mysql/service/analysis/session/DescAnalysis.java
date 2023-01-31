@@ -8,6 +8,7 @@ import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.token.SqlToken;
 import org.gongxuanzhang.mysql.service.token.TokenSupport;
 import org.gongxuanzhang.mysql.tool.ExceptionThrower;
+import org.gongxuanzhang.mysql.tool.Pair;
 
 import java.util.List;
 
@@ -23,10 +24,9 @@ public class DescAnalysis implements TokenAnalysis {
 
     @Override
     public Executor analysis(List<SqlToken> sqlTokenList) throws MySQLException {
-        TableInfo tableInfo = new TableInfo();
-        int i = TokenSupport.fillTableName(tableInfo, sqlTokenList, 1);
-        ExceptionThrower.ifNotThrow(sqlTokenList.size() == i + 1);
-        return new DescTableExecutor(tableInfo);
+        Pair<Integer, TableInfo> pair = TokenSupport.analysisTableInfo(sqlTokenList, 1);
+        ExceptionThrower.ifNotThrow(sqlTokenList.size() == pair.getKey() + 1);
+        return new DescTableExecutor(pair.getValue());
     }
 
 }

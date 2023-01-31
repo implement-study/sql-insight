@@ -2,6 +2,7 @@ package org.gongxuanzhang.mysql.entity;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Data;
+import org.gongxuanzhang.mysql.core.TableInfoBox;
 import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Data
-public class InsertData {
+public class InsertData implements TableInfoBox {
 
     private final List<JSONObject> data;
 
@@ -27,10 +28,16 @@ public class InsertData {
 
     private List<String> insertStr;
 
+    private TableInfo tableInfo;
 
-    public InsertData(List<JSONObject> data, Set<String> uniqueKeys) {
+    private IncrementKey incrementKey;
+
+
+    public InsertData(List<JSONObject> data, TableInfo tableInfo) {
         this.data = data;
-        this.uniqueKeys = uniqueKeys;
+        this.tableInfo = tableInfo;
+        this.incrementKey = tableInfo.getIncrementKey();
+        this.uniqueKeys = tableInfo.uniqueKeys();
         if (!uniqueKeys.isEmpty()) {
             data.forEach(this::fillUnique);
         }
@@ -58,11 +65,21 @@ public class InsertData {
 
     public List<String> getInsertStr() {
         if (insertStr == null) {
-            insertStr = getData().stream().map(JSONObject::toString).collect(Collectors.toList());
+            insertStr = getData().stream()
+                    .map(this::fillIncrement)
+                    .map(JSONObject::toString)
+                    .collect(Collectors.toList());
         }
         return insertStr;
     }
 
+    private JSONObject fillIncrement(JSONObject jsonObject) {
+        if (incrementKey != null) {
+            int increment = (int) jsonObject.computeIfAbsent(incrementKey.getColName(), k -> incrementKey.nextKey());
+            incrementKey.check(increment);
+        }
+        return jsonObject;
+    }
 
     private void fillUnique(JSONObject data) {
         for (String uniqueKey : uniqueKeys) {

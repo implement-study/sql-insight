@@ -29,7 +29,7 @@ public class InsertAnalysis implements TokenAnalysis {
         TokenSupport.mustTokenKind(sqlTokenList.get(1), TokenKind.INTO);
         InsertInfo info = new InsertInfo();
         int offset = 2;
-        offset += TokenSupport.fillTableName(info, sqlTokenList, offset);
+        offset += TokenSupport.fillTableInfo(info, sqlTokenList, offset);
         final int finalOffset = offset;
         TokenSupport.token(sqlTokenList.get(finalOffset))
                 .when(TokenKind.LEFT_PAREN)

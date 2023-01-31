@@ -16,14 +16,14 @@
             <el-container>
                 <el-row>
                     <el-tooltip class="item" effect="dark" placement="bottom-end" open-delay="500">
-                        <div slot="content">执行SQL<br/>快捷键：shift+enter</div>
+                        <div slot="content">执行SQL<br/>快捷键：ctrl + R</div>
                         <el-button @click="doSql" icon="el-icon-caret-right"></el-button>
                     </el-tooltip>
                 </el-row>
                 <el-row>
                     <el-col :span="18">
                         <el-input
-                                @keydown.enter.native="enterGo"
+                                @keydown.ctrl.82.native="enterGo"
                                 type="textarea"
                                 :autosize="{ minRows: 8, maxRows: 8}"
                                 placeholder="请输入sql"
@@ -86,9 +86,7 @@
             watch: {},
             methods: {
                 enterGo(e) {
-                    if (e.shiftKey) {
-                        this.doSql();
-                    }
+                    this.doSql();
                 },
                 doSql() {
                     $.post(`/execute`, {sql: `${this.sql}`}).then(res => {

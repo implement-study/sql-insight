@@ -14,6 +14,7 @@ import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
 import org.gongxuanzhang.mysql.tool.Context;
 import org.gongxuanzhang.mysql.tool.ConvertUtils;
+import org.gongxuanzhang.mysql.tool.Pair;
 import org.gongxuanzhang.mysql.tool.ThrowableRunnable;
 
 import java.util.Arrays;
@@ -213,46 +214,46 @@ public class TokenSupport {
      * 分析token  解析出 数据库和表名
      * 填充到表信息中
      *
-     * @param tableInfo 表信息实体
      * @param tokenList token 流
      * @param offset    token流从哪开始解析
-     * @return 返回使用了多少个流
+     * @return pair key 使用了多少流中token  value 表信息
      **/
     @DependOnContext
-    public static int fillTableName(TableInfo tableInfo, List<SqlToken> tokenList, int offset) throws MySQLException {
+    public static Pair<Integer, TableInfo> analysisTableInfo(List<SqlToken> tokenList, int offset) throws MySQLException {
+        TableInfo tableInfo = new TableInfo();
         String candidate = TokenSupport.getMustVar(tokenList.get(offset));
         if (tokenList.size() < offset + 3) {
             tableInfo.setTableName(candidate);
             String database = SessionManager.currentSession().getDatabase();
             tableInfo.setDatabase(new DatabaseInfo(database));
             TableInfo realInfo = Context.getTableManager().select(tableInfo);
-            tableInfo.transport(realInfo);
-            return 1;
+            return Pair.of(1, realInfo);
         }
         if (TokenSupport.isTokenKind(tokenList.get(offset + 1), TokenKind.DOT)) {
             String tableName = TokenSupport.getMustVar(tokenList.get(offset + 2));
             tableInfo.setDatabase(new DatabaseInfo(candidate));
             tableInfo.setTableName(tableName);
             TableInfo realInfo = Context.getTableManager().select(tableInfo);
-            tableInfo.transport(realInfo);
-            return 3;
+            return Pair.of(3, realInfo);
         }
         tableInfo.setTableName(candidate);
         TableInfo realInfo = Context.getTableManager().select(tableInfo);
-        tableInfo.transport(realInfo);
-        return 1;
+        return Pair.of(1, realInfo);
     }
 
-    public static int fillTableName(TableInfo tableInfo, List<SqlToken> tokenList) throws MySQLException {
-        return fillTableName(tableInfo, tokenList, 0);
+    /**
+     * @return 返回偏移量
+     **/
+    @DependOnContext
+    public static int fillTableInfo(TableInfoBox box, List<SqlToken> tokenList, int offset) throws MySQLException {
+        Pair<Integer, TableInfo> pair = analysisTableInfo(tokenList, offset);
+        box.setTableInfo(pair.getValue());
+        return pair.getKey();
     }
 
-    public static int fillTableName(TableInfoBox box, List<SqlToken> tokenList, int offset) throws MySQLException {
-        return fillTableName(box.getTableInfo(), tokenList, offset);
-    }
 
-    public static int fillTableName(TableInfoBox box, List<SqlToken> tokenList) throws MySQLException {
-        return fillTableName(box.getTableInfo(), tokenList, 0);
+    public static int fillTableInfo(TableInfoBox box, List<SqlToken> tokenList) throws MySQLException {
+        return fillTableInfo(box, tokenList, 0);
     }
 
 
