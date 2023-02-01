@@ -1,12 +1,8 @@
 package org.gongxuanzhang.mysql.service.analysis.dml;
 
 import org.gongxuanzhang.mysql.core.select.As;
-import org.gongxuanzhang.mysql.core.select.Condition;
-import org.gongxuanzhang.mysql.core.select.From;
 import org.gongxuanzhang.mysql.core.select.SelectCol;
-import org.gongxuanzhang.mysql.core.select.Where;
 import org.gongxuanzhang.mysql.entity.SingleSelectInfo;
-import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
@@ -17,7 +13,6 @@ import org.gongxuanzhang.mysql.service.token.TokenSupport;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
 import org.gongxuanzhang.mysql.tool.Context;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,25 +28,12 @@ public class SelectAnalysis implements TokenAnalysis {
         SingleSelectInfo singleSelectInfo = new SingleSelectInfo();
         int offset = 1;
         offset += fillAs(singleSelectInfo, sqlTokenList.subList(1, sqlTokenList.size()));
-        offset += fillFrom(singleSelectInfo, sqlTokenList.subList(offset, sqlTokenList.size()));
-        analysisWhere(singleSelectInfo, sqlTokenList.subList(offset, sqlTokenList.size()));
+        offset += TokenSupport.fillFrom(singleSelectInfo, sqlTokenList.subList(offset, sqlTokenList.size()));
+        TokenSupport.fillWhere(singleSelectInfo, sqlTokenList.subList(offset, sqlTokenList.size()));
         StorageEngine engine = Context.selectStorageEngine(singleSelectInfo.getFrom().getMain());
         return new SelectExecutor(engine, singleSelectInfo);
     }
 
-
-    /**
-     * 解析from
-     * todo 目前只支持单表解析
-     **/
-    private int fillFrom(SingleSelectInfo info, List<SqlToken> sqlTokenList) throws MySQLException {
-        From from = new From();
-        TokenSupport.mustTokenKind(sqlTokenList.get(0), TokenKind.FROM);
-        info.setFrom(from);
-        int tableOffset = TokenSupport.fillTableInfo(from, sqlTokenList, 1);
-        //  from
-        return tableOffset + 1;
-    }
 
     /**
      * 解析别名
@@ -119,41 +101,6 @@ public class SelectAnalysis implements TokenAnalysis {
             offset++;
         }
         return offset;
-    }
-
-
-    /**
-     * 解析where
-     */
-    private int analysisWhere(SingleSelectInfo singleSelectInfo, List<SqlToken> sqlTokenList) throws MySQLException {
-        Where where = new Where();
-        singleSelectInfo.setWhere(where);
-        if (sqlTokenList.isEmpty()) {
-            return 0;
-        }
-        TokenSupport.mustTokenKind(sqlTokenList.get(0), TokenKind.WHERE);
-        int offset = 1;
-        boolean and = true;
-        List<SqlToken> subTokenList = new ArrayList<>();
-        while (offset < sqlTokenList.size()) {
-            if (TokenSupport.isTokenKind(sqlTokenList.get(offset), TokenKind.AND)) {
-                fillWhereCondition(subTokenList, where, and);
-                and = true;
-            } else if (TokenSupport.isTokenKind(sqlTokenList.get(offset), TokenKind.OR)) {
-                fillWhereCondition(subTokenList, where, and);
-                and = false;
-            } else {
-                subTokenList.add(sqlTokenList.get(offset));
-            }
-            offset++;
-        }
-        fillWhereCondition(subTokenList, where, and);
-        return offset;
-    }
-
-    private void fillWhereCondition(List<SqlToken> subTokenList, Where where, boolean and) throws MySQLException {
-        where.addCondition(and ? Condition.and(subTokenList) : Condition.or(subTokenList));
-        subTokenList.clear();
     }
 
 

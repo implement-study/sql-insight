@@ -66,10 +66,8 @@ public class SubSqlAnalysis implements TokenAnalysis {
         }
         try {
             return tokenAnalysis.analysis(sqlTokenList);
-        } catch (MySQLException mysql) {
-            throw new SqlAnalysisException(mysql.getMessage());
         } catch (Exception e) {
-            throw new SqlAnalysisException(String.format("sql解析出现问题,错误信息[%s]", e.getMessage()));
+            throw new SqlAnalysisException(e);
         }
 
     }

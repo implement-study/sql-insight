@@ -30,7 +30,7 @@ public class FoolSelect implements SelectEngine {
         List<SelectCol> selectCols = tableInfo.scatterCol(info.getAs());
         FileUtils.readAllLines(tableInfo.dataFile().toPath(), (line) -> {
             JSONObject jsonObject = JSONObject.parseObject(line);
-            if (where.getValue(jsonObject)) {
+            if (where.hit(jsonObject)) {
                 JSONObject viewJson = new JSONObject();
                 for (SelectCol selectCol : selectCols) {
                     viewJson.put(selectCol.getAlias(), jsonObject.getString(selectCol.getColName()));

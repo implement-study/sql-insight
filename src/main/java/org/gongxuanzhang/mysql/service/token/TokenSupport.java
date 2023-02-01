@@ -1,8 +1,13 @@
 package org.gongxuanzhang.mysql.service.token;
 
 import org.gongxuanzhang.mysql.annotation.DependOnContext;
+import org.gongxuanzhang.mysql.core.FromBox;
 import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.core.TableInfoBox;
+import org.gongxuanzhang.mysql.core.WhereBox;
+import org.gongxuanzhang.mysql.core.select.Condition;
+import org.gongxuanzhang.mysql.core.select.From;
+import org.gongxuanzhang.mysql.core.select.Where;
 import org.gongxuanzhang.mysql.entity.Cell;
 import org.gongxuanzhang.mysql.entity.ColumnType;
 import org.gongxuanzhang.mysql.entity.DatabaseInfo;
@@ -17,6 +22,7 @@ import org.gongxuanzhang.mysql.tool.ConvertUtils;
 import org.gongxuanzhang.mysql.tool.Pair;
 import org.gongxuanzhang.mysql.tool.ThrowableRunnable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -137,6 +143,58 @@ public class TokenSupport {
         return false;
     }
 
+    /**
+     * 解析from
+     * todo 目前只支持单表解析
+     *
+     * @return 返回偏移量
+     **/
+    public static int fillFrom(FromBox fromBox, List<SqlToken> sqlTokenList) throws MySQLException {
+        From from = new From();
+        TokenSupport.mustTokenKind(sqlTokenList.get(0), TokenKind.FROM);
+        fromBox.setFrom(from);
+        int tableOffset = TokenSupport.fillTableInfo(from, sqlTokenList, 1);
+        //  from
+        return tableOffset + 1;
+    }
+
+    /**
+     * 解析where
+     *
+     * @return 返回偏移量
+     */
+    public static int fillWhere(WhereBox whereBox, List<SqlToken> sqlTokenList) throws MySQLException {
+        Where where = new Where();
+        whereBox.setWhere(where);
+        if (sqlTokenList.isEmpty()) {
+            return 0;
+        }
+        TokenSupport.mustTokenKind(sqlTokenList.get(0), TokenKind.WHERE);
+        int offset = 1;
+        boolean and = true;
+        List<SqlToken> subTokenList = new ArrayList<>();
+        while (offset < sqlTokenList.size()) {
+            if (TokenSupport.isTokenKind(sqlTokenList.get(offset), TokenKind.AND)) {
+                fillWhereCondition(subTokenList, where, and);
+                and = true;
+            } else if (TokenSupport.isTokenKind(sqlTokenList.get(offset), TokenKind.OR)) {
+                fillWhereCondition(subTokenList, where, and);
+                and = false;
+            } else {
+                subTokenList.add(sqlTokenList.get(offset));
+            }
+            offset++;
+        }
+        fillWhereCondition(subTokenList, where, and);
+        return offset;
+    }
+
+
+    private static void fillWhereCondition(List<SqlToken> subTokenList, Where where, boolean and) throws MySQLException {
+        where.addCondition(and ? Condition.and(subTokenList) : Condition.or(subTokenList));
+        subTokenList.clear();
+    }
+
     public static boolean isTokenKind(SqlToken sqlToken, TokenKind... target) {
         return isTokenKind(sqlToken.getTokenKind(), target);
     }
@@ -222,23 +280,21 @@ public class TokenSupport {
     public static Pair<Integer, TableInfo> analysisTableInfo(List<SqlToken> tokenList, int offset) throws MySQLException {
         TableInfo tableInfo = new TableInfo();
         String candidate = TokenSupport.getMustVar(tokenList.get(offset));
-        if (tokenList.size() < offset + 3) {
-            tableInfo.setTableName(candidate);
-            String database = SessionManager.currentSession().getDatabase();
-            tableInfo.setDatabase(new DatabaseInfo(database));
-            TableInfo realInfo = Context.getTableManager().select(tableInfo);
-            return Pair.of(1, realInfo);
+        String database;
+        String tableName;
+        if (offset+1 < tokenList.size() && TokenSupport.isTokenKind(tokenList.get(offset + 1), TokenKind.DOT)) {
+            database = candidate;
+            tableName = TokenSupport.getString(tokenList.get(offset + 2));
+            offset = 3;
+        } else {
+            database = SessionManager.currentSession().getDatabase();
+            tableName = candidate;
+            offset = 1;
         }
-        if (TokenSupport.isTokenKind(tokenList.get(offset + 1), TokenKind.DOT)) {
-            String tableName = TokenSupport.getMustVar(tokenList.get(offset + 2));
-            tableInfo.setDatabase(new DatabaseInfo(candidate));
-            tableInfo.setTableName(tableName);
-            TableInfo realInfo = Context.getTableManager().select(tableInfo);
-            return Pair.of(3, realInfo);
-        }
-        tableInfo.setTableName(candidate);
+        tableInfo.setDatabase(new DatabaseInfo(database));
+        tableInfo.setTableName(tableName);
         TableInfo realInfo = Context.getTableManager().select(tableInfo);
-        return Pair.of(1, realInfo);
+        return Pair.of(offset, realInfo);
     }
 
     /**

@@ -17,17 +17,27 @@ public class FileUtils {
 
     }
 
+    /**
+     * 按行读取文件
+     *
+     * @param path   path
+     * @param handle 处理器
+     * @return 总行数
+     **/
     @DependOnContext
-    public static void readAllLines(Path path, LineHandle handle) throws MySQLException {
-
+    public static int readAllLines(Path path, LineHandle handle) throws MySQLException {
+        int lineSize = 0;
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             String line;
             while ((line = reader.readLine()) != null) {
+                lineSize++;
                 handle.handle(line);
             }
+            return lineSize;
         } catch (IOException e) {
-            ExceptionThrower.errorSwap(e);
+            return ExceptionThrower.errorSwap(e);
         }
+
     }
 
     public static void append(Path path, Iterable<String> iterable) throws MySQLException {

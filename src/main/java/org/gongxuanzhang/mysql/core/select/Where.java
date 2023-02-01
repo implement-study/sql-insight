@@ -25,7 +25,7 @@ public class Where {
     }
 
 
-    public boolean getValue(JSONObject jsonObject) {
+    public boolean hit(JSONObject jsonObject) {
         for (Condition orCondition : orConditions) {
             if (orCondition.getValue(jsonObject)) {
                 return true;
