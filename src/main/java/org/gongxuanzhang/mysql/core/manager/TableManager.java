@@ -1,9 +1,11 @@
 package org.gongxuanzhang.mysql.core.manager;
 
 import lombok.extern.slf4j.Slf4j;
+import org.gongxuanzhang.mysql.annotation.InitAfter;
 import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
+import org.gongxuanzhang.mysql.exception.MySQLInitException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,6 +21,7 @@ import static org.gongxuanzhang.mysql.entity.TableInfo.GFRM_SUFFIX;
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Slf4j
+@InitAfter(EngineManager.class)
 public class TableManager extends AbstractManager<TableInfo> {
 
 
@@ -49,7 +52,7 @@ public class TableManager extends AbstractManager<TableInfo> {
              ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
             return (TableInfo) objectInputStream.readObject();
         } catch (Exception e) {
-            throw new RuntimeException(gfrmFile.getName() + "表文件有问题，无法启动mysql,错误信息:" + e.getMessage());
+            throw new MySQLInitException(gfrmFile.getName() + "表文件有问题，无法启动mysql,错误信息:" + e.getMessage());
         }
 
     }

@@ -282,7 +282,7 @@ public class TokenSupport {
         String candidate = TokenSupport.getMustVar(tokenList.get(offset));
         String database;
         String tableName;
-        if (offset+1 < tokenList.size() && TokenSupport.isTokenKind(tokenList.get(offset + 1), TokenKind.DOT)) {
+        if (offset + 1 < tokenList.size() && TokenSupport.isTokenKind(tokenList.get(offset + 1), TokenKind.DOT)) {
             database = candidate;
             tableName = TokenSupport.getString(tokenList.get(offset + 2));
             offset = 3;

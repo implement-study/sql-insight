@@ -1,5 +1,6 @@
 package org.gongxuanzhang.mysql.core.manager;
 
+import org.gongxuanzhang.mysql.annotation.InitAfter;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
 
@@ -8,6 +9,7 @@ import org.gongxuanzhang.mysql.storage.StorageEngine;
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
+@InitAfter(DatabaseManager.class)
 public class EngineManager extends AbstractManager<StorageEngine> {
 
 

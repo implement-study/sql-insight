@@ -8,7 +8,7 @@ package org.gongxuanzhang.mysql.exception;
 public class SqlAnalysisException extends MySQLException {
 
     public SqlAnalysisException(Throwable cause) {
-        super(String.format("sql解析出现问题,错误信息[%s]", cause.getMessage()),cause);
+        super(String.format("sql解析出现问题,错误信息[%s]", cause.getMessage()), cause);
     }
 
     public SqlAnalysisException(String message) {

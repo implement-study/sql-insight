@@ -1,6 +1,5 @@
 package org.gongxuanzhang.mysql.service.analysis.ast;
 
-import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
 import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.ddl.AlterAnalysis;

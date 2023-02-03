@@ -1,18 +1,26 @@
 package org.gongxuanzhang.mysql.tool;
 
+import org.gongxuanzhang.mysql.annotation.InitAfter;
 import org.gongxuanzhang.mysql.core.EngineSelectable;
 import org.gongxuanzhang.mysql.core.MySqlProperties;
 import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.core.manager.DatabaseManager;
 import org.gongxuanzhang.mysql.core.manager.EngineManager;
+import org.gongxuanzhang.mysql.core.manager.MySQLManager;
 import org.gongxuanzhang.mysql.core.manager.TableManager;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
+import org.gongxuanzhang.mysql.exception.MySQLInitException;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.gongxuanzhang.mysql.core.MySqlProperties.DEFAULT_STORAGE_ENGINE;
 
@@ -24,18 +32,20 @@ import static org.gongxuanzhang.mysql.core.MySqlProperties.DEFAULT_STORAGE_ENGIN
 public class Context {
 
 
-    private static final DatabaseManager DATABASE_MANAGER;
-    private static final TableManager TABLE_MANAGER;
-    private static final EngineManager ENGINE_MANAGER;
+    private final static DatabaseManager DATABASE_MANAGER;
+    private final static TableManager TABLE_MANAGER;
+    private final static EngineManager ENGINE_MANAGER;
 
     static {
         try {
             DATABASE_MANAGER = new DatabaseManager();
             ENGINE_MANAGER = new EngineManager();
             TABLE_MANAGER = new TableManager(DATABASE_MANAGER);
-            DATABASE_MANAGER.refresh();
-            ENGINE_MANAGER.refresh();
-            TABLE_MANAGER.refresh();
+            ManagerInitialization init = new ManagerInitialization();
+            init.registerManager(TABLE_MANAGER);
+            init.registerManager(ENGINE_MANAGER);
+            init.registerManager(DATABASE_MANAGER);
+            init.managerRefresh();
         } catch (MySQLException e) {
             throw new RuntimeException(e);
         }
@@ -134,6 +144,46 @@ public class Context {
             throw new MySQLException("数据库[" + database + "]有问题");
         }
         return file;
+    }
+
+    public static class ManagerInitialization {
+
+        private final Map<Class<? extends MySQLManager<?>>, MySQLManager<?>> allManager = new HashMap<>();
+
+        private final List<MySQLManager<?>> sortedList = new ArrayList<>();
+
+        private final Set<Class<? extends MySQLManager<?>>> added = new HashSet<>();
+
+        private void registerManager(MySQLManager<?> manager) {
+            allManager.put((Class<? extends MySQLManager<?>>) manager.getClass(), manager);
+        }
+
+        private void managerRefresh() throws MySQLException {
+            allManager.forEach(this::doRefresh);
+            for (MySQLManager<?> manager : sortedList) {
+                manager.refresh();
+            }
+        }
+
+        private void doRefresh(Class<? extends MySQLManager<?>> clazz, MySQLManager<?> manager) {
+            if (added.contains(clazz)) {
+                return;
+            }
+            InitAfter initAfter = clazz.getAnnotation(InitAfter.class);
+            if (initAfter != null) {
+                Class<? extends MySQLManager<?>> after = initAfter.value();
+                MySQLManager<?> first = allManager.get(after);
+                if (first == null) {
+                    throw new MySQLInitException("没有注册" + after.getName() + "组件");
+                }
+                doRefresh(after, first);
+            }
+            this.sortedList.add(manager);
+            this.added.add(clazz);
+
+        }
+
+
     }
 
 
