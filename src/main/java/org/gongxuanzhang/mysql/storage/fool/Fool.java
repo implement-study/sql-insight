@@ -25,7 +25,7 @@ import org.gongxuanzhang.mysql.storage.UpdateEngine;
  **/
 @Engine
 @Slf4j
-public class FoolStorageEngine implements StorageEngine {
+public class Fool implements StorageEngine {
 
 
     private final CreateTableEngine foolCreateTable = new FoolTableCreator();

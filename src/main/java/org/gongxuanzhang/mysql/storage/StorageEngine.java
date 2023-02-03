@@ -1,7 +1,7 @@
 package org.gongxuanzhang.mysql.storage;
 
 import org.gongxuanzhang.mysql.annotation.DependOnContext;
-import org.gongxuanzhang.mysql.storage.fool.FoolStorageEngine;
+import org.gongxuanzhang.mysql.storage.fool.Fool;
 import org.gongxuanzhang.mysql.storage.innodb.InnoDb;
 
 /**
@@ -10,7 +10,7 @@ import org.gongxuanzhang.mysql.storage.innodb.InnoDb;
  * 可以自定义
  *
  * @author gxz gongxuanzhang@foxmail.com
- * @see FoolStorageEngine
+ * @see Fool
  * @see InnoDb
  **/
 @DependOnContext
