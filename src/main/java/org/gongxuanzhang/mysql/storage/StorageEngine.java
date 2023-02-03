@@ -2,6 +2,7 @@ package org.gongxuanzhang.mysql.storage;
 
 import org.gongxuanzhang.mysql.annotation.DependOnContext;
 import org.gongxuanzhang.mysql.storage.fool.FoolStorageEngine;
+import org.gongxuanzhang.mysql.storage.innodb.InnoDb;
 
 /**
  * 存储引擎接口

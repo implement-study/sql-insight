@@ -23,6 +23,7 @@ import java.util.List;
  * @author gxz gongxuanzhang@foxmail.com
  **/
 public class FoolDelete implements DeleteEngine {
+
     @Override
     public Result delete(DeleteInfo info) throws MySQLException {
         From from = info.getFrom();
