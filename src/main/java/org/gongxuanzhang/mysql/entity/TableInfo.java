@@ -1,5 +1,6 @@
 package org.gongxuanzhang.mysql.entity;
 
+import com.alibaba.fastjson2.JSONObject;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.mysql.annotation.DependOnContext;
@@ -168,11 +169,11 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
         }
     }
 
-    public List<Map<String, ?>> descTable() {
-        List<Map<String, ?>> result = new ArrayList<>();
+    public List<JSONObject> descTable() {
+        List<JSONObject> result = new ArrayList<>();
         Set<String> primary = primaryKey == null ? new HashSet<>() : new HashSet<>(primaryKey);
         for (ColumnInfo columnInfo : columnInfos) {
-            Map<String, String> colInfo = new HashMap<>(8);
+            JSONObject colInfo = new JSONObject(8);
             colInfo.put("field", columnInfo.getName());
             colInfo.put("type", columnInfo.getType().keyword);
             colInfo.put("null", Boolean.toString(!columnInfo.isNotNull()));

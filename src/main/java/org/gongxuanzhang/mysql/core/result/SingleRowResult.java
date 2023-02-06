@@ -1,6 +1,7 @@
 package org.gongxuanzhang.mysql.core.result;
 
-import java.util.Collections;
+import com.alibaba.fastjson2.JSONObject;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,7 +14,11 @@ public class SingleRowResult extends SelectResult {
 
     public SingleRowResult(String head, List<String> data) {
         super(new String[]{head},
-                data.stream().map(d -> Collections.singletonMap(head, d)).collect(Collectors.toList()));
+                data.stream().map(d -> {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put(head, d);
+                    return jsonObject;
+                }).collect(Collectors.toList()));
 
     }
 

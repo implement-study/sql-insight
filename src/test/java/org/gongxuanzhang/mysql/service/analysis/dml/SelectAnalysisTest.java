@@ -7,6 +7,7 @@ import org.gongxuanzhang.mysql.service.analysis.ast.SubSqlAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.token.SqlToken;
 import org.gongxuanzhang.mysql.service.token.SqlTokenizer;
+import org.gongxuanzhang.mysql.tool.Console;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -69,6 +70,8 @@ class SelectAnalysisTest {
     @Test
     public void testAnalysisOrder(@Autowired Connection connection) {
         String sql = "select * from aa.user order by id desc";
+        Console.infoResult(connection.execute(sql));
     }
+
 
 }

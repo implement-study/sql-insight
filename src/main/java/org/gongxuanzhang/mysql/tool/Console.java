@@ -1,5 +1,6 @@
 package org.gongxuanzhang.mysql.tool;
 
+import com.alibaba.fastjson2.JSONObject;
 import org.gongxuanzhang.mysql.core.ErrorResult;
 import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.core.result.SelectResult;
@@ -25,10 +26,8 @@ public class Console {
     }
 
     private static void selectInfo(SelectResult selectResult) {
-        List<Map<String, ?>> data = selectResult.getData();
-        for (Map<String, ?> datum : data) {
-            System.out.println(datum);
-        }
+        List<JSONObject> data = selectResult.getData();
+        data.forEach(System.out::println);
     }
 
 }

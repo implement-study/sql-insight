@@ -1,5 +1,6 @@
 package org.gongxuanzhang.mysql.service.executor.session.show;
 
+import com.alibaba.fastjson2.JSONObject;
 import org.gongxuanzhang.mysql.core.MySqlSession;
 import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.core.result.Result;
@@ -71,12 +72,12 @@ public class VariablesShower implements Shower {
     }
 
     private Result returnVar(Map<String, String> allAttr) {
-        List<Map<String, ? extends Object>> data = new ArrayList<>();
+        List<JSONObject> data = new ArrayList<>();
         allAttr.forEach((k, v) -> {
-            Map<String, String> map = new HashMap<>(4);
-            map.put(HEAD[0], k);
-            map.put(HEAD[1], v);
-            data.add(map);
+            JSONObject jsonObject = new JSONObject(4);
+            jsonObject.put(HEAD[0], k);
+            jsonObject.put(HEAD[1], v);
+            data.add(jsonObject);
         });
         return Result.select(HEAD, data);
     }

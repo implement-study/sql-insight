@@ -1,5 +1,6 @@
 package org.gongxuanzhang.mysql.core.result;
 
+import com.alibaba.fastjson2.JSONObject;
 import lombok.Data;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public class SelectResult implements Result {
 
     private final String[] head;
 
-    private final List<Map<String, ? extends Object>> data;
+    private final List<JSONObject> data;
 
     private String sqlTime;
 

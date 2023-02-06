@@ -1,6 +1,7 @@
 package org.gongxuanzhang.mysql.core.result;
 
 
+import com.alibaba.fastjson2.JSONObject;
 import org.gongxuanzhang.mysql.core.ErrorResult;
 import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.exception.SessionException;
@@ -116,7 +117,7 @@ public interface Result {
      * @param dataList 元数据
      * @return 结果
      **/
-    static Result select(String[] head, List<Map<String, ?>> dataList) {
+    static Result select(String[] head, List<JSONObject> dataList) {
         try {
             String sql = SessionManager.currentSession().getSql();
             SelectResult selectResult = new SelectResult(head, dataList);

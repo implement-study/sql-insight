@@ -25,7 +25,6 @@ public class FoolSelect implements SelectEngine {
 
     @Override
     public Result select(SingleSelectInfo info) throws MySQLException {
-        List<Map<String, ?>> data = new ArrayList<>();
         TableInfo tableInfo = info.getFrom().getTableInfo();
         Where where = info.getWhere();
         List<SelectCol> selectCols = tableInfo.scatterCol(info.getAs());
@@ -34,9 +33,10 @@ public class FoolSelect implements SelectEngine {
         FileUtils.readAllLines(tableInfo.dataFile().toPath(), (line) -> {
             JSONObject jsonObject = JSONObject.parseObject(line);
             // where
-            if (where.available() && where.hit(jsonObject)) {
-                viewJson.add(jsonObject);
+            if (where.available() && !where.hit(jsonObject)) {
+                return;
             }
+            viewJson.add(jsonObject);
         });
         //  as
         viewJson.forEach((json) -> {
@@ -53,6 +53,6 @@ public class FoolSelect implements SelectEngine {
         for (SelectCol selectCol : selectCols) {
             colNames.add(selectCol.getAlias());
         }
-        return Result.select(colNames.toArray(new String[]{}), data);
+        return Result.select(colNames.toArray(new String[]{}), viewJson);
     }
 }
