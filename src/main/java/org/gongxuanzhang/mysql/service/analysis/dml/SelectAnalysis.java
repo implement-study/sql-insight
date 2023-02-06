@@ -1,6 +1,7 @@
 package org.gongxuanzhang.mysql.service.analysis.dml;
 
 import org.gongxuanzhang.mysql.core.select.As;
+import org.gongxuanzhang.mysql.core.select.JsonOrder;
 import org.gongxuanzhang.mysql.core.select.SelectCol;
 import org.gongxuanzhang.mysql.entity.SingleSelectInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
@@ -12,6 +13,7 @@ import org.gongxuanzhang.mysql.service.token.TokenKind;
 import org.gongxuanzhang.mysql.service.token.TokenSupport;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
 import org.gongxuanzhang.mysql.tool.Context;
+import org.gongxuanzhang.mysql.tool.ExceptionThrower;
 
 import java.util.List;
 
@@ -29,7 +31,10 @@ public class SelectAnalysis implements TokenAnalysis {
         int offset = 1;
         offset += fillAs(singleSelectInfo, sqlTokenList.subList(1, sqlTokenList.size()));
         offset += TokenSupport.fillFrom(singleSelectInfo, sqlTokenList.subList(offset, sqlTokenList.size()));
-        TokenSupport.fillWhere(singleSelectInfo, sqlTokenList.subList(offset, sqlTokenList.size()));
+        offset += TokenSupport.fillWhere(singleSelectInfo, sqlTokenList.subList(offset, sqlTokenList.size()));
+        singleSelectInfo.setOrder(new JsonOrder());
+        offset += TokenSupport.fillOrderBy(singleSelectInfo, sqlTokenList.subList(offset, sqlTokenList.size()));
+        ExceptionThrower.ifNotThrow(offset == sqlTokenList.size(), "sql解析失败");
         StorageEngine engine = Context.selectStorageEngine(singleSelectInfo.getFrom().getMain());
         return new SelectExecutor(engine, singleSelectInfo);
     }
@@ -96,7 +101,7 @@ public class SelectAnalysis implements TokenAnalysis {
         }
         as.addSelectCol(SelectCol.single(key, value));
         //  判断下一个是否是逗号或者结束
-        if (offset + start < sqlTokenList.size() && TokenSupport.isTokenKind(sqlTokenList.get(offset),
+        if (offset + start < sqlTokenList.size() && TokenSupport.isTokenKind(sqlTokenList.get(start + offset),
                 TokenKind.COMMA)) {
             offset++;
         }

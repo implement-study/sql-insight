@@ -2,11 +2,14 @@ package org.gongxuanzhang.mysql.service.token;
 
 import org.gongxuanzhang.mysql.annotation.DependOnContext;
 import org.gongxuanzhang.mysql.core.FromBox;
+import org.gongxuanzhang.mysql.core.OrderBox;
 import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.core.TableInfoBox;
 import org.gongxuanzhang.mysql.core.WhereBox;
 import org.gongxuanzhang.mysql.core.select.Condition;
 import org.gongxuanzhang.mysql.core.select.From;
+import org.gongxuanzhang.mysql.core.select.Order;
+import org.gongxuanzhang.mysql.core.select.OrderEnum;
 import org.gongxuanzhang.mysql.core.select.Where;
 import org.gongxuanzhang.mysql.entity.Cell;
 import org.gongxuanzhang.mysql.entity.ColumnType;
@@ -166,10 +169,9 @@ public class TokenSupport {
     public static int fillWhere(WhereBox whereBox, List<SqlToken> sqlTokenList) throws MySQLException {
         Where where = new Where();
         whereBox.setWhere(where);
-        if (sqlTokenList.isEmpty()) {
+        if (sqlTokenList.isEmpty() || TokenSupport.isNotTokenKind(sqlTokenList.get(0), TokenKind.WHERE)) {
             return 0;
         }
-        TokenSupport.mustTokenKind(sqlTokenList.get(0), TokenKind.WHERE);
         int offset = 1;
         boolean and = true;
         List<SqlToken> subTokenList = new ArrayList<>();
@@ -187,6 +189,50 @@ public class TokenSupport {
         }
         fillWhereCondition(subTokenList, where, and);
         return offset;
+    }
+
+    /**
+     * 解析并填充order
+     *
+     * @return 偏移量
+     **/
+    public static int fillOrderBy(OrderBox orderBox, List<SqlToken> sqlTokenList) throws SqlAnalysisException {
+        Order<?> order = orderBox.getOrder();
+        if (sqlTokenList.isEmpty() || isNotTokenKind(sqlTokenList.get(0), TokenKind.ORDER)) {
+            return 0;
+        }
+        mustTokenKind(sqlTokenList.get(1), TokenKind.BY);
+        int offset = 2;
+        while (offset < sqlTokenList.size()) {
+            offset += doFillOrder(order, sqlTokenList, offset);
+        }
+        return offset;
+    }
+
+    private static int doFillOrder(Order<?> order, List<SqlToken> sqlTokenList, int offset) throws SqlAnalysisException {
+        String col = getString(sqlTokenList.get(offset));
+        int newOffset = 1;
+        if (offset + newOffset == sqlTokenList.size()) {
+            order.addOrder(col);
+            return 1;
+        }
+        if (TokenSupport.isTokenKind(sqlTokenList.get(offset + newOffset), TokenKind.COMMA)) {
+            order.addOrder(col);
+            return 2;
+        }
+        if (TokenSupport.isTokenKind(sqlTokenList.get(offset + newOffset), TokenKind.DESC)) {
+            order.addOrder(col, OrderEnum.desc);
+        } else if (TokenSupport.isTokenKind(sqlTokenList.get(offset + newOffset), TokenKind.ASC)) {
+            order.addOrder(col, OrderEnum.asc);
+        } else {
+            throw new SqlAnalysisException(sqlTokenList.get(offset + newOffset).getValue() + "错误");
+        }
+        newOffset++;
+        if (offset + newOffset == sqlTokenList.size()) {
+            return newOffset;
+        }
+        TokenSupport.mustTokenKind(sqlTokenList.get(offset + newOffset), TokenKind.COMMA);
+        return newOffset + 1;
     }
 
 

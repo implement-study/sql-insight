@@ -1,6 +1,5 @@
 package org.gongxuanzhang.mysql.core.manager;
 
-import org.gongxuanzhang.mysql.annotation.InitAfter;
 import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.tool.CollectionUtils;
@@ -37,7 +36,6 @@ public class DatabaseManager extends AbstractManager<DatabaseInfo> {
     public String toId(DatabaseInfo databaseInfo) {
         return databaseInfo.getDatabaseName();
     }
-
 
 
 }

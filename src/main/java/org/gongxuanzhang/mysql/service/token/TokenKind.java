@@ -58,6 +58,9 @@ public enum TokenKind implements SqlAstNode {
     AND,
     VALUES,
     AS,
+    ORDER,
+    BY,
+    ASC,
 
 
     //  data type

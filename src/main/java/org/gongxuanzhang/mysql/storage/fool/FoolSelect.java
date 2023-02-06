@@ -2,6 +2,7 @@ package org.gongxuanzhang.mysql.storage.fool;
 
 import com.alibaba.fastjson2.JSONObject;
 import org.gongxuanzhang.mysql.core.result.Result;
+import org.gongxuanzhang.mysql.core.select.Order;
 import org.gongxuanzhang.mysql.core.select.SelectCol;
 import org.gongxuanzhang.mysql.core.select.Where;
 import org.gongxuanzhang.mysql.entity.SingleSelectInfo;
@@ -24,21 +25,30 @@ public class FoolSelect implements SelectEngine {
 
     @Override
     public Result select(SingleSelectInfo info) throws MySQLException {
-        List<Map<String, ? extends Object>> data = new ArrayList<>();
+        List<Map<String, ?>> data = new ArrayList<>();
         TableInfo tableInfo = info.getFrom().getTableInfo();
         Where where = info.getWhere();
         List<SelectCol> selectCols = tableInfo.scatterCol(info.getAs());
+        List<JSONObject> viewJson = new ArrayList<>();
+
         FileUtils.readAllLines(tableInfo.dataFile().toPath(), (line) -> {
             JSONObject jsonObject = JSONObject.parseObject(line);
-            if (where.hit(jsonObject)) {
-                JSONObject viewJson = new JSONObject();
-                for (SelectCol selectCol : selectCols) {
-                    viewJson.put(selectCol.getAlias(), jsonObject.getString(selectCol.getColName()));
-                }
-                data.add(viewJson);
+            // where
+            if (where.available() && where.hit(jsonObject)) {
+                viewJson.add(jsonObject);
             }
         });
-
+        //  as
+        viewJson.forEach((json) -> {
+            for (SelectCol selectCol : selectCols) {
+                json.put(selectCol.getAlias(), json.get(selectCol.getColName()));
+            }
+        });
+        // order
+        Order<?> order = info.getOrder();
+        if (order.available()) {
+            viewJson.sort((Order<JSONObject>) order);
+        }
         List<String> colNames = new ArrayList<>();
         for (SelectCol selectCol : selectCols) {
             colNames.add(selectCol.getAlias());

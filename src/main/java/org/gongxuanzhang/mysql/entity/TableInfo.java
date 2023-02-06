@@ -168,8 +168,8 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
         }
     }
 
-    public List<Map<String, ? extends Object>> descTable() {
-        List<Map<String, ? extends Object>> result = new ArrayList<>();
+    public List<Map<String, ?>> descTable() {
+        List<Map<String, ?>> result = new ArrayList<>();
         Set<String> primary = primaryKey == null ? new HashSet<>() : new HashSet<>(primaryKey);
         for (ColumnInfo columnInfo : columnInfos) {
             Map<String, String> colInfo = new HashMap<>(8);

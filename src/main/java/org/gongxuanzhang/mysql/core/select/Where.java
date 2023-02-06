@@ -1,6 +1,7 @@
 package org.gongxuanzhang.mysql.core.select;
 
 import com.alibaba.fastjson2.JSONObject;
+import org.gongxuanzhang.mysql.core.Available;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class Where {
+public class Where implements Available {
 
     private final List<Condition> andConditions = new ArrayList<>();
 
@@ -35,6 +36,14 @@ public class Where {
             if (!andCondition.getValue(jsonObject)) {
                 return false;
             }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean available() {
+        if (this.andConditions.isEmpty() && this.orConditions.isEmpty()) {
+            return false;
         }
         return true;
     }
