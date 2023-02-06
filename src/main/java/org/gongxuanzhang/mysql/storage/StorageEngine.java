@@ -14,7 +14,8 @@ import org.gongxuanzhang.mysql.storage.innodb.InnoDb;
  * @see InnoDb
  **/
 @DependOnContext
-public interface StorageEngine extends CreateTableEngine, InsertEngine, DeleteEngine, SelectEngine, UpdateEngine {
+public interface StorageEngine extends CreateTableEngine, InsertEngine,
+        DeleteEngine, SelectEngine, UpdateEngine, TruncateEngine {
 
 
     /**

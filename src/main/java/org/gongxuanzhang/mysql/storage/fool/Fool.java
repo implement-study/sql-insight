@@ -7,6 +7,7 @@ import org.gongxuanzhang.mysql.entity.DeleteInfo;
 import org.gongxuanzhang.mysql.entity.InsertInfo;
 import org.gongxuanzhang.mysql.entity.SingleSelectInfo;
 import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.entity.TruncateInfo;
 import org.gongxuanzhang.mysql.entity.UpdateInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.storage.CreateTableEngine;
@@ -14,6 +15,7 @@ import org.gongxuanzhang.mysql.storage.DeleteEngine;
 import org.gongxuanzhang.mysql.storage.InsertEngine;
 import org.gongxuanzhang.mysql.storage.SelectEngine;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
+import org.gongxuanzhang.mysql.storage.TruncateEngine;
 import org.gongxuanzhang.mysql.storage.UpdateEngine;
 
 /**
@@ -37,6 +39,8 @@ public class Fool implements StorageEngine {
     private final UpdateEngine foolUpdate = new FoolUpdate();
 
     private final DeleteEngine foolDelete = new FoolDelete();
+
+    private final TruncateEngine truncateEngine = new FoolTruncate();
 
     @Override
     public String getEngineName() {
@@ -81,4 +85,8 @@ public class Fool implements StorageEngine {
     }
 
 
+    @Override
+    public Result truncate(TruncateInfo info) throws MySQLException {
+        return truncateEngine.truncate(info);
+    }
 }

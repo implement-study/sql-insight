@@ -1,23 +1,22 @@
 package org.gongxuanzhang.mysql.storage;
 
 import org.gongxuanzhang.mysql.core.result.Result;
-import org.gongxuanzhang.mysql.entity.UpdateInfo;
+import org.gongxuanzhang.mysql.entity.TruncateInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 
 /**
- * 修改引擎
+ * truncate引擎
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface UpdateEngine {
-
+public interface TruncateEngine {
 
     /**
-     * 修改数据
+     * 截断表
      *
-     * @param info update info
+     * @param info truncate info
      * @return 通用返回
      * @throws MySQLException 执行过程中出现问题抛出异常
      **/
-    Result update(UpdateInfo info) throws MySQLException;
+    Result truncate(TruncateInfo info) throws MySQLException;
 }

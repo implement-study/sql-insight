@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * alter 解析器
- * truncate table(todo)
+ * alter table(todo)
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/

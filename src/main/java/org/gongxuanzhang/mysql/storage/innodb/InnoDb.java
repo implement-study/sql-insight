@@ -6,6 +6,7 @@ import org.gongxuanzhang.mysql.entity.DeleteInfo;
 import org.gongxuanzhang.mysql.entity.InsertInfo;
 import org.gongxuanzhang.mysql.entity.SingleSelectInfo;
 import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.entity.TruncateInfo;
 import org.gongxuanzhang.mysql.entity.UpdateInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.storage.CreateTableEngine;
@@ -69,4 +70,8 @@ public class InnoDb implements StorageEngine {
     }
 
 
+    @Override
+    public Result truncate(TruncateInfo info) throws MySQLException {
+        return null;
+    }
 }
