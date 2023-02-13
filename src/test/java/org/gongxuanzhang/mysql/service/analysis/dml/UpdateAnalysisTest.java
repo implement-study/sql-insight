@@ -14,7 +14,7 @@ class UpdateAnalysisTest {
 
     @Test
     public void updateAnalysis(@Autowired Connection connection){
-        String sql = "update aa.user set a = 1 , b='a'";
+        String sql = "update aa.user set name = '李四111111' where id >4";
         connection.execute(sql);
 
     }
