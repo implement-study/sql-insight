@@ -66,6 +66,7 @@ public class SubSqlAnalysis implements TokenAnalysis {
         try {
             return tokenAnalysis.analysis(sqlTokenList);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new SqlAnalysisException(e);
         }
 

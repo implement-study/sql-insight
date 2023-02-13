@@ -15,6 +15,10 @@ public enum TokenKind implements SqlAstNode {
      * 标准字符串
      **/
     LITERACY,
+    /**
+     * 数字
+     **/
+    NUMBER,
 
 
     //  keyword

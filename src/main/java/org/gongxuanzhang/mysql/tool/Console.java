@@ -7,7 +7,6 @@ import org.gongxuanzhang.mysql.core.result.SelectResult;
 import org.gongxuanzhang.mysql.core.result.SuccessResult;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author gxz gongxuanzhang@foxmail.com

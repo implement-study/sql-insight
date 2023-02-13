@@ -147,7 +147,7 @@ public class SqlTokenizer {
             offset++;
         } while (TokenSupport.isDigit(currentChar()));
         String data = new String(charArray, start, offset - start);
-        this.sqlTokenList.add(new SqlToken(TokenKind.INT, data));
+        this.sqlTokenList.add(new SqlToken(TokenKind.NUMBER, data));
     }
 
     private void appendString() throws SqlParseException {

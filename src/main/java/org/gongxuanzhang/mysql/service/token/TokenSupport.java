@@ -294,6 +294,17 @@ public class TokenSupport {
         return sqlToken.getValue();
     }
 
+    /**
+     * 功能类似于{@link TokenSupport#getString(SqlToken)}
+     * 只是当不是目标类型时返回null
+     **/
+    public static String tryGetString(SqlToken sqlToken){
+        if (!isTokenKind(sqlToken, TokenKind.LITERACY, TokenKind.VAR)) {
+            return null;
+        }
+        return sqlToken.getValue();
+    }
+
     public static void mustTokenKind(SqlToken sqlToken, TokenKind... tokenKind) throws SqlAnalysisException {
         if (!isTokenKind(sqlToken, tokenKind)) {
             throwSqlAnalysis(sqlToken.getValue());
