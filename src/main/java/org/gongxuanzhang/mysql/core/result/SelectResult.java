@@ -4,7 +4,6 @@ import com.alibaba.fastjson2.JSONObject;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 查询结果返回实体

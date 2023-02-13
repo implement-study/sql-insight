@@ -55,7 +55,7 @@ public class ExceptionThrower {
     }
 
     public static void ifNotThrow(boolean expression) throws SqlAnalysisException {
-        ifNotThrow(expression, "sql无法解析");
+        ifNotThrow(expression, "sql有错误无法解析");
     }
 
     /**

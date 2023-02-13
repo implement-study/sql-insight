@@ -11,7 +11,7 @@ import org.gongxuanzhang.mysql.core.select.Where;
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Data
-public class UpdateInfo implements ExecuteInfo, TableInfoBox , WhereBox {
+public class UpdateInfo implements ExecuteInfo, TableInfoBox, WhereBox {
 
     private TableInfo tableInfo;
 

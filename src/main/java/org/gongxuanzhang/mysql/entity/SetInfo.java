@@ -19,7 +19,7 @@ public class SetInfo implements ExecuteInfo, Iterable<Pair<String, String>> {
 
 
     public void addSet(String colName, String value) {
-        setList.add(Pair.of(colName,value));
+        setList.add(Pair.of(colName, value));
     }
 
 

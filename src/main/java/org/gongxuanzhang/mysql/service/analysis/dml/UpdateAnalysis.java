@@ -12,6 +12,7 @@ import org.gongxuanzhang.mysql.service.token.TokenKind;
 import org.gongxuanzhang.mysql.service.token.TokenSupport;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
 import org.gongxuanzhang.mysql.tool.Context;
+import org.gongxuanzhang.mysql.tool.ExceptionThrower;
 
 import java.util.List;
 
@@ -33,7 +34,8 @@ public class UpdateAnalysis implements TokenAnalysis {
         TokenSupport.mustTokenKind(sqlTokenList.get(offset), TokenKind.SET);
         offset++;
         offset += fillSet(updateInfo, sqlTokenList, offset);
-        TokenSupport.fillWhere(updateInfo, sqlTokenList.subList(offset, sqlTokenList.size()));
+        offset += TokenSupport.fillWhere(updateInfo, sqlTokenList.subList(offset, sqlTokenList.size()));
+        ExceptionThrower.ifNotThrow(offset == sqlTokenList.size());
         StorageEngine engine = Context.selectStorageEngine(updateInfo.getTableInfo());
         return new UpdateExecutor(engine, updateInfo);
     }
@@ -60,7 +62,7 @@ public class UpdateAnalysis implements TokenAnalysis {
             if (offset + newOffset == tokenList.size()) {
                 break;
             }
-            if(!isTokenKind(tokenList.get(offset+newOffset),TokenKind.COMMA)){
+            if (!isTokenKind(tokenList.get(offset + newOffset), TokenKind.COMMA)) {
                 break;
             }
             newOffset++;

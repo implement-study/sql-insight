@@ -1,7 +1,6 @@
 package org.gongxuanzhang.mysql.service.executor.dml;
 
 import org.gongxuanzhang.mysql.core.result.Result;
-import org.gongxuanzhang.mysql.entity.DeleteInfo;
 import org.gongxuanzhang.mysql.entity.UpdateInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.executor.EngineExecutor;

@@ -298,7 +298,7 @@ public class TokenSupport {
      * 功能类似于{@link TokenSupport#getString(SqlToken)}
      * 只是当不是目标类型时返回null
      **/
-    public static String tryGetString(SqlToken sqlToken){
+    public static String tryGetString(SqlToken sqlToken) {
         if (!isTokenKind(sqlToken, TokenKind.LITERACY, TokenKind.VAR)) {
             return null;
         }
