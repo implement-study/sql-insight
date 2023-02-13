@@ -157,7 +157,7 @@ public class TokenSupport {
         TokenSupport.mustTokenKind(sqlTokenList.get(0), TokenKind.FROM);
         fromBox.setFrom(from);
         int tableOffset = TokenSupport.fillTableInfo(from, sqlTokenList, 1);
-        //  from
+        // offset from keyword
         return tableOffset + 1;
     }
 
@@ -175,15 +175,32 @@ public class TokenSupport {
         int offset = 1;
         boolean and = true;
         List<SqlToken> subTokenList = new ArrayList<>();
+        whereAnalysis:
         while (offset < sqlTokenList.size()) {
-            if (TokenSupport.isTokenKind(sqlTokenList.get(offset), TokenKind.AND)) {
-                fillWhereCondition(subTokenList, where, and);
-                and = true;
-            } else if (TokenSupport.isTokenKind(sqlTokenList.get(offset), TokenKind.OR)) {
-                fillWhereCondition(subTokenList, where, and);
-                and = false;
-            } else {
-                subTokenList.add(sqlTokenList.get(offset));
+            SqlToken currentSqlToken = sqlTokenList.get(offset);
+            switch (currentSqlToken.getTokenKind()) {
+                case AND:
+                    fillWhereCondition(subTokenList, where, and);
+                    and = true;
+                    break;
+                case OR:
+                    fillWhereCondition(subTokenList, where, and);
+                    and = false;
+                    break;
+                case LITERACY:
+                case VAR:
+                case NUMBER:
+                case EQUALS:
+                case NE:
+                case GT:
+                case GTE:
+                case LT:
+                case LTE:
+                    subTokenList.add(currentSqlToken);
+                    break;
+                default:
+                    break whereAnalysis;
+
             }
             offset++;
         }

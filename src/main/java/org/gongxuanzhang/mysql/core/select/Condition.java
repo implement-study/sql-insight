@@ -80,7 +80,7 @@ public class Condition {
         switch (sqlToken.getTokenKind()) {
             case VAR:
                 return (json) -> json.getString(sqlToken.getValue());
-            case INT:
+            case NUMBER:
             case LITERACY:
                 return (json) -> sqlToken.getValue();
             case NULL:

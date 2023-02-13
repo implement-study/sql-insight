@@ -46,6 +46,14 @@ class SelectAnalysisTest {
         Executor analysis = subSqlAnalysis.analysis(process);
     }
 
+    @Test
+    public void testAnalysisOrderAndWhere(@Autowired SubSqlAnalysis subSqlAnalysis) throws MySQLException{
+        String sql = "select * from aa.user where 1=1 order by id";
+        SqlTokenizer sqlTokenizer = new SqlTokenizer(sql);
+        List<SqlToken> process = sqlTokenizer.process();
+        Executor analysis = subSqlAnalysis.analysis(process);
+    }
+
 
     @Test
     public void testAnalysisOrderTargetOrder(@Autowired SubSqlAnalysis subSqlAnalysis) throws MySQLException {
