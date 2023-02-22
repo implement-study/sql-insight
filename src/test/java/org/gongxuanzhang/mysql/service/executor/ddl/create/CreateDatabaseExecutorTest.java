@@ -12,10 +12,11 @@ import java.io.File;
 
 
 @SpringBootTest
-class CreateDatabaseExecutorTest {
+public class CreateDatabaseExecutorTest {
 
 
-    private final String testDatabaseName = "test1";
+    private String testDatabaseName = "test1";
+
 
     @Test
     public void createDatabase(@Autowired Connection connection) {
@@ -28,10 +29,13 @@ class CreateDatabaseExecutorTest {
     }
 
     @AfterEach
-    public void deleteFile() {
+    public void deleteDb() {
         File home = Context.getHome();
         new File(home, testDatabaseName).delete();
     }
 
-
+    public CreateDatabaseExecutorTest setTestDatabaseName(String testDatabaseName) {
+        this.testDatabaseName = testDatabaseName;
+        return this;
+    }
 }
