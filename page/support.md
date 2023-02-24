@@ -5,17 +5,18 @@
 ### 数据库
 
 - [x] [create database](./ddl/database/createDatabase.md)
-- [ ] [alter database](./ddl/database/alterDatabase.md)
+- [ ] [alter database](./ddl/database/alterDatabase.md) (未实现)
 - [x] [drop database](./ddl/database/dropDatabase.md)
 - [x] [show databases](./ddl/database/showDatabase.md)
 
 ### 表
 
 - [x] [create table](./ddl/table/createTable.md)
-- [ ] [alter table](./ddl/table/alterTable.md)
+- [ ] [alter table](./ddl/table/alterTable.md)(未实现)
 - [x] [drop table](./ddl/table/dropTable.md)
+- [x] [truncate table](./ddl/table/truncateTable.md)
 - [x] [show tables](./ddl/table/showTable.md)
-- [x] [desc table](./descTable.md)
+- [x] [desc table](./ddl/table/descTable.md)
 
 ### 索引(未实现)
 

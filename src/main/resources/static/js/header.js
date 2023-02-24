@@ -13,16 +13,16 @@ let headerTemplate = `
 		</el-menu>
 	`
 
-Vue.component('common-menu',{
-    template:headerTemplate,
-    props:{
-        activeIndex:{
-            type:String
+Vue.component('common-menu', {
+    template: headerTemplate,
+    props: {
+        activeIndex: {
+            type: String
         }
     },
-    methods:{
-		handleSelect(key, keyPath) {
-			location.href = key;
-		},
+    methods: {
+        handleSelect(key, keyPath) {
+            location.href = key;
+        },
     }
 })

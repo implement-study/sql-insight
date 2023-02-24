@@ -1,5 +1,6 @@
 package org.gongxuanzhang.mysql.service.executor.ddl.database
 
+import org.gongxuanzhang.mysql.core.result.Result
 import org.gongxuanzhang.mysql.doSql
 import org.gongxuanzhang.mysql.exception.MySQLException
 import org.gongxuanzhang.mysql.tool.Context
@@ -24,9 +25,15 @@ class DropDatabaseTest {
         val dir = File(Context.getHome(), database)
         dir.mkdirs()
         assert(dir.exists() && dir.isDirectory)
-        "drop database $database".doSql()
+        doDropDatabase(database)
         assert(!dir.exists())
     }
+
+
+    fun doDropDatabase(database: String): Result {
+        return "drop database $database".doSql()
+    }
+
 
     @Test
     @DisplayName("删除不存在的数据库")

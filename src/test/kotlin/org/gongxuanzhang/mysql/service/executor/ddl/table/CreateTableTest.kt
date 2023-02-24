@@ -1,10 +1,14 @@
 package org.gongxuanzhang.mysql.service.executor.ddl.table
 
+import org.gongxuanzhang.mysql.core.result.Result
 import org.gongxuanzhang.mysql.doSql
 import org.gongxuanzhang.mysql.entity.ColumnInfo
 import org.gongxuanzhang.mysql.entity.ColumnType
+import org.gongxuanzhang.mysql.entity.TableInfo
 import org.gongxuanzhang.mysql.exception.ExecuteException
 import org.gongxuanzhang.mysql.service.executor.ddl.database.CreateDatabaseTest
+import org.gongxuanzhang.mysql.service.executor.ddl.database.DropDatabaseTest
+import org.gongxuanzhang.mysql.service.executor.ddl.database.UseDatabaseTest
 import org.gongxuanzhang.mysql.tool.Context
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -25,6 +29,68 @@ class CreateTableTest {
         val tableName = "create_test_table_user"
         doCreateTable(database, tableName)
         val select = Context.getTableManager().select("$database.$tableName")
+        checkTableInfo(select, database, tableName)
+        DropDatabaseTest().doDropDatabase(database)
+    }
+
+
+    @Test
+    fun createSessionTable() {
+        val database = "create_database"
+        CreateDatabaseTest().doCreateDatabase(database)
+        val tableName = "aaa"
+        UseDatabaseTest().doUseDatabase(database)
+        doCreateSessionTable(tableName)
+        val select = Context.getTableManager().select("$database.$tableName")
+        checkTableInfo(select, database, tableName)
+        DropDatabaseTest().doDropDatabase(database)
+    }
+
+    @Test
+    fun createExistTable() {
+        val database = "create_database"
+        CreateDatabaseTest().doCreateDatabase(database)
+        doCreateTable(database, "aaa")
+        assertThrows<ExecuteException> {
+            doCreateTable(database, "aaa")
+        }
+        DropDatabaseTest().doDropDatabase(database)
+    }
+
+    @Test
+    fun createNoExistDatabase() {
+        assertThrows<ExecuteException> {
+            doCreateTable("aaa", "aaaaa")
+        }
+    }
+
+
+    fun doCreateSessionTable(tableName: String): Result {
+        return """
+                    create table $tableName(
+                    id int primary key auto_increment,
+                    name varchar not null,
+                    gender varchar default '张三' not null,
+                    age int comment '年龄',
+                    id_card varchar UNIQUE,
+                    ) comment ='用户表'
+                """.doSql()
+    }
+
+    fun doCreateTable(database: String, tableName: String): Result {
+        return """
+                    create table $database.$tableName(
+                    id int primary key auto_increment,
+                    name varchar not null,
+                    gender varchar default '张三' not null,
+                    age int comment '年龄',
+                    id_card varchar UNIQUE,
+                    ) comment ='用户表'
+                """.doSql()
+    }
+
+
+    private fun checkTableInfo(select: TableInfo, database: String, tableName: String) {
         assert(select.database.databaseName == database)
         assert(select.tableName == tableName)
         assert(select.comment == "用户表")
@@ -66,39 +132,6 @@ class CreateTableTest {
         })
         assert(select.comment == "用户表")
         assert(select.primaryKey == arrayListOf("id"))
-        "drop database $database".doSql()
-    }
-
-
-    @Test
-    fun createExistTable() {
-        val database = "create_database"
-        CreateDatabaseTest().doCreateDatabase(database)
-        doCreateTable(database, "aaa")
-        assertThrows<ExecuteException> {
-            doCreateTable(database, "aaa")
-        }
-        "drop database $database".doSql()
-    }
-
-    @Test
-    fun createNoExistDatabase() {
-        assertThrows<ExecuteException> {
-            doCreateTable("aaa", "aaaaa")
-        }
-    }
-
-
-    fun doCreateTable(database: String, tableName: String) {
-        """
-            create table $database.$tableName(
-            id int primary key auto_increment,
-            name varchar not null,
-            gender varchar default '张三' not null,
-            age int comment '年龄',
-            id_card varchar UNIQUE,
-            ) comment ='用户表'
-        """.doSql()
     }
 
 }

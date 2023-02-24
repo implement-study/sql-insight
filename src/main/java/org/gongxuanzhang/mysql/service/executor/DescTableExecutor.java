@@ -15,7 +15,7 @@ import org.gongxuanzhang.mysql.tool.Context;
 public class DescTableExecutor implements Executor {
 
     private static final String[] TABLE_DESC_HEAD = new String[]{
-            "field", "type", "null", "primary key", "default", "auto_increment"};
+            "field", "type", "notNull", "primary key", "default", "auto_increment", "unique", "comment"};
 
     private final TableInfo info;
 

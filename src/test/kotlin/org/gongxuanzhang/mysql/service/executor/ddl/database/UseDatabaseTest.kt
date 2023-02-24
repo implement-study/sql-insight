@@ -1,6 +1,7 @@
 package org.gongxuanzhang.mysql.service.executor.ddl.database
 
 import org.gongxuanzhang.mysql.core.SessionManager
+import org.gongxuanzhang.mysql.core.result.Result
 import org.gongxuanzhang.mysql.doSql
 import org.gongxuanzhang.mysql.exception.MySQLException
 import org.gongxuanzhang.mysql.tool.randomDatabase
@@ -20,16 +21,20 @@ class UseDatabaseTest {
     fun useDatabase() {
         val database = randomDatabase()
         "create database '$database'".doSql()
-        "use $database".doSql()
+        doUseDatabase(database)
         assert(SessionManager.currentSession().database == database)
         "drop database $database".doSql()
+    }
+
+    fun doUseDatabase(database: String): Result {
+        return "use $database".doSql()
     }
 
     @Test
     fun userNoExistDatabase() {
         val uuid = randomDatabase()
         assertThrows<MySQLException> {
-            "use $uuid".doSql()
+            doUseDatabase(uuid)
         }
     }
 }

@@ -15,9 +15,7 @@ public class FoolTruncate implements TruncateEngine {
 
     @Override
     public Result truncate(TruncateInfo info) throws MySQLException {
-        //  不用短路
-        boolean successDelete = info.getTableInfo().dataFile().delete() & info.getTableInfo().structFile().delete();
-        if (successDelete) {
+        if (info.getTableInfo().dataFile().delete()) {
             return Result.info("成功删除" + info.getTableInfo().getTableName() + "表");
         }
         return Result.error("删除表失败");

@@ -33,8 +33,8 @@ public interface MySQLManager<T> {
 
     /**
      * 删除内容
-     * @param name 标识
      *
+     * @param name 标识
      **/
     void remove(String name);
 

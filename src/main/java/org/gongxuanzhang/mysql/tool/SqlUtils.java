@@ -19,7 +19,6 @@ public class SqlUtils {
     private static final Pattern ILLEGAL_PATTERN = Pattern.compile("[^\\w]+");
 
 
-
     /**
      * 校验变量名的合法行
      *

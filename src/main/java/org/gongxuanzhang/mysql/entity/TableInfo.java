@@ -176,10 +176,12 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
             JSONObject colInfo = new JSONObject(8);
             colInfo.put("field", columnInfo.getName());
             colInfo.put("type", columnInfo.getType().keyword);
-            colInfo.put("null", Boolean.toString(!columnInfo.isNotNull()));
+            colInfo.put("notNull", Boolean.toString(!columnInfo.isNotNull()));
             colInfo.put("primary key", Boolean.toString(primary.contains(columnInfo.getName())));
             colInfo.put("default", columnInfo.getDefaultValue());
             colInfo.put("auto_increment", Boolean.toString(columnInfo.isAutoIncrement()));
+            colInfo.put("unique", Boolean.toString(columnInfo.isUnique()));
+            colInfo.put("comment", columnInfo.getComment());
             result.add(colInfo);
         }
         return result;
