@@ -1,8 +1,6 @@
 package org.gongxuanzhang.mysql.service.executor.ddl.table
 
 import org.gongxuanzhang.mysql.doSql
-import org.gongxuanzhang.mysql.entity.ColumnInfo
-import org.gongxuanzhang.mysql.entity.ColumnType
 import org.gongxuanzhang.mysql.exception.MySQLException
 import org.gongxuanzhang.mysql.tool.Context
 import org.junit.jupiter.api.Test
@@ -42,10 +40,23 @@ class DropTableTest {
             Context.getTableManager().select("$database.$tableName")
         }
         //  硬盘上删除
-        val dbDir = File(Context.getHome(),database)
+        val dbDir = File(Context.getHome(), database)
         val tableFiles = dbDir.listFiles(FileFilter { it.name.contains(tableName) })
         assert(tableFiles?.isEmpty() == true)
+        "drop database $database".doSql()
+    }
 
+    @Test
+    fun dropNoExistTable() {
+        val database = "create_database"
+
+        "create database $database".doSql()
+
+        assertThrows<MySQLException> {
+            "drop table $database.aaaaaaaaa".doSql()
+        }
+
+        "drop database $database".doSql()
 
     }
 

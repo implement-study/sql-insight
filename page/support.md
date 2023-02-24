@@ -12,7 +12,7 @@
 ### 表
 
 - [x] [create table](./ddl/table/createTable.md)
-- [x] [alter table](./ddl/table/alterTable.md)
+- [ ] [alter table](./ddl/table/alterTable.md)
 - [x] [drop table](./ddl/table/dropTable.md)
 - [x] [show tables](./ddl/table/showTable.md)
 - [x] [desc table](./descTable.md)

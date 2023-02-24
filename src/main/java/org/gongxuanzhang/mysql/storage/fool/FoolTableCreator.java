@@ -29,7 +29,7 @@ public class FoolTableCreator implements CreateTableEngine {
         try (FileOutputStream fileOutputStream = new FileOutputStream(tableInfo.structFile());
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
             objectOutputStream.writeObject(tableInfo);
-            log.info("创建表{}.{}", tableInfo.getDatabase(), tableInfo.getTableName());
+            log.info("创建表{}.{}", tableInfo.getDatabase().getDatabaseName(), tableInfo.getTableName());
             Context.getTableManager().register(tableInfo);
             return Result.success();
         } catch (IOException e) {

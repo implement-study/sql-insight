@@ -3,8 +3,11 @@ package org.gongxuanzhang.mysql.service.executor.ddl.table
 import org.gongxuanzhang.mysql.doSql
 import org.gongxuanzhang.mysql.entity.ColumnInfo
 import org.gongxuanzhang.mysql.entity.ColumnType
+import org.gongxuanzhang.mysql.exception.ExecuteException
+import org.gongxuanzhang.mysql.service.executor.ddl.database.CreateDatabaseTest
 import org.gongxuanzhang.mysql.tool.Context
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.test.context.SpringBootTest
 
 
@@ -16,22 +19,11 @@ class CreateTableTest {
 
 
     @Test
-    fun createTable() {
+    fun createTableTest() {
         val database = "create_database"
-
-        "create database $database".doSql()
-
+        CreateDatabaseTest().doCreateDatabase(database)
         val tableName = "create_test_table_user"
-        """
-            create table $database.$tableName(
-            id int primary key auto_increment,
-            name varchar not null,
-            gender varchar default '张三' not null,
-            age int comment '年龄',
-            id_card varchar UNIQUE,
-            ) comment ='用户表'
-        """.doSql()
-
+        doCreateTable(database, tableName)
         val select = Context.getTableManager().select("$database.$tableName")
         assert(select.database.databaseName == database)
         assert(select.tableName == tableName)
@@ -74,10 +66,39 @@ class CreateTableTest {
         })
         assert(select.comment == "用户表")
         assert(select.primaryKey == arrayListOf("id"))
-
-        
         "drop database $database".doSql()
+    }
 
+
+    @Test
+    fun createExistTable() {
+        val database = "create_database"
+        CreateDatabaseTest().doCreateDatabase(database)
+        doCreateTable(database, "aaa")
+        assertThrows<ExecuteException> {
+            doCreateTable(database, "aaa")
+        }
+        "drop database $database".doSql()
+    }
+
+    @Test
+    fun createNoExistDatabase() {
+        assertThrows<ExecuteException> {
+            doCreateTable("aaa", "aaaaa")
+        }
+    }
+
+
+    fun doCreateTable(database: String, tableName: String) {
+        """
+            create table $database.$tableName(
+            id int primary key auto_increment,
+            name varchar not null,
+            gender varchar default '张三' not null,
+            age int comment '年龄',
+            id_card varchar UNIQUE,
+            ) comment ='用户表'
+        """.doSql()
     }
 
 }

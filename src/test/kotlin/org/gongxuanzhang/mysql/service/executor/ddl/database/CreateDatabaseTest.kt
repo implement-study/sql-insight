@@ -21,11 +21,15 @@ class CreateDatabaseTest {
     @Test
     @DisplayName("普通创建数据库")
     fun simpleCreateDatabase() {
-        "create database $database".doSql()
+        doCreateDatabase(database)
         val home = Context.getHome()
         val file = File(home, database)
         assert(file.exists())
         file.deleteRecursively()
+    }
+
+    fun doCreateDatabase(database: String) {
+        "create database $database".doSql()
     }
 
 

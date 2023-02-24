@@ -30,16 +30,22 @@ public class DropTableExecutor implements Executor {
     @Override
     public Result doExecute() throws MySQLException {
         File gfrmFile = this.tableInfo.structFile();
+        String databaseName = tableInfo.getDatabase().getDatabaseName();
         if (!gfrmFile.exists()) {
-            String message = String.format("表%s.%s不存在", tableInfo.getDatabase(), tableInfo.getTableName());
+            String message = String.format("表%s.%s不存在", databaseName, tableInfo.getTableName());
             throw new ExecuteException(message);
         }
         if (!gfrmFile.delete()) {
-            String message = String.format("删除表%s.%s失败", tableInfo.getDatabase(), tableInfo.getTableName());
+            String message = String.format("删除表%s.%s失败", databaseName, tableInfo.getTableName());
             throw new ExecuteException(message);
         }
-        log.info("删除表{}.{}", tableInfo.getDatabase(), tableInfo.getTableName());
-        Context.getTableManager().remove(String.format("%s.%s", tableInfo.getDatabase(), tableInfo.getTableName()));
+        File dataFile = this.tableInfo.dataFile();
+        if (!dataFile.delete()) {
+            String message = String.format("删除表%s.%s失败", databaseName, tableInfo.getTableName());
+            throw new ExecuteException(message);
+        }
+        log.info("删除表{}.{}", databaseName, tableInfo.getTableName());
+        Context.getTableManager().remove(String.format("%s.%s", databaseName, tableInfo.getTableName()));
         return Result.success();
     }
 }

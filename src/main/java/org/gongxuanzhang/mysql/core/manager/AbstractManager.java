@@ -43,6 +43,7 @@ public abstract class AbstractManager<T> implements MySQLManager<T> {
 
     /**
      * 找不到内容的异常信息
+     * @return 异常信息 not null
      */
     protected abstract String errorMessage();
 
