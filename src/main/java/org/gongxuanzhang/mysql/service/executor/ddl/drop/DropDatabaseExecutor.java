@@ -48,6 +48,8 @@ public class DropDatabaseExecutor implements Executor {
                     .forEach(File::delete);
             databaseManager.refresh();
             log.info("删除{}数据库", databaseInfo.getDatabaseName());
+            Context.getDatabaseManager().remove(databaseInfo.getDatabaseName());
+            Context.getTableManager().removeDatabase(databaseInfo.getDatabaseName());
             return Result.success();
         } catch (IOException e) {
             throw new ExecuteException("删除数据库失败");

@@ -75,7 +75,7 @@ class CreateTableTest {
         assert(select.comment == "用户表")
         assert(select.primaryKey == arrayListOf("id"))
 
-
+        
         "drop database $database".doSql()
 
     }

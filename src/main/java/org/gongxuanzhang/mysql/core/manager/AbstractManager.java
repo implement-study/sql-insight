@@ -35,6 +35,12 @@ public abstract class AbstractManager<T> implements MySQLManager<T> {
         return t;
     }
 
+
+    @Override
+    public void remove(String name) {
+        cache.remove(name);
+    }
+
     /**
      * 找不到内容的异常信息
      */
@@ -54,9 +60,20 @@ public abstract class AbstractManager<T> implements MySQLManager<T> {
     }
 
     /**
+     * 拿到缓存
+     * @return not null
+     **/
+    protected Map<String, T> getCache() {
+        return this.cache;
+    }
+
+
+    /**
      * 初始化内容，在构造和refresh的时候会触发
      *
      * @throws MySQLException 初始化发生异常触发
      **/
     protected abstract void init() throws MySQLException;
+
+
 }

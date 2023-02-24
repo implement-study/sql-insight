@@ -6,6 +6,7 @@ import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.executor.Executor;
+import org.gongxuanzhang.mysql.tool.Context;
 
 import java.io.File;
 
@@ -38,6 +39,7 @@ public class DropTableExecutor implements Executor {
             throw new ExecuteException(message);
         }
         log.info("删除表{}.{}", tableInfo.getDatabase(), tableInfo.getTableName());
+        Context.getTableManager().remove(String.format("%s.%s", tableInfo.getDatabase(), tableInfo.getTableName()));
         return Result.success();
     }
 }

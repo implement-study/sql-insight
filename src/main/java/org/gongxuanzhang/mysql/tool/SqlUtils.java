@@ -18,32 +18,6 @@ public class SqlUtils {
 
     private static final Pattern ILLEGAL_PATTERN = Pattern.compile("[^\\w]+");
 
-    /**
-     * 此方法会把sql格式化
-     * 格式化包括 去掉前后空格，
-     * 所有连续空格变成一个
-     * 等号两边加一个空格
-     * 括号左右加一个空格
-     *
-     * @param sql 用户输入的sql
-     * @return 格式化之后的sql
-     **/
-    @Deprecated
-    public static String formatSql(String sql) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (char c : sql.trim().toCharArray()) {
-            switch (c) {
-                case '=':
-                case '(':
-                case ')':
-                    stringBuilder.append(" ").append(c).append(" ");
-                    break;
-                default:
-                    stringBuilder.append(c);
-            }
-        }
-        return stringBuilder.toString().replaceAll("\\s+", " ");
-    }
 
 
     /**

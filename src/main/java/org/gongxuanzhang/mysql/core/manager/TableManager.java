@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.gongxuanzhang.mysql.entity.TableInfo.GFRM_SUFFIX;
@@ -46,6 +47,15 @@ public class TableManager extends AbstractManager<TableInfo> {
                 .map(this::gfrmToInfo)
                 .forEach(this::register);
     }
+
+    public void removeDatabase(String database) {
+        this.getCache().keySet().stream()
+                .filter(tableName -> tableName.startsWith(database))
+                .collect(Collectors.toList())
+                .forEach(this.getCache()::remove);
+
+    }
+
 
     private TableInfo gfrmToInfo(File gfrmFile) {
         try (FileInputStream fileInputStream = new FileInputStream(gfrmFile);

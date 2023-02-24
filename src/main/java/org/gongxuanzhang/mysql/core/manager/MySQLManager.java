@@ -31,6 +31,13 @@ public interface MySQLManager<T> {
         return select(toId(t));
     }
 
+    /**
+     * 删除内容
+     * @param name 标识
+     *
+     **/
+    void remove(String name);
+
 
     /**
      * 拿到所有的管理数据
