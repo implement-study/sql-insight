@@ -14,28 +14,18 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.service.analysis;
+package org.gongxuanzhang.mysql.service.executor.dcl;
 
-import org.gongxuanzhang.mysql.exception.MySQLException;
-import org.gongxuanzhang.mysql.service.executor.Executor;
-import org.gongxuanzhang.mysql.service.token.SqlToken;
-
-import java.util.List;
+import com.alibaba.druid.sql.ast.SQLStatement;
+import org.gongxuanzhang.mysql.service.executor.AbstractExecutor;
 
 /**
- * @author gxz gongxuanzhang@foxmail.com
+ * dcl执行器
+ * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public interface TokenAnalysis {
+public abstract class DclExecutor<T extends SQLStatement> extends AbstractExecutor<T> {
 
-
-    /**
-     * 解析成一个执行器
-     *
-     * @param sqlTokenList tokens
-     * @return 执行器
-     * @throws MySQLException 解析失败抛出异常
-     **/
-    @Deprecated
-    Executor analysis(List<SqlToken> sqlTokenList) throws MySQLException;
-
+    public DclExecutor(T sqlStatement) {
+        super(sqlStatement);
+    }
 }

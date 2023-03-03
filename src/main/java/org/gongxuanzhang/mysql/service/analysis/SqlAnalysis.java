@@ -18,24 +18,20 @@ package org.gongxuanzhang.mysql.service.analysis;
 
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.executor.Executor;
-import org.gongxuanzhang.mysql.service.token.SqlToken;
-
-import java.util.List;
 
 /**
+ * sql解析器
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface TokenAnalysis {
+public interface SqlAnalysis {
 
 
     /**
      * 解析成一个执行器
      *
-     * @param sqlTokenList tokens
+     * @param sql sql
      * @return 执行器
-     * @throws MySQLException 解析失败抛出异常
+     * @throws MySQLException 过程中可能抛出异常
      **/
-    @Deprecated
-    Executor analysis(List<SqlToken> sqlTokenList) throws MySQLException;
-
+    Executor analysis(String sql) throws MySQLException;
 }

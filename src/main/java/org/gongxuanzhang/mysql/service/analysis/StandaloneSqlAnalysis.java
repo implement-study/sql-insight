@@ -16,26 +16,31 @@
 
 package org.gongxuanzhang.mysql.service.analysis;
 
-import org.gongxuanzhang.mysql.exception.MySQLException;
+import com.alibaba.druid.sql.ast.SQLStatement;
 import org.gongxuanzhang.mysql.service.executor.Executor;
-import org.gongxuanzhang.mysql.service.token.SqlToken;
-
-import java.util.List;
 
 /**
+ * 只支持一种sql类型的解析器
+ *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface TokenAnalysis {
+public interface StandaloneSqlAnalysis {
 
 
     /**
-     * 解析成一个执行器
+     * 支持的sql类型
      *
-     * @param sqlTokenList tokens
-     * @return 执行器
-     * @throws MySQLException 解析失败抛出异常
+     * @return 返回支持的sql类型
      **/
-    @Deprecated
-    Executor analysis(List<SqlToken> sqlTokenList) throws MySQLException;
+    Class<? extends SQLStatement> support();
+
+    /**
+     * 解析sql状态返回执行器
+     *
+     * @param sqlStatement sql
+     * @return 返回执行器
+     **/
+    Executor doAnalysis(SQLStatement sqlStatement);
+
 
 }

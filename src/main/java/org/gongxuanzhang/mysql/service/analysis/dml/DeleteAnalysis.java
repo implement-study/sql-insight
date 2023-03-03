@@ -16,8 +16,12 @@
 
 package org.gongxuanzhang.mysql.service.analysis.dml;
 
+import com.alibaba.druid.sql.ast.SQLStatement;
+import com.alibaba.druid.sql.ast.statement.SQLTableSource;
+import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlDeleteStatement;
 import org.gongxuanzhang.mysql.entity.DeleteInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
+import org.gongxuanzhang.mysql.service.analysis.StandaloneSqlAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.executor.dml.DeleteExecutor;
@@ -33,7 +37,7 @@ import java.util.List;
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class DeleteAnalysis implements TokenAnalysis {
+public class DeleteAnalysis implements TokenAnalysis, StandaloneSqlAnalysis {
 
 
     @Override
@@ -47,4 +51,14 @@ public class DeleteAnalysis implements TokenAnalysis {
     }
 
 
+    @Override
+    public Class<? extends SQLStatement> support() {
+        return MySqlDeleteStatement.class;
+    }
+
+    @Override
+    public Executor doAnalysis(SQLStatement sqlStatement) {
+        MySqlDeleteStatement deleteStatement = (MySqlDeleteStatement) sqlStatement;
+        return new DeleteExecutor(deleteStatement);
+    }
 }
