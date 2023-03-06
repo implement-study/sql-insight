@@ -17,6 +17,7 @@
 package org.gongxuanzhang.mysql.service.analysis;
 
 import com.alibaba.druid.sql.ast.SQLStatement;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 
 /**
@@ -39,8 +40,9 @@ public interface StandaloneSqlAnalysis {
      *
      * @param sqlStatement sql
      * @return 返回执行器
+     * @throws MySQLException 执行过程中出现问题
      **/
-    Executor doAnalysis(SQLStatement sqlStatement);
+    Executor doAnalysis(SQLStatement sqlStatement) throws MySQLException;
 
 
 }

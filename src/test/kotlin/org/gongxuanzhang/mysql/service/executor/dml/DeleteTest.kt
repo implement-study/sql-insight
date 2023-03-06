@@ -14,38 +14,33 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.core.select;
+package org.gongxuanzhang.mysql.service.executor.dml
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.gongxuanzhang.mysql.core.TableInfoBox;
-import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.doSql
+import org.gongxuanzhang.mysql.exception.ExecuteException
+import org.gongxuanzhang.mysql.tool.Context
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.springframework.boot.test.context.SpringBootTest
+import java.io.File
+
 
 /**
- * select 中的from内容
- *
- * @author gxz gongxuanzhang@foxmail.com
- **/
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class From implements TableInfoBox {
+ * @author gongxuanzhang
+ */
+@SpringBootTest
+class DeleteTest {
 
-    /**
-     * 查询主表
-     **/
-    private TableInfo main;
+    var database: String = "testDatabase"
 
-    @Override
-    public TableInfo getTableInfo() {
-        return this.main;
+    @Test
+    @DisplayName("删除普通数据库")
+    fun simpleCreateDatabase() {
+        "delete from a.a where a = 1".doSql()
     }
 
-    @Override
-    public void setTableInfo(TableInfo tableInfo) {
-        this.main = tableInfo;
-    }
+
 
 
 }

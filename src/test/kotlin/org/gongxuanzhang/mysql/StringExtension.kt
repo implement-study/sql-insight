@@ -16,10 +16,15 @@
 
 package org.gongxuanzhang.mysql
 
+import com.alibaba.druid.sql.SQLUtils
+import org.gongxuanzhang.mysql.core.CoreMySqlEngine
 import org.gongxuanzhang.mysql.core.result.Result
+import org.gongxuanzhang.mysql.service.analysis.SqlAnalysis
 import org.gongxuanzhang.mysql.service.analysis.ast.SubSqlAnalysis
 import org.gongxuanzhang.mysql.service.executor.Executor
 import org.gongxuanzhang.mysql.service.token.SqlTokenizer
+import org.gongxuanzhang.mysql.tool.ApplicationUtils
+import org.gongxuanzhang.mysql.tool.SqlUtils
 
 
 /**
@@ -27,11 +32,15 @@ import org.gongxuanzhang.mysql.service.token.SqlTokenizer
  **/
 
 fun String.doSql(): Result {
-    val tokenAnalysis = SubSqlAnalysis()
-    tokenAnalysis.init()
-    val tokenizer = SqlTokenizer(this)
-    val process = tokenizer.process()
-    val executor: Executor = tokenAnalysis.analysis(process)
-    return executor.doExecute()
+//    val tokenAnalysis = SubSqlAnalysis()
+//    tokenAnalysis.init()
+//    val tokenizer = SqlTokenizer(this)
+//    val process = tokenizer.process()
+//    val executor: Executor = tokenAnalysis.analysis(process)
+//    return executor.doExecute()
+    val applicationContext = ApplicationUtils.applicationContext
+    val sqlAnalysis = applicationContext.getBean(SqlAnalysis::class.java)
+    return sqlAnalysis.analysis(this).doExecute()
 }
+
 

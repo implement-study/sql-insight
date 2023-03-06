@@ -16,6 +16,15 @@
 
 package org.gongxuanzhang.mysql.tool;
 
+import com.alibaba.druid.sql.ast.SQLExpr;
+import com.alibaba.druid.sql.ast.SQLName;
+import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
+import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
+import org.gongxuanzhang.mysql.core.FromBox;
+import org.gongxuanzhang.mysql.core.SessionManager;
+import org.gongxuanzhang.mysql.core.select.From;
+import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
 
 import java.util.regex.Matcher;
@@ -58,5 +67,32 @@ public class SqlUtils {
         return String.format("%.3f s", (System.currentTimeMillis() - startTime) / 1000.0);
     }
 
+
+    /**
+     * 装配数据库信息
+     **/
+    public static void assembleTableInfo(FromBox box, SQLName sqlName) throws MySQLException {
+
+        if (sqlName instanceof SQLIdentifierExpr) {
+            String database = SessionManager.currentSession().getDatabase();
+            String tableName = sqlName.getSimpleName();
+            String absoluteName = database + "." + tableName;
+            TableInfo tableInfo = Context.getTableManager().select(absoluteName);
+            box.setFrom(new From(tableInfo));
+            return;
+        }
+
+        if (sqlName instanceof SQLPropertyExpr) {
+            SQLExpr owner = ((SQLPropertyExpr) sqlName).getOwner();
+            if (!(owner instanceof SQLIdentifierExpr)) {
+                throw new MySQLException(sqlName.toString() + "无法解析");
+            }
+            TableInfo tableInfo = Context.getTableManager().select(sqlName.toString());
+            box.setFrom(new From(tableInfo));
+            return;
+        }
+        throw new MySQLException("未知错误");
+
+    }
 
 }

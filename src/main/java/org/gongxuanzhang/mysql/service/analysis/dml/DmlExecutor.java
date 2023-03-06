@@ -14,38 +14,20 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.core.select;
+package org.gongxuanzhang.mysql.service.analysis.dml;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.gongxuanzhang.mysql.core.TableInfoBox;
-import org.gongxuanzhang.mysql.entity.TableInfo;
+import com.alibaba.druid.sql.ast.SQLStatement;
+import org.gongxuanzhang.mysql.service.executor.AbstractExecutor;
 
 /**
- * select 中的from内容
- *
- * @author gxz gongxuanzhang@foxmail.com
+ * dml执行器
+ * 由执行引擎执行
+ * @author gxz gongxuanzhangmelt@gmail.com
  **/
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class From implements TableInfoBox {
+public abstract class DmlExecutor<T extends SQLStatement> extends AbstractExecutor<T> {
 
-    /**
-     * 查询主表
-     **/
-    private TableInfo main;
-
-    @Override
-    public TableInfo getTableInfo() {
-        return this.main;
+    public DmlExecutor(T sqlStatement) {
+        super(sqlStatement);
     }
-
-    @Override
-    public void setTableInfo(TableInfo tableInfo) {
-        this.main = tableInfo;
-    }
-
 
 }

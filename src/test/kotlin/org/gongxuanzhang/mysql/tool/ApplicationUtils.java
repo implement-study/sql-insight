@@ -14,38 +14,28 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.core.select;
+package org.gongxuanzhang.mysql.tool;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.gongxuanzhang.mysql.core.TableInfoBox;
-import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
 /**
- * select 中的from内容
- *
- * @author gxz gongxuanzhang@foxmail.com
+ * @author gxz gongxuanzhangmelt@gmail.com
  **/
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class From implements TableInfoBox {
+@Component
+public class ApplicationUtils implements ApplicationContextAware {
 
-    /**
-     * 查询主表
-     **/
-    private TableInfo main;
+
+    public static ApplicationContext applicationContext;
+
 
     @Override
-    public TableInfo getTableInfo() {
-        return this.main;
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        ApplicationUtils.applicationContext = applicationContext;
     }
-
-    @Override
-    public void setTableInfo(TableInfo tableInfo) {
-        this.main = tableInfo;
-    }
-
-
 }
+
+
+

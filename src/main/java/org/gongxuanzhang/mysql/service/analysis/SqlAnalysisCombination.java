@@ -24,6 +24,7 @@ import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -34,6 +35,7 @@ import java.util.Map;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Component
+@Primary
 public class SqlAnalysisCombination implements SqlAnalysis, ApplicationContextAware {
 
 

@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.mysql.storage.innodb;
 
+import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlDeleteStatement;
 import org.gongxuanzhang.mysql.annotation.Engine;
 import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.entity.DeleteInfo;

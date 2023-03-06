@@ -60,4 +60,5 @@ public class FoolDelete implements DeleteEngine {
             return ExceptionThrower.errorSwap(e);
         }
     }
+
 }

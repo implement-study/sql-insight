@@ -14,37 +14,24 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.core.select;
+package org.gongxuanzhang.mysql.service.executor.dcl;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.gongxuanzhang.mysql.core.TableInfoBox;
-import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.connection.Connection;
+import org.gongxuanzhang.mysql.core.result.Result;
+import org.gongxuanzhang.mysql.tool.Console;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-/**
- * select 中的from内容
- *
- * @author gxz gongxuanzhang@foxmail.com
- **/
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class From implements TableInfoBox {
 
-    /**
-     * 查询主表
-     **/
-    private TableInfo main;
+@SpringBootTest
+class EngineShowerTest {
 
-    @Override
-    public TableInfo getTableInfo() {
-        return this.main;
-    }
-
-    @Override
-    public void setTableInfo(TableInfo tableInfo) {
-        this.main = tableInfo;
+    @Test
+    public void showEngine(@Autowired Connection connection) {
+        String sql = "show engines";
+        Result result = connection.execute(sql);
+        Console.infoResult(result);
     }
 
 

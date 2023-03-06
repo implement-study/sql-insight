@@ -29,4 +29,9 @@ public abstract class AbstractExecutor<T extends SQLStatement> implements Execut
         this.sqlStatement = sqlStatement;
     }
 
+
+    public T getSqlStatement() {
+        return this.sqlStatement;
+    }
+
 }

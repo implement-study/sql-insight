@@ -33,6 +33,7 @@ import org.gongxuanzhang.mysql.service.analysis.session.UseAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.token.SqlToken;
 import org.gongxuanzhang.mysql.service.token.TokenKind;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -48,6 +49,7 @@ import java.util.Map;
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Component
+@Primary
 public class SubSqlAnalysis implements TokenAnalysis {
 
     private final Map<TokenKind, TokenAnalysis> analysisMap = new HashMap<>();
@@ -66,7 +68,7 @@ public class SubSqlAnalysis implements TokenAnalysis {
         analysisMap.put(TokenKind.SELECT, new SelectAnalysis());
         analysisMap.put(TokenKind.UPDATE, new UpdateAnalysis());
         analysisMap.put(TokenKind.INSERT, new InsertAnalysis());
-        analysisMap.put(TokenKind.DELETE, new DeleteAnalysis());
+//        analysisMap.put(TokenKind.DELETE, new DeleteAnalysis());
     }
 
     @Override
