@@ -54,7 +54,7 @@ public class ColumnInfo implements ExecuteInfo {
         this.autoIncrement = definition.isAutoIncrement();
         analysisType(definition.getDataType());
         analysisConstraint(definition.getConstraints());
-
+        this.name = definition.getColumnName();
     }
 
     private void analysisConstraint(List<SQLColumnConstraint> constraints) {
@@ -71,7 +71,7 @@ public class ColumnInfo implements ExecuteInfo {
     }
 
     private void analysisType(SQLDataType dataType) {
-        this.type = ColumnType.valueOf(dataType.getName());
+        this.type = ColumnType.valueOf(dataType.getName().toUpperCase());
         if (!CollectionUtils.isEmpty(dataType.getArguments())) {
             SQLExpr sqlExpr = dataType.getArguments().get(0);
             if (sqlExpr instanceof SQLIntegerExpr) {

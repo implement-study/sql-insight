@@ -29,7 +29,7 @@ import org.gongxuanzhang.mysql.core.select.As;
 import org.gongxuanzhang.mysql.core.select.SelectCol;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
-import org.gongxuanzhang.mysql.tool.SqlUtils;
+import org.gongxuanzhang.mysql.tool.TableInfoUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
@@ -49,6 +49,7 @@ import static org.gongxuanzhang.mysql.tool.ExceptionThrower.errorSwap;
 /**
  * 表信息
  * todo  还没有具体信息
+ *
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Data
@@ -87,12 +88,18 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
         if (CollectionUtils.isEmpty(columnDefinitions)) {
             throw new MySQLException("无法获取列信息");
         }
+        this.primaryKey = statement.getPrimaryKeyNames();
         columnInfos = new ArrayList<>();
         for (SQLColumnDefinition columnDefinition : columnDefinitions) {
             columnInfos.add(new ColumnInfo(columnDefinition));
+            if (columnDefinition.isPrimaryKey() && !primaryKey.isEmpty()) {
+                throw new MySQLException("主键重复定义");
+            } else if (columnDefinition.isPrimaryKey()) {
+                this.primaryKey.add(columnDefinition.getColumnName());
+            }
+
         }
-        SqlUtils.fillTableInfo(this, statement.getTableSource());
-        this.primaryKey = statement.getPrimaryKeyNames();
+        TableInfoUtils.fillTableInfo(this, statement.getTableSource().toString());
         if (statement.getComment() != null) {
             this.comment = statement.getComment().toString();
         }

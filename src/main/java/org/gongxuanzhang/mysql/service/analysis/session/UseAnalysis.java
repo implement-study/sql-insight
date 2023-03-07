@@ -16,15 +16,13 @@
 
 package org.gongxuanzhang.mysql.service.analysis.session;
 
-import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
-import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
+import com.alibaba.druid.sql.ast.SQLStatement;
+import com.alibaba.druid.sql.ast.statement.SQLUseStatement;
+import org.gongxuanzhang.mysql.exception.MySQLException;
+import org.gongxuanzhang.mysql.service.analysis.StandaloneSqlAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.executor.UseDatabaseExecutor;
-import org.gongxuanzhang.mysql.service.token.SqlToken;
-import org.gongxuanzhang.mysql.service.token.TokenSupport;
-import org.gongxuanzhang.mysql.tool.ExceptionThrower;
-
-import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * use 解析器
@@ -32,14 +30,19 @@ import java.util.List;
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class UseAnalysis implements TokenAnalysis {
+@Component
+public class UseAnalysis implements StandaloneSqlAnalysis {
+
 
 
     @Override
-    public Executor analysis(List<SqlToken> sqlTokenList) throws SqlAnalysisException {
-        ExceptionThrower.ifNotThrow(sqlTokenList.size() == 2, "sql 无法解析");
-        String databaseName = TokenSupport.getMustVar(sqlTokenList.get(1));
-        return new UseDatabaseExecutor(databaseName);
+    public Class<? extends SQLStatement> support() {
+        return SQLUseStatement.class;
     }
 
+    @Override
+    public Executor doAnalysis(SQLStatement sqlStatement) throws MySQLException {
+        SQLUseStatement statement = (SQLUseStatement) sqlStatement;
+        return new UseDatabaseExecutor(statement.getDatabase().toString());
+    }
 }

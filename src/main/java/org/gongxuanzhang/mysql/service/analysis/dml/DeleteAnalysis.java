@@ -27,7 +27,7 @@ import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.executor.dml.DeleteExecutor;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
 import org.gongxuanzhang.mysql.tool.Context;
-import org.gongxuanzhang.mysql.tool.SqlUtils;
+import org.gongxuanzhang.mysql.tool.TableInfoUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -54,7 +54,7 @@ public class DeleteAnalysis implements StandaloneSqlAnalysis {
 
     private DeleteInfo warp(MySqlDeleteStatement deleteStatement) throws MySQLException {
         DeleteInfo deleteInfo = new DeleteInfo();
-        SqlUtils.assembleTableInfo(deleteInfo, deleteStatement.getTableSource());
+        TableInfoUtils.assembleTableInfo(deleteInfo, deleteStatement.getTableSource().toString());
         SQLExpr where = deleteStatement.getWhere();
         deleteInfo.setWhere(new Where());
         return deleteInfo;

@@ -25,7 +25,7 @@ import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.analysis.StandaloneSqlAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.executor.dml.TruncateExecutor;
-import org.gongxuanzhang.mysql.tool.SqlUtils;
+import org.gongxuanzhang.mysql.tool.TableInfoUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -49,7 +49,7 @@ public class TruncateAnalysis implements StandaloneSqlAnalysis {
     public Executor doAnalysis(SQLStatement sqlStatement) throws MySQLException {
         SQLTruncateStatement statement = (SQLTruncateStatement) sqlStatement;
         List<SQLExprTableSource> tableSources = statement.getTableSources();
-        List<TableInfo> tableInfos = SqlUtils.batchSelectTableInfo(tableSources);
+        List<TableInfo> tableInfos = TableInfoUtils.batchSelectTableInfo(tableSources);
         List<TruncateInfo> infos = tableInfos.stream().map(TruncateInfo::new).collect(Collectors.toList());
         return new TruncateExecutor(infos);
     }

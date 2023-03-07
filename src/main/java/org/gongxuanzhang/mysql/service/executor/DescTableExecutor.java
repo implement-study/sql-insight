@@ -21,6 +21,7 @@ import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
+import org.gongxuanzhang.mysql.service.executor.dcl.DclExecutor;
 import org.gongxuanzhang.mysql.tool.Context;
 
 /**
@@ -28,19 +29,18 @@ import org.gongxuanzhang.mysql.tool.Context;
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class DescTableExecutor implements Executor {
+public class DescTableExecutor extends DclExecutor<TableInfo> {
 
     private static final String[] TABLE_DESC_HEAD = new String[]{
             "field", "type", "notNull", "primary key", "default", "auto_increment", "unique", "comment"};
 
-    private final TableInfo info;
 
     public DescTableExecutor(TableInfo info) {
-        this.info = info;
+        super(info);
     }
 
     @Override
-    public Result doExecute() throws MySQLException {
+    public Result doExecute(TableInfo info) throws MySQLException {
         TableManager tableManager = Context.getTableManager();
         TableInfo select = tableManager.select(info.absoluteName());
         if (select == null) {
@@ -48,4 +48,5 @@ public class DescTableExecutor implements Executor {
         }
         return Result.select(TABLE_DESC_HEAD, select.descTable());
     }
+
 }

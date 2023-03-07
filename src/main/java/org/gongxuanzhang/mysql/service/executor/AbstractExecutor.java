@@ -16,7 +16,9 @@
 
 package org.gongxuanzhang.mysql.service.executor;
 
+import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.entity.ExecuteInfo;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
@@ -32,5 +34,21 @@ public abstract class AbstractExecutor<T extends ExecuteInfo> implements Executo
 
     public T getInfo() {
         return info;
+    }
+
+
+    /**
+     * 根据信息执行
+     *
+     * @param info 执行信息
+     * @return {@link this#doExecute()}
+     * @throws MySQLException 执行异常
+     **/
+    public abstract Result doExecute(T info) throws MySQLException;
+
+
+    @Override
+    public Result doExecute() throws MySQLException {
+        return this.doExecute(info);
     }
 }

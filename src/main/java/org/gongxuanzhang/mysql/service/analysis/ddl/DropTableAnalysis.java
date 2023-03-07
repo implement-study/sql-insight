@@ -23,7 +23,7 @@ import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.analysis.StandaloneSqlAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.executor.ddl.drop.DropTableExecutor;
-import org.gongxuanzhang.mysql.tool.SqlUtils;
+import org.gongxuanzhang.mysql.tool.TableInfoUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public class DropTableAnalysis implements StandaloneSqlAnalysis {
     @Override
     public Executor doAnalysis(SQLStatement sqlStatement) throws MySQLException {
         SQLDropTableStatement statement = (SQLDropTableStatement) sqlStatement;
-        List<TableInfo> tableInfos = SqlUtils.batchSelectTableInfo(statement.getTableSources());
+        List<TableInfo> tableInfos = TableInfoUtils.batchSelectTableInfo(statement.getTableSources());
         return new DropTableExecutor(tableInfos);
     }
 

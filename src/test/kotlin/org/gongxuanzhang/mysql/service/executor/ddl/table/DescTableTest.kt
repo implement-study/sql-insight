@@ -19,6 +19,7 @@ package org.gongxuanzhang.mysql.service.executor.ddl.table
 import com.alibaba.fastjson2.JSONObject
 import org.gongxuanzhang.mysql.core.result.SelectResult
 import org.gongxuanzhang.mysql.doSql
+import org.gongxuanzhang.mysql.entity.ColumnType
 import org.gongxuanzhang.mysql.exception.MySQLException
 import org.gongxuanzhang.mysql.service.executor.ddl.database.CreateDatabaseTest
 import org.gongxuanzhang.mysql.service.executor.ddl.database.DropDatabaseTest
@@ -74,11 +75,11 @@ class DescTableTest {
 
     fun checkInfo(sql: String) {
         val doSql = sql.doSql()
-        val colId = col("id", "int").fluentPut("primary key", "true").fluentPut("auto_increment", "true")
-        val colName = col("name", "varchar").fluentPut("notNull", "false")
-        val colGender = col("gender", "varchar").fluentPut("notNull", "false").fluentPut("default", "张三")
-        val colAge = col("age", "int").fluentPut("comment", "年龄")
-        val colIdCard = col("id_card", "varchar").fluentPut("unique", "true")
+        val colId = col("id", ColumnType.INT).fluentPut("primary key", "true").fluentPut("auto_increment", "true")
+        val colName = col("name", ColumnType.VARCHAR).fluentPut("notNull", "false")
+        val colGender = col("gender", ColumnType.VARCHAR).fluentPut("notNull", "false").fluentPut("default", "张三")
+        val colAge = col("age", ColumnType.INT).fluentPut("comment", "年龄")
+        val colIdCard = col("id_card", ColumnType.VARCHAR).fluentPut("unique", "true")
         val data = (doSql as SelectResult).data
         assert(colId == data[0])
         assert(colName == data[1])
@@ -87,7 +88,7 @@ class DescTableTest {
         assert(colIdCard == data[4])
     }
 
-    fun col(colName: String, type: String): JSONObject {
+    fun col(colName: String, type: ColumnType): JSONObject {
         return mapOf(
             "field" to colName,
             "type" to type,

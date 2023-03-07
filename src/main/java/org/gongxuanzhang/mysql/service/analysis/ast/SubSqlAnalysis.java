@@ -22,10 +22,8 @@ import org.gongxuanzhang.mysql.service.analysis.ddl.AlterAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.dml.InsertAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.dml.SelectAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.dml.UpdateAnalysis;
-import org.gongxuanzhang.mysql.service.analysis.session.DescAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.session.SetAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.session.ShowAnalysis;
-import org.gongxuanzhang.mysql.service.analysis.session.UseAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.token.SqlToken;
 import org.gongxuanzhang.mysql.service.token.TokenKind;
@@ -54,8 +52,8 @@ public class SubSqlAnalysis implements TokenAnalysis {
     public void init() {
         // analysisMap.put(TokenKind.CREATE, new CreateTableAnalysis());
         analysisMap.put(TokenKind.SET, new SetAnalysis());
-        analysisMap.put(TokenKind.USE, new UseAnalysis());
-        analysisMap.put(TokenKind.DESC, new DescAnalysis());
+        //analysisMap.put(TokenKind.USE, new UseAnalysis());
+        // analysisMap.put(TokenKind.DESC, new DescAnalysis());
         analysisMap.put(TokenKind.DESCRIBE, analysisMap.get(TokenKind.DESC));
         analysisMap.put(TokenKind.SHOW, new ShowAnalysis());
         // analysisMap.put(TokenKind.DROP, new DropTableAnalysis());

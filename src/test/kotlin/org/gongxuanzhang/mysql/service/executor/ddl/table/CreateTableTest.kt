@@ -97,10 +97,10 @@ class CreateTableTest {
         return """
                     create table $database.$tableName(
                     id int primary key auto_increment,
-                    name varchar not null,
-                    gender varchar default '张三' not null,
+                    name varchar(200) not null,
+                    gender varchar(200) default '张三' not null,
                     age int comment '年龄',
-                    id_card varchar UNIQUE,
+                    id_card varchar UNIQUE
                     ) comment ='用户表'
                 """.doSql()
     }
