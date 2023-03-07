@@ -14,49 +14,41 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.service.analysis.dml;
+package org.gongxuanzhang.mysql.service.analysis.ddl;
 
-import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLStatement;
-import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlDeleteStatement;
-import org.gongxuanzhang.mysql.core.select.Where;
-import org.gongxuanzhang.mysql.entity.DeleteInfo;
+import com.alibaba.druid.sql.ast.statement.SQLDropTableStatement;
+import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.analysis.StandaloneSqlAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
-import org.gongxuanzhang.mysql.service.executor.dml.DeleteExecutor;
-import org.gongxuanzhang.mysql.storage.StorageEngine;
-import org.gongxuanzhang.mysql.tool.Context;
+import org.gongxuanzhang.mysql.service.executor.ddl.drop.DropTableExecutor;
 import org.gongxuanzhang.mysql.tool.SqlUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
- * delete 解析器
+ * drop table 解析器
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Component
-public class DeleteAnalysis implements StandaloneSqlAnalysis {
+public class DropTableAnalysis implements StandaloneSqlAnalysis {
+
 
 
     @Override
     public Class<? extends SQLStatement> support() {
-        return MySqlDeleteStatement.class;
+        return SQLDropTableStatement.class;
     }
 
     @Override
     public Executor doAnalysis(SQLStatement sqlStatement) throws MySQLException {
-        MySqlDeleteStatement deleteStatement = (MySqlDeleteStatement) sqlStatement;
-        DeleteInfo deleteInfo = warp(deleteStatement);
-        StorageEngine engine = Context.selectStorageEngine(deleteInfo.getFrom().getTableInfo().getEngineName());
-        return new DeleteExecutor(engine, deleteInfo);
+        SQLDropTableStatement statement = (SQLDropTableStatement) sqlStatement;
+        List<TableInfo> tableInfos = SqlUtils.batchSelectTableInfo(statement.getTableSources());
+        return new DropTableExecutor(tableInfos);
     }
 
-    private DeleteInfo warp(MySqlDeleteStatement deleteStatement) throws MySQLException {
-        DeleteInfo deleteInfo = new DeleteInfo();
-        SqlUtils.assembleTableInfo(deleteInfo, deleteStatement.getTableSource());
-        SQLExpr where = deleteStatement.getWhere();
-        deleteInfo.setWhere(new Where());
-        return deleteInfo;
-    }
+
 }

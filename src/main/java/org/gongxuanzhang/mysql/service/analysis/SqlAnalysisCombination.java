@@ -47,7 +47,7 @@ public class SqlAnalysisCombination implements SqlAnalysis, ApplicationContextAw
         try {
             sqlStatement = SQLUtils.parseSingleMysqlStatement(sql);
         } catch (Exception e) {
-            throw new SqlParseException(e.getMessage());
+            throw new SqlParseException(e);
         }
         StandaloneSqlAnalysis standaloneSqlAnalysis = this.standaloneAnalyzerMap.get(sqlStatement.getClass());
         if (standaloneSqlAnalysis == null) {

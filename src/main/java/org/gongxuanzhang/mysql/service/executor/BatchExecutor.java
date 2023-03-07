@@ -19,38 +19,39 @@ package org.gongxuanzhang.mysql.service.executor;
 import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.entity.ExecuteInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
-import org.gongxuanzhang.mysql.storage.StorageEngine;
+
+import java.util.List;
 
 /**
+ * 支持批量执行
+ *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public abstract class StorageEngineExecutor<T extends ExecuteInfo> extends AbstractExecutor<T> {
+public abstract class BatchExecutor<T extends ExecuteInfo> implements Executor {
 
-    private final StorageEngine engine;
+    protected final List<T> infos;
 
-    public StorageEngineExecutor(StorageEngine engine, T sqlStatement) {
-        super(sqlStatement);
-        this.engine = engine;
+    public BatchExecutor(List<T> infos) {
+        this.infos = infos;
     }
 
-    public StorageEngine getEngine() {
-        return this.engine;
+    public List<T> getInfos() {
+        return infos;
     }
 
 
     /**
-     * 执行
+     * 批量执行信息
      *
-     * @param engine       引擎
-     * @param sqlStatement sql执行信息
-     * @return 同Result
-     * @throws MySQLException 执行过程中可能出现的问题
+     * @param infos 批量信息
+     * @return {@link this#doExecute()}
+     * @throws MySQLException 执行异常
      **/
-    public abstract Result doExecute(StorageEngine engine, T sqlStatement) throws MySQLException;
+    public abstract Result doExecute(List<T> infos) throws MySQLException;
 
 
     @Override
     public Result doExecute() throws MySQLException {
-        return this.doExecute(this.engine, this.info);
+        return doExecute(this.getInfos());
     }
 }

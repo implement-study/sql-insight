@@ -16,18 +16,20 @@
 
 package org.gongxuanzhang.mysql.service.analysis.dml;
 
-import com.alibaba.druid.sql.ast.SQLStatement;
-import org.gongxuanzhang.mysql.service.executor.AbstractExecutor;
+import org.gongxuanzhang.mysql.entity.ExecuteInfo;
+import org.gongxuanzhang.mysql.service.executor.StorageEngineExecutor;
+import org.gongxuanzhang.mysql.storage.StorageEngine;
 
 /**
  * dml执行器
  * 由执行引擎执行
+ *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public abstract class DmlExecutor<T extends SQLStatement> extends AbstractExecutor<T> {
+public abstract class DmlExecutor<T extends ExecuteInfo> extends StorageEngineExecutor<T> {
 
-    public DmlExecutor(T sqlStatement) {
-        super(sqlStatement);
+    public DmlExecutor(StorageEngine engine, T info) {
+        super(engine, info);
     }
 
 }

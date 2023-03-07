@@ -16,7 +16,9 @@
 
 package org.gongxuanzhang.mysql.service.executor.ddl;
 
-import com.alibaba.druid.sql.ast.SQLStatement;
+import org.gongxuanzhang.mysql.core.result.Result;
+import org.gongxuanzhang.mysql.entity.ExecuteInfo;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.executor.AbstractExecutor;
 
 /**
@@ -24,10 +26,25 @@ import org.gongxuanzhang.mysql.service.executor.AbstractExecutor;
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public abstract class DdlExecutor<T extends SQLStatement> extends AbstractExecutor<T> {
+public abstract class DdlExecutor<T extends ExecuteInfo> extends AbstractExecutor<T> {
 
     public DdlExecutor(T sqlStatement) {
         super(sqlStatement);
     }
 
+
+    /**
+     * 用信息执行
+     *
+     * @param info 信息
+     * @return 同 {@link this#doExecute()}
+     * @throws MySQLException 异常信息
+     **/
+    public abstract Result doExecute(T info) throws MySQLException;
+
+
+    @Override
+    public Result doExecute() throws MySQLException {
+        return this.doExecute(this.getInfo());
+    }
 }

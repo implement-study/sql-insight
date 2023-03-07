@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.service.executor.ddl.database
+package org.gongxuanzhang.mysql.service.analysis
 
-import org.gongxuanzhang.mysql.core.SessionManager
-import org.gongxuanzhang.mysql.core.result.Result
 import org.gongxuanzhang.mysql.doSql
-import org.gongxuanzhang.mysql.exception.MySQLException
-import org.gongxuanzhang.mysql.tool.randomDatabase
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.test.context.SpringBootTest
 
 
@@ -30,27 +25,21 @@ import org.springframework.boot.test.context.SpringBootTest
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @SpringBootTest
-class UseDatabaseTest {
+class CreateTableAnalysisTest {
 
 
     @Test
-    fun useDatabase() {
-        val database = randomDatabase()
-        "create database '$database'".doSql()
-        doUseDatabase(database)
-        assert(SessionManager.currentSession().database.databaseName == database)
-        "drop database $database".doSql()
-    }
-
-    fun doUseDatabase(database: String): Result {
-        return "use $database".doSql()
-    }
-
-    @Test
-    fun userNoExistDatabase() {
-        val uuid = randomDatabase()
-        assertThrows<MySQLException> {
-            doUseDatabase(uuid)
-        }
+    fun createTableTest(){
+        """
+            CREATE TABLE aa.example_table (
+              id INT UNSIGNED primary key NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+              name VARCHAR(50) NOT NULL DEFAULT '' COMMENT '姓名',
+              age INT NOT NULL DEFAULT 0 COMMENT '年龄',
+              email VARCHAR(100) NOT NULL UNIQUE COMMENT '电子邮箱',
+              created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+              updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+              PRIMARY KEY (id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='示例表';
+        """.trimIndent().doSql()
     }
 }

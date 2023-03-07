@@ -370,10 +370,10 @@ public class TokenSupport {
     public static Pair<Integer, TableInfo> analysisTableInfo(List<SqlToken> tokenList, int offset) throws MySQLException {
         TableInfo tableInfo = new TableInfo();
         String candidate = TokenSupport.getMustVar(tokenList.get(offset));
-        String database;
+        DatabaseInfo database;
         String tableName;
         if (offset + 1 < tokenList.size() && TokenSupport.isTokenKind(tokenList.get(offset + 1), TokenKind.DOT)) {
-            database = candidate;
+            database = new DatabaseInfo(candidate);
             tableName = TokenSupport.getString(tokenList.get(offset + 2));
             offset = 3;
         } else {
@@ -381,7 +381,7 @@ public class TokenSupport {
             tableName = candidate;
             offset = 1;
         }
-        tableInfo.setDatabase(new DatabaseInfo(database));
+        tableInfo.setDatabase(database);
         tableInfo.setTableName(tableName);
         TableInfo realInfo = Context.getTableManager().select(tableInfo);
         return Pair.of(offset, realInfo);

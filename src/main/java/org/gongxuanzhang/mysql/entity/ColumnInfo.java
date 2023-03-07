@@ -16,7 +16,17 @@
 
 package org.gongxuanzhang.mysql.entity;
 
+import com.alibaba.druid.sql.ast.SQLDataType;
+import com.alibaba.druid.sql.ast.SQLExpr;
+import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
+import com.alibaba.druid.sql.ast.statement.SQLColumnConstraint;
+import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
+import com.alibaba.druid.sql.ast.statement.SQLNotNullConstraint;
+import com.alibaba.druid.sql.ast.statement.SQLUniqueConstraint;
 import lombok.Data;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 
 /**
  * 列信息
@@ -33,6 +43,41 @@ public class ColumnInfo implements ExecuteInfo {
     private boolean notNull;
     private boolean unique;
     private String defaultValue;
+    private Integer length;
 
+
+    public ColumnInfo() {
+
+    }
+
+    public ColumnInfo(SQLColumnDefinition definition) {
+        this.autoIncrement = definition.isAutoIncrement();
+        analysisType(definition.getDataType());
+        analysisConstraint(definition.getConstraints());
+
+    }
+
+    private void analysisConstraint(List<SQLColumnConstraint> constraints) {
+        if (CollectionUtils.isEmpty(constraints)) {
+            return;
+        }
+        for (SQLColumnConstraint constraint : constraints) {
+            if(constraint instanceof SQLNotNullConstraint){
+                this.notNull = true;
+            }else if(constraint instanceof SQLUniqueConstraint){
+                this.unique = true;
+            }
+        }
+    }
+
+    private void analysisType(SQLDataType dataType) {
+        this.type = ColumnType.valueOf(dataType.getName());
+        if (!CollectionUtils.isEmpty(dataType.getArguments())) {
+            SQLExpr sqlExpr = dataType.getArguments().get(0);
+            if (sqlExpr instanceof SQLIntegerExpr) {
+                this.length = (Integer) ((SQLIntegerExpr) sqlExpr).getValue();
+            }
+        }
+    }
 
 }

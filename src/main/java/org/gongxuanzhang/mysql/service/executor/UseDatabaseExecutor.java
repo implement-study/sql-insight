@@ -45,7 +45,7 @@ public class UseDatabaseExecutor implements Executor {
         if (select == null) {
             return Result.error("数据库" + database + "不存在");
         }
-        mySqlSession.useDatabase(database);
+        mySqlSession.useDatabase(select);
         return Result.success();
     }
 }

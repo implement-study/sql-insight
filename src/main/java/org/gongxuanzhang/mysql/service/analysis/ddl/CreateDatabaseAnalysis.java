@@ -17,40 +17,35 @@
 package org.gongxuanzhang.mysql.service.analysis.ddl;
 
 import com.alibaba.druid.sql.ast.SQLStatement;
-import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
-import com.alibaba.druid.sql.ast.statement.SQLTruncateStatement;
-import org.gongxuanzhang.mysql.entity.TableInfo;
-import org.gongxuanzhang.mysql.entity.TruncateInfo;
+import com.alibaba.druid.sql.ast.statement.SQLCreateDatabaseStatement;
+import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.analysis.StandaloneSqlAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
-import org.gongxuanzhang.mysql.service.executor.dml.TruncateExecutor;
-import org.gongxuanzhang.mysql.tool.SqlUtils;
+import org.gongxuanzhang.mysql.service.executor.ddl.create.CreateDatabaseExecutor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
- * truncate 解析器
+ * create database 解析器
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Component
-public class TruncateAnalysis implements StandaloneSqlAnalysis {
+public class CreateDatabaseAnalysis implements StandaloneSqlAnalysis {
+
 
 
     @Override
     public Class<? extends SQLStatement> support() {
-        return SQLTruncateStatement.class;
+        return SQLCreateDatabaseStatement.class;
     }
 
     @Override
     public Executor doAnalysis(SQLStatement sqlStatement) throws MySQLException {
-        SQLTruncateStatement statement = (SQLTruncateStatement) sqlStatement;
-        List<SQLExprTableSource> tableSources = statement.getTableSources();
-        List<TableInfo> tableInfos = SqlUtils.batchSelectTableInfo(tableSources);
-        List<TruncateInfo> infos = tableInfos.stream().map(TruncateInfo::new).collect(Collectors.toList());
-        return new TruncateExecutor(infos);
+        SQLCreateDatabaseStatement statement = (SQLCreateDatabaseStatement) sqlStatement;
+        DatabaseInfo databaseInfo = new DatabaseInfo(statement.getDatabaseName());
+        return new CreateDatabaseExecutor(databaseInfo);
     }
+
+
 }

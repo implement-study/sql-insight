@@ -16,22 +16,21 @@
 
 package org.gongxuanzhang.mysql.service.executor;
 
-import com.alibaba.druid.sql.ast.SQLStatement;
+import org.gongxuanzhang.mysql.entity.ExecuteInfo;
 
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public abstract class AbstractExecutor<T extends SQLStatement> implements Executor {
+public abstract class AbstractExecutor<T extends ExecuteInfo> implements Executor {
 
-    protected T sqlStatement;
+    protected T info;
 
-    public AbstractExecutor(T sqlStatement) {
-        this.sqlStatement = sqlStatement;
+    public AbstractExecutor(T info) {
+        this.info = info;
     }
 
 
-    public T getSqlStatement() {
-        return this.sqlStatement;
+    public T getInfo() {
+        return info;
     }
-
 }

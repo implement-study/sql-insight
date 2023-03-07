@@ -19,10 +19,6 @@ package org.gongxuanzhang.mysql.service.analysis.ast;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
 import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.ddl.AlterAnalysis;
-import org.gongxuanzhang.mysql.service.analysis.ddl.CreateAnalysis;
-import org.gongxuanzhang.mysql.service.analysis.ddl.DropAnalysis;
-import org.gongxuanzhang.mysql.service.analysis.ddl.TruncateAnalysis;
-import org.gongxuanzhang.mysql.service.analysis.dml.DeleteAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.dml.InsertAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.dml.SelectAnalysis;
 import org.gongxuanzhang.mysql.service.analysis.dml.UpdateAnalysis;
@@ -56,14 +52,14 @@ public class SubSqlAnalysis implements TokenAnalysis {
 
     @PostConstruct
     public void init() {
-        analysisMap.put(TokenKind.CREATE, new CreateAnalysis());
+        // analysisMap.put(TokenKind.CREATE, new CreateTableAnalysis());
         analysisMap.put(TokenKind.SET, new SetAnalysis());
         analysisMap.put(TokenKind.USE, new UseAnalysis());
         analysisMap.put(TokenKind.DESC, new DescAnalysis());
         analysisMap.put(TokenKind.DESCRIBE, analysisMap.get(TokenKind.DESC));
         analysisMap.put(TokenKind.SHOW, new ShowAnalysis());
-        analysisMap.put(TokenKind.DROP, new DropAnalysis());
-        analysisMap.put(TokenKind.TRUNCATE, new TruncateAnalysis());
+        // analysisMap.put(TokenKind.DROP, new DropTableAnalysis());
+        //analysisMap.put(TokenKind.TRUNCATE, new TruncateAnalysis());
         analysisMap.put(TokenKind.ALTER, new AlterAnalysis());
         analysisMap.put(TokenKind.SELECT, new SelectAnalysis());
         analysisMap.put(TokenKind.UPDATE, new UpdateAnalysis());

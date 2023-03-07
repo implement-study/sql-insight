@@ -27,6 +27,10 @@ import org.gongxuanzhang.mysql.core.TableInfoBox;
 @Data
 public class TruncateInfo implements ExecuteInfo, TableInfoBox {
 
+    public TruncateInfo(TableInfo tableInfo) {
+        this.tableInfo = tableInfo;
+    }
+
     private TableInfo tableInfo;
 
 }

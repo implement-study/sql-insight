@@ -16,6 +16,8 @@
 
 package org.gongxuanzhang.mysql.entity;
 
+import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
+import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlCreateTableStatement;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +29,7 @@ import org.gongxuanzhang.mysql.core.select.As;
 import org.gongxuanzhang.mysql.core.select.SelectCol;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
-import org.gongxuanzhang.mysql.tool.Context;
+import org.gongxuanzhang.mysql.tool.SqlUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
@@ -46,7 +48,7 @@ import static org.gongxuanzhang.mysql.tool.ExceptionThrower.errorSwap;
 
 /**
  * 表信息
- *
+ * todo  还没有具体信息
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Data
@@ -74,6 +76,28 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
      * 自增主键，只能有一个
      */
     private IncrementKey incrementKey;
+
+
+    public TableInfo() {
+
+    }
+
+    public TableInfo(MySqlCreateTableStatement statement) throws MySQLException {
+        List<SQLColumnDefinition> columnDefinitions = statement.getColumnDefinitions();
+        if (CollectionUtils.isEmpty(columnDefinitions)) {
+            throw new MySQLException("无法获取列信息");
+        }
+        columnInfos = new ArrayList<>();
+        for (SQLColumnDefinition columnDefinition : columnDefinitions) {
+            columnInfos.add(new ColumnInfo(columnDefinition));
+        }
+        SqlUtils.fillTableInfo(this, statement.getTableSource());
+        this.primaryKey = statement.getPrimaryKeyNames();
+        if (statement.getComment() != null) {
+            this.comment = statement.getComment().toString();
+        }
+    }
+
 
     public void transport(TableInfo tableInfo) {
         this.tableName = tableInfo.tableName;
@@ -130,8 +154,7 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
      **/
     private File checkDatabase() throws MySQLException {
         if (database == null) {
-            String sessionDb = SessionManager.currentSession().getDatabase();
-            this.database = Context.getDatabaseManager().select(sessionDb);
+            this.database = SessionManager.currentSession().getDatabase();
         }
         if (database == null) {
             throw new MySQLException("无法获取database");
@@ -191,7 +214,7 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
         for (ColumnInfo columnInfo : columnInfos) {
             JSONObject colInfo = new JSONObject(8);
             colInfo.put("field", columnInfo.getName());
-            colInfo.put("type", columnInfo.getType().keyword);
+            colInfo.put("type", columnInfo.getType());
             colInfo.put("notNull", Boolean.toString(!columnInfo.isNotNull()));
             colInfo.put("primary key", Boolean.toString(primary.contains(columnInfo.getName())));
             colInfo.put("default", columnInfo.getDefaultValue());

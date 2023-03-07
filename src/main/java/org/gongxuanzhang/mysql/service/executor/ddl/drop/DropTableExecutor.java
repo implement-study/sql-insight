@@ -21,10 +21,11 @@ import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
-import org.gongxuanzhang.mysql.service.executor.Executor;
+import org.gongxuanzhang.mysql.service.executor.ddl.BatchDdlExecutor;
 import org.gongxuanzhang.mysql.tool.Context;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * 删除表
@@ -33,19 +34,24 @@ import java.io.File;
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Slf4j
-public class DropTableExecutor implements Executor {
+public class DropTableExecutor extends BatchDdlExecutor<TableInfo> {
 
 
-    private final TableInfo tableInfo;
+    public DropTableExecutor(List<TableInfo> infos) {
+        super(infos);
+    }
 
-    public DropTableExecutor(TableInfo tableInfo) {
-        this.tableInfo = tableInfo;
+    @Override
+    public Result doExecute(List<TableInfo> infos) throws MySQLException {
+        for (TableInfo info : infos) {
+            dropTable(info);
+        }
+        return Result.success();
     }
 
 
-    @Override
-    public Result doExecute() throws MySQLException {
-        File gfrmFile = this.tableInfo.structFile();
+    public void dropTable(TableInfo tableInfo) throws MySQLException {
+        File gfrmFile = tableInfo.structFile();
         String databaseName = tableInfo.getDatabase().getDatabaseName();
         if (!gfrmFile.exists()) {
             String message = String.format("表%s.%s不存在", databaseName, tableInfo.getTableName());
@@ -55,13 +61,13 @@ public class DropTableExecutor implements Executor {
             String message = String.format("删除表%s.%s失败", databaseName, tableInfo.getTableName());
             throw new ExecuteException(message);
         }
-        File dataFile = this.tableInfo.dataFile();
+        File dataFile = tableInfo.dataFile();
         if (!dataFile.delete()) {
             String message = String.format("删除表%s.%s失败", databaseName, tableInfo.getTableName());
             throw new ExecuteException(message);
         }
         log.info("删除表{}.{}", databaseName, tableInfo.getTableName());
         Context.getTableManager().remove(String.format("%s.%s", databaseName, tableInfo.getTableName()));
-        return Result.success();
     }
+
 }

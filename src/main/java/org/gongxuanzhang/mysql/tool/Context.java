@@ -24,6 +24,7 @@ import org.gongxuanzhang.mysql.core.manager.DatabaseManager;
 import org.gongxuanzhang.mysql.core.manager.EngineManager;
 import org.gongxuanzhang.mysql.core.manager.MySQLManager;
 import org.gongxuanzhang.mysql.core.manager.TableManager;
+import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
@@ -110,8 +111,8 @@ public class Context {
      **/
     public static TableInfo fillTableInfo(TableInfo info) throws MySQLException {
         if (info.getDatabase() == null) {
-            String database = SessionManager.currentSession().getDatabase();
-            info.setDatabase(Context.getDatabaseManager().select(database));
+            DatabaseInfo database = SessionManager.currentSession().getDatabase();
+            info.setDatabase(database);
         }
         String key = info.absoluteName();
         TableInfo select = TABLE_MANAGER.select(key);
@@ -155,6 +156,21 @@ public class Context {
      **/
     public static File getDatabaseHome(String database) throws MySQLException {
         File file = new File(getHome(), database);
+        if (!file.exists() || !file.isDirectory()) {
+            throw new MySQLException("数据库[" + database + "]有问题");
+        }
+        return file;
+    }
+
+    /**
+     * 拿到数据库目录
+     *
+     * @param database 数据库实体
+     * @return 数据库目录
+     * @throws MySQLException 数据库不存在或者文件异常会抛出异常
+     **/
+    public static File getDatabaseHome(DatabaseInfo database) throws MySQLException {
+        File file = new File(getHome(), database.getDatabaseName());
         if (!file.exists() || !file.isDirectory()) {
             throw new MySQLException("数据库[" + database + "]有问题");
         }

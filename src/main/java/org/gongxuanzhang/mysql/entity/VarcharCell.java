@@ -26,7 +26,7 @@ import lombok.Data;
 @Data
 public class VarcharCell implements Cell<String> {
 
-    private final ColumnType type = ColumnType.STRING;
+    private final ColumnType type = ColumnType.VARCHAR;
 
     private final String value;
 

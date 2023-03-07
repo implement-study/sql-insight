@@ -16,39 +16,46 @@
 
 package org.gongxuanzhang.mysql.entity;
 
-import lombok.Data;
-import org.gongxuanzhang.mysql.annotation.DependOnContext;
-import org.gongxuanzhang.mysql.tool.Context;
-
-import java.io.File;
+import com.alibaba.druid.sql.ast.SQLExpr;
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
+import com.alibaba.druid.sql.ast.expr.SQLValuableExpr;
 
 
 /**
- * 数据库信息
- *
- * @author gxz gongxuanzhang@foxmail.com
+ * where 条件
+ * todo  条件还不支持
+ * @author gxz gongxuanzhangmelt@gmail.com
  **/
-@Data
-public class DatabaseInfo implements ExecuteInfo {
+public class Where {
 
+    private final SQLExpr source;
 
-    private final String databaseName;
-
-    public DatabaseInfo(String databaseName) {
-        this.databaseName = databaseName;
+    public Where(SQLExpr whereExpr) {
+        this.source = whereExpr;
     }
+
+
+
 
     /**
-     * 返回数据库目标位置文件夹
+     * 装配where
+     *
+     * @param whereExpr 解析出的表达式 可以是null
      **/
-    @DependOnContext
-    public File sourceFile() {
-        File home = Context.getHome();
-        return new File(home, databaseName);
-    }
+    public static void assembleWhere(SQLExpr whereExpr) {
+        if (whereExpr == null) {
+            return;
+        }
 
-    @Override
-    public String toString() {
-        return databaseName;
+        if (whereExpr instanceof SQLValuableExpr) {
+            ((SQLValuableExpr) whereExpr).getValue();
+
+        }
+
+        if (whereExpr instanceof SQLBinaryOpExpr) {
+
+        }
+
+
     }
 }

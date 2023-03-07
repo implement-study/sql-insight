@@ -120,14 +120,14 @@ class CreateTableTest {
         assert(select.columnInfos[1] == run {
             val columnInfo = ColumnInfo()
             columnInfo.name = "name"
-            columnInfo.type = ColumnType.STRING
+            columnInfo.type = ColumnType.VARCHAR
             columnInfo.isNotNull = true
             columnInfo
         })
         assert(select.columnInfos[2] == run {
             val columnInfo = ColumnInfo()
             columnInfo.name = "gender"
-            columnInfo.type = ColumnType.STRING
+            columnInfo.type = ColumnType.VARCHAR
             columnInfo.isNotNull = true
             columnInfo.defaultValue = "张三"
             columnInfo
@@ -142,7 +142,7 @@ class CreateTableTest {
         assert(select.columnInfos[4] == run {
             val columnInfo = ColumnInfo()
             columnInfo.name = "id_card"
-            columnInfo.type = ColumnType.STRING
+            columnInfo.type = ColumnType.VARCHAR
             columnInfo.isUnique = true
             columnInfo
         })

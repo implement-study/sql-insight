@@ -16,14 +16,14 @@
 
 package org.gongxuanzhang.mysql.service.executor.dcl;
 
-import com.alibaba.druid.sql.ast.SQLStatement;
+import org.gongxuanzhang.mysql.entity.ExecuteInfo;
 import org.gongxuanzhang.mysql.service.executor.AbstractExecutor;
 
 /**
  * dcl执行器
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public abstract class DclExecutor<T extends SQLStatement> extends AbstractExecutor<T> {
+public abstract class DclExecutor<T extends ExecuteInfo> extends AbstractExecutor<T> {
 
     public DclExecutor(T sqlStatement) {
         super(sqlStatement);

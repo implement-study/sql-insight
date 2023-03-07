@@ -41,7 +41,7 @@ public class ConvertUtils {
 
     static {
         CONVERTER_MAP.put(ColumnType.INT, new IntConverter());
-        CONVERTER_MAP.put(ColumnType.STRING, new VarcharConverter());
+        CONVERTER_MAP.put(ColumnType.VARCHAR, new VarcharConverter());
         CONVERTER_MAP.put(ColumnType.TIMESTAMP, new TimeStampConverter());
 
     }

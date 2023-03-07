@@ -16,17 +16,18 @@
 
 package org.gongxuanzhang.mysql.tool;
 
-import com.alibaba.druid.sql.ast.SQLExpr;
-import com.alibaba.druid.sql.ast.SQLName;
-import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
-import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
+import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import org.gongxuanzhang.mysql.core.FromBox;
 import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.core.select.From;
+import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,6 +43,8 @@ public class SqlUtils {
     }
 
     private static final Pattern ILLEGAL_PATTERN = Pattern.compile("[^\\w]+");
+
+    private static final String TABLENAME_SEPARATOR = ".";
 
 
     /**
@@ -69,30 +72,72 @@ public class SqlUtils {
 
 
     /**
-     * 装配数据库信息
+     * 拼装已经存在的表
      **/
-    public static void assembleTableInfo(FromBox box, SQLName sqlName) throws MySQLException {
-
-        if (sqlName instanceof SQLIdentifierExpr) {
-            String database = SessionManager.currentSession().getDatabase();
-            String tableName = sqlName.getSimpleName();
-            String absoluteName = database + "." + tableName;
-            TableInfo tableInfo = Context.getTableManager().select(absoluteName);
-            box.setFrom(new From(tableInfo));
-            return;
-        }
-
-        if (sqlName instanceof SQLPropertyExpr) {
-            SQLExpr owner = ((SQLPropertyExpr) sqlName).getOwner();
-            if (!(owner instanceof SQLIdentifierExpr)) {
-                throw new MySQLException(sqlName.toString() + "无法解析");
-            }
-            TableInfo tableInfo = Context.getTableManager().select(sqlName.toString());
-            box.setFrom(new From(tableInfo));
-            return;
-        }
-        throw new MySQLException("未知错误");
-
+    public static void assembleTableInfo(FromBox box, SQLTableSource tableSource) throws MySQLException {
+        TableInfo tableInfo = selectTableInfo(tableSource);
+        box.setFrom(new From(tableInfo));
     }
+
+    /**
+     * 选择已经存在的表信息
+     *
+     * @param tableSource sql解析出的表信息
+     * @return 返回已经存在的表信息
+     **/
+    public static TableInfo selectTableInfo(SQLTableSource tableSource) throws MySQLException {
+        String tableSourceStr = tableSource.toString();
+        if (tableSourceStr.indexOf(TABLENAME_SEPARATOR) != tableSourceStr.lastIndexOf(TABLENAME_SEPARATOR)) {
+            throw new MySQLException(tableSource.toString() + "无法解析");
+        }
+        if (tableSourceStr.contains(TABLENAME_SEPARATOR)) {
+            String[] split = tableSourceStr.split("\\.");
+            return Context.getTableManager().select(split[0] + TABLENAME_SEPARATOR + split[1]);
+        }
+        DatabaseInfo database = SessionManager.currentSession().getDatabase();
+        String absoluteName = database + TABLENAME_SEPARATOR + tableSourceStr;
+        return Context.getTableManager().select(absoluteName);
+    }
+
+    /**
+     * 填充tableInfo
+     * 用于还不存在的表
+     **/
+    public static void fillTableInfo(TableInfo tableInfo, SQLTableSource tableSource) throws MySQLException {
+        String candidate = tableSource.toString();
+        if (candidate.indexOf(TABLENAME_SEPARATOR) != candidate.lastIndexOf(TABLENAME_SEPARATOR)) {
+            throw new MySQLException(tableSource + "无法解析");
+        }
+        DatabaseInfo databaseInfo;
+        String tableName;
+        if (candidate.contains(TABLENAME_SEPARATOR)) {
+            String[] split = candidate.split("\\.");
+            databaseInfo = new DatabaseInfo(split[0]);
+            tableName = split[1];
+        } else {
+            databaseInfo = SessionManager.currentSession().getDatabase();
+            tableName = candidate;
+        }
+        tableInfo.setDatabase(databaseInfo);
+        tableInfo.setTableName(tableName);
+    }
+
+    /**
+     * 批量查询已经存在的表信息
+     *
+     * @param tableSources sql解析出的表信息
+     * @return 返回填充你
+     **/
+    public static List<TableInfo> batchSelectTableInfo(List<? extends SQLTableSource> tableSources) throws MySQLException {
+        if (CollectionUtils.isEmpty(tableSources)) {
+            return new ArrayList<>();
+        }
+        List<TableInfo> result = new ArrayList<>(tableSources.size());
+        for (SQLTableSource tableSource : tableSources) {
+            result.add(selectTableInfo(tableSource));
+        }
+        return result;
+    }
+
 
 }

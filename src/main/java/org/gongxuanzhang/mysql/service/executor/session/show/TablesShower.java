@@ -19,6 +19,7 @@ package org.gongxuanzhang.mysql.service.executor.session.show;
 import org.gongxuanzhang.mysql.core.MySqlSession;
 import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.core.result.Result;
+import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.tool.CollectionUtils;
 import org.gongxuanzhang.mysql.tool.Context;
 
@@ -38,7 +39,7 @@ public class TablesShower implements Shower {
     public Result show() {
         try {
             MySqlSession session = SessionManager.currentSession();
-            String database = session.getDatabase();
+            DatabaseInfo database = session.getDatabase();
             File databaseHome = Context.getDatabaseHome(database);
             File[] tableFiles = databaseHome.listFiles((f) -> f.getName().endsWith(".gfrm"));
             final String key = "tables_in_" + database;

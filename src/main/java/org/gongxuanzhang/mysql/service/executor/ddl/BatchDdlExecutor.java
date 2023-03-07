@@ -14,28 +14,23 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.entity;
+package org.gongxuanzhang.mysql.service.executor.ddl;
 
+import org.gongxuanzhang.mysql.entity.ExecuteInfo;
+import org.gongxuanzhang.mysql.service.executor.BatchExecutor;
+
+import java.util.List;
 
 /**
- * 列类型
  *
- * @author gxz gongxuanzhang@foxmail.com
+ * 批量ddl执行器
+ * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public enum ColumnType {
+public abstract class BatchDdlExecutor<T extends ExecuteInfo> extends BatchExecutor<T> {
 
-    /**
-     * 数字
-     **/
-    INT,
-    /**
-     * 字符串
-     **/
-    VARCHAR,
-    /**
-     * 时间戳
-     **/
-    TIMESTAMP;
+    public BatchDdlExecutor(List<T> infos) {
+        super(infos);
+    }
 
 
 }
