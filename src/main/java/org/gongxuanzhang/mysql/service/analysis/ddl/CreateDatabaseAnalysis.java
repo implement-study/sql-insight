@@ -44,7 +44,7 @@ public class CreateDatabaseAnalysis implements StandaloneSqlAnalysis {
     public Executor doAnalysis(SQLStatement sqlStatement) throws MySQLException {
         SQLCreateDatabaseStatement statement = (SQLCreateDatabaseStatement) sqlStatement;
         DatabaseInfo databaseInfo = new DatabaseInfo(statement.getDatabaseName());
-        return new CreateDatabaseExecutor(databaseInfo);
+        return new CreateDatabaseExecutor(databaseInfo,statement.isIfNotExists());
     }
 
 

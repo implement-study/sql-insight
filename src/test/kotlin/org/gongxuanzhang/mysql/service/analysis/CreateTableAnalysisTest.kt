@@ -32,7 +32,7 @@ class CreateTableAnalysisTest {
     fun createTableTest(){
         """
             CREATE TABLE aa.example_table (
-              id INT UNSIGNED primary key NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+              id INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
               name VARCHAR(50) NOT NULL DEFAULT '' COMMENT '姓名',
               age INT NOT NULL DEFAULT 0 COMMENT '年龄',
               email VARCHAR(100) NOT NULL UNIQUE COMMENT '电子邮箱',

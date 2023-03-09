@@ -18,6 +18,7 @@ package org.gongxuanzhang.mysql.service.executor.ddl.database
 
 import org.gongxuanzhang.mysql.doSql
 import org.gongxuanzhang.mysql.exception.ExecuteException
+import org.gongxuanzhang.mysql.exception.MySQLException
 import org.gongxuanzhang.mysql.tool.Context
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -46,6 +47,17 @@ class CreateDatabaseTest {
 
     fun doCreateDatabase(database: String) {
         "create database $database".doSql()
+    }
+
+
+    @Test
+    fun createIfNotExist(){
+        "create database if not exists bb".doSql()
+        "create database if not exists bb".doSql()
+        "create database if not exists bb".doSql()
+        assertThrows<MySQLException> { "create database bb".doSql() }
+        "drop database bb".doSql()
+
     }
 
 

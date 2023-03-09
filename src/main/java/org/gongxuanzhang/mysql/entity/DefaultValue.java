@@ -16,40 +16,21 @@
 
 package org.gongxuanzhang.mysql.entity;
 
-import lombok.Data;
-import org.gongxuanzhang.mysql.annotation.DependOnContext;
-import org.gongxuanzhang.mysql.tool.Context;
-
-import java.io.File;
-
 
 /**
- * 数据库信息
+ * 默认值
  *
- * @author gxz gongxuanzhang@foxmail.com
+ * @author gxz gongxuanzhangmelt@gmail.com
  **/
-@Data
-public class DatabaseInfo implements ExecuteInfo {
-
-
-    private final String databaseName;
-
-    public DatabaseInfo(String databaseName) {
-        this.databaseName = databaseName;
-    }
+public interface DefaultValue<T> extends ExecuteInfo {
 
 
     /**
-     * 返回数据库目标位置文件夹
+     * 返回默认值
+     *
+     * @return 不能为空
      **/
-    @DependOnContext
-    public File sourceFile() {
-        File home = Context.getHome();
-        return new File(home, databaseName);
-    }
+    T getValue();
 
-    @Override
-    public String toString() {
-        return databaseName;
-    }
+
 }

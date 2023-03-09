@@ -18,6 +18,7 @@ package org.gongxuanzhang.mysql.entity;
 
 import com.alibaba.druid.sql.ast.SQLDataType;
 import com.alibaba.druid.sql.ast.SQLExpr;
+import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
 import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
 import com.alibaba.druid.sql.ast.statement.SQLColumnConstraint;
 import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
@@ -42,7 +43,7 @@ public class ColumnInfo implements ExecuteInfo {
     private boolean autoIncrement;
     private boolean notNull;
     private boolean unique;
-    private String defaultValue;
+    private DefaultValue<?> defaultValue;
     private Integer length;
 
 
@@ -55,6 +56,21 @@ public class ColumnInfo implements ExecuteInfo {
         analysisType(definition.getDataType());
         analysisConstraint(definition.getConstraints());
         this.name = definition.getColumnName();
+        analysisDefault(definition.getDefaultExpr());
+    }
+
+    private void analysisDefault(SQLExpr defaultExpr) {
+        if(defaultExpr == null){
+            return;
+        }
+        if(defaultExpr instanceof SQLCharExpr){
+            String defaultValue = ((SQLCharExpr) defaultExpr).getValue().toString();
+            this.defaultValue = new StringDefaultValue(defaultValue);
+        } else if(defaultExpr instanceof SQLIntegerExpr){
+            Integer value = (Integer) ((SQLIntegerExpr) defaultExpr).getValue();
+            this.defaultValue = new IntegerDefaultValue(value);
+        }
+
     }
 
     private void analysisConstraint(List<SQLColumnConstraint> constraints) {
@@ -62,9 +78,9 @@ public class ColumnInfo implements ExecuteInfo {
             return;
         }
         for (SQLColumnConstraint constraint : constraints) {
-            if(constraint instanceof SQLNotNullConstraint){
+            if (constraint instanceof SQLNotNullConstraint) {
                 this.notNull = true;
-            }else if(constraint instanceof SQLUniqueConstraint){
+            } else if (constraint instanceof SQLUniqueConstraint) {
                 this.unique = true;
             }
         }

@@ -20,6 +20,7 @@ import org.gongxuanzhang.mysql.core.result.Result
 import org.gongxuanzhang.mysql.doSql
 import org.gongxuanzhang.mysql.entity.ColumnInfo
 import org.gongxuanzhang.mysql.entity.ColumnType
+import org.gongxuanzhang.mysql.entity.StringDefaultValue
 import org.gongxuanzhang.mysql.entity.TableInfo
 import org.gongxuanzhang.mysql.exception.ExecuteException
 import org.gongxuanzhang.mysql.service.executor.ddl.database.CreateDatabaseTest
@@ -83,12 +84,12 @@ class CreateTableTest {
 
     fun doCreateSessionTable(tableName: String): Result {
         return """
-                    create table $tableName(
+                    create table IF NOT EXISTS $tableName(
                     id int primary key auto_increment,
                     name varchar not null,
                     gender varchar default '张三' not null,
                     age int comment '年龄',
-                    id_card varchar UNIQUE,
+                    id_card varchar UNIQUE
                     ) comment ='用户表'
                 """.doSql()
     }
@@ -129,7 +130,7 @@ class CreateTableTest {
             columnInfo.name = "gender"
             columnInfo.type = ColumnType.VARCHAR
             columnInfo.isNotNull = true
-            columnInfo.defaultValue = "张三"
+            columnInfo.defaultValue = StringDefaultValue("张三")
             columnInfo
         })
         assert(select.columnInfos[3] == run {

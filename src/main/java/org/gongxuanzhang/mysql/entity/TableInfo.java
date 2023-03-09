@@ -39,6 +39,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,7 +49,6 @@ import static org.gongxuanzhang.mysql.tool.ExceptionThrower.errorSwap;
 
 /**
  * 表信息
- * todo  还没有具体信息
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
@@ -88,14 +88,12 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
         if (CollectionUtils.isEmpty(columnDefinitions)) {
             throw new MySQLException("无法获取列信息");
         }
-        this.primaryKey = statement.getPrimaryKeyNames();
+        Set<String> primaryKey = new LinkedHashSet<>(statement.getPrimaryKeyNames());
         columnInfos = new ArrayList<>();
         for (SQLColumnDefinition columnDefinition : columnDefinitions) {
             columnInfos.add(new ColumnInfo(columnDefinition));
-            if (columnDefinition.isPrimaryKey() && !primaryKey.isEmpty()) {
+            if (columnDefinition.isPrimaryKey() && primaryKey.add(columnDefinition.getColumnName())) {
                 throw new MySQLException("主键重复定义");
-            } else if (columnDefinition.isPrimaryKey()) {
-                this.primaryKey.add(columnDefinition.getColumnName());
             }
 
         }

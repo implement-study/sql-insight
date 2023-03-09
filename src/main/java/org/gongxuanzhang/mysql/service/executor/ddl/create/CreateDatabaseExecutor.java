@@ -40,9 +40,11 @@ public class CreateDatabaseExecutor implements Executor {
 
 
     private final DatabaseInfo databaseInfo;
+    private final boolean ifNotExists;
 
-    public CreateDatabaseExecutor(DatabaseInfo databaseInfo) {
+    public CreateDatabaseExecutor(DatabaseInfo databaseInfo, boolean ifNotExists) {
         this.databaseInfo = databaseInfo;
+        this.ifNotExists = ifNotExists;
     }
 
 
@@ -57,9 +59,14 @@ public class CreateDatabaseExecutor implements Executor {
         String dataDir = GlobalProperties.getInstance().get(MySqlProperties.DATA_DIR);
         File db = new File(dataDir);
         File file = new File(db, databaseName);
-        if (file.exists() || !file.mkdirs()) {
+        if (file.exists()) {
+            if (ifNotExists) {
+                log.info("数据库{}已经存在",databaseName);
+                return Result.success();
+            }
             throw new ExecuteException("数据库" + databaseName + "已经存在");
         }
+        file.mkdirs();
         log.info("创建{}数据库", databaseName);
         Context.getDatabaseManager().register(databaseInfo);
         return Result.success();
