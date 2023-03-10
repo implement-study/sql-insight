@@ -20,10 +20,8 @@ package org.gongxuanzhang.mysql.entity.page;
 import java.util.List;
 
 /**
- *
  * InnoDb 页结构
  * 默认16K 暂时不支持修改
- *
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
@@ -37,7 +35,7 @@ public class InnoDbPage {
     /**
      * 页头 56字节
      **/
-    private PageHaader pageHaader;
+    private PageHeader pageHeader;
 
     /**
      * 下确界，13字节
@@ -56,7 +54,7 @@ public class InnoDbPage {
 
 
     /**
-     *  空闲空间
+     * 空闲空间
      **/
     private FreeSpace freeSpace;
 
@@ -72,12 +70,9 @@ public class InnoDbPage {
     private FileTrailer fileTrailer;
 
 
-
-    public InnoDbPage(byte[] bytes){
+    public InnoDbPage(byte[] bytes) {
 
     }
-
-
 
 
 }

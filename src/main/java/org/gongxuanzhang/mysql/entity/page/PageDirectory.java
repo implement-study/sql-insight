@@ -16,15 +16,12 @@
 
 package org.gongxuanzhang.mysql.entity.page;
 
-import lombok.Data;
-
 /**
- * dynamic行格式
+ * 页目录
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-@Data
-public class Dynamic implements UserRecord {
+public class PageDirectory {
 
 
 }

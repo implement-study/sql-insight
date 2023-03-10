@@ -17,8 +17,8 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 /**
- *
  * 空闲空间
+ *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 public class FreeSpace {

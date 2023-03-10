@@ -16,15 +16,36 @@
 
 package org.gongxuanzhang.mysql.entity.page;
 
-import lombok.Data;
 
 /**
- * dynamic行格式
+ * Compact行格式的记录类型
  *
- * @author gxz gongxuanzhangmelt@gmail.com
+ * @author gxz gongxuanzhang@foxmail.com
  **/
-@Data
-public class Dynamic implements UserRecord {
+public enum RecordType {
+    /**
+     * 普通记录
+     **/
+    NORMAL(0x00),
+    /**
+     * 非叶子节点记录
+     **/
+    PAGE(0x01),
+    /**
+     * 上确界
+     **/
+    SUPREMUM(0x02),
+    /**
+     * 下确界
+     **/
+    INFIMUM(0x03);
+
+
+    final int value;
+
+    RecordType(int value) {
+        this.value = value;
+    }
 
 
 }

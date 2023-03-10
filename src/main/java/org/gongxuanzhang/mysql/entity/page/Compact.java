@@ -24,8 +24,40 @@ import lombok.Data;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class Compact implements UserRecord{
+public class Compact implements UserRecord {
 
+    /**
+     * 记录头信息 5字节
+     **/
     RecordHeader recordHeader;
 
+    /**
+     * 变长字段信息
+     **/
+    int[] variables;
+
+    /**
+     * null值列表
+     **/
+    int[] nullValues;
+    /**
+     * 真实记录
+     **/
+    byte[] body;
+    /**
+     * 6字节  唯一标识
+     **/
+    int rowId;
+    /**
+     * 事务id  6字节
+     **/
+    int transactionId;
+
+    /**
+     * 7字节，回滚指针
+     **/
+    int rollPointer;
+
+
 }
+
