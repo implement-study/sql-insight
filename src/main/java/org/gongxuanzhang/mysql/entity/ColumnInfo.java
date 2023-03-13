@@ -25,6 +25,7 @@ import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
 import com.alibaba.druid.sql.ast.statement.SQLNotNullConstraint;
 import com.alibaba.druid.sql.ast.statement.SQLUniqueConstraint;
 import lombok.Data;
+import org.gongxuanzhang.mysql.exception.SqlParseException;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -36,6 +37,8 @@ import java.util.List;
  **/
 @Data
 public class ColumnInfo implements ExecuteInfo {
+
+    public static final int MAX_SIZE = 0xff;
 
     private ColumnType type;
     private String name;
@@ -51,7 +54,7 @@ public class ColumnInfo implements ExecuteInfo {
 
     }
 
-    public ColumnInfo(SQLColumnDefinition definition) {
+    public ColumnInfo(SQLColumnDefinition definition) throws SqlParseException {
         this.autoIncrement = definition.isAutoIncrement();
         analysisType(definition.getDataType());
         analysisConstraint(definition.getConstraints());
@@ -86,12 +89,15 @@ public class ColumnInfo implements ExecuteInfo {
         }
     }
 
-    private void analysisType(SQLDataType dataType) {
+    private void analysisType(SQLDataType dataType) throws SqlParseException {
         this.type = ColumnType.valueOf(dataType.getName().toUpperCase());
         if (!CollectionUtils.isEmpty(dataType.getArguments())) {
             SQLExpr sqlExpr = dataType.getArguments().get(0);
             if (sqlExpr instanceof SQLIntegerExpr) {
                 this.length = (Integer) ((SQLIntegerExpr) sqlExpr).getValue();
+                if (this.length >= MAX_SIZE) {
+                    throw new SqlParseException("暂不支持超过" + MAX_SIZE + "长度的字符串");
+                }
             }
         }
     }

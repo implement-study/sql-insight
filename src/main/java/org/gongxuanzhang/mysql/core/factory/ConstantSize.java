@@ -31,6 +31,7 @@ public enum ConstantSize {
     SUPREMUM_BODY_SIZE("上确界内容", 13),
     INFIMUM_BODY_SIZE("下确界内容", 13),
     FILE_TRAILER("文件尾", 8),
+    COMPACT_NULL_SIZE("compact null值列表", 8),
     RECORD_HEADER("记录头", 5);
 
     private final String desc;

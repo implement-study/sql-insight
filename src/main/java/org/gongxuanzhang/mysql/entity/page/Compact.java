@@ -18,6 +18,10 @@ package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
+import org.gongxuanzhang.mysql.core.factory.ConstantSize;
+import org.gongxuanzhang.mysql.tool.BitUtils;
+
+import java.nio.ByteBuffer;
 
 /**
  * compact行格式
@@ -35,24 +39,24 @@ public class Compact implements UserRecord, ByteSwappable<Compact> {
     /**
      * 变长字段信息
      **/
-    int[] variables;
+    Variables variables;
 
     /**
-     * null值列表
+     * null值列表 默认两字节
      **/
-    int[] nullValues;
+    CompactNullValue nullValues;
     /**
      * 6字节  唯一标识
      **/
-    int rowId;
+    long rowId;
     /**
      * 事务id  6字节
      **/
-    int transactionId;
+    long transactionId;
     /**
      * 7字节，回滚指针
      **/
-    int rollPointer;
+    long rollPointer;
     /**
      * 真实记录
      **/
@@ -61,14 +65,40 @@ public class Compact implements UserRecord, ByteSwappable<Compact> {
 
     @Override
     public byte[] toBytes() {
-        //  todo
-        return new byte[0];
+        ByteBuffer buffer = ByteBuffer.allocate(length());
+        buffer.put(recordHeader.toBytes());
+        buffer.put(variables.toBytes());
+        buffer.put(nullValues.toBytes());
+        buffer.put(BitUtils.cutToByteArray(rowId, 6));
+        buffer.put(BitUtils.cutToByteArray(transactionId, 6));
+        buffer.put(BitUtils.cutToByteArray(rollPointer, 7));
+        buffer.put(body);
+        return buffer.array();
     }
 
     @Override
     public Compact fromBytes(byte[] bytes) {
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        byte[] headBuffer = new byte[ConstantSize.RECORD_HEADER.getSize()];
+        buffer.get(headBuffer);
+        this.recordHeader = new RecordHeader(headBuffer);
+
         //  todo
         return null;
     }
+
+    private int length() {
+        return body.length + variables.length() + nullValues.length()
+                //  record_head
+                + 5
+                //  txId
+                + 6
+                //  rowId
+                + 6
+                //  rollPointer
+                + 7;
+    }
+
+
 }
 

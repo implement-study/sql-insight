@@ -14,27 +14,22 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql
+package org.gongxuanzhang.mysql.entity.page
 
-import org.gongxuanzhang.mysql.core.result.Result
-import org.gongxuanzhang.mysql.service.analysis.SqlAnalysis
-import org.gongxuanzhang.mysql.tool.ApplicationUtils
+import org.gongxuanzhang.mysql.chaosEquals
+import org.junit.jupiter.api.Test
 
 
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
+class CompactNullValueTest {
 
-fun String.doSql(): Result {
-//    val tokenAnalysis = SubSqlAnalysis()
-//    tokenAnalysis.init()
-//    val tokenizer = SqlTokenizer(this)
-//    val process = tokenizer.process()
-//    val executor: Executor = tokenAnalysis.analysis(process)
-//    return executor.doExecute()
-    val applicationContext = ApplicationUtils.applicationContext
-    val sqlAnalysis = applicationContext.getBean(SqlAnalysis::class.java)
-    return sqlAnalysis.analysis(this).doExecute()
+    @Test
+    fun nullCol(){
+        val compactNullValue = CompactNullValue(0x1234)
+        val nullColIndex = compactNullValue.nullColIndex()
+        assert(nullColIndex.chaosEquals(listOf(2,4,5,9,12)))
+
+    }
 }
-
-

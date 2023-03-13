@@ -16,6 +16,8 @@
 
 package org.gongxuanzhang.mysql.tool;
 
+import org.springframework.util.Assert;
+
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
@@ -26,9 +28,43 @@ public class BitUtils {
         throw new IllegalArgumentException("不支持");
     }
 
+    /**
+     * 把一个int转换成想要的字节数组
+     * 最多切成4个字节
+     *
+     * @param integer 数字
+     * @param bitSize 目标的字节数组长度
+     * @return 字节数组
+     **/
+    public static byte[] cutToByteArray(Integer integer, int bitSize) {
+        Assert.state(bitSize <= 4, "integer最多切成4个字节");
+        Assert.state(bitSize >= 1, "integer至少切成1个字节");
+        if (bitSize == 1) {
+            return new byte[]{integer.byteValue()};
+        }
+        byte[] result = new byte[bitSize];
+        final int base = 0xff;
+        for (int size = bitSize - 1; size >= 0; size--) {
+            result[size] = (byte) (integer & base);
+            integer >>= 8;
+        }
+        return result;
+    }
 
-
-
+    public static byte[] cutToByteArray(Long aLong, int bitSize) {
+        Assert.state(bitSize <= 8, "long最多切成8个字节");
+        Assert.state(bitSize >= 1, "long至少切成1个字节");
+        if (bitSize == 1) {
+            return new byte[]{aLong.byteValue()};
+        }
+        byte[] result = new byte[bitSize];
+        final int base = 0xffff;
+        for (int size = bitSize - 1; size >= 0; size--) {
+            result[size] = (byte) (aLong & base);
+            aLong >>= 8;
+        }
+        return result;
+    }
 
 
 }
