@@ -17,6 +17,7 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
+import org.gongxuanzhang.mysql.core.ByteSwappable;
 
 /**
  * dynamic行格式
@@ -24,7 +25,18 @@ import lombok.Data;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class Dynamic implements UserRecord {
+public class Dynamic implements UserRecord, ByteSwappable<Dynamic> {
 
 
+    @Override
+    public byte[] toBytes() {
+        //  todo
+        return new byte[0];
+    }
+
+    @Override
+    public Dynamic fromBytes(byte[] bytes) {
+        //  todo
+        return null;
+    }
 }

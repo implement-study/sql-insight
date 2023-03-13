@@ -17,6 +17,7 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
+import org.gongxuanzhang.mysql.core.ByteSwappable;
 
 /**
  * 页头，56字节
@@ -24,7 +25,7 @@ import lombok.Data;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class PageHeader {
+public class PageHeader implements ByteSwappable<PageHeader> {
 
     /**
      * 页中slot的数量，2字节
@@ -91,4 +92,15 @@ public class PageHeader {
     int segTop;
 
 
+    @Override
+    public byte[] toBytes() {
+        //  todo
+        return new byte[0];
+    }
+
+    @Override
+    public PageHeader fromBytes(byte[] bytes) {
+        //  todo
+        return null;
+    }
 }

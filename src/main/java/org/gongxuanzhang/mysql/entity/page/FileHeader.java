@@ -17,6 +17,7 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
+import org.gongxuanzhang.mysql.core.ByteSwappable;
 
 /**
  * 文件头，描述各种页的通用信息
@@ -25,7 +26,7 @@ import lombok.Data;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class FileHeader {
+public class FileHeader implements ByteSwappable<FileHeader> {
 
 
     /**
@@ -57,4 +58,15 @@ public class FileHeader {
     long lsn;
 
 
+    @Override
+    public byte[] toBytes() {
+        //  todo
+        return new byte[0];
+    }
+
+    @Override
+    public FileHeader fromBytes(byte[] bytes) {
+        //  todo
+        return null;
+    }
 }

@@ -16,10 +16,35 @@
 
 package org.gongxuanzhang.mysql.entity.page;
 
+import org.gongxuanzhang.mysql.core.ByteSwappable;
+
 /**
  * 上确界
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public class Supremum {
+public class Supremum implements ByteSwappable<Supremum> {
+
+    /**
+     * 记录头信息 5字节
+     **/
+    RecordHeader recordHeader;
+
+    /**
+     * 定长8字节 "supremum"
+     **/
+    byte[] body;
+
+
+    @Override
+    public byte[] toBytes() {
+        //  todo
+        return new byte[0];
+    }
+
+    @Override
+    public Supremum fromBytes(byte[] bytes) {
+        //  todo
+        return null;
+    }
 }

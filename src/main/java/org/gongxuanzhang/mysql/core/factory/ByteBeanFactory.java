@@ -14,37 +14,29 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.entity.page;
-
-
-import org.gongxuanzhang.mysql.core.ByteSwappable;
+package org.gongxuanzhang.mysql.core.factory;
 
 /**
- * 下确界
+ * 通过字节数组转换工厂
  *
- * @author gxz gongxuanzhangmelt@gmail.com
+ * @author gxz gongxuanzhang@foxmail.com
  **/
-public class Infimum implements ByteSwappable<Infimum> {
+public interface ByteBeanFactory<T> {
+
 
     /**
-     * 记录头信息 5字节
+     * 通过字节转换内容
+     *
+     * @param bytes 字节数组
+     *
+     * @return 得到的结果对象
      **/
-    RecordHeader recordHeader;
+    T swap(byte[] bytes);
 
     /**
-     * 定长8字节 "infimum" 这是7字节 最后一字节是0
+     * 创建一个初始化对象
+     *
+     * @return 得到初始化对象
      **/
-    byte[] body;
-
-    @Override
-    public byte[] toBytes() {
-        //  todo
-        return new byte[0];
-    }
-
-    @Override
-    public Infimum fromBytes(byte[] bytes) {
-        //  todo
-        return null;
-    }
+    T create();
 }

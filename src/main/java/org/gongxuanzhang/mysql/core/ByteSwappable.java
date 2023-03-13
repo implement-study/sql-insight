@@ -14,12 +14,29 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.entity.page;
+package org.gongxuanzhang.mysql.core;
 
 /**
- * 空闲空间
+ * 可以通过字节数组转换
  *
- * @author gxz gongxuanzhangmelt@gmail.com
+ * @author gxz gongxuanzhang@foxmail.com
  **/
-public class FreeSpace {
+public interface ByteSwappable<T> {
+
+
+    /**
+     * 转换成字节数组
+     *
+     * @return 转成字节数组
+     **/
+    byte[] toBytes();
+
+    /**
+     * 从字节数组转换过来
+     *
+     * @param bytes 字节数组
+     *
+     * @return 转成实体
+     */
+    T fromBytes(byte[] bytes);
 }

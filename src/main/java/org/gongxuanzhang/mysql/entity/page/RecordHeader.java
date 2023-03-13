@@ -16,6 +16,8 @@
 
 package org.gongxuanzhang.mysql.entity.page;
 
+import org.gongxuanzhang.mysql.core.ByteSwappable;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -33,7 +35,7 @@ import java.nio.ByteBuffer;
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public class RecordHeader {
+public class RecordHeader implements ByteSwappable<RecordHeader> {
 
     /**
      * 记录头本质上只有5个字节 但是40bit有不同作用
@@ -107,4 +109,15 @@ public class RecordHeader {
     }
 
 
+    @Override
+    public byte[] toBytes() {
+        //  todo
+        return new byte[0];
+    }
+
+    @Override
+    public RecordHeader fromBytes(byte[] bytes) {
+        //  todo
+        return null;
+    }
 }

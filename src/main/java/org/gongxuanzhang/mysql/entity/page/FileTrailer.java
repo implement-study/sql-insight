@@ -17,6 +17,7 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
+import org.gongxuanzhang.mysql.core.ByteSwappable;
 
 /**
  * 文件尾
@@ -24,7 +25,7 @@ import lombok.Data;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class FileTrailer {
+public class FileTrailer implements ByteSwappable<FileTrailer> {
 
     /**
      * 校验和，和文件头的4字节校验和一起校验
@@ -38,4 +39,15 @@ public class FileTrailer {
      **/
     int lsn;
 
+    @Override
+    public byte[] toBytes() {
+        //  todo
+        return new byte[0];
+    }
+
+    @Override
+    public FileTrailer fromBytes(byte[] bytes) {
+        //  todo
+        return null;
+    }
 }

@@ -17,6 +17,10 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 
+import lombok.Data;
+import org.gongxuanzhang.mysql.core.ByteSwappable;
+import org.gongxuanzhang.mysql.core.factory.InnoDbPageFactory;
+
 import java.util.List;
 
 /**
@@ -25,53 +29,51 @@ import java.util.List;
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public class InnoDbPage {
+@Data
+public class InnoDbPage implements ByteSwappable<InnoDbPage> {
 
     /**
      * 文件头 38字节
      **/
     private FileHeader fileHeader;
-
     /**
      * 页头 56字节
      **/
     private PageHeader pageHeader;
-
     /**
      * 下确界，13字节
      **/
     private Infimum infimum;
-
     /**
      * 上确界，13字节
      **/
     private Supremum supremum;
-
     /**
      * 用户记录  不确定字节
      **/
     private List<UserRecord> userRecords;
-
-
     /**
-     * 空闲空间
+     * 空闲空间，这里只记录字节数
      **/
-    private FreeSpace freeSpace;
-
-
+    private int freeSpace;
     /**
      * 页目录
      **/
     private PageDirectory pageDirectory;
-
     /**
      * 文件尾 8字节
      **/
     private FileTrailer fileTrailer;
 
 
-    public InnoDbPage(byte[] bytes) {
+    public byte[] toBytes() {
+        //  todo
+        return new byte[]{};
+    }
 
+    @Override
+    public InnoDbPage fromBytes(byte[] bytes) {
+        return new InnoDbPageFactory().swap(bytes);
     }
 
 

@@ -17,6 +17,7 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
+import org.gongxuanzhang.mysql.core.ByteSwappable;
 
 /**
  * compact行格式
@@ -24,7 +25,7 @@ import lombok.Data;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class Compact implements UserRecord {
+public class Compact implements UserRecord, ByteSwappable<Compact> {
 
     /**
      * 记录头信息 5字节
@@ -41,10 +42,6 @@ public class Compact implements UserRecord {
      **/
     int[] nullValues;
     /**
-     * 真实记录
-     **/
-    byte[] body;
-    /**
      * 6字节  唯一标识
      **/
     int rowId;
@@ -52,12 +49,26 @@ public class Compact implements UserRecord {
      * 事务id  6字节
      **/
     int transactionId;
-
     /**
      * 7字节，回滚指针
      **/
     int rollPointer;
+    /**
+     * 真实记录
+     **/
+    byte[] body;
 
 
+    @Override
+    public byte[] toBytes() {
+        //  todo
+        return new byte[0];
+    }
+
+    @Override
+    public Compact fromBytes(byte[] bytes) {
+        //  todo
+        return null;
+    }
 }
 
