@@ -22,7 +22,7 @@ import lombok.Data;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class StringDefaultValue implements DefaultValue<String>{
+public class StringDefaultValue implements DefaultValue<String> {
 
     private final String value;
 

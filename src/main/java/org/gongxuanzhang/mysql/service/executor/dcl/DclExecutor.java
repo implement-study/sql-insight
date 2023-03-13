@@ -21,6 +21,7 @@ import org.gongxuanzhang.mysql.service.executor.AbstractExecutor;
 
 /**
  * dcl执行器
+ *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 public abstract class DclExecutor<T extends ExecuteInfo> extends AbstractExecutor<T> {

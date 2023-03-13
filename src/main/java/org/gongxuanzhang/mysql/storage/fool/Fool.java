@@ -16,7 +16,6 @@
 
 package org.gongxuanzhang.mysql.storage.fool;
 
-import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlDeleteStatement;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.mysql.annotation.Engine;
 import org.gongxuanzhang.mysql.core.result.Result;

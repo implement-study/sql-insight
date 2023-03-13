@@ -34,7 +34,6 @@ import org.springframework.stereotype.Component;
 public class CreateDatabaseAnalysis implements StandaloneSqlAnalysis {
 
 
-
     @Override
     public Class<? extends SQLStatement> support() {
         return SQLCreateDatabaseStatement.class;
@@ -44,7 +43,7 @@ public class CreateDatabaseAnalysis implements StandaloneSqlAnalysis {
     public Executor doAnalysis(SQLStatement sqlStatement) throws MySQLException {
         SQLCreateDatabaseStatement statement = (SQLCreateDatabaseStatement) sqlStatement;
         DatabaseInfo databaseInfo = new DatabaseInfo(statement.getDatabaseName());
-        return new CreateDatabaseExecutor(databaseInfo,statement.isIfNotExists());
+        return new CreateDatabaseExecutor(databaseInfo, statement.isIfNotExists());
     }
 
 

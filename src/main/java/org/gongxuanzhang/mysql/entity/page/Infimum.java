@@ -18,6 +18,9 @@ package org.gongxuanzhang.mysql.entity.page;
 
 
 import org.gongxuanzhang.mysql.core.ByteSwappable;
+import org.gongxuanzhang.mysql.core.factory.ConstantSize;
+
+import java.nio.ByteBuffer;
 
 /**
  * 下确界
@@ -38,13 +41,21 @@ public class Infimum implements ByteSwappable<Infimum> {
 
     @Override
     public byte[] toBytes() {
-        //  todo
-        return new byte[0];
+        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.INFIMUM_SIZE.getSize());
+        buffer.put(this.recordHeader.toBytes());
+        buffer.put(body);
+        return buffer.array();
     }
 
     @Override
     public Infimum fromBytes(byte[] bytes) {
-        //  todo
-        return null;
+        ConstantSize.INFIMUM_SIZE.checkSize(bytes);
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        byte[] headBuffer = new byte[ConstantSize.RECORD_HEADER.getSize()];
+        buffer.get(headBuffer);
+        this.recordHeader = new RecordHeader(headBuffer);
+        this.body = new byte[ConstantSize.INFIMUM_BODY_SIZE.getSize()];
+        buffer.get(this.body);
+        return this;
     }
 }

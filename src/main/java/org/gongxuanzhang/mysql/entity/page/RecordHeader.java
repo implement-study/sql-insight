@@ -17,6 +17,7 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import org.gongxuanzhang.mysql.core.ByteSwappable;
+import org.gongxuanzhang.mysql.core.factory.ConstantSize;
 
 import java.nio.ByteBuffer;
 
@@ -44,6 +45,7 @@ public class RecordHeader implements ByteSwappable<RecordHeader> {
 
 
     public RecordHeader(byte[] source) {
+        ConstantSize.RECORD_HEADER.checkSize(source);
         this.source = ByteBuffer.wrap(source);
     }
 
@@ -111,13 +113,13 @@ public class RecordHeader implements ByteSwappable<RecordHeader> {
 
     @Override
     public byte[] toBytes() {
-        //  todo
-        return new byte[0];
+        return this.source.array();
     }
 
     @Override
     public RecordHeader fromBytes(byte[] bytes) {
-        //  todo
-        return null;
+        ConstantSize.RECORD_HEADER.checkSize(bytes);
+        this.source.put(bytes);
+        return this;
     }
 }

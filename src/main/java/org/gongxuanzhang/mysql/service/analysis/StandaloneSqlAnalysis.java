@@ -39,7 +39,9 @@ public interface StandaloneSqlAnalysis {
      * 解析sql状态返回执行器
      *
      * @param sqlStatement sql
+     *
      * @return 返回执行器
+     *
      * @throws MySQLException 执行过程中出现问题
      **/
     Executor doAnalysis(SQLStatement sqlStatement) throws MySQLException;

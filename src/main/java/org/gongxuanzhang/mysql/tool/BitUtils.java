@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.storage.innodb;
-
-import org.gongxuanzhang.mysql.core.result.Result;
-import org.gongxuanzhang.mysql.entity.DeleteInfo;
-import org.gongxuanzhang.mysql.exception.MySQLException;
-import org.gongxuanzhang.mysql.storage.DeleteEngine;
+package org.gongxuanzhang.mysql.tool;
 
 /**
- * fool 引擎的删除操作
- *
- * @author gxz gongxuanzhang@foxmail.com
+ * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public class InnoDbDelete implements DeleteEngine {
+public class BitUtils {
 
 
-    @Override
-    public Result delete(DeleteInfo info) throws MySQLException {
-        return null;
+    private BitUtils() {
+        throw new IllegalArgumentException("不支持");
     }
+
+
+
+
+
+
 }

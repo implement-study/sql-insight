@@ -78,6 +78,7 @@ public class ExceptionThrower {
      * 异常转换
      *
      * @param e 异常
+     *
      * @return 其实没有返回值，只是为了适配编译
      **/
     public static <V> V errorSwap(Exception e) throws MySQLException {

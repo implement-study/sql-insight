@@ -34,7 +34,6 @@ import org.springframework.stereotype.Component;
 public class CreateTableAnalysis implements StandaloneSqlAnalysis {
 
 
-
     @Override
     public Class<? extends SQLStatement> support() {
         return MySqlCreateTableStatement.class;

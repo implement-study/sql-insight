@@ -94,6 +94,7 @@ public class ColumnAdjust {
      * 填充基本输入数据
      *
      * @param inputRow 输入数据
+     *
      * @return 返回填充之后的一行数据
      */
     public JSONObject fillInputData(List<Cell<?>> inputRow) throws MySQLException {

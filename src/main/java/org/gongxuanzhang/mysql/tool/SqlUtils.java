@@ -35,7 +35,6 @@ public class SqlUtils {
     private static final Pattern ILLEGAL_PATTERN = Pattern.compile("[^\\w]+");
 
 
-
     /**
      * 校验变量名的合法行
      *
@@ -53,14 +52,12 @@ public class SqlUtils {
      * 计算器执行时间
      *
      * @param startTime 开始时间
+     *
      * @return double小数的秒
      **/
     public static String sqlTime(long startTime) {
         return String.format("%.3f s", (System.currentTimeMillis() - startTime) / 1000.0);
     }
-
-
-
 
 
 }

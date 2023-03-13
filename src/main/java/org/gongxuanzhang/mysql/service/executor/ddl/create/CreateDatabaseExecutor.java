@@ -61,7 +61,7 @@ public class CreateDatabaseExecutor implements Executor {
         File file = new File(db, databaseName);
         if (file.exists()) {
             if (ifNotExists) {
-                log.info("数据库{}已经存在",databaseName);
+                log.info("数据库{}已经存在", databaseName);
                 return Result.success();
             }
             throw new ExecuteException("数据库" + databaseName + "已经存在");

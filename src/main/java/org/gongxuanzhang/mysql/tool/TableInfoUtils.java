@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * 表相关工具类
  *
  * @author gxz gongxuanzhangmelt@gmail.com
@@ -51,6 +50,7 @@ public abstract class TableInfoUtils {
      * 选择已经存在的表信息
      *
      * @param candidate sql解析出的表名  database.table
+     *
      * @return 返回已经存在的表信息
      **/
     public static TableInfo selectTableInfo(String candidate) throws MySQLException {
@@ -92,6 +92,7 @@ public abstract class TableInfoUtils {
      * 批量查询已经存在的表信息
      *
      * @param tableSources sql解析出的表信息
+     *
      * @return 返回填充
      **/
     public static List<TableInfo> batchSelectTableInfo(List<? extends SQLTableSource> tableSources) throws MySQLException {

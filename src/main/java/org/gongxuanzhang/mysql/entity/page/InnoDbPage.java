@@ -19,8 +19,10 @@ package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
+import org.gongxuanzhang.mysql.core.factory.ConstantSize;
 import org.gongxuanzhang.mysql.core.factory.InnoDbPageFactory;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 
 /**
@@ -31,6 +33,7 @@ import java.util.List;
  **/
 @Data
 public class InnoDbPage implements ByteSwappable<InnoDbPage> {
+
 
     /**
      * 文件头 38字节
@@ -67,8 +70,15 @@ public class InnoDbPage implements ByteSwappable<InnoDbPage> {
 
 
     public byte[] toBytes() {
+        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.PAGE_SIZE.getSize());
+        buffer.put(fileHeader.toBytes());
+        buffer.put(pageHeader.toBytes());
+        buffer.put(infimum.toBytes());
+        buffer.put(supremum.toBytes());
         //  todo
-        return new byte[]{};
+        buffer.put(pageDirectory.toBytes());
+        buffer.put(fileTrailer.toBytes());
+        return buffer.array();
     }
 
     @Override

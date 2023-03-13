@@ -34,7 +34,6 @@ import org.springframework.stereotype.Component;
 public class UseAnalysis implements StandaloneSqlAnalysis {
 
 
-
     @Override
     public Class<? extends SQLStatement> support() {
         return SQLUseStatement.class;

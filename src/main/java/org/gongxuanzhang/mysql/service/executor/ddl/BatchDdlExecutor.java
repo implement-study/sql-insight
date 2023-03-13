@@ -22,8 +22,8 @@ import org.gongxuanzhang.mysql.service.executor.BatchExecutor;
 import java.util.List;
 
 /**
- *
  * 批量ddl执行器
+ *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 public abstract class BatchDdlExecutor<T extends ExecuteInfo> extends BatchExecutor<T> {

@@ -34,7 +34,6 @@ import org.springframework.stereotype.Component;
 public class DropDatabaseAnalysis implements StandaloneSqlAnalysis {
 
 
-
     @Override
     public Class<? extends SQLStatement> support() {
         return SQLDropDatabaseStatement.class;

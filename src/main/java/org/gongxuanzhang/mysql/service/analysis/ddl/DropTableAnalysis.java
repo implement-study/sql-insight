@@ -37,7 +37,6 @@ import java.util.List;
 public class DropTableAnalysis implements StandaloneSqlAnalysis {
 
 
-
     @Override
     public Class<? extends SQLStatement> support() {
         return SQLDropTableStatement.class;

@@ -32,6 +32,7 @@ public interface Shower extends Executor {
      * 展示
      *
      * @return 同 executor
+     *
      * @throws MySQLException 同executor
      **/
     Result show() throws MySQLException;
@@ -40,6 +41,7 @@ public interface Shower extends Executor {
      * 委托为show
      *
      * @return 同executor
+     *
      * @throws MySQLException 同executor
      **/
     @Override

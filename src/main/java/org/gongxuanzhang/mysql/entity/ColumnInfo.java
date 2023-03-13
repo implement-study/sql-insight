@@ -60,13 +60,13 @@ public class ColumnInfo implements ExecuteInfo {
     }
 
     private void analysisDefault(SQLExpr defaultExpr) {
-        if(defaultExpr == null){
+        if (defaultExpr == null) {
             return;
         }
-        if(defaultExpr instanceof SQLCharExpr){
+        if (defaultExpr instanceof SQLCharExpr) {
             String defaultValue = ((SQLCharExpr) defaultExpr).getValue().toString();
             this.defaultValue = new StringDefaultValue(defaultValue);
-        } else if(defaultExpr instanceof SQLIntegerExpr){
+        } else if (defaultExpr instanceof SQLIntegerExpr) {
             Integer value = (Integer) ((SQLIntegerExpr) defaultExpr).getValue();
             this.defaultValue = new IntegerDefaultValue(value);
         }

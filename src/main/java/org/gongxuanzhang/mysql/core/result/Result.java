@@ -57,8 +57,6 @@ public interface Result {
 
     /**
      * 设置sql时间
-     *
-     * @param sqlTime
      **/
     void setSqlTime(String sqlTime);
 
@@ -96,6 +94,7 @@ public interface Result {
      * 如 插入 修改时
      *
      * @param message 信息内容
+     *
      * @return 携带信息的返回值
      **/
     static Result info(String message) {
@@ -113,6 +112,7 @@ public interface Result {
      * 错误返回
      *
      * @param errorMessage 错误信息
+     *
      * @return 错误返回
      **/
     static Result error(String errorMessage) {
@@ -130,6 +130,7 @@ public interface Result {
      *
      * @param head     元数据头
      * @param dataList 元数据
+     *
      * @return 结果
      **/
     static Result select(String[] head, List<JSONObject> dataList) {
@@ -149,6 +150,7 @@ public interface Result {
      *
      * @param head     列标题
      * @param dataList 列数据
+     *
      * @return 结果
      **/
     static Result singleRow(String head, List<String> dataList) {

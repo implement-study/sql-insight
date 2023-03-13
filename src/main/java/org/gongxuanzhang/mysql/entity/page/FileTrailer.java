@@ -18,6 +18,9 @@ package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
+import org.gongxuanzhang.mysql.core.factory.ConstantSize;
+
+import java.nio.ByteBuffer;
 
 /**
  * 文件尾
@@ -41,13 +44,17 @@ public class FileTrailer implements ByteSwappable<FileTrailer> {
 
     @Override
     public byte[] toBytes() {
-        //  todo
-        return new byte[0];
+        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.FILE_TRAILER.getSize());
+        buffer.putInt(checkSum);
+        buffer.putInt(lsn);
+        return buffer.array();
     }
 
     @Override
     public FileTrailer fromBytes(byte[] bytes) {
-        //  todo
-        return null;
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        this.checkSum = buffer.getInt();
+        this.lsn = buffer.getInt();
+        return this;
     }
 }

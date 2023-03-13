@@ -151,7 +151,9 @@ public class Context {
      * 拿到数据库目录
      *
      * @param database 数据库名
+     *
      * @return 数据库目录
+     *
      * @throws MySQLException 数据库不存在或者文件异常会抛出异常
      **/
     public static File getDatabaseHome(String database) throws MySQLException {
@@ -166,7 +168,9 @@ public class Context {
      * 拿到数据库目录
      *
      * @param database 数据库实体
+     *
      * @return 数据库目录
+     *
      * @throws MySQLException 数据库不存在或者文件异常会抛出异常
      **/
     public static File getDatabaseHome(DatabaseInfo database) throws MySQLException {

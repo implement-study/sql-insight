@@ -24,6 +24,7 @@ import com.alibaba.druid.sql.ast.expr.SQLValuableExpr;
 /**
  * where 条件
  * todo  条件还不支持
+ *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 public class Where {
@@ -33,8 +34,6 @@ public class Where {
     public Where(SQLExpr whereExpr) {
         this.source = whereExpr;
     }
-
-
 
 
     /**

@@ -17,6 +17,9 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import org.gongxuanzhang.mysql.core.ByteSwappable;
+import org.gongxuanzhang.mysql.core.factory.ConstantSize;
+
+import java.nio.ByteBuffer;
 
 /**
  * 上确界
@@ -38,13 +41,21 @@ public class Supremum implements ByteSwappable<Supremum> {
 
     @Override
     public byte[] toBytes() {
-        //  todo
-        return new byte[0];
+        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.SUPREMUM_SIZE.getSize());
+        buffer.put(this.recordHeader.toBytes());
+        buffer.put(body);
+        return buffer.array();
     }
 
     @Override
     public Supremum fromBytes(byte[] bytes) {
-        //  todo
-        return null;
+        ConstantSize.SUPREMUM_SIZE.checkSize(bytes);
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        byte[] headBuffer = new byte[ConstantSize.RECORD_HEADER.getSize()];
+        buffer.get(headBuffer);
+        this.recordHeader = new RecordHeader(headBuffer);
+        this.body = new byte[ConstantSize.SUPREMUM_BODY_SIZE.getSize()];
+        buffer.get(this.body);
+        return this;
     }
 }

@@ -49,6 +49,6 @@ public class DescAnalysis implements StandaloneSqlAnalysis {
         MySqlExplainStatement statement = (MySqlExplainStatement) sqlStatement;
         SQLName tableName = statement.getTableName();
         TableInfo tableInfo = TableInfoUtils.selectTableInfo(tableName.toString());
-        return  new DescTableExecutor(tableInfo);
+        return new DescTableExecutor(tableInfo);
     }
 }

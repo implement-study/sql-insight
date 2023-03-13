@@ -40,23 +40,23 @@ public class InnoDbPageFactory implements ByteBeanFactory<InnoDbPage> {
 
     @Override
     public InnoDbPage swap(byte[] bytes) {
-        checkSize(bytes, ConstantSize.PAGE_SIZE);
+        ConstantSize.PAGE_SIZE.checkSize(bytes);
         ByteBuffer wrap = ByteBuffer.wrap(bytes);
         InnoDbPage page = new InnoDbPage();
 
-        byte[] buffer = new byte[ConstantSize.FILE_HEADER_SIZE.size];
+        byte[] buffer = new byte[ConstantSize.FILE_HEADER_SIZE.getSize()];
         wrap.get(buffer);
         page.setFileHeader(createFileHeader(buffer));
 
-        buffer = new byte[ConstantSize.PAGE_HEADER_SIZE.size];
+        buffer = new byte[ConstantSize.PAGE_HEADER_SIZE.getSize()];
         wrap.get(buffer);
         page.setPageHeader(createPageHeader(buffer));
 
-        buffer = new byte[ConstantSize.INFIMUM_SIZE.size];
+        buffer = new byte[ConstantSize.INFIMUM_SIZE.getSize()];
         wrap.get(buffer);
         page.setInfimum(createInfimum(buffer));
 
-        buffer = new byte[ConstantSize.SUPREMUM_SIZE.size];
+        buffer = new byte[ConstantSize.SUPREMUM_SIZE.getSize()];
         wrap.get(buffer);
         page.setSupremum(createSupremum(buffer));
 
@@ -83,26 +83,26 @@ public class InnoDbPageFactory implements ByteBeanFactory<InnoDbPage> {
     }
 
     public static FileHeader createFileHeader(byte[] bytes) {
-        checkSize(bytes, ConstantSize.FILE_HEADER_SIZE);
+        ConstantSize.FILE_HEADER_SIZE.checkSize(bytes);
         FileHeader fileHeader = new FileHeader();
         fileHeader.setCheckSum(INIT_CHECKSUM);
         return fileHeader;
     }
 
     public static PageHeader createPageHeader(byte[] bytes) {
-        checkSize(bytes, ConstantSize.PAGE_HEADER_SIZE);
+        ConstantSize.PAGE_HEADER_SIZE.checkSize(bytes);
         PageHeader pageHeader = new PageHeader();
         return pageHeader;
     }
 
     public static Infimum createInfimum(byte[] bytes) {
-        checkSize(bytes, ConstantSize.INFIMUM_SIZE);
+        ConstantSize.INFIMUM_SIZE.checkSize(bytes);
         Infimum infimum = new Infimum();
         return infimum;
     }
 
     public static Supremum createSupremum(byte[] bytes) {
-        checkSize(bytes, ConstantSize.SUPREMUM_SIZE);
+        ConstantSize.SUPREMUM_SIZE.checkSize(bytes);
         Supremum supremum = new Supremum();
         return supremum;
     }
@@ -114,34 +114,4 @@ public class InnoDbPageFactory implements ByteBeanFactory<InnoDbPage> {
     }
 
 
-    private static void checkSize(byte[] bytes, ConstantSize constantSize) {
-        if (bytes.length != constantSize.size) {
-            throw new IllegalArgumentException(constantSize.getDesc() + "大小必须是" + constantSize.size + "字节");
-        }
-    }
-
-
-    public enum ConstantSize {
-        PAGE_SIZE("页", 8 * 1024),
-        FILE_HEADER_SIZE("文件头", 38),
-        PAGE_HEADER_SIZE("页头", 56),
-        INFIMUM_SIZE("下确界", 13),
-        SUPREMUM_SIZE("上确界", 13);
-
-        private final String desc;
-        private final int size;
-
-        ConstantSize(String desc, int size) {
-            this.desc = desc;
-            this.size = size;
-        }
-
-        public String getDesc() {
-            return desc;
-        }
-
-        public int getSize() {
-            return size;
-        }
-    }
 }
