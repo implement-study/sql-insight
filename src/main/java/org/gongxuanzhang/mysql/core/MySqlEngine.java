@@ -30,7 +30,6 @@ public interface MySqlEngine {
      * 执行sql
      *
      * @param sql sql
-     *
      * @return 返回错误内容
      **/
     Result doSql(String sql);

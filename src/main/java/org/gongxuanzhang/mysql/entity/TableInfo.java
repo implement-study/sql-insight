@@ -155,7 +155,6 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
      * 校验数据库信息
      *
      * @return 返回数据库文件夹
-     *
      * @throws MySQLException 校验失败会抛出异常
      **/
     private File checkDatabase() throws MySQLException {

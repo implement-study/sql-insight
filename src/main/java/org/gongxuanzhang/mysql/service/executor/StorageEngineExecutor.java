@@ -43,9 +43,7 @@ public abstract class StorageEngineExecutor<T extends ExecuteInfo> extends Abstr
      *
      * @param engine       引擎
      * @param sqlStatement sql执行信息
-     *
      * @return 同Result
-     *
      * @throws MySQLException 执行过程中可能出现的问题
      **/
     public abstract Result doExecute(StorageEngine engine, T sqlStatement) throws MySQLException;

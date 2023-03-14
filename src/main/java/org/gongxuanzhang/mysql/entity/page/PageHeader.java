@@ -18,6 +18,9 @@ package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
+import org.gongxuanzhang.mysql.core.factory.ConstantSize;
+
+import java.nio.ByteBuffer;
 
 /**
  * 页头，56字节
@@ -94,13 +97,42 @@ public class PageHeader implements ByteSwappable<PageHeader> {
 
     @Override
     public byte[] toBytes() {
-        //  todo
-        return new byte[0];
+        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.PAGE_HEADER_SIZE.getSize());
+        buffer.putShort(this.slotCount);
+        buffer.putShort(this.heapTop);
+        buffer.putShort(this.absoluteRecordCount);
+        buffer.putShort(this.recordCount);
+        buffer.putShort(this.free);
+        buffer.putShort(this.garbage);
+        buffer.putShort(this.lastInsert);
+        buffer.putShort(this.direction);
+        buffer.putShort(this.directionCount);
+        buffer.putLong(this.maxTransactionId);
+        buffer.putShort(this.level);
+        buffer.putLong(this.indexId);
+        buffer.putLong(this.segLeaf);
+        buffer.putLong(this.segTop);
+        return buffer.array();
     }
 
     @Override
     public PageHeader fromBytes(byte[] bytes) {
-        //  todo
-        return null;
+        ConstantSize.PAGE_HEADER_SIZE.checkSize(bytes);
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        this.slotCount = buffer.getShort();
+        this.heapTop = buffer.getShort();
+        this.absoluteRecordCount = buffer.getShort();
+        this.recordCount = buffer.getShort();
+        this.free = buffer.getShort();
+        this.garbage = buffer.getShort();
+        this.lastInsert = buffer.getShort();
+        this.direction = buffer.getShort();
+        this.directionCount = buffer.getShort();
+        this.maxTransactionId = buffer.getLong();
+        this.level = buffer.getShort();
+        this.indexId = buffer.getLong();
+        this.segLeaf = buffer.getLong();
+        this.segTop = buffer.getLong();
+        return this;
     }
 }

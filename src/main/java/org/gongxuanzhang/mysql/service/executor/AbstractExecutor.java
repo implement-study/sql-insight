@@ -41,9 +41,7 @@ public abstract class AbstractExecutor<T extends ExecuteInfo> implements Executo
      * 根据信息执行
      *
      * @param info 执行信息
-     *
      * @return {@link this#doExecute()}
-     *
      * @throws MySQLException 执行异常
      **/
     public abstract Result doExecute(T info) throws MySQLException;

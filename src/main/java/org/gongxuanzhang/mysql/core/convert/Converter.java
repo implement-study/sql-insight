@@ -28,7 +28,6 @@ public interface Converter<T> {
      * 表示的字符串 转换为目标对象
      *
      * @param value 字符串
-     *
      * @return 可以为空
      **/
     T convert(String value);

@@ -32,9 +32,7 @@ public interface UpdateEngine {
      * 修改数据
      *
      * @param info update info
-     *
      * @return 通用返回
-     *
      * @throws MySQLException 执行过程中出现问题抛出异常
      **/
     Result update(UpdateInfo info) throws MySQLException;

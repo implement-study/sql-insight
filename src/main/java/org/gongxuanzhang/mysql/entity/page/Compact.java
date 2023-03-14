@@ -82,9 +82,27 @@ public class Compact implements UserRecord, ByteSwappable<Compact> {
         byte[] headBuffer = new byte[ConstantSize.RECORD_HEADER.getSize()];
         buffer.get(headBuffer);
         this.recordHeader = new RecordHeader(headBuffer);
-
-        //  todo
-        return null;
+        byte varLength = buffer.get();
+        this.variables = new Variables();
+        if (varLength == 0) {
+            this.variables.fromBytes(new byte[0]);
+        } else {
+            byte[] varBytes = new byte[varLength];
+            buffer.get(varBytes);
+            this.variables.fromBytes(varBytes);
+        }
+        this.nullValues = new CompactNullValue(buffer.getShort());
+        byte[] candidateBuffer = new byte[6];
+        buffer.get(candidateBuffer);
+        this.rowId = BitUtils.joinLong(candidateBuffer);
+        buffer.get(candidateBuffer);
+        this.transactionId = BitUtils.joinLong(candidateBuffer);
+        candidateBuffer = new byte[7];
+        buffer.get(candidateBuffer);
+        this.rollPointer = BitUtils.joinLong(candidateBuffer);
+        this.body = new byte[buffer.remaining()];
+        buffer.get(this.body);
+        return this;
     }
 
     private int length() {

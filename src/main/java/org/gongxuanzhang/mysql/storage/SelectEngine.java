@@ -31,9 +31,7 @@ public interface SelectEngine {
      * 查询数据数据
      *
      * @param info select info
-     *
      * @return 通用返回
-     *
      * @throws MySQLException 执行过程中出现问题抛出异常
      **/
     Result select(SingleSelectInfo info) throws MySQLException;

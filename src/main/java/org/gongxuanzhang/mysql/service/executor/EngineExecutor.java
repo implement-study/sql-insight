@@ -42,9 +42,7 @@ public abstract class EngineExecutor<T extends ExecuteInfo> implements Executor 
      *
      * @param info   执行信息
      * @param engine 执行引擎
-     *
      * @return 统一返回值
-     *
      * @throws MySQLException 执行过程出现问题
      **/
     public abstract Result doEngine(StorageEngine engine, T info) throws MySQLException;

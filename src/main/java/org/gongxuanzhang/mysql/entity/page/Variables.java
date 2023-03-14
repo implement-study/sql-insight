@@ -18,8 +18,6 @@ package org.gongxuanzhang.mysql.entity.page;
 
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 
-import java.nio.ByteBuffer;
-
 /**
  * 变长列表
  *
@@ -27,8 +25,6 @@ import java.nio.ByteBuffer;
  **/
 public class Variables implements ByteSwappable<Variables> {
 
-
-    byte length;
 
     byte[] varBytes;
 
@@ -46,15 +42,7 @@ public class Variables implements ByteSwappable<Variables> {
 
     @Override
     public Variables fromBytes(byte[] bytes) {
-        if (bytes.length == 1) {
-            this.length = 1;
-            this.varBytes = new byte[0];
-            return this;
-        }
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        this.length = buffer.get();
-        this.varBytes = new byte[this.length];
-        buffer.get(this.varBytes);
+        this.varBytes = bytes;
         return this;
     }
 }

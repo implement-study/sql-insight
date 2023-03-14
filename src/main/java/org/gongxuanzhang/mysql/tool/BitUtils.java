@@ -67,4 +67,41 @@ public class BitUtils {
     }
 
 
+    /**
+     * 把一个不定长的字节数组组成一个int
+     *
+     * @param bytes 最长是4
+     * @return 返回int
+     **/
+    public static int joinInt(byte[] bytes) {
+        if (bytes.length > 4) {
+            throw new IllegalArgumentException("拼接int数组最长为4");
+        }
+        int result = 0;
+        for (byte aByte : bytes) {
+            result <<= 8;
+            result |= aByte;
+        }
+        return result;
+    }
+
+    /**
+     * 把一个不定长的字节数组组成一个long
+     *
+     * @param bytes 最长是8
+     * @return 返回long
+     **/
+    public static long joinLong(byte[] bytes) {
+        if (bytes.length > 8) {
+            throw new IllegalArgumentException("拼接long数组最长为8");
+        }
+        long result = 0L;
+        for (byte aByte : bytes) {
+            result <<= 8;
+            result |= aByte;
+        }
+        return result;
+    }
+
+
 }

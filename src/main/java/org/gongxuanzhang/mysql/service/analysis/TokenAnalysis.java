@@ -32,9 +32,7 @@ public interface TokenAnalysis {
      * 解析成一个执行器
      *
      * @param sqlTokenList tokens
-     *
      * @return 执行器
-     *
      * @throws MySQLException 解析失败抛出异常
      **/
     @Deprecated

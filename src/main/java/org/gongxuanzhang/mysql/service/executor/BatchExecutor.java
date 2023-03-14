@@ -44,9 +44,7 @@ public abstract class BatchExecutor<T extends ExecuteInfo> implements Executor {
      * 批量执行信息
      *
      * @param infos 批量信息
-     *
      * @return {@link this#doExecute()}
-     *
      * @throws MySQLException 执行异常
      **/
     public abstract Result doExecute(List<T> infos) throws MySQLException;

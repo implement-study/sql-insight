@@ -31,7 +31,6 @@ public interface Executor {
      * 执行
      *
      * @return 返回执行结果
-     *
      * @throws MySQLException 执行过程中出现问题抛出异常
      **/
     Result doExecute() throws MySQLException;

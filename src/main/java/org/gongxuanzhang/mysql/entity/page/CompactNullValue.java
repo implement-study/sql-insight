@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * compact 的null值列表
  * 固定占两字节，本质上是一个short数字位图
  *
@@ -63,6 +62,7 @@ public class CompactNullValue implements ByteSwappable<CompactNullValue> {
     /**
      * 返回所有null值的列的角标
      * 返回的列是反过来的
+     *
      * @return [0, 1] 表示0列和1列为null
      **/
     public List<Integer> nullColIndex() {

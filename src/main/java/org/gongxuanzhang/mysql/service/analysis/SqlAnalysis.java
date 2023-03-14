@@ -31,9 +31,7 @@ public interface SqlAnalysis {
      * 解析成一个执行器
      *
      * @param sql sql
-     *
      * @return 执行器
-     *
      * @throws MySQLException 过程中可能抛出异常
      **/
     Executor analysis(String sql) throws MySQLException;

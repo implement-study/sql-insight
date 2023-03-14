@@ -31,9 +31,7 @@ public interface InsertEngine {
      * 插入数据
      *
      * @param info insert info
-     *
      * @return 通用返回
-     *
      * @throws MySQLException 执行过程中出现问题抛出异常
      **/
     Result insert(InsertInfo info) throws MySQLException;

@@ -37,9 +37,7 @@ public abstract class DdlExecutor<T extends ExecuteInfo> extends AbstractExecuto
      * 用信息执行
      *
      * @param info 信息
-     *
      * @return 同 {@link this#doExecute()}
-     *
      * @throws MySQLException 异常信息
      **/
     public abstract Result doExecute(T info) throws MySQLException;

@@ -19,6 +19,8 @@ package org.gongxuanzhang.mysql.entity.page;
 import lombok.Data;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 
+import java.nio.ByteBuffer;
+
 /**
  * 页目录
  * 里面有N个slot
@@ -32,18 +34,25 @@ public class PageDirectory implements ByteSwappable<PageDirectory> {
     /**
      * slot的每个数字记录每个槽中最大数据的偏移位置
      **/
-    int[] slots;
+    short[] slots;
 
 
     @Override
     public byte[] toBytes() {
-        //  todo
-        return new byte[0];
+        ByteBuffer buffer = ByteBuffer.allocate(slots.length * 2);
+        for (short slot : slots) {
+            buffer.putShort(slot);
+        }
+        return buffer.array();
     }
 
     @Override
     public PageDirectory fromBytes(byte[] bytes) {
-        //  todo
-        return null;
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        this.slots = new short[bytes.length / 2];
+        for (int i = bytes.length / 2; i > 0; i--) {
+            slots[i] = buffer.getShort();
+        }
+        return this;
     }
 }

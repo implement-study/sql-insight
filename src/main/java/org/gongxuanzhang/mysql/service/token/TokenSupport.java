@@ -90,7 +90,6 @@ public class TokenSupport {
      * 判断字符是否是数字
      *
      * @param c char
-     *
      * @return true是数字
      **/
     public static boolean isDigit(char c) {
@@ -103,7 +102,6 @@ public class TokenSupport {
 
     /**
      * @param c char
-     *
      * @return true是字母
      **/
     public static boolean isAlphabet(char c) {
@@ -118,7 +116,6 @@ public class TokenSupport {
      * 是否是标识符
      *
      * @param c char
-     *
      * @return true是标识符
      **/
     public static boolean isIdentifier(char c) {
@@ -133,7 +130,6 @@ public class TokenSupport {
      * 尝试交换关键字
      *
      * @param sqlToken var sql token
-     *
      * @return 如果可以交换，返回交换之后的关键字 sql token 如果不能交换，返回原token
      **/
     public static SqlToken swapKeyword(SqlToken sqlToken) {
@@ -152,7 +148,6 @@ public class TokenSupport {
      *
      * @param tokenKind token类型
      * @param target    目标类型
-     *
      * @return true是目标类型  false不是目标类型
      **/
     public static boolean isTokenKind(TokenKind tokenKind, TokenKind... target) {
@@ -295,7 +290,6 @@ public class TokenSupport {
      * 通过一个sql token var 拿到一个结果 要求token必须是var
      *
      * @return token的值
-     *
      * @throws SqlAnalysisException 如果不是 var token 抛出异常
      **/
     public static String getMustVar(SqlToken sqlToken) throws SqlAnalysisException {
@@ -309,9 +303,7 @@ public class TokenSupport {
      * 通过一个sql token  拿到一个结果  要求token必须是LITERACY
      *
      * @param sqlToken sql token
-     *
      * @return token的值
-     *
      * @throws SqlAnalysisException 如果不是 LITERACY token 抛出异常
      **/
     public static String getMustLiteracy(SqlToken sqlToken) throws SqlAnalysisException {
@@ -325,9 +317,7 @@ public class TokenSupport {
      * 通过一个sql token  拿到一个结果  要求token必须是LITERACY或者是var
      *
      * @param sqlToken sql token
-     *
      * @return token的值
-     *
      * @throws SqlAnalysisException 如果不是 LITERACY或者var token 抛出异常
      **/
     public static String getString(SqlToken sqlToken) throws SqlAnalysisException {
@@ -374,7 +364,6 @@ public class TokenSupport {
      *
      * @param tokenList token 流
      * @param offset    token流从哪开始解析
-     *
      * @return pair key 使用了多少流中token  value 表信息
      **/
     @DependOnContext

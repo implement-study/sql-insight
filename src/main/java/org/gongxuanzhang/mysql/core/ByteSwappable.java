@@ -35,7 +35,6 @@ public interface ByteSwappable<T> {
      * 从字节数组转换过来
      *
      * @param bytes 字节数组
-     *
      * @return 转成实体
      */
     T fromBytes(byte[] bytes);

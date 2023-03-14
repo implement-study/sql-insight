@@ -39,7 +39,6 @@ public interface MySQLManager<T> {
      * 通过唯一表示获得管理的信息
      *
      * @param name 信息标识
-     *
      * @return null 或者是信息
      **/
     T select(String name) throws MySQLException;
@@ -73,7 +72,6 @@ public interface MySQLManager<T> {
      * 被注册的内容如何变成唯一标识
      *
      * @param t 被注册的内容
-     *
      * @return id
      **/
     String toId(T t);

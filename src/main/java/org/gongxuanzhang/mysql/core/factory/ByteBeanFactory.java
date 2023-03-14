@@ -28,7 +28,6 @@ public interface ByteBeanFactory<T> {
      * 通过字节转换内容
      *
      * @param bytes 字节数组
-     *
      * @return 得到的结果对象
      **/
     T swap(byte[] bytes);

@@ -52,7 +52,6 @@ public class SqlUtils {
      * 计算器执行时间
      *
      * @param startTime 开始时间
-     *
      * @return double小数的秒
      **/
     public static String sqlTime(long startTime) {
