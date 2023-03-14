@@ -19,17 +19,18 @@ package org.gongxuanzhang.mysql.entity.page;
 import lombok.Data;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.core.factory.ConstantSize;
+import org.gongxuanzhang.mysql.entity.ShowLength;
 
 import java.nio.ByteBuffer;
 
 /**
- * 文件头，描述各种页的通用信息
+ * 文件头，描述各种页的信息 一般来说不会变
  * 共38字节
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class FileHeader implements ByteSwappable<FileHeader> {
+public class FileHeader implements ByteSwappable<FileHeader>, ShowLength {
 
 
     /**
@@ -95,5 +96,10 @@ public class FileHeader implements ByteSwappable<FileHeader> {
         this.flushLsn = buffer.getLong();
         this.spaceId = buffer.getInt();
         return this;
+    }
+
+    @Override
+    public int length() {
+        return ConstantSize.FILE_HEADER_SIZE.getSize();
     }
 }

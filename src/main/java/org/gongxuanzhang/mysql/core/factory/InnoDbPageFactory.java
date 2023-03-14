@@ -23,9 +23,9 @@ import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
 import org.gongxuanzhang.mysql.entity.page.PageDirectory;
 import org.gongxuanzhang.mysql.entity.page.PageHeader;
 import org.gongxuanzhang.mysql.entity.page.Supremum;
+import org.gongxuanzhang.mysql.entity.page.UserRecords;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 
 /**
  * 页工厂
@@ -60,7 +60,7 @@ public class InnoDbPageFactory implements ByteBeanFactory<InnoDbPage> {
         wrap.get(buffer);
         page.setSupremum(createSupremum(buffer));
 
-        page.setUserRecords(new ArrayList<>());
+        page.setUserRecords(new UserRecords());
         page.setPageDirectory(createPageDirectory());
 
         page.setFileTrailer(createFileTrailer());
@@ -68,9 +68,17 @@ public class InnoDbPageFactory implements ByteBeanFactory<InnoDbPage> {
         return page;
     }
 
+
+    /**
+     * 创建新页
+     **/
     @Override
     public InnoDbPage create() {
         InnoDbPage innoDbPage = new InnoDbPage();
+        innoDbPage.setFileHeader(new FileHeader());
+        innoDbPage.setPageHeader(new PageHeader());
+        innoDbPage.setInfimum(new Infimum());
+        innoDbPage.setSupremum(new Supremum());
         //  todo
         return innoDbPage;
     }
@@ -78,7 +86,7 @@ public class InnoDbPageFactory implements ByteBeanFactory<InnoDbPage> {
 
     public static PageDirectory createPageDirectory() {
         PageDirectory pageDirectory = new PageDirectory();
-        pageDirectory.setSlots(new int[]{});
+        pageDirectory.setSlots(new short[]{});
         return pageDirectory;
     }
 

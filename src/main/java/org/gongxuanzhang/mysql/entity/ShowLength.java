@@ -16,45 +16,17 @@
 
 package org.gongxuanzhang.mysql.entity;
 
-import com.alibaba.druid.sql.ast.SQLExpr;
-import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
-import com.alibaba.druid.sql.ast.expr.SQLValuableExpr;
-
-
 /**
- * where 条件
- * todo  条件还不支持
  *
- * @author gxz gongxuanzhangmelt@gmail.com
+ * 对外暴露字节长度的组件
+ * @author gxz gongxuanzhang@foxmail.com
  **/
-public class Where {
-
-    private final SQLExpr source;
-
-    public Where(SQLExpr whereExpr) {
-        this.source = whereExpr;
-    }
-
+public interface ShowLength {
 
     /**
-     * 装配where
+     * 得到实体字节长度
      *
-     * @param whereExpr 解析出的表达式 可以是null
+     * @return 最小是0
      **/
-    public static void assembleWhere(SQLExpr whereExpr) {
-        if (whereExpr == null) {
-            return;
-        }
-
-        if (whereExpr instanceof SQLValuableExpr) {
-            ((SQLValuableExpr) whereExpr).getValue();
-
-        }
-
-        if (whereExpr instanceof SQLBinaryOpExpr) {
-
-        }
-
-
-    }
+    int length();
 }

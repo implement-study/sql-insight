@@ -18,6 +18,7 @@ package org.gongxuanzhang.mysql.entity.page;
 
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.core.factory.ConstantSize;
+import org.gongxuanzhang.mysql.entity.ShowLength;
 
 import java.nio.ByteBuffer;
 
@@ -26,7 +27,7 @@ import java.nio.ByteBuffer;
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public class Supremum implements ByteSwappable<Supremum> {
+public class Supremum implements ByteSwappable<Supremum>, ShowLength {
 
     /**
      * 记录头信息 5字节
@@ -57,5 +58,10 @@ public class Supremum implements ByteSwappable<Supremum> {
         this.body = new byte[ConstantSize.SUPREMUM_BODY_SIZE.getSize()];
         buffer.get(this.body);
         return this;
+    }
+
+    @Override
+    public int length() {
+        return ConstantSize.SUPREMUM_SIZE.getSize();
     }
 }

@@ -14,38 +14,27 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.entity.page;
+package org.gongxuanzhang.mysql.core.factory
+
+import org.junit.jupiter.api.Test
+import java.io.File
 
 
 /**
- * Compact行格式的记录类型
- *
- * @author gxz gongxuanzhang@foxmail.com
+ * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public enum RecordType {
-    /**
-     * 普通记录
-     **/
-    NORMAL(0x00),
-    /**
-     * 非叶子节点记录(目录项)
-     **/
-    PAGE(0x01),
-    /**
-     * 上确界
-     **/
-    SUPREMUM(0x02),
-    /**
-     * 下确界
-     **/
-    INFIMUM(0x03);
+class InnoDbPageFactoryTest {
 
 
-    final int value;
+    @Test
+    fun testInnodbPageRead(){
 
-    RecordType(int value) {
-        this.value = value;
     }
 
-
+    @Test
+    fun testInnodbPageWrite(){
+        val page = InnoDbPageFactory().create()
+        File("simpleInnoDbPage").writeBytes(page.toBytes())
+    }
 }
+

@@ -19,16 +19,17 @@ package org.gongxuanzhang.mysql.entity.page;
 import lombok.Data;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.core.factory.ConstantSize;
+import org.gongxuanzhang.mysql.entity.ShowLength;
 
 import java.nio.ByteBuffer;
 
 /**
  * 页头，56字节
- *
+ * 记录页的状态信息
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class PageHeader implements ByteSwappable<PageHeader> {
+public class PageHeader implements ByteSwappable<PageHeader> , ShowLength {
 
     /**
      * 页中slot的数量，2字节
@@ -134,5 +135,10 @@ public class PageHeader implements ByteSwappable<PageHeader> {
         this.segLeaf = buffer.getLong();
         this.segTop = buffer.getLong();
         return this;
+    }
+
+    @Override
+    public int length() {
+        return ConstantSize.PAGE_HEADER_SIZE.getSize();
     }
 }

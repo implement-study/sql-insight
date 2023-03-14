@@ -21,9 +21,9 @@ import lombok.Data;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.core.factory.ConstantSize;
 import org.gongxuanzhang.mysql.core.factory.InnoDbPageFactory;
+import org.gongxuanzhang.mysql.entity.ShowLength;
 
 import java.nio.ByteBuffer;
-import java.util.List;
 
 /**
  * InnoDb 页结构
@@ -32,7 +32,7 @@ import java.util.List;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class InnoDbPage implements ByteSwappable<InnoDbPage> {
+public class InnoDbPage implements ByteSwappable<InnoDbPage>, ShowLength {
 
 
     /**
@@ -54,7 +54,7 @@ public class InnoDbPage implements ByteSwappable<InnoDbPage> {
     /**
      * 用户记录  不确定字节
      **/
-    private List<UserRecord> userRecords;
+    private UserRecords userRecords;
     /**
      * 空闲空间，这里只记录字节数
      **/
@@ -69,13 +69,40 @@ public class InnoDbPage implements ByteSwappable<InnoDbPage> {
     private FileTrailer fileTrailer;
 
 
+    public InnoDbPage() {
+        this.fileHeader = new FileHeader();
+        this.pageHeader = new PageHeader();
+        this.infimum = new Infimum();
+        this.supremum = new Supremum();
+        this.userRecords = new UserRecords();
+        this.pageDirectory = new PageDirectory();
+        this.fileTrailer = new FileTrailer();
+        this.freeSpace = ConstantSize.PAGE_SIZE.getSize() - fixLength();
+
+    }
+
+    /**
+     * 返回固定字节数
+     **/
+    private int fixLength() {
+        return this.fileHeader.length() +
+                this.pageHeader.length() +
+                this.infimum.length() +
+                this.supremum.length() +
+                this.userRecords.length() +
+                this.pageDirectory.length() +
+                this.fileTrailer.length();
+    }
+
+
     public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.PAGE_SIZE.getSize());
+        ByteBuffer buffer = ByteBuffer.allocate(length());
         buffer.put(fileHeader.toBytes());
         buffer.put(pageHeader.toBytes());
         buffer.put(infimum.toBytes());
         buffer.put(supremum.toBytes());
-        //  todo
+        buffer.put(userRecords.toBytes());
+        buffer.position(buffer.position() + freeSpace);
         buffer.put(pageDirectory.toBytes());
         buffer.put(fileTrailer.toBytes());
         return buffer.array();
@@ -87,4 +114,8 @@ public class InnoDbPage implements ByteSwappable<InnoDbPage> {
     }
 
 
+    @Override
+    public int length() {
+        return ConstantSize.PAGE_SIZE.getSize();
+    }
 }

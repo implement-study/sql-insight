@@ -20,45 +20,34 @@ import lombok.Data;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.entity.ShowLength;
 
-import java.nio.ByteBuffer;
+import java.util.List;
 
 /**
- * 页目录
- * 里面有N个slot
- * 每个slot中只记录一个偏移量
+ * 用户数据组合
  *
- * @author gxz gongxuanzhangmelt@gmail.com
+ * @author gxz gongxuanzhang@foxmail.com
  **/
 @Data
-public class PageDirectory implements ByteSwappable<PageDirectory>, ShowLength {
+public class UserRecords implements ByteSwappable<UserRecords>, ShowLength {
 
-    /**
-     * slot的每个数字记录每个槽中最大数据的偏移位置
-     **/
-    short[] slots;
+    byte[] source;
 
+    List<UserRecord> userRecordList;
 
-    @Override
-    public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(slots.length * 2);
-        for (short slot : slots) {
-            buffer.putShort(slot);
-        }
-        return buffer.array();
-    }
-
-    @Override
-    public PageDirectory fromBytes(byte[] bytes) {
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        this.slots = new short[bytes.length / 2];
-        for (int i = bytes.length / 2; i > 0; i--) {
-            slots[i] = buffer.getShort();
-        }
-        return this;
-    }
 
     @Override
     public int length() {
-        return this.slots.length * 2;
+        return source.length;
+    }
+
+    @Override
+    public byte[] toBytes() {
+        return source;
+    }
+
+    @Override
+    public UserRecords fromBytes(byte[] bytes) {
+        //  todo
+        return null;
     }
 }

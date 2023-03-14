@@ -19,6 +19,7 @@ package org.gongxuanzhang.mysql.entity.page;
 
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.core.factory.ConstantSize;
+import org.gongxuanzhang.mysql.entity.ShowLength;
 
 import java.nio.ByteBuffer;
 
@@ -27,7 +28,7 @@ import java.nio.ByteBuffer;
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public class Infimum implements ByteSwappable<Infimum> {
+public class Infimum implements ByteSwappable<Infimum>, ShowLength {
 
     /**
      * 记录头信息 5字节
@@ -57,5 +58,10 @@ public class Infimum implements ByteSwappable<Infimum> {
         this.body = new byte[ConstantSize.INFIMUM_BODY_SIZE.getSize()];
         buffer.get(this.body);
         return this;
+    }
+
+    @Override
+    public int length() {
+        return ConstantSize.INFIMUM_SIZE.getSize();
     }
 }

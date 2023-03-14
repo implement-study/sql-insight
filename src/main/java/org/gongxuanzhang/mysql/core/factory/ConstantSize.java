@@ -23,7 +23,7 @@ package org.gongxuanzhang.mysql.core.factory;
  */
 
 public enum ConstantSize {
-    PAGE_SIZE("页", 8 * 1024),
+    PAGE_SIZE("页", 16 * 1024),
     FILE_HEADER_SIZE("文件头", 38),
     PAGE_HEADER_SIZE("页头", 56),
     INFIMUM_SIZE("下确界", 13),
