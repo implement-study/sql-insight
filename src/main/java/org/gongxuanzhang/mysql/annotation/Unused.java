@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.core;
+package org.gongxuanzhang.mysql.annotation;
+
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * 可以交换成字节数组
- *
+ * 表示某字段暂时没有功能，只是为了MySQL特性预留字段
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface ByteSwappable {
-
-    /**
-     * 把实体转换为字节数组
-     *
-     * @return 字节数组
-     **/
-    byte[] toBytes();
+@Target({ElementType.FIELD})
+@Retention(RetentionPolicy.SOURCE)
+@Documented
+public @interface Unused {
 
 }

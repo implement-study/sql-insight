@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.core;
+package org.gongxuanzhang.mysql.constant;
 
 /**
- * 可以交换成字节数组
+ * 通用常量
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface ByteSwappable {
+public interface Constant {
 
-    /**
-     * 把实体转换为字节数组
-     *
-     * @return 字节数组
-     **/
-    byte[] toBytes();
+    int INIT_CHECKSUM = 12345;
 
 }

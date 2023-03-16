@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.core.factory;
+package org.gongxuanzhang.mysql.constant;
 
 /**
  * 默认大小长度
@@ -28,8 +28,8 @@ public enum ConstantSize {
     PAGE_HEADER_SIZE("页头", 56),
     INFIMUM_SIZE("下确界", 13),
     SUPREMUM_SIZE("上确界", 13),
-    SUPREMUM_BODY_SIZE("上确界内容", 13),
-    INFIMUM_BODY_SIZE("下确界内容", 13),
+    SUPREMUM_BODY_SIZE("上确界内容", 8),
+    INFIMUM_BODY_SIZE("下确界内容", 8),
     FILE_TRAILER("文件尾", 8),
     COMPACT_NULL_SIZE("compact null值列表", 8),
     RECORD_HEADER("记录头", 5);

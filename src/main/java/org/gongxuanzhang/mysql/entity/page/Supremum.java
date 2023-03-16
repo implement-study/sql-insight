@@ -16,8 +16,8 @@
 
 package org.gongxuanzhang.mysql.entity.page;
 
+import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
-import org.gongxuanzhang.mysql.core.factory.ConstantSize;
 import org.gongxuanzhang.mysql.entity.ShowLength;
 
 import java.nio.ByteBuffer;
@@ -27,7 +27,7 @@ import java.nio.ByteBuffer;
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public class Supremum implements ByteSwappable<Supremum>, ShowLength {
+public class Supremum implements ShowLength, ByteSwappable {
 
     /**
      * 记录头信息 5字节
@@ -41,27 +41,15 @@ public class Supremum implements ByteSwappable<Supremum>, ShowLength {
 
 
     @Override
-    public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.SUPREMUM_SIZE.getSize());
-        buffer.put(this.recordHeader.toBytes());
-        buffer.put(body);
-        return buffer.array();
-    }
-
-    @Override
-    public Supremum fromBytes(byte[] bytes) {
-        ConstantSize.SUPREMUM_SIZE.checkSize(bytes);
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        byte[] headBuffer = new byte[ConstantSize.RECORD_HEADER.getSize()];
-        buffer.get(headBuffer);
-        this.recordHeader = new RecordHeader(headBuffer);
-        this.body = new byte[ConstantSize.SUPREMUM_BODY_SIZE.getSize()];
-        buffer.get(this.body);
-        return this;
-    }
-
-    @Override
     public int length() {
         return ConstantSize.SUPREMUM_SIZE.getSize();
+    }
+
+    @Override
+    public byte[] toBytes() {
+        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.SUPREMUM_SIZE.getSize());
+        buffer.put(recordHeader.toBytes());
+        buffer.put(body);
+        return buffer.array();
     }
 }

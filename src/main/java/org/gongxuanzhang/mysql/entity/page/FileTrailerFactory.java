@@ -14,28 +14,32 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.core.factory;
+package org.gongxuanzhang.mysql.entity.page;
+
+import java.nio.ByteBuffer;
 
 /**
- * 通过字节数组转换工厂
+ * File Trailer 工厂 {@link FileTrailer}
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface ByteBeanFactory<T> {
+public class FileTrailerFactory implements ByteBeanFactory<FileTrailer> {
 
+    @Override
+    public FileTrailer swap(FileTrailer bean, byte[] bytes) {
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        bean.checkSum = buffer.getInt();
+        bean.lsn = buffer.getInt();
+        return bean;
+    }
 
-    /**
-     * 通过字节转换内容
-     *
-     * @param bytes 字节数组
-     * @return 得到的结果对象
-     **/
-    T swap(byte[] bytes);
+    @Override
+    public FileTrailer create() {
+        FileTrailer fileTrailer = new FileTrailer();
+        fileTrailer.setCheckSum(0);
+        fileTrailer.setLsn(0);
+        return fileTrailer;
+    }
 
-    /**
-     * 创建一个初始化对象
-     *
-     * @return 得到初始化对象
-     **/
-    T create();
 }
+

@@ -16,8 +16,10 @@
 
 package org.gongxuanzhang.mysql.entity.page;
 
+
+import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
-import org.gongxuanzhang.mysql.core.factory.ConstantSize;
+import org.gongxuanzhang.mysql.entity.ShowLength;
 
 import java.nio.ByteBuffer;
 
@@ -36,7 +38,7 @@ import java.nio.ByteBuffer;
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public class RecordHeader implements ByteSwappable<RecordHeader> {
+public class RecordHeader implements ShowLength, ByteSwappable {
 
     /**
      * 记录头本质上只有5个字节 但是40bit有不同作用
@@ -117,9 +119,7 @@ public class RecordHeader implements ByteSwappable<RecordHeader> {
     }
 
     @Override
-    public RecordHeader fromBytes(byte[] bytes) {
-        ConstantSize.RECORD_HEADER.checkSize(bytes);
-        this.source.put(bytes);
-        return this;
+    public int length() {
+        return this.source.capacity();
     }
 }

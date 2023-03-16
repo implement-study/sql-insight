@@ -23,7 +23,7 @@ import org.gongxuanzhang.mysql.core.ByteSwappable;
  *
  * @author gongxuanzhang
  **/
-public class Variables implements ByteSwappable<Variables> {
+public class Variables implements ByteSwappable {
 
 
     byte[] varBytes;
@@ -38,11 +38,5 @@ public class Variables implements ByteSwappable<Variables> {
     @Override
     public byte[] toBytes() {
         return varBytes;
-    }
-
-    @Override
-    public Variables fromBytes(byte[] bytes) {
-        this.varBytes = bytes;
-        return this;
     }
 }

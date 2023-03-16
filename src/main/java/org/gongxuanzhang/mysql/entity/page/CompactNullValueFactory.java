@@ -14,20 +14,28 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.core;
+package org.gongxuanzhang.mysql.entity.page;
+
+import org.gongxuanzhang.mysql.constant.ConstantSize;
+
+import java.nio.ByteBuffer;
 
 /**
- * 可以交换成字节数组
- *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface ByteSwappable {
+public class CompactNullValueFactory implements ByteBeanFactory<CompactNullValue> {
 
-    /**
-     * 把实体转换为字节数组
-     *
-     * @return 字节数组
-     **/
-    byte[] toBytes();
 
+    @Override
+    public CompactNullValue swap(CompactNullValue bean, byte[] bytes) {
+        ConstantSize.COMPACT_NULL_SIZE.checkSize(bytes);
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        bean.value = buffer.getShort();
+        return bean;
+    }
+
+    @Override
+    public CompactNullValue create() {
+        return null;
+    }
 }

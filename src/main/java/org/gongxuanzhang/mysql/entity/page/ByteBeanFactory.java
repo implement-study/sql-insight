@@ -14,20 +14,31 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.core;
+package org.gongxuanzhang.mysql.entity.page;
 
 /**
- * 可以交换成字节数组
+ * 通过字节数组转换工厂
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface ByteSwappable {
+public interface ByteBeanFactory<T> {
+
 
     /**
-     * 把实体转换为字节数组
+     * 通过字节转换内容
      *
-     * @return 字节数组
+     * @param bean  实体
+     * @param bytes 字节数组
+     * @return 得到的结果对象
      **/
-    byte[] toBytes();
+    T swap(T bean, byte[] bytes);
+
+    /**
+     * 创建一个初始化对象
+     *
+     * @return 得到初始化对象
+     **/
+    T create();
+
 
 }

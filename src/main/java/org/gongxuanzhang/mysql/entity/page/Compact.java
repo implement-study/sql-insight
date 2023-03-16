@@ -18,7 +18,7 @@ package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
-import org.gongxuanzhang.mysql.core.factory.ConstantSize;
+import org.gongxuanzhang.mysql.entity.ShowLength;
 import org.gongxuanzhang.mysql.tool.BitUtils;
 
 import java.nio.ByteBuffer;
@@ -29,7 +29,7 @@ import java.nio.ByteBuffer;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class Compact implements UserRecord, ByteSwappable<Compact> {
+public class Compact implements UserRecord, ByteSwappable, ShowLength {
 
     /**
      * 记录头信息 5字节
@@ -76,36 +76,9 @@ public class Compact implements UserRecord, ByteSwappable<Compact> {
         return buffer.array();
     }
 
-    @Override
-    public Compact fromBytes(byte[] bytes) {
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        byte[] headBuffer = new byte[ConstantSize.RECORD_HEADER.getSize()];
-        buffer.get(headBuffer);
-        this.recordHeader = new RecordHeader(headBuffer);
-        byte varLength = buffer.get();
-        this.variables = new Variables();
-        if (varLength == 0) {
-            this.variables.fromBytes(new byte[0]);
-        } else {
-            byte[] varBytes = new byte[varLength];
-            buffer.get(varBytes);
-            this.variables.fromBytes(varBytes);
-        }
-        this.nullValues = new CompactNullValue(buffer.getShort());
-        byte[] candidateBuffer = new byte[6];
-        buffer.get(candidateBuffer);
-        this.rowId = BitUtils.joinLong(candidateBuffer);
-        buffer.get(candidateBuffer);
-        this.transactionId = BitUtils.joinLong(candidateBuffer);
-        candidateBuffer = new byte[7];
-        buffer.get(candidateBuffer);
-        this.rollPointer = BitUtils.joinLong(candidateBuffer);
-        this.body = new byte[buffer.remaining()];
-        buffer.get(this.body);
-        return this;
-    }
 
-    private int length() {
+    @Override
+    public int length() {
         return body.length + variables.length() + nullValues.length()
                 //  record_head
                 + 5

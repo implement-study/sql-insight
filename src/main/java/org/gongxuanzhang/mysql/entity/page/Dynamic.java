@@ -25,7 +25,7 @@ import org.gongxuanzhang.mysql.core.ByteSwappable;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class Dynamic implements UserRecord, ByteSwappable<Dynamic> {
+public class Dynamic implements UserRecord, ByteSwappable {
 
 
     @Override
@@ -34,9 +34,4 @@ public class Dynamic implements UserRecord, ByteSwappable<Dynamic> {
         return new byte[0];
     }
 
-    @Override
-    public Dynamic fromBytes(byte[] bytes) {
-        //  todo
-        return null;
-    }
 }

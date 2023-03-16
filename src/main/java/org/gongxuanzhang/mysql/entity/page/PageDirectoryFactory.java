@@ -14,20 +14,33 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.core;
+package org.gongxuanzhang.mysql.entity.page;
+
+import java.nio.ByteBuffer;
 
 /**
- * 可以交换成字节数组
+ * PageDirectory 工厂
+ * {@link PageDirectory}
  *
- * @author gxz gongxuanzhang@foxmail.com
+ * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public interface ByteSwappable {
+public class PageDirectoryFactory implements ByteBeanFactory<PageDirectory> {
 
-    /**
-     * 把实体转换为字节数组
-     *
-     * @return 字节数组
-     **/
-    byte[] toBytes();
+
+    @Override
+    public PageDirectory swap(PageDirectory bean, byte[] bytes) {
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        short[] slots = new short[bytes.length / 2];
+        for (int i = bytes.length / 2; i > 0; i--) {
+            slots[i] = buffer.getShort();
+        }
+        bean.slots = slots;
+        return bean;
+    }
+
+    @Override
+    public PageDirectory create() {
+        return null;
+    }
 
 }

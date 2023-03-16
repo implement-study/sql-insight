@@ -17,18 +17,23 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 
+import lombok.Data;
+import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
-import org.gongxuanzhang.mysql.core.factory.ConstantSize;
 import org.gongxuanzhang.mysql.entity.ShowLength;
 
 import java.nio.ByteBuffer;
+
 
 /**
  * 下确界
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public class Infimum implements ByteSwappable<Infimum>, ShowLength {
+@Data
+public class Infimum implements ByteSwappable, ShowLength {
+
+    public static final String INFIMUM_BODY = "infimum";
 
     /**
      * 记录头信息 5字节
@@ -40,28 +45,18 @@ public class Infimum implements ByteSwappable<Infimum>, ShowLength {
      **/
     byte[] body;
 
-    @Override
-    public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.INFIMUM_SIZE.getSize());
-        buffer.put(this.recordHeader.toBytes());
-        buffer.put(body);
-        return buffer.array();
-    }
-
-    @Override
-    public Infimum fromBytes(byte[] bytes) {
-        ConstantSize.INFIMUM_SIZE.checkSize(bytes);
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        byte[] headBuffer = new byte[ConstantSize.RECORD_HEADER.getSize()];
-        buffer.get(headBuffer);
-        this.recordHeader = new RecordHeader(headBuffer);
-        this.body = new byte[ConstantSize.INFIMUM_BODY_SIZE.getSize()];
-        buffer.get(this.body);
-        return this;
-    }
 
     @Override
     public int length() {
         return ConstantSize.INFIMUM_SIZE.getSize();
+    }
+
+    @Override
+    public byte[] toBytes() {
+        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.INFIMUM_SIZE.getSize());
+        byte[] recordHeaderBytes = recordHeader.toBytes();
+        buffer.put(recordHeaderBytes);
+        buffer.put(this.body);
+        return buffer.array();
     }
 }

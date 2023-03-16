@@ -14,20 +14,26 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.core;
+package org.gongxuanzhang.mysql.entity.page;
 
 /**
- * 可以交换成字节数组
+ * UserRecords 用户组 工厂
+ * <p>
+ * todo
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface ByteSwappable {
+public class UserRecordsFactory implements ByteBeanFactory<UserRecords> {
 
-    /**
-     * 把实体转换为字节数组
-     *
-     * @return 字节数组
-     **/
-    byte[] toBytes();
+
+    @Override
+    public UserRecords swap(UserRecords bean, byte[] bytes) {
+        return null;
+    }
+
+    @Override
+    public UserRecords create() {
+        return null;
+    }
 
 }

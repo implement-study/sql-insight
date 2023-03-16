@@ -17,11 +17,13 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
+import org.gongxuanzhang.mysql.annotation.Unused;
+import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
-import org.gongxuanzhang.mysql.core.factory.ConstantSize;
 import org.gongxuanzhang.mysql.entity.ShowLength;
 
 import java.nio.ByteBuffer;
+
 
 /**
  * 文件尾 8字节
@@ -29,38 +31,33 @@ import java.nio.ByteBuffer;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class FileTrailer implements ByteSwappable<FileTrailer>, ShowLength {
+public class FileTrailer implements ByteSwappable, ShowLength {
 
     /**
      * 校验和，和文件头的4字节校验和一起校验
      * {@link FileHeader#checkSum}
      */
+    @Unused
     int checkSum;
 
     /**
      * 和文件头的lsn一起校验
      * {@link FileHeader#lsn}
      **/
+    @Unused
     int lsn;
 
-    @Override
-    public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.FILE_TRAILER.getSize());
-        buffer.putInt(checkSum);
-        buffer.putInt(lsn);
-        return buffer.array();
-    }
-
-    @Override
-    public FileTrailer fromBytes(byte[] bytes) {
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        this.checkSum = buffer.getInt();
-        this.lsn = buffer.getInt();
-        return this;
-    }
 
     @Override
     public int length() {
         return ConstantSize.FILE_TRAILER.getSize();
+    }
+
+    @Override
+    public byte[] toBytes() {
+        ByteBuffer buffer = ByteBuffer.allocate(this.length());
+        buffer.putInt(this.checkSum);
+        buffer.putInt(this.lsn);
+        return buffer.array();
     }
 }

@@ -16,33 +16,42 @@
 
 package org.gongxuanzhang.mysql.entity.page;
 
-import lombok.Data;
-import org.gongxuanzhang.mysql.core.ByteSwappable;
-import org.gongxuanzhang.mysql.entity.ShowLength;
 
-import java.util.List;
+import org.gongxuanzhang.mysql.constant.ConstantSize;
 
 /**
- * 用户数据组合
+ * RecordHeader 工厂 {@link RecordHeader}
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-@Data
-public class UserRecords implements ShowLength, ByteSwappable {
-
-    byte[] source;
-
-    List<UserRecord> userRecordList;
-
+public class RecordHeaderFactory implements ByteBeanFactory<RecordHeader> {
 
     @Override
-    public int length() {
-        return source.length;
+    public RecordHeader swap(RecordHeader bean, byte[] bytes) {
+        ConstantSize.RECORD_HEADER.checkSize(bytes);
+        bean.source.put(bytes);
+        return bean;
     }
 
     @Override
-    public byte[] toBytes() {
-        //  todo
-        return new byte[0];
+    public RecordHeader create() {
+        throw new UnsupportedOperationException("use createInfimumHeader() or createSupremumHeader()");
     }
+
+
+    /**
+     * 创建下确界记录头
+     **/
+    public RecordHeader createInfimumHeader() {
+        return new RecordHeader(new byte[0]);
+    }
+
+    /**
+     * 创建上确界记录头
+     **/
+    public RecordHeader createSupremumHeader() {
+        return new RecordHeader(new byte[0]);
+    }
+
+
 }

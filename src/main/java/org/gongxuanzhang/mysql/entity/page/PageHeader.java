@@ -17,19 +17,22 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
+import org.gongxuanzhang.mysql.annotation.Unused;
+import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
-import org.gongxuanzhang.mysql.core.factory.ConstantSize;
 import org.gongxuanzhang.mysql.entity.ShowLength;
 
 import java.nio.ByteBuffer;
 
+
 /**
  * 页头，56字节
  * 记录页的状态信息
+ *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class PageHeader implements ByteSwappable<PageHeader> , ShowLength {
+public class PageHeader implements ShowLength, ByteSwappable {
 
     /**
      * 页中slot的数量，2字节
@@ -66,15 +69,18 @@ public class PageHeader implements ByteSwappable<PageHeader> , ShowLength {
     /**
      * 2字节/记录插入的方向
      **/
+    @Unused
     short direction;
     /**
      * 2字节/一个方向连续插入的记录数量
      **/
+    @Unused
     short directionCount;
 
     /**
      * 8字节/修改当前页的最大事务ID，该值仅在二级索引中定义
      **/
+    @Unused
     long maxTransactionId;
 
     /**
@@ -85,60 +91,42 @@ public class PageHeader implements ByteSwappable<PageHeader> , ShowLength {
     /**
      * 8字节 索引ID,表示当前页属于哪个索引
      **/
+    @Unused
     long indexId;
     /**
      * 10字节 b+树叶子段的头部信息 只有root才有意义
      **/
+    @Unused
     long segLeaf;
     /**
      * 10字节 b+树 非叶子结点段的头部信息 只有root才有意义
      **/
+    @Unused
     long segTop;
 
 
     @Override
-    public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.PAGE_HEADER_SIZE.getSize());
-        buffer.putShort(this.slotCount);
-        buffer.putShort(this.heapTop);
-        buffer.putShort(this.absoluteRecordCount);
-        buffer.putShort(this.recordCount);
-        buffer.putShort(this.free);
-        buffer.putShort(this.garbage);
-        buffer.putShort(this.lastInsert);
-        buffer.putShort(this.direction);
-        buffer.putShort(this.directionCount);
-        buffer.putLong(this.maxTransactionId);
-        buffer.putShort(this.level);
-        buffer.putLong(this.indexId);
-        buffer.putLong(this.segLeaf);
-        buffer.putLong(this.segTop);
-        return buffer.array();
-    }
-
-    @Override
-    public PageHeader fromBytes(byte[] bytes) {
-        ConstantSize.PAGE_HEADER_SIZE.checkSize(bytes);
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        this.slotCount = buffer.getShort();
-        this.heapTop = buffer.getShort();
-        this.absoluteRecordCount = buffer.getShort();
-        this.recordCount = buffer.getShort();
-        this.free = buffer.getShort();
-        this.garbage = buffer.getShort();
-        this.lastInsert = buffer.getShort();
-        this.direction = buffer.getShort();
-        this.directionCount = buffer.getShort();
-        this.maxTransactionId = buffer.getLong();
-        this.level = buffer.getShort();
-        this.indexId = buffer.getLong();
-        this.segLeaf = buffer.getLong();
-        this.segTop = buffer.getLong();
-        return this;
-    }
-
-    @Override
     public int length() {
         return ConstantSize.PAGE_HEADER_SIZE.getSize();
+    }
+
+    @Override
+    public byte[] toBytes() {
+        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.PAGE_HEADER_SIZE.getSize());
+        buffer.putShort(slotCount);
+        buffer.putShort(heapTop);
+        buffer.putShort(absoluteRecordCount);
+        buffer.putShort(recordCount);
+        buffer.putShort(free);
+        buffer.putShort(garbage);
+        buffer.putShort(lastInsert);
+        buffer.putShort(direction);
+        buffer.putShort(directionCount);
+        buffer.putLong(maxTransactionId);
+        buffer.putShort(level);
+        buffer.putLong(indexId);
+        buffer.putLong(segLeaf);
+        buffer.putLong(segTop);
+        return buffer.array();
     }
 }

@@ -17,8 +17,9 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
+import org.gongxuanzhang.mysql.annotation.Unused;
+import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
-import org.gongxuanzhang.mysql.core.factory.ConstantSize;
 import org.gongxuanzhang.mysql.entity.ShowLength;
 
 import java.nio.ByteBuffer;
@@ -30,7 +31,7 @@ import java.nio.ByteBuffer;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class FileHeader implements ByteSwappable<FileHeader>, ShowLength {
+public class FileHeader implements ByteSwappable, ShowLength {
 
 
     /**
@@ -53,22 +54,31 @@ public class FileHeader implements ByteSwappable<FileHeader>, ShowLength {
      * 校验和,和文件尾的校验和一起使用  4字节
      * {@link FileTrailer#checkSum}
      **/
+    @Unused
     int checkSum;
     /**
      * Log Sequence Number 8字节
      * 和文件尾一起校验使用
      * {@link FileTrailer#lsn}
      **/
+    @Unused
     long lsn;
     /**
      * 系统表空间的定义
      **/
+    @Unused
     long flushLsn;
     /**
      * 所属表空间
      **/
+    @Unused
     int spaceId;
 
+
+    @Override
+    public int length() {
+        return ConstantSize.FILE_HEADER_SIZE.getSize();
+    }
 
     @Override
     public byte[] toBytes() {
@@ -77,29 +87,10 @@ public class FileHeader implements ByteSwappable<FileHeader>, ShowLength {
         buffer.putShort(this.pageType);
         buffer.putInt(this.pre);
         buffer.putInt(this.next);
-        buffer.putInt(checkSum);
-        buffer.putLong(lsn);
-        buffer.putLong(flushLsn);
-        buffer.putInt(spaceId);
+        buffer.putInt(this.checkSum);
+        buffer.putLong(this.lsn);
+        buffer.putLong(this.flushLsn);
+        buffer.putInt(this.spaceId);
         return buffer.array();
-    }
-
-    @Override
-    public FileHeader fromBytes(byte[] bytes) {
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        this.offset = buffer.getInt();
-        this.pageType = buffer.getShort();
-        this.pre = buffer.getInt();
-        this.next = buffer.getInt();
-        this.checkSum = buffer.getInt();
-        this.lsn = buffer.getLong();
-        this.flushLsn = buffer.getLong();
-        this.spaceId = buffer.getInt();
-        return this;
-    }
-
-    @Override
-    public int length() {
-        return ConstantSize.FILE_HEADER_SIZE.getSize();
     }
 }

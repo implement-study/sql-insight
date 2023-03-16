@@ -17,9 +17,8 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import org.gongxuanzhang.mysql.core.ByteSwappable;
-import org.gongxuanzhang.mysql.core.factory.ConstantSize;
+import org.gongxuanzhang.mysql.entity.ShowLength;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +28,7 @@ import java.util.List;
  *
  * @author gongxuanzhang
  **/
-public class CompactNullValue implements ByteSwappable<CompactNullValue> {
+public class CompactNullValue implements ByteSwappable, ShowLength {
 
 
     short value;
@@ -38,6 +37,7 @@ public class CompactNullValue implements ByteSwappable<CompactNullValue> {
         this.value = value;
     }
 
+    @Override
     public int length() {
         return 2;
     }
@@ -48,14 +48,6 @@ public class CompactNullValue implements ByteSwappable<CompactNullValue> {
         result[1] = (byte) value;
         result[0] = (byte) (value >> 8);
         return result;
-    }
-
-    @Override
-    public CompactNullValue fromBytes(byte[] bytes) {
-        ConstantSize.COMPACT_NULL_SIZE.checkSize(bytes);
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        this.value = buffer.getShort();
-        return this;
     }
 
 

@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.mysql.core.factory
 
+import org.gongxuanzhang.mysql.entity.page.InnoDbPageFactory
 import org.junit.jupiter.api.Test
 import java.io.File
 

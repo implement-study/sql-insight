@@ -29,24 +29,24 @@ public enum PageType {
     /**
      * 最新分配，还没使用
      **/
-    FIL_PAGE_TYPE_ALLOC(0X0000),
+    FIL_PAGE_TYPE_ALLOC((short) 0X0000),
     /**
      * 日志页
      **/
-    FIL_PAGE_TYPE_UNDO_LOG(0X0001),
+    FIL_PAGE_TYPE_UNDO_LOG((short) 0X0001),
     /**
      * 数据页，这个值是按照MySQL标准来的
      **/
-    FIL_PAGE_INDEX(0X45bf);
+    FIL_PAGE_INDEX((short) 0X45bf);
 
 
-    private final int value;
+    private final short value;
 
-    PageType(int value) {
+    PageType(short value) {
         this.value = value;
     }
 
-    public int getValue() {
+    public short getValue() {
         return value;
     }
 

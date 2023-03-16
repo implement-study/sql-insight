@@ -17,8 +17,8 @@
 package org.gongxuanzhang.mysql.entity;
 
 /**
- *
  * 对外暴露字节长度的组件
+ *
  * @author gxz gongxuanzhang@foxmail.com
  **/
 public interface ShowLength {

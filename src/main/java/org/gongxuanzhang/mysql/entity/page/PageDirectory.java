@@ -30,7 +30,7 @@ import java.nio.ByteBuffer;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class PageDirectory implements ByteSwappable<PageDirectory>, ShowLength {
+public class PageDirectory implements ShowLength, ByteSwappable {
 
     /**
      * slot的每个数字记录每个槽中最大数据的偏移位置
@@ -39,26 +39,16 @@ public class PageDirectory implements ByteSwappable<PageDirectory>, ShowLength {
 
 
     @Override
+    public int length() {
+        return this.slots.length * 2;
+    }
+
+    @Override
     public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(slots.length * 2);
+        ByteBuffer buffer = ByteBuffer.allocate(length());
         for (short slot : slots) {
             buffer.putShort(slot);
         }
         return buffer.array();
-    }
-
-    @Override
-    public PageDirectory fromBytes(byte[] bytes) {
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        this.slots = new short[bytes.length / 2];
-        for (int i = bytes.length / 2; i > 0; i--) {
-            slots[i] = buffer.getShort();
-        }
-        return this;
-    }
-
-    @Override
-    public int length() {
-        return this.slots.length * 2;
     }
 }
