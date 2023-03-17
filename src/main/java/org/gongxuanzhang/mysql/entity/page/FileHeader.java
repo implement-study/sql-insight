@@ -35,6 +35,12 @@ public class FileHeader implements ByteSwappable, ShowLength {
 
 
     /**
+     * 校验和,和文件尾的校验和一起使用  4字节
+     * {@link FileTrailer#checkSum}
+     **/
+    @Unused
+    int checkSum;
+    /**
      * 偏移量,页号 4字节int
      **/
     int offset;
@@ -50,12 +56,6 @@ public class FileHeader implements ByteSwappable, ShowLength {
      * 下一页 4字节
      **/
     int next;
-    /**
-     * 校验和,和文件尾的校验和一起使用  4字节
-     * {@link FileTrailer#checkSum}
-     **/
-    @Unused
-    int checkSum;
     /**
      * Log Sequence Number 8字节
      * 和文件尾一起校验使用
@@ -77,17 +77,17 @@ public class FileHeader implements ByteSwappable, ShowLength {
 
     @Override
     public int length() {
-        return ConstantSize.FILE_HEADER_SIZE.getSize();
+        return ConstantSize.FILE_HEADER.getSize();
     }
 
     @Override
     public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.FILE_HEADER_SIZE.getSize());
+        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.FILE_HEADER.getSize());
+        buffer.putInt(this.checkSum);
         buffer.putInt(this.offset);
         buffer.putShort(this.pageType);
         buffer.putInt(this.pre);
         buffer.putInt(this.next);
-        buffer.putInt(this.checkSum);
         buffer.putLong(this.lsn);
         buffer.putLong(this.flushLsn);
         buffer.putInt(this.spaceId);

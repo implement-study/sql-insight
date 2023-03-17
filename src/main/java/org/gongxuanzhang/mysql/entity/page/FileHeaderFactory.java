@@ -35,11 +35,11 @@ public class FileHeaderFactory implements ByteBeanFactory<FileHeader> {
     @Override
     public FileHeader swap(FileHeader bean, byte[] bytes) {
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        bean.checkSum = buffer.getInt();
         bean.offset = buffer.getInt();
         bean.pageType = buffer.getShort();
         bean.pre = buffer.getInt();
         bean.next = buffer.getInt();
-        bean.checkSum = buffer.getInt();
         bean.lsn = buffer.getLong();
         bean.flushLsn = buffer.getLong();
         bean.spaceId = buffer.getInt();
@@ -54,6 +54,7 @@ public class FileHeaderFactory implements ByteBeanFactory<FileHeader> {
         fileHeader.setPageType(PageType.FIL_PAGE_TYPE_ALLOC.getValue());
         fileHeader.setPre(0);
         fileHeader.setNext(0);
+        //  unused
         fileHeader.setLsn(0L);
         fileHeader.setSpaceId(0);
         fileHeader.setLsn(0L);

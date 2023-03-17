@@ -31,12 +31,12 @@ public class SupremumFactory implements ByteBeanFactory<Supremum> {
 
     @Override
     public Supremum swap(Supremum bean, byte[] bytes) {
-        ConstantSize.SUPREMUM_SIZE.checkSize(bytes);
+        ConstantSize.SUPREMUM.checkSize(bytes);
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         byte[] headBuffer = new byte[ConstantSize.RECORD_HEADER.getSize()];
         buffer.get(headBuffer);
         bean.recordHeader = new RecordHeader(headBuffer);
-        bean.body = new byte[ConstantSize.SUPREMUM_BODY_SIZE.getSize()];
+        bean.body = new byte[ConstantSize.SUPREMUM_BODY.getSize()];
         buffer.get(bean.body);
         return bean;
     }
@@ -51,7 +51,7 @@ public class SupremumFactory implements ByteBeanFactory<Supremum> {
 
 
     private byte[] infimumInitBody() {
-        ByteBuffer bodyBuffer = ByteBuffer.allocate(ConstantSize.INFIMUM_BODY_SIZE.getSize());
+        ByteBuffer bodyBuffer = ByteBuffer.allocate(ConstantSize.INFIMUM_BODY.getSize());
         bodyBuffer.put(Infimum.INFIMUM_BODY.getBytes(StandardCharsets.UTF_8));
         return bodyBuffer.array();
     }

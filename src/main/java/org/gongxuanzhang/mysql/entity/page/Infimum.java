@@ -48,12 +48,12 @@ public class Infimum implements ByteSwappable, ShowLength {
 
     @Override
     public int length() {
-        return ConstantSize.INFIMUM_SIZE.getSize();
+        return ConstantSize.INFIMUM.getSize();
     }
 
     @Override
     public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.INFIMUM_SIZE.getSize());
+        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.INFIMUM.getSize());
         byte[] recordHeaderBytes = recordHeader.toBytes();
         buffer.put(recordHeaderBytes);
         buffer.put(this.body);

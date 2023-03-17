@@ -20,8 +20,6 @@ import lombok.Data;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.entity.ShowLength;
 
-import java.util.List;
-
 /**
  * 用户数据组合
  *
@@ -32,7 +30,9 @@ public class UserRecords implements ShowLength, ByteSwappable {
 
     byte[] source;
 
-    List<UserRecord> userRecordList;
+    public UserRecords(byte[] source) {
+        this.source = source;
+    }
 
 
     @Override
@@ -42,7 +42,6 @@ public class UserRecords implements ShowLength, ByteSwappable {
 
     @Override
     public byte[] toBytes() {
-        //  todo
-        return new byte[0];
+        return this.source;
     }
 }

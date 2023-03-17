@@ -29,6 +29,7 @@ import java.nio.ByteBuffer;
  * 默认16K 暂时不支持修改
  *
  * @author gxz gongxuanzhangmelt@gmail.com
+ * @see InnoDbPageFactory
  **/
 @Data
 public class InnoDbPage implements ShowLength, ByteSwappable {
@@ -57,7 +58,7 @@ public class InnoDbPage implements ShowLength, ByteSwappable {
     /**
      * 空闲空间，这里只记录字节数
      **/
-    int freeSpace;
+    short freeSpace;
     /**
      * 页目录
      **/
@@ -70,7 +71,7 @@ public class InnoDbPage implements ShowLength, ByteSwappable {
 
     @Override
     public int length() {
-        return ConstantSize.PAGE_SIZE.getSize();
+        return ConstantSize.PAGE.getSize();
     }
 
     @Override

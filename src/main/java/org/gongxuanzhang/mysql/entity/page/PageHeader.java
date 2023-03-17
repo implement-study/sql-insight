@@ -30,6 +30,7 @@ import java.nio.ByteBuffer;
  * 记录页的状态信息
  *
  * @author gxz gongxuanzhangmelt@gmail.com
+ * @see PageHeaderFactory
  **/
 @Data
 public class PageHeader implements ShowLength, ByteSwappable {
@@ -41,11 +42,11 @@ public class PageHeader implements ShowLength, ByteSwappable {
     short slotCount;
 
     /**
-     * 页中还没使用的最小地址，2字节
+     * 2字节/页中 空闲空间起始位置
      **/
     short heapTop;
     /**
-     * 页中的记录数量 2字节(包括最小记录和最大记录)
+     * 页中的记录数量 2字节(包括最小记录和最大记录和被删除的记录)
      * MySQL中叫 PAGE_N_HEAP
      **/
     short absoluteRecordCount;
@@ -55,16 +56,20 @@ public class PageHeader implements ShowLength, ByteSwappable {
     short recordCount;
     /**
      * 第一个被标记删除的地址，可以通过next_record找到删除列表
+     * java-mysql中约定如果没有删除记录此字段为0
      * 2字节
      **/
+    @Unused("暂不支持释放删除地址")
     short free;
     /**
      * 2字节|已删除记录占用的字节数
      **/
+    @Unused("暂不支持释放删除地址")
     short garbage;
     /**
      * 2字节/最后插入记录的位置
      **/
+    @Unused("理论上和空闲空间保持一致，但是如果删除记录被释放的时候就不一样了")
     short lastInsert;
     /**
      * 2字节/记录插入的方向
@@ -80,7 +85,7 @@ public class PageHeader implements ShowLength, ByteSwappable {
     /**
      * 8字节/修改当前页的最大事务ID，该值仅在二级索引中定义
      **/
-    @Unused
+    @Unused("此版本不支持事务")
     long maxTransactionId;
 
     /**
@@ -91,7 +96,7 @@ public class PageHeader implements ShowLength, ByteSwappable {
     /**
      * 8字节 索引ID,表示当前页属于哪个索引
      **/
-    @Unused
+    @Unused("此版本不支持事务")
     long indexId;
     /**
      * 10字节 b+树叶子段的头部信息 只有root才有意义
@@ -107,12 +112,12 @@ public class PageHeader implements ShowLength, ByteSwappable {
 
     @Override
     public int length() {
-        return ConstantSize.PAGE_HEADER_SIZE.getSize();
+        return ConstantSize.PAGE_HEADER.getSize();
     }
 
     @Override
     public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.PAGE_HEADER_SIZE.getSize());
+        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.PAGE_HEADER.getSize());
         buffer.putShort(slotCount);
         buffer.putShort(heapTop);
         buffer.putShort(absoluteRecordCount);

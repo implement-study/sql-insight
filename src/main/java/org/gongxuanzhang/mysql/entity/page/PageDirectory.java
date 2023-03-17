@@ -24,8 +24,13 @@ import java.nio.ByteBuffer;
 
 /**
  * 页目录
- * 里面有N个slot
+ * 里面有N个slot 标记着页中所有记录分的组
+ * 第一组只有最小记录
+ * 最后一组有最大记录，1-8条
+ * 其他组 有4-8条
+ * 初始化的时候只有两个组  分别装着最大记录和最小记录
  * 每个slot中只记录一个偏移量
+ * 偏移量表示一组记录中最大的记录的偏移量
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/

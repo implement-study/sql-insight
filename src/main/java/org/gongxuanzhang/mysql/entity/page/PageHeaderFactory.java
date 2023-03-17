@@ -29,7 +29,7 @@ public class PageHeaderFactory implements ByteBeanFactory<PageHeader> {
 
     @Override
     public PageHeader swap(PageHeader bean, byte[] bytes) {
-        ConstantSize.PAGE_HEADER_SIZE.checkSize(bytes);
+        ConstantSize.PAGE_HEADER.checkSize(bytes);
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         bean.slotCount = buffer.getShort();
         bean.heapTop = buffer.getShort();
@@ -51,15 +51,20 @@ public class PageHeaderFactory implements ByteBeanFactory<PageHeader> {
     @Override
     public PageHeader create() {
         PageHeader pageHeader = new PageHeader();
-        //  todo
-//        pageHeader.setSlotCount(0);
-//        pageHeader.setHeapTop();
-//        pageHeader.setAbsoluteRecordCount();
-//        pageHeader.setRecordCount();
-//        pageHeader.setFree();
-//        pageHeader.setGarbage();
-//        pageHeader.setLastInsert();
-//        pageHeader.setLevel();
+        //  初始化有两个槽
+        pageHeader.setSlotCount((short) 2);
+        pageHeader.setHeapTop(initHeapTop());
+        //   初始化有有最大最小值
+        pageHeader.setAbsoluteRecordCount((short) 2);
+        pageHeader.setRecordCount((short) 0);
+        pageHeader.setFree((short) 0);
+        pageHeader.setGarbage((short) 0);
+        //  最后插入的地址
+        pageHeader.setLastInsert(initHeapTop());
+        //  默认先是0层
+        pageHeader.setLevel((short) 0);
+
+        //  unused
         pageHeader.setDirection((short) 0);
         pageHeader.setDirectionCount((short) 0);
         pageHeader.setMaxTransactionId(0L);
@@ -67,6 +72,16 @@ public class PageHeaderFactory implements ByteBeanFactory<PageHeader> {
         pageHeader.setSegLeaf(0L);
         pageHeader.setSegTop(0L);
         return pageHeader;
+    }
+
+    /**
+     * 还没使用的最小地址 初始化的时候 file header+ page header + infimum + supremum + user_record(0)
+     **/
+    private short initHeapTop() {
+        return (short) (ConstantSize.FILE_HEADER.getSize() +
+                ConstantSize.PAGE_HEADER.getSize() +
+                ConstantSize.INFIMUM.getSize() +
+                ConstantSize.SUPREMUM.getSize());
     }
 
 

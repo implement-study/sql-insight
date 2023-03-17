@@ -16,7 +16,12 @@
 
 package org.gongxuanzhang.mysql.entity.page;
 
+import org.gongxuanzhang.mysql.constant.ConstantSize;
+
 import java.nio.ByteBuffer;
+
+import static org.gongxuanzhang.mysql.constant.ConstantSize.FILE_HEADER;
+import static org.gongxuanzhang.mysql.constant.ConstantSize.PAGE_HEADER;
 
 /**
  * PageDirectory 工厂
@@ -38,9 +43,26 @@ public class PageDirectoryFactory implements ByteBeanFactory<PageDirectory> {
         return bean;
     }
 
+
+    /**
+     * 初始化页目录有两个槽
+     * 一个是最小记录 一个是最大记录
+     * 偏移量
+     *
+     * @return 返回个啥
+     **/
     @Override
     public PageDirectory create() {
-        return null;
+        PageDirectory pageDirectory = new PageDirectory();
+        short[] slots = new short[2];
+        //  下确界偏移量是  page header + file header
+        short infimumOffset = (short) (PAGE_HEADER.getSize() + FILE_HEADER.getSize());
+        //  上确捷是 下确界offset+下确界size
+        short supremumOffset = (short) (infimumOffset + ConstantSize.INFIMUM.getSize());
+        slots[0] = infimumOffset;
+        slots[1] = supremumOffset;
+        pageDirectory.setSlots(slots);
+        return pageDirectory;
     }
 
 }

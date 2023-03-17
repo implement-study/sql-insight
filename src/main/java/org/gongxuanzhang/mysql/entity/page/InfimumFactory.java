@@ -31,12 +31,12 @@ public class InfimumFactory implements ByteBeanFactory<Infimum> {
 
     @Override
     public Infimum swap(Infimum bean, byte[] bytes) {
-        ConstantSize.INFIMUM_SIZE.checkSize(bytes);
+        ConstantSize.INFIMUM.checkSize(bytes);
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         byte[] headBuffer = new byte[ConstantSize.RECORD_HEADER.getSize()];
         buffer.get(headBuffer);
         bean.recordHeader = new RecordHeader(headBuffer);
-        bean.body = new byte[ConstantSize.INFIMUM_BODY_SIZE.getSize()];
+        bean.body = new byte[ConstantSize.INFIMUM_BODY.getSize()];
         buffer.get(bean.body);
         return bean;
     }
@@ -51,7 +51,7 @@ public class InfimumFactory implements ByteBeanFactory<Infimum> {
 
 
     private byte[] infimumInitBody() {
-        ByteBuffer bodyBuffer = ByteBuffer.allocate(ConstantSize.INFIMUM_BODY_SIZE.getSize());
+        ByteBuffer bodyBuffer = ByteBuffer.allocate(ConstantSize.INFIMUM_BODY.getSize());
         bodyBuffer.put(Infimum.INFIMUM_BODY.getBytes(StandardCharsets.UTF_8));
         return bodyBuffer.array();
     }

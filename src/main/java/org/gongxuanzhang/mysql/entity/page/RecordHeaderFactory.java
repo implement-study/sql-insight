@@ -26,6 +26,13 @@ import org.gongxuanzhang.mysql.constant.ConstantSize;
  **/
 public class RecordHeaderFactory implements ByteBeanFactory<RecordHeader> {
 
+    /**
+     * heap_no 13位序号  最小值是0 最大值是1
+     * record_type  3位类型  最小记录是2 最大记录是3
+     **/
+    private static final byte MIN_RECORD_HEAP_NO = 0b00000_010;
+    private static final byte MAX_RECORD_HEAP_NO = 0b00001_011;
+
     @Override
     public RecordHeader swap(RecordHeader bean, byte[] bytes) {
         ConstantSize.RECORD_HEADER.checkSize(bytes);
@@ -35,7 +42,7 @@ public class RecordHeaderFactory implements ByteBeanFactory<RecordHeader> {
 
     @Override
     public RecordHeader create() {
-        throw new UnsupportedOperationException("use createInfimumHeader() or createSupremumHeader()");
+        throw new UnsupportedOperationException("should be use createInfimumHeader() or createSupremumHeader()");
     }
 
 
@@ -43,14 +50,28 @@ public class RecordHeaderFactory implements ByteBeanFactory<RecordHeader> {
      * 创建下确界记录头
      **/
     public RecordHeader createInfimumHeader() {
-        return new RecordHeader(new byte[0]);
+        //  unuseful(1) │ unuseful(1)│delete_mask(1)│min_rec_mask(1)│n_owned(4)│heap_no(13)│record_type(3)
+        //  │next_record(16)│
+        return new RecordHeader(new byte[]{
+                (byte) 0x01,
+                (byte) 0x00,
+                MIN_RECORD_HEAP_NO,
+                (byte) 0b0000_0001,
+                (byte) 0b0000_0001,
+        });
     }
 
     /**
      * 创建上确界记录头
      **/
     public RecordHeader createSupremumHeader() {
-        return new RecordHeader(new byte[0]);
+        return new RecordHeader(new byte[]{
+                (byte) 0x01,
+                (byte) 0x00,
+                MAX_RECORD_HEAP_NO,
+                (byte) 0b0000_0001,
+                (byte) 0b0000_0001,
+        });
     }
 
 

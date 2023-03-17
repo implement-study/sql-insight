@@ -42,12 +42,12 @@ public class Supremum implements ShowLength, ByteSwappable {
 
     @Override
     public int length() {
-        return ConstantSize.SUPREMUM_SIZE.getSize();
+        return ConstantSize.SUPREMUM.getSize();
     }
 
     @Override
     public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.SUPREMUM_SIZE.getSize());
+        ByteBuffer buffer = ByteBuffer.allocate(ConstantSize.SUPREMUM.getSize());
         buffer.put(recordHeader.toBytes());
         buffer.put(body);
         return buffer.array();

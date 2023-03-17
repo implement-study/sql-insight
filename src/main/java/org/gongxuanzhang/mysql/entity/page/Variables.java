@@ -18,6 +18,8 @@ package org.gongxuanzhang.mysql.entity.page;
 
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 
+import java.nio.ByteBuffer;
+
 /**
  * 变长列表
  *
@@ -28,6 +30,10 @@ public class Variables implements ByteSwappable {
 
     byte[] varBytes;
 
+    Variables(byte[] varBytes) {
+        this.varBytes = varBytes;
+    }
+
     /**
      * 变长列表 第一个字节表示变长列表的长度
      **/
@@ -37,6 +43,9 @@ public class Variables implements ByteSwappable {
 
     @Override
     public byte[] toBytes() {
-        return varBytes;
+        ByteBuffer buffer = ByteBuffer.allocate(length());
+        buffer.put((byte) this.varBytes.length);
+        buffer.put(this.varBytes);
+        return buffer.array();
     }
 }

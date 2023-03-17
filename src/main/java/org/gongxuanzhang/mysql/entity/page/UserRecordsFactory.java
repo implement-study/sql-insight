@@ -18,8 +18,6 @@ package org.gongxuanzhang.mysql.entity.page;
 
 /**
  * UserRecords 用户组 工厂
- * <p>
- * todo
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
@@ -28,12 +26,17 @@ public class UserRecordsFactory implements ByteBeanFactory<UserRecords> {
 
     @Override
     public UserRecords swap(UserRecords bean, byte[] bytes) {
-        return null;
+        bean.source = bytes;
+        return bean;
     }
 
+    /**
+     * 新建的用户组没有任何信息
+     * 页的使用情况在pageHeader中 {@link PageHeader}
+     **/
     @Override
     public UserRecords create() {
-        return null;
+        return new UserRecords(new byte[0]);
     }
 
 }

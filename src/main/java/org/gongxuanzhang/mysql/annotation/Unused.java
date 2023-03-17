@@ -25,11 +25,14 @@ import java.lang.annotation.Target;
 
 /**
  * 表示某字段暂时没有功能，只是为了MySQL特性预留字段
+ *
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.SOURCE)
 @Documented
 public @interface Unused {
+
+    String value() default "";
 
 }

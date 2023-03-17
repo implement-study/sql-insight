@@ -33,6 +33,13 @@ class InnoDbPageFactoryTest {
     }
 
     @Test
+    fun createInnodbPage(){
+        val innoDbPage = InnoDbPageFactory().create()
+        println(1)
+
+    }
+
+    @Test
     fun testInnodbPageWrite(){
         val page = InnoDbPageFactory().create()
         File("simpleInnoDbPage").writeBytes(page.toBytes())

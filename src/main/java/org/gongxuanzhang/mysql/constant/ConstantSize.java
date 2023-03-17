@@ -23,15 +23,15 @@ package org.gongxuanzhang.mysql.constant;
  */
 
 public enum ConstantSize {
-    PAGE_SIZE("页", 16 * 1024),
-    FILE_HEADER_SIZE("文件头", 38),
-    PAGE_HEADER_SIZE("页头", 56),
-    INFIMUM_SIZE("下确界", 13),
-    SUPREMUM_SIZE("上确界", 13),
-    SUPREMUM_BODY_SIZE("上确界内容", 8),
-    INFIMUM_BODY_SIZE("下确界内容", 8),
+    PAGE("页", 16 * 1024),
+    FILE_HEADER("文件头", 38),
+    PAGE_HEADER("页头", 56),
+    INFIMUM("下确界", 13),
+    SUPREMUM("上确界", 13),
+    SUPREMUM_BODY("上确界内容", 8),
+    INFIMUM_BODY("下确界内容", 8),
     FILE_TRAILER("文件尾", 8),
-    COMPACT_NULL_SIZE("compact null值列表", 8),
+    COMPACT_NULL("compact null值列表", 8),
     RECORD_HEADER("记录头", 5);
 
     private final String desc;

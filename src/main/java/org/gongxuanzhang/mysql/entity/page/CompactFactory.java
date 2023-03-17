@@ -33,7 +33,6 @@ public class CompactFactory implements ByteBeanFactory<Compact> {
         buffer.get(headBuffer);
         bean.recordHeader = new RecordHeader(headBuffer);
         byte varLength = buffer.get();
-        bean.variables = new Variables();
         VariablesFactory variablesFactory = new VariablesFactory();
         if (varLength == 0) {
             variablesFactory.swap(bean.variables, new byte[0]);
