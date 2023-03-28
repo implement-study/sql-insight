@@ -18,7 +18,8 @@ package org.gongxuanzhang.mysql.service.executor.ddl.create;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.mysql.core.result.Result;
-import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.entity.CreateTableInfo;
+import org.gongxuanzhang.mysql.entity.page.InnoDbPageFactory;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.executor.ddl.DdlExecutor;
@@ -28,6 +29,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.nio.file.Files;
 
 import static org.gongxuanzhang.mysql.tool.ExceptionThrower.errorSwap;
 
@@ -38,20 +40,28 @@ import static org.gongxuanzhang.mysql.tool.ExceptionThrower.errorSwap;
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Slf4j
-public class CreateTableExecutor extends DdlExecutor<TableInfo> {
+public class CreateTableExecutor extends DdlExecutor<CreateTableInfo> {
 
 
-    public CreateTableExecutor(TableInfo info) {
+    public CreateTableExecutor(CreateTableInfo info) {
         super(info);
     }
 
     @Override
-    public Result doExecute(TableInfo tableInfo) throws MySQLException {
+    public Result doExecute(CreateTableInfo tableInfo) throws MySQLException {
+        if (tableInfo.notIfExists() && tableInfo.structFile().exists()) {
+            log.info("表{}已经存在", tableInfo.getTableName());
+            return Result.success();
+        }
         checkTableFile(tableInfo.structFile());
         checkTableFile(tableInfo.dataFile());
         try (FileOutputStream fileOutputStream = new FileOutputStream(tableInfo.structFile());
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
             objectOutputStream.writeObject(tableInfo);
+            File dataFile = tableInfo.dataFile();
+            InnoDbPageFactory innoDbPageFactory = new InnoDbPageFactory();
+            byte[] pageBytes = innoDbPageFactory.create().toBytes();
+            Files.write(dataFile.toPath(), pageBytes);
             log.info("创建表{}.{}", tableInfo.getDatabase().getDatabaseName(), tableInfo.getTableName());
             Context.getTableManager().register(tableInfo);
             return Result.success();

@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.mysql.core.manager.DatabaseManager;
 import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.entity.DatabaseInfo;
+import org.gongxuanzhang.mysql.entity.DropDatabaseInfo;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.executor.Executor;
@@ -42,9 +43,9 @@ import java.util.stream.Stream;
 public class DropDatabaseExecutor implements Executor {
 
 
-    private final DatabaseInfo databaseInfo;
+    private final DropDatabaseInfo databaseInfo;
 
-    public DropDatabaseExecutor(DatabaseInfo databaseInfo) {
+    public DropDatabaseExecutor(DropDatabaseInfo databaseInfo) {
         this.databaseInfo = databaseInfo;
     }
 

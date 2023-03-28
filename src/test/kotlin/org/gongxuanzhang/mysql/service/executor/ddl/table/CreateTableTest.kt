@@ -27,6 +27,8 @@ import org.gongxuanzhang.mysql.service.executor.ddl.database.CreateDatabaseTest
 import org.gongxuanzhang.mysql.service.executor.ddl.database.DropDatabaseTest
 import org.gongxuanzhang.mysql.service.executor.ddl.database.UseDatabaseTest
 import org.gongxuanzhang.mysql.tool.Context
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.test.context.SpringBootTest
@@ -39,39 +41,54 @@ import org.springframework.boot.test.context.SpringBootTest
 class CreateTableTest {
 
 
+    companion object {
+
+        var database: String = ""
+
+        @AfterAll
+        @JvmStatic
+        fun dropDatabase() {
+            print(database)
+            DropDatabaseTest().doDropDatabaseIsNotExists(database)
+        }
+    }
+
+
     @Test
     fun createTableTest() {
-        val database = "create_database"
+        database = "create_database"
         CreateDatabaseTest().doCreateDatabase(database)
         val tableName = "create_test_table_user"
         doCreateTable(database, tableName)
         val select = Context.getTableManager().select("$database.$tableName")
         checkTableInfo(select, database, tableName)
-        DropDatabaseTest().doDropDatabase(database)
+        checkInnodbPage()
+    }
+
+    private fun checkInnodbPage() {
+        TODO("Not yet implemented")
     }
 
 
     @Test
     fun createSessionTable() {
-        val database = "create_database"
+        database = "create_database"
         CreateDatabaseTest().doCreateDatabase(database)
         val tableName = "aaa"
         UseDatabaseTest().doUseDatabase(database)
         doCreateSessionTable(tableName)
         val select = Context.getTableManager().select("$database.$tableName")
         checkTableInfo(select, database, tableName)
-        DropDatabaseTest().doDropDatabase(database)
     }
 
     @Test
     fun createExistTable() {
-        val database = "create_database"
+        database = "create_database"
         CreateDatabaseTest().doCreateDatabase(database)
         doCreateTable(database, "aaa")
         assertThrows<ExecuteException> {
             doCreateTable(database, "aaa")
         }
-        DropDatabaseTest().doDropDatabase(database)
     }
 
     @Test
@@ -96,59 +113,61 @@ class CreateTableTest {
 
     fun doCreateTable(database: String, tableName: String): Result {
         return """
-                    create table $database.$tableName(
-                    id int primary key auto_increment,
+                    create table `$database.$tableName`(
+                    `id` int primary key auto_increment,
                     name varchar(200) not null,
                     gender varchar(200) default '张三' not null,
                     age int comment '年龄',
                     id_card varchar UNIQUE
-                    ) comment ='用户表'
+                    ) comment =`用户表`
                 """.doSql()
     }
 
 
     private fun checkTableInfo(select: TableInfo, database: String, tableName: String) {
-        assert(select.database.databaseName == database)
-        assert(select.tableName == tableName)
-        assert(select.comment == "用户表")
-        assert(select.columnInfos[0] == run {
+        assertEquals(select.database.databaseName, database)
+        assertEquals(select.tableName, tableName)
+        assertEquals(select.comment, "用户表")
+        assertEquals(select.columnInfos[0], run {
             val columnInfo = ColumnInfo()
             columnInfo.name = "id"
             columnInfo.type = ColumnType.INT
             columnInfo.isAutoIncrement = true
             columnInfo
         })
-        assert(select.columnInfos[1] == run {
+        assertEquals(select.columnInfos[1], run {
             val columnInfo = ColumnInfo()
             columnInfo.name = "name"
             columnInfo.type = ColumnType.VARCHAR
             columnInfo.isNotNull = true
+            columnInfo.length = 200
             columnInfo
         })
-        assert(select.columnInfos[2] == run {
+        assertEquals(select.columnInfos[2], run {
             val columnInfo = ColumnInfo()
             columnInfo.name = "gender"
             columnInfo.type = ColumnType.VARCHAR
             columnInfo.isNotNull = true
             columnInfo.defaultValue = StringDefaultValue("张三")
+            columnInfo.length = 200
             columnInfo
         })
-        assert(select.columnInfos[3] == run {
+        assertEquals(select.columnInfos[3], run {
             val columnInfo = ColumnInfo()
             columnInfo.name = "age"
             columnInfo.type = ColumnType.INT
             columnInfo.comment = "年龄"
             columnInfo
         })
-        assert(select.columnInfos[4] == run {
+        assertEquals(select.columnInfos[4], run {
             val columnInfo = ColumnInfo()
             columnInfo.name = "id_card"
             columnInfo.type = ColumnType.VARCHAR
             columnInfo.isUnique = true
             columnInfo
         })
-        assert(select.comment == "用户表")
-        assert(select.primaryKey == arrayListOf("id"))
+        assertEquals(select.comment, "用户表")
+        assertEquals(select.primaryKey, arrayListOf("id"))
     }
 
 }

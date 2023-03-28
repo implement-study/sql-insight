@@ -37,7 +37,6 @@ import java.nio.ByteBuffer;
  * next_record 下一条记录的偏移量(如果物理上是连续的就是本记录的长度，如果物理上不连续就是下条记录在本页的偏移量)
  * 如果是最大记录此条为0
  *
- *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 public class RecordHeader implements ShowLength, ByteSwappable {

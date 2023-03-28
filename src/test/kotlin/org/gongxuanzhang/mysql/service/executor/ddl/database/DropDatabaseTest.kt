@@ -41,13 +41,13 @@ class DropDatabaseTest {
         val dir = File(Context.getHome(), database)
         dir.mkdirs()
         assert(dir.exists() && dir.isDirectory)
-        doDropDatabase(database)
+        doDropDatabaseIsNotExists(database)
         assert(!dir.exists())
     }
 
 
-    fun doDropDatabase(database: String): Result {
-        return "drop database $database".doSql()
+    fun doDropDatabaseIsNotExists(database: String): Result {
+        return "drop database if exists $database".doSql()
     }
 
 

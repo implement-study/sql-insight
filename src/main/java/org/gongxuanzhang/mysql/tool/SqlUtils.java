@@ -34,6 +34,10 @@ public class SqlUtils {
 
     private static final Pattern ILLEGAL_PATTERN = Pattern.compile("[^\\w]+");
 
+    private static final char BACKTICK = '`';
+    private static final char DOUBLE_QUOTE = '"';
+    private static final char SINGLE_QUOTE = '\'';
+
 
     /**
      * 校验变量名的合法行
@@ -56,6 +60,39 @@ public class SqlUtils {
      **/
     public static String sqlTime(long startTime) {
         return String.format("%.3f s", (System.currentTimeMillis() - startTime) / 1000.0);
+    }
+
+    /**
+     * 解析转义字符
+     * 修剪前后的` " '  sql转义字符
+     * 不支持多级转义
+     *
+     * @return 返回修剪之后的
+     **/
+    public static String trimSqlEsc(String str) {
+        if (str.length() <= 2) {
+            return str;
+        }
+        switch (str.charAt(0)) {
+            case BACKTICK: {
+                if (str.charAt(str.length() - 1) == BACKTICK) {
+                    return str.substring(1, str.length() - 1);
+                }
+                return str;
+            }
+            case DOUBLE_QUOTE:
+                if (str.charAt(str.length() - 1) == DOUBLE_QUOTE) {
+                    return str.substring(1, str.length() - 1);
+                }
+                return str;
+            case SINGLE_QUOTE:
+                if (str.charAt(str.length() - 1) == SINGLE_QUOTE) {
+                    return str.substring(1, str.length() - 1);
+                }
+                return str;
+            default:
+                return str;
+        }
     }
 
 

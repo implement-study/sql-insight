@@ -46,7 +46,13 @@ public class SessionManager {
 
 
     public static MySqlSession currentSession() throws SessionException {
-        RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+        RequestAttributes requestAttributes = null;
+        try {
+            requestAttributes = RequestContextHolder.currentRequestAttributes();
+        } catch (Exception e) {
+            return new MySqlSession("virtual");
+        }
+
         MySqlSession mySqlSession = SESSION_BOX.get(requestAttributes.getSessionId());
         if (mySqlSession != null) {
             return mySqlSession;

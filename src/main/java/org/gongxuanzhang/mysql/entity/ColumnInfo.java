@@ -22,10 +22,11 @@ import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
 import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
 import com.alibaba.druid.sql.ast.statement.SQLColumnConstraint;
 import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
+import com.alibaba.druid.sql.ast.statement.SQLColumnUniqueKey;
 import com.alibaba.druid.sql.ast.statement.SQLNotNullConstraint;
-import com.alibaba.druid.sql.ast.statement.SQLUniqueConstraint;
 import lombok.Data;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
+import org.gongxuanzhang.mysql.tool.SqlUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -58,8 +59,11 @@ public class ColumnInfo implements ExecuteInfo {
         this.autoIncrement = definition.isAutoIncrement();
         analysisType(definition.getDataType());
         analysisConstraint(definition.getConstraints());
-        this.name = definition.getColumnName();
+        this.name = SqlUtils.trimSqlEsc(definition.getColumnName());
         analysisDefault(definition.getDefaultExpr());
+        if (definition.getComment() != null) {
+            this.comment = SqlUtils.trimSqlEsc(definition.getComment().toString());
+        }
     }
 
     private void analysisDefault(SQLExpr defaultExpr) {
@@ -83,7 +87,7 @@ public class ColumnInfo implements ExecuteInfo {
         for (SQLColumnConstraint constraint : constraints) {
             if (constraint instanceof SQLNotNullConstraint) {
                 this.notNull = true;
-            } else if (constraint instanceof SQLUniqueConstraint) {
+            } else if (constraint instanceof SQLColumnUniqueKey) {
                 this.unique = true;
             }
         }

@@ -48,7 +48,7 @@ class DescTableTest {
                 checkInfo(it)
             }
         } finally {
-            DropDatabaseTest().doDropDatabase(database)
+            DropDatabaseTest().doDropDatabaseIsNotExists(database)
         }
     }
 
@@ -64,7 +64,7 @@ class DescTableTest {
                 checkInfo(it)
             }
         } finally {
-            DropDatabaseTest().doDropDatabase(database)
+            DropDatabaseTest().doDropDatabaseIsNotExists(database)
         }
     }
 

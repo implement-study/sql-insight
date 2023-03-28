@@ -73,12 +73,13 @@ public abstract class TableInfoUtils {
         if (candidate.indexOf(TABLE_NAME_SEPARATOR) != candidate.lastIndexOf(TABLE_NAME_SEPARATOR)) {
             throw new MySQLException(candidate + "无法解析");
         }
+        candidate = SqlUtils.trimSqlEsc(candidate);
         DatabaseInfo databaseInfo;
         String tableName;
         if (candidate.contains(TABLE_NAME_SEPARATOR)) {
             String[] split = candidate.split("\\.");
-            databaseInfo = new DatabaseInfo(split[0]);
-            tableName = split[1];
+            databaseInfo = new DatabaseInfo(SqlUtils.trimSqlEsc(split[0]));
+            tableName = SqlUtils.trimSqlEsc(split[1]);
         } else {
             databaseInfo = SessionManager.currentSession().getDatabase();
             tableName = candidate;

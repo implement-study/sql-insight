@@ -29,6 +29,7 @@ import org.gongxuanzhang.mysql.core.select.As;
 import org.gongxuanzhang.mysql.core.select.SelectCol;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
+import org.gongxuanzhang.mysql.tool.SqlUtils;
 import org.gongxuanzhang.mysql.tool.TableInfoUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -39,7 +40,6 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -83,23 +83,30 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
 
     }
 
-    public TableInfo(MySqlCreateTableStatement statement) throws MySQLException {
+    protected TableInfo(MySqlCreateTableStatement statement) throws MySQLException {
         List<SQLColumnDefinition> columnDefinitions = statement.getColumnDefinitions();
         if (CollectionUtils.isEmpty(columnDefinitions)) {
             throw new MySQLException("无法获取列信息");
         }
-        Set<String> primaryKey = new LinkedHashSet<>(statement.getPrimaryKeyNames());
+        Set<String> primaryKey =
+                statement.getPrimaryKeyNames()
+                        .stream()
+                        .map(SqlUtils::trimSqlEsc)
+                        .collect(Collectors.toSet());
         columnInfos = new ArrayList<>();
         for (SQLColumnDefinition columnDefinition : columnDefinitions) {
-            columnInfos.add(new ColumnInfo(columnDefinition));
-            if (columnDefinition.isPrimaryKey() && primaryKey.add(columnDefinition.getColumnName())) {
+            ColumnInfo columnInfo = new ColumnInfo(columnDefinition);
+            columnInfos.add(columnInfo);
+            //  这里使用columnInfo而不是columnDefinition 是以为druid没有转义
+            if (columnDefinition.isPrimaryKey() && !primaryKey.add(columnInfo.getName())) {
                 throw new MySQLException("主键重复定义");
             }
-
         }
+        this.primaryKey = new ArrayList<>(primaryKey);
         TableInfoUtils.fillTableInfo(this, statement.getTableSource().toString());
         if (statement.getComment() != null) {
-            this.comment = statement.getComment().toString();
+            String comment = statement.getComment().toString();
+            this.comment = SqlUtils.trimSqlEsc(comment);
         }
     }
 

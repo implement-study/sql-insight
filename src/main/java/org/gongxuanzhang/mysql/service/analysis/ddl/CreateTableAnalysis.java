@@ -18,7 +18,7 @@ package org.gongxuanzhang.mysql.service.analysis.ddl;
 
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlCreateTableStatement;
-import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.entity.CreateTableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.analysis.StandaloneSqlAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
@@ -42,7 +42,7 @@ public class CreateTableAnalysis implements StandaloneSqlAnalysis {
     @Override
     public Executor doAnalysis(SQLStatement sqlStatement) throws MySQLException {
         MySqlCreateTableStatement statement = (MySqlCreateTableStatement) sqlStatement;
-        TableInfo tableInfo = new TableInfo(statement);
+        CreateTableInfo tableInfo = new CreateTableInfo(statement);
         return new CreateTableExecutor(tableInfo);
     }
 

@@ -19,7 +19,7 @@ package org.gongxuanzhang.mysql.service.executor.ddl.create;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.mysql.core.MySqlProperties;
 import org.gongxuanzhang.mysql.core.result.Result;
-import org.gongxuanzhang.mysql.entity.DatabaseInfo;
+import org.gongxuanzhang.mysql.entity.CreateDatabaseInfo;
 import org.gongxuanzhang.mysql.entity.GlobalProperties;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
@@ -39,12 +39,10 @@ import java.io.File;
 public class CreateDatabaseExecutor implements Executor {
 
 
-    private final DatabaseInfo databaseInfo;
-    private final boolean ifNotExists;
+    private final CreateDatabaseInfo databaseInfo;
 
-    public CreateDatabaseExecutor(DatabaseInfo databaseInfo, boolean ifNotExists) {
+    public CreateDatabaseExecutor(CreateDatabaseInfo databaseInfo) {
         this.databaseInfo = databaseInfo;
-        this.ifNotExists = ifNotExists;
     }
 
 
@@ -60,7 +58,7 @@ public class CreateDatabaseExecutor implements Executor {
         File db = new File(dataDir);
         File file = new File(db, databaseName);
         if (file.exists()) {
-            if (ifNotExists) {
+            if (databaseInfo.notIfExists()) {
                 log.info("数据库{}已经存在", databaseName);
                 return Result.success();
             }

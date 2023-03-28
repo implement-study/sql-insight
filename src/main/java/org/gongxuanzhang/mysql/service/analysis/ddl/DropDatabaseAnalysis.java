@@ -18,7 +18,7 @@ package org.gongxuanzhang.mysql.service.analysis.ddl;
 
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.statement.SQLDropDatabaseStatement;
-import org.gongxuanzhang.mysql.entity.DatabaseInfo;
+import org.gongxuanzhang.mysql.entity.DropDatabaseInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.analysis.StandaloneSqlAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
@@ -42,8 +42,8 @@ public class DropDatabaseAnalysis implements StandaloneSqlAnalysis {
     @Override
     public Executor doAnalysis(SQLStatement sqlStatement) throws MySQLException {
         SQLDropDatabaseStatement statement = (SQLDropDatabaseStatement) sqlStatement;
-        String databaseName = statement.getDatabaseName();
-        return new DropDatabaseExecutor(new DatabaseInfo(databaseName));
+        DropDatabaseInfo databaseInfo = new DropDatabaseInfo(statement);
+        return new DropDatabaseExecutor(databaseInfo);
     }
 
 

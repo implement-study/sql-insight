@@ -46,7 +46,7 @@ class CreateDatabaseTest {
     }
 
     fun doCreateDatabase(database: String) {
-        "create database $database".doSql()
+        "create database if not exists $database".doSql()
     }
 
 
