@@ -32,5 +32,12 @@ public interface DefaultValue<T> extends ExecuteInfo {
      **/
     T getValue();
 
+    /**
+     * 默认值变成cell
+     *
+     * @return cell
+     **/
+    Cell<T> toCell();
+
 
 }

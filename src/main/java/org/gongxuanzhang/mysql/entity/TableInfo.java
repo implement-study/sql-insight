@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.gongxuanzhang.mysql.core.MySqlProperties.STORAGE_ENGINE;
 import static org.gongxuanzhang.mysql.tool.ExceptionThrower.errorSwap;
 
 /**
@@ -68,7 +69,7 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
     private DatabaseInfo database;
 
     private String tableName;
-    private List<ColumnInfo> columnInfos;
+    private List<Column> columns;
     private List<String> primaryKey;
     private String comment;
     private String engineName;
@@ -93,12 +94,12 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
                         .stream()
                         .map(SqlUtils::trimSqlEsc)
                         .collect(Collectors.toSet());
-        columnInfos = new ArrayList<>();
+        columns = new ArrayList<>();
         for (SQLColumnDefinition columnDefinition : columnDefinitions) {
-            ColumnInfo columnInfo = new ColumnInfo(columnDefinition);
-            columnInfos.add(columnInfo);
+            Column column = new Column(columnDefinition);
+            columns.add(column);
             //  这里使用columnInfo而不是columnDefinition 是以为druid没有转义
-            if (columnDefinition.isPrimaryKey() && !primaryKey.add(columnInfo.getName())) {
+            if (columnDefinition.isPrimaryKey() && !primaryKey.add(column.getName())) {
                 throw new MySQLException("主键重复定义");
             }
         }
@@ -108,6 +109,11 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
             String comment = statement.getComment().toString();
             this.comment = SqlUtils.trimSqlEsc(comment);
         }
+        if (statement.getEngine() == null) {
+            this.engineName = GlobalProperties.getValue(STORAGE_ENGINE);
+        } else {
+            this.engineName = statement.getEngine().toString();
+        }
     }
 
 
@@ -115,7 +121,7 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
         this.tableName = tableInfo.tableName;
         this.comment = tableInfo.comment;
         this.database = tableInfo.database;
-        this.columnInfos = tableInfo.columnInfos;
+        this.columns = tableInfo.columns;
         this.primaryKey = tableInfo.primaryKey;
         this.engineName = tableInfo.engineName;
         this.incrementKey = tableInfo.incrementKey;
@@ -129,9 +135,9 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
      * @return 返回个啥
      **/
     public Set<String> uniqueKeys() {
-        Set<String> uniqueKey = this.columnInfos.stream()
-                .filter(ColumnInfo::isUnique)
-                .map(ColumnInfo::getName)
+        Set<String> uniqueKey = this.columns.stream()
+                .filter(Column::isUnique)
+                .map(Column::getName)
                 .collect(Collectors.toSet());
         if (!CollectionUtils.isEmpty(primaryKey)) {
             uniqueKey.addAll(primaryKey);
@@ -215,24 +221,24 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
     }
 
     private void fillAllCol(Map<String, Integer> allCount, List<SelectCol> result) {
-        for (ColumnInfo columnInfo : this.columnInfos) {
-            fillSingleCol(SelectCol.single(columnInfo.getName(), null), allCount, result);
+        for (Column column : this.columns) {
+            fillSingleCol(SelectCol.single(column.getName(), null), allCount, result);
         }
     }
 
     public List<JSONObject> descTable() {
         List<JSONObject> result = new ArrayList<>();
         Set<String> primary = primaryKey == null ? new HashSet<>() : new HashSet<>(primaryKey);
-        for (ColumnInfo columnInfo : columnInfos) {
+        for (Column column : columns) {
             JSONObject colInfo = new JSONObject(8);
-            colInfo.put("field", columnInfo.getName());
-            colInfo.put("type", columnInfo.getType());
-            colInfo.put("notNull", Boolean.toString(!columnInfo.isNotNull()));
-            colInfo.put("primary key", Boolean.toString(primary.contains(columnInfo.getName())));
-            colInfo.put("default", columnInfo.getDefaultValue());
-            colInfo.put("auto_increment", Boolean.toString(columnInfo.isAutoIncrement()));
-            colInfo.put("unique", Boolean.toString(columnInfo.isUnique()));
-            colInfo.put("comment", columnInfo.getComment());
+            colInfo.put("field", column.getName());
+            colInfo.put("type", column.getType());
+            colInfo.put("notNull", Boolean.toString(!column.isNotNull()));
+            colInfo.put("primary key", Boolean.toString(primary.contains(column.getName())));
+            colInfo.put("default", column.getDefaultValue());
+            colInfo.put("auto_increment", Boolean.toString(column.isAutoIncrement()));
+            colInfo.put("unique", Boolean.toString(column.isUnique()));
+            colInfo.put("comment", column.getComment());
             result.add(colInfo);
         }
         return result;

@@ -25,6 +25,7 @@ import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
 import com.alibaba.druid.sql.ast.statement.SQLColumnUniqueKey;
 import com.alibaba.druid.sql.ast.statement.SQLNotNullConstraint;
 import lombok.Data;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
 import org.gongxuanzhang.mysql.tool.SqlUtils;
 import org.springframework.util.CollectionUtils;
@@ -37,7 +38,7 @@ import java.util.List;
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Data
-public class ColumnInfo implements ExecuteInfo {
+public class Column implements ExecuteInfo {
 
     public static final int MAX_SIZE = 0xff;
 
@@ -51,11 +52,11 @@ public class ColumnInfo implements ExecuteInfo {
     private Integer length;
 
 
-    public ColumnInfo() {
+    public Column() {
 
     }
 
-    public ColumnInfo(SQLColumnDefinition definition) throws SqlParseException {
+    public Column(SQLColumnDefinition definition) throws SqlParseException {
         this.autoIncrement = definition.isAutoIncrement();
         analysisType(definition.getDataType());
         analysisConstraint(definition.getConstraints());
@@ -63,6 +64,31 @@ public class ColumnInfo implements ExecuteInfo {
         analysisDefault(definition.getDefaultExpr());
         if (definition.getComment() != null) {
             this.comment = SqlUtils.trimSqlEsc(definition.getComment().toString());
+        }
+    }
+
+    /**
+     * 约束校验 如果错误会抛异常
+     * 如果有类型转换会转换
+     **/
+    public Cell<?> checkCellAndSwap(Cell<?> cell) throws MySQLException {
+        if (this.notNull && cell.getValue() == null) {
+            throw new MySQLException(String.format("%s列不允许为null", this.getName()));
+        }
+        if (cell.getValue() == null) {
+            return cell;
+        }
+        switch (this.type) {
+            case INT:
+                if (cell.getType() != ColumnType.INT) {
+                    return new IntCell(cell);
+                }
+            case VARCHAR:
+                if (cell.getType() != ColumnType.VARCHAR) {
+                    return new VarcharCell(cell.getValue().toString());
+                }
+            default:
+                return cell;
         }
     }
 

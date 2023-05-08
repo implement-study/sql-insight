@@ -69,6 +69,13 @@ public class GlobalProperties implements EnvironmentAware {
         return instance;
     }
 
+    /**
+     * 委托给实例执行
+     **/
+    public static String getValue(MySqlProperties mySqlProperties) {
+        return getInstance().get(mySqlProperties);
+    }
+
     public void set(String key, String value) throws VariableException {
         if (READONLY.contains(key)) {
             throw new VariableException(key + "是只读的，不能修改");

@@ -27,17 +27,11 @@ import org.gongxuanzhang.mysql.core.select.From;
 import org.gongxuanzhang.mysql.core.select.Order;
 import org.gongxuanzhang.mysql.core.select.OrderEnum;
 import org.gongxuanzhang.mysql.core.select.Where;
-import org.gongxuanzhang.mysql.entity.Cell;
-import org.gongxuanzhang.mysql.entity.ColumnType;
 import org.gongxuanzhang.mysql.entity.DatabaseInfo;
-import org.gongxuanzhang.mysql.entity.IntCell;
 import org.gongxuanzhang.mysql.entity.TableInfo;
-import org.gongxuanzhang.mysql.entity.TimeStampCell;
-import org.gongxuanzhang.mysql.entity.VarcharCell;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlAnalysisException;
 import org.gongxuanzhang.mysql.tool.Context;
-import org.gongxuanzhang.mysql.tool.ConvertUtils;
 import org.gongxuanzhang.mysql.tool.Pair;
 import org.gongxuanzhang.mysql.tool.ThrowableRunnable;
 
@@ -344,18 +338,6 @@ public class TokenSupport {
         }
     }
 
-    public static Cell<?> parseCell(SqlToken sqlToken) throws MySQLException {
-        switch (sqlToken.getTokenKind()) {
-            case LITERACY:
-                return new VarcharCell(sqlToken.getValue());
-            case INT:
-                return new IntCell(ConvertUtils.convert(ColumnType.INT, sqlToken.getValue()));
-            case TIMESTAMP:
-                return new TimeStampCell(ConvertUtils.convert(ColumnType.TIMESTAMP, sqlToken.getValue()));
-            default:
-                throw new MySQLException(sqlToken.getTokenKind() + "无法解析");
-        }
-    }
 
 
     /**

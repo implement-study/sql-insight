@@ -16,6 +16,15 @@
 
 package org.gongxuanzhang.mysql.tool;
 
+import com.alibaba.druid.sql.ast.SQLExpr;
+import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
+import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
+import com.alibaba.druid.sql.ast.expr.SQLNullExpr;
+import org.gongxuanzhang.mysql.entity.Cell;
+import org.gongxuanzhang.mysql.entity.IntCell;
+import org.gongxuanzhang.mysql.entity.NullCell;
+import org.gongxuanzhang.mysql.entity.VarcharCell;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
 
 import java.util.regex.Matcher;
@@ -95,5 +104,16 @@ public class SqlUtils {
         }
     }
 
+    public static Cell<?> cellWrap(SQLExpr sqlExpr) throws MySQLException {
+        if (sqlExpr instanceof SQLIntegerExpr) {
+            return new IntCell((Integer) ((SQLIntegerExpr) sqlExpr).getValue());
+        } else if (sqlExpr instanceof SQLCharExpr) {
+            return new VarcharCell(((SQLCharExpr) sqlExpr).getText());
+        } else if (sqlExpr instanceof SQLNullExpr) {
+            return new NullCell();
+        } else {
+            throw new MySQLException(sqlExpr.toString() + "暂不支持");
+        }
+    }
 
 }

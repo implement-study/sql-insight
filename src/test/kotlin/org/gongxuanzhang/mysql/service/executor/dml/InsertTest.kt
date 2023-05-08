@@ -14,23 +14,35 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.service.analysis.dml;
+package org.gongxuanzhang.mysql.service.executor.dml
 
-import org.gongxuanzhang.mysql.connection.Connection;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.gongxuanzhang.mysql.doSql
+import org.gongxuanzhang.mysql.service.executor.ddl.table.CreateTableTest
+import org.junit.jupiter.api.Test
+import org.springframework.boot.test.context.SpringBootTest
 
 
+/**
+ * @author gongxuanzhang
+ */
 @SpringBootTest
-class UpdateAnalysisTest {
+class InsertTest {
 
+    var database: String = "testDatabase"
 
     @Test
-    public void updateAnalysis(@Autowired Connection connection) {
-        String sql = "update aa.user set name = '李四111111' where id >4";
-        connection.execute(sql);
-
+    fun simpleCreateDatabase() {
+        CreateTableTest().createTableTest()
+        """
+            insert into create_database.create_test_table_user (id,age,name,gender,id_card) 
+            values(1,18,'zhangsan','男','abcd'),
+               (2,24,'lisi','女','abcd'),
+               (3,25,'wangwu',NULL,'afff')
+            
+        """.doSql()
     }
+
+
+
 
 }

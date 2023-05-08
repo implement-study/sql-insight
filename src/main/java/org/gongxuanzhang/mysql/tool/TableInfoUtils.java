@@ -40,6 +40,8 @@ public abstract class TableInfoUtils {
 
     /**
      * 拼装已经存在的表
+     *
+     * @param tableName database.table 也可以是tableName
      **/
     public static void assembleTableInfo(FromBox box, String tableName) throws MySQLException {
         TableInfo tableInfo = selectTableInfo(tableName);
@@ -49,7 +51,7 @@ public abstract class TableInfoUtils {
     /**
      * 选择已经存在的表信息
      *
-     * @param candidate sql解析出的表名  database.table
+     * @param candidate sql解析出的表名  database.table 也可以是tableName
      * @return 返回已经存在的表信息
      **/
     public static TableInfo selectTableInfo(String candidate) throws MySQLException {
@@ -68,6 +70,8 @@ public abstract class TableInfoUtils {
     /**
      * 填充tableInfo
      * 用于还不存在的表
+     *
+     * @param candidate 表名 可以是 database.tableName 也可以只是tableName
      **/
     public static void fillTableInfo(TableInfo tableInfo, String candidate) throws MySQLException {
         if (candidate.indexOf(TABLE_NAME_SEPARATOR) != candidate.lastIndexOf(TABLE_NAME_SEPARATOR)) {

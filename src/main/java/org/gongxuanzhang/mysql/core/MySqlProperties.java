@@ -45,7 +45,12 @@ public enum MySqlProperties {
      * session持续时间,不代表到时就过期，当会话数量超过 MAX_SESSION_COUNT
      * 同时有过期会话才会过期
      **/
-    SESSION_DURATION("session-duration", Long.toString(TimeUnit.MINUTES.toMillis(10)), true);
+    SESSION_DURATION("session-duration", Long.toString(TimeUnit.MINUTES.toMillis(10)), true),
+
+    /**
+     * 默认存储引擎
+     **/
+    STORAGE_ENGINE("storage_engine","innodb",false);
 
     public final String key;
 

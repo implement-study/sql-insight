@@ -35,7 +35,11 @@ public enum ColumnType {
     /**
      * 时间戳
      **/
-    TIMESTAMP;
+    TIMESTAMP,
+    /**
+     * null
+     **/
+    NULL,
 
 
 }

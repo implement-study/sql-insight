@@ -17,9 +17,13 @@
 package org.gongxuanzhang.mysql.storage.innodb;
 
 import org.gongxuanzhang.mysql.core.result.Result;
+import org.gongxuanzhang.mysql.entity.Cell;
+import org.gongxuanzhang.mysql.entity.Column;
 import org.gongxuanzhang.mysql.entity.InsertInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.storage.InsertEngine;
+
+import java.util.List;
 
 /**
  * innodb 引擎的插入模板
@@ -28,9 +32,32 @@ import org.gongxuanzhang.mysql.storage.InsertEngine;
  **/
 public class InnoDbInsert implements InsertEngine {
 
+
     @Override
     public Result insert(InsertInfo info) throws MySQLException {
-        return null;
+        List<Column> columns = info.getTableInfo().getColumns();
+        for (List<Cell<?>> row : info.getInsertData()) {
+            checkAndSwapRow(row, columns);
+            doInsert(row);
+        }
+        return Result.info("成功插入"+columns.size()+"条数据");
     }
+
+    private void doInsert(List<Cell<?>> row) {
+        //  todo
+    }
+
+
+    private void checkAndSwapRow(List<Cell<?>> row, List<Column> columns) throws MySQLException {
+        //  columns 和cell的数量一定是一样的
+        for (int i = 0; i < row.size(); i++) {
+            Cell<?> cell = row.get(i);
+            Cell<?> swapCell = columns.get(i).checkCellAndSwap(cell);
+            if (cell != swapCell) {
+                row.set(i, swapCell);
+            }
+        }
+    }
+
 
 }

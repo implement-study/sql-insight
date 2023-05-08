@@ -34,4 +34,9 @@ public class IntegerDefaultValue implements DefaultValue<Integer> {
     public Integer getValue() {
         return value;
     }
+
+    @Override
+    public Cell<Integer> toCell() {
+        return new IntCell(value);
+    }
 }

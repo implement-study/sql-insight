@@ -20,8 +20,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -102,4 +104,42 @@ public abstract class CollectionUtils {
         }
         return result;
     }
+
+
+    public static <K, V> Map<K, V> newHashMapWithExpectEntrySize(int entrySize) {
+        if (entrySize < 3) {
+            return new HashMap<>(4);
+        }
+        return new HashMap<>((int) (entrySize / 0.75F + 1));
+    }
+
+
+    /**
+     * 把一个collection按迭代器顺序创建索引
+     *
+     * @param collection
+     **/
+    public static <V, M> Map<M, Integer> indexCollection(Collection<V> collection, Function<V, M> map) {
+        if (map == null) {
+            throw new NullPointerException();
+        }
+        Map<M, Integer> indexMap = newHashMapWithExpectEntrySize(collection.size());
+        int index = 0;
+        for (V v : collection) {
+            indexMap.put(map.apply(v), index);
+            index++;
+        }
+        return indexMap;
+    }
+
+    public static <V> Map<V, Integer> indexCollection(Collection<V> collection) {
+        Map<V, Integer> indexMap = newHashMapWithExpectEntrySize(collection.size());
+        int index = 0;
+        for (V v : collection) {
+            indexMap.put(v, index);
+            index++;
+        }
+        return indexMap;
+    }
+
 }

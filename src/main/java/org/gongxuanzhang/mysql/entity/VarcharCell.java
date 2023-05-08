@@ -16,18 +16,28 @@
 
 package org.gongxuanzhang.mysql.entity;
 
-import lombok.Data;
 
 /**
  * var char单元格
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-@Data
 public class VarcharCell implements Cell<String> {
 
-    private final ColumnType type = ColumnType.VARCHAR;
 
     private final String value;
 
+    public VarcharCell(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public ColumnType getType() {
+        return ColumnType.VARCHAR;
+    }
+
+    @Override
+    public String getValue() {
+        return value;
+    }
 }

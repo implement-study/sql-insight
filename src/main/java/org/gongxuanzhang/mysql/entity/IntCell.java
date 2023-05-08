@@ -16,18 +16,38 @@
 
 package org.gongxuanzhang.mysql.entity;
 
-import lombok.Data;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 
 /**
  * int单元格
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-@Data
 public class IntCell implements Cell<Integer> {
 
-    private final ColumnType type = ColumnType.INT;
 
     private final Integer value;
 
+    public IntCell(Integer value) {
+        this.value = value;
+    }
+
+    public IntCell(Cell<?> cell) throws MySQLException {
+        try {
+            this.value = Integer.parseInt(cell.getValue().toString());
+        } catch (NumberFormatException e) {
+            throw new MySQLException(cell.getValue() + "不能转换成int");
+        }
+
+    }
+
+    @Override
+    public ColumnType getType() {
+        return ColumnType.INT;
+    }
+
+    @Override
+    public Integer getValue() {
+        return value;
+    }
 }

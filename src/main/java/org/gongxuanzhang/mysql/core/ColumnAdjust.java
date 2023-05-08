@@ -37,6 +37,7 @@ import java.util.Map;
  * @author gongxuanzhang
  */
 @DependOnContext
+@Deprecated
 public class ColumnAdjust {
 
     private final Map<Integer, String> indexColMap;
@@ -55,14 +56,15 @@ public class ColumnAdjust {
     public ColumnAdjust(InsertInfo insertInfo) {
         this.insertInfo = insertInfo;
         this.tableInfo = insertInfo.getTableInfo();
-        List<String> colList = insertInfo.getColumns();
+        //  List<String> colList = insertInfo.getColumns();
+        List<String> colList = new ArrayList<>();
         this.indexColMap = new HashMap<>(colList.size());
         for (int i = 0; i < colList.size(); i++) {
             this.indexColMap.put(i, colList.get(i));
         }
         this.incrementKey = tableInfo.getIncrementKey();
         this.defaultValue = new HashMap<>();
-        tableInfo.getColumnInfos().stream()
+        tableInfo.getColumns().stream()
                 .filter(columnInfo -> columnInfo.getDefaultValue() != null)
                 .forEach((columnInfo -> defaultValue.put(columnInfo.getName(), columnInfo.getDefaultValue())));
 

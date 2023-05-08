@@ -14,27 +14,21 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.storage.fool;
+package org.gongxuanzhang.mysql.entity;
 
-import org.gongxuanzhang.mysql.connection.Connection;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+/**
+ * null cell
+ * @author gxz gongxuanzhang@foxmail.com
+ **/
+public final class NullCell implements Cell<Object> {
 
-
-@SpringBootTest
-class FoolTruncateTest {
-
-    @Test
-    public void truncate(@Autowired Connection connection) {
-        String sql = "truncate table aa.user";
-        connection.execute(sql);
+    @Override
+    public ColumnType getType() {
+        return ColumnType.NULL;
     }
 
-    @Test
-    public void truncateError(@Autowired Connection connection) {
-        String sql = "truncate table aa.user 1";
-        System.out.println(connection.execute(sql));
+    @Override
+    public Object getValue() {
+        return null;
     }
-
 }

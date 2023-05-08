@@ -90,6 +90,22 @@ public interface Result {
     }
 
     /**
+     * 错误返回
+     *
+     * @param errorMessage 错误信息
+     * @return 错误返回
+     **/
+    static Result error(String errorMessage) {
+        try {
+            String sql = SessionManager.currentSession().getSql();
+            return new ErrorResult(errorMessage, sql);
+        } catch (SessionException e) {
+            return new ErrorResult("会话异常", "unknown");
+        }
+
+    }
+
+    /**
      * 携带信息的返回值
      * 如 插入 修改时
      *
@@ -105,22 +121,6 @@ public interface Result {
         } catch (SessionException e) {
             return new ErrorResult("会话异常", "unknown");
         }
-    }
-
-    /**
-     * 错误返回
-     *
-     * @param errorMessage 错误信息
-     * @return 错误返回
-     **/
-    static Result error(String errorMessage) {
-        try {
-            String sql = SessionManager.currentSession().getSql();
-            return new ErrorResult(errorMessage, sql);
-        } catch (SessionException e) {
-            return new ErrorResult("会话异常", "unknown");
-        }
-
     }
 
     /**

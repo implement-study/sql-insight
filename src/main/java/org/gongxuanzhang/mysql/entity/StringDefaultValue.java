@@ -34,4 +34,9 @@ public class StringDefaultValue implements DefaultValue<String> {
     public String getValue() {
         return value;
     }
+
+    @Override
+    public Cell<String> toCell() {
+        return new VarcharCell(value);
+    }
 }
