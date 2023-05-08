@@ -50,12 +50,19 @@ public class MySqlSession {
         attr.put(key, value);
     }
 
-    public String get(String key) {
-        return attr.get(key);
+    /**
+     * 切换数据库
+     *
+     * @return 切换成功返回true 切换失败或者没有转换返回false
+     **/
+    public boolean useDatabase(DatabaseInfo database) {
+        boolean result = this.database != database;
+        this.database = database;
+        return result;
     }
 
-    public void useDatabase(DatabaseInfo database) {
-        this.database = database;
+    public String get(String key) {
+        return attr.get(key);
     }
 
     public void setSql(String sql) {
