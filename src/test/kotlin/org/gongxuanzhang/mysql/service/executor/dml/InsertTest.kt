@@ -17,13 +17,13 @@
 package org.gongxuanzhang.mysql.service.executor.dml
 
 import org.gongxuanzhang.mysql.doSql
-import org.gongxuanzhang.mysql.service.executor.ddl.table.CreateTableTest
+import org.gongxuanzhang.mysql.tool.TestGod
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 
 
 /**
- * @author gongxuanzhang
+ * @author gongxuanzhangmelt@gmail.com
  */
 @SpringBootTest
 class InsertTest {
@@ -32,16 +32,16 @@ class InsertTest {
 
     @Test
     fun simpleCreateDatabase() {
-        CreateTableTest().createTableTest()
+        val testGod = TestGod()
+        testGod.prepareGodTable()
         """
-            insert into create_database.create_test_table_user (id,age,name,gender,id_card) 
+            insert into ${testGod.fullName} (id,age,name,gender,id_card) 
             values(1,18,'zhangsan','男','abcd'),
                (2,24,'lisi','女','abcd'),
                (3,25,'wangwu',NULL,'afff')
             
         """.doSql()
     }
-
 
 
 
