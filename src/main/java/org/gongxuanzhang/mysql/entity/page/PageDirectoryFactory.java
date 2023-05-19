@@ -33,7 +33,8 @@ public class PageDirectoryFactory implements ByteBeanFactory<PageDirectory> {
 
 
     @Override
-    public PageDirectory swap(PageDirectory bean, byte[] bytes) {
+    public PageDirectory swap(byte[] bytes) {
+        PageDirectory bean = new PageDirectory();
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         short[] slots = new short[bytes.length / 2];
         for (int i = bytes.length / 2; i > 0; i--) {

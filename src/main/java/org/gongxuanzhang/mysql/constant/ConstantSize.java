@@ -55,4 +55,8 @@ public enum ConstantSize {
             throw new IllegalArgumentException(this.getDesc() + "大小必须是" + this.getSize() + "字节");
         }
     }
+
+    public byte[] emptyBuff() {
+        return new byte[this.size];
+    }
 }

@@ -30,7 +30,8 @@ import java.nio.charset.StandardCharsets;
 public class InfimumFactory implements ByteBeanFactory<Infimum> {
 
     @Override
-    public Infimum swap(Infimum bean, byte[] bytes) {
+    public Infimum swap(byte[] bytes) {
+        Infimum bean = new Infimum();
         ConstantSize.INFIMUM.checkSize(bytes);
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         byte[] headBuffer = new byte[ConstantSize.RECORD_HEADER.getSize()];

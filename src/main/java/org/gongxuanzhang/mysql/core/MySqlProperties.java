@@ -50,7 +50,7 @@ public enum MySqlProperties {
     /**
      * 默认存储引擎
      **/
-    STORAGE_ENGINE("storage_engine","innodb",false);
+    STORAGE_ENGINE("storage_engine", "innodb", false);
 
     public final String key;
 

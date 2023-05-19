@@ -122,9 +122,9 @@ public class Column implements ExecuteInfo {
 
     private void analysisType(SQLDataType dataType) throws SqlParseException {
         this.type = ColumnType.valueOf(dataType.getName().toUpperCase());
-        if (!dataType.hasKeyLength()) {
-            SqlAssert.isTure(length != 1, this.name + " type: " + dataType.getName() + "没有长度");
+        if (CollectionUtils.isEmpty(dataType.getArguments())) {
             this.length = type.getLength();
+            SqlAssert.isTure(length != 1, this.name + " type: " + dataType.getName() + "没有长度");
             return;
         }
         SQLExpr sqlExpr = dataType.getArguments().get(0);

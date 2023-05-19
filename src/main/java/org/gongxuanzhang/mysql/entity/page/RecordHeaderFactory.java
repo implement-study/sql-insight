@@ -34,10 +34,9 @@ public class RecordHeaderFactory implements ByteBeanFactory<RecordHeader> {
     private static final byte MAX_RECORD_HEAP_NO = 0b00001_011;
 
     @Override
-    public RecordHeader swap(RecordHeader bean, byte[] bytes) {
+    public RecordHeader swap(byte[] bytes) {
         ConstantSize.RECORD_HEADER.checkSize(bytes);
-        bean.source.put(bytes);
-        return bean;
+        return new RecordHeader(bytes);
     }
 
     @Override

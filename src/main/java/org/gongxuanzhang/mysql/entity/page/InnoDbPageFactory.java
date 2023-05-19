@@ -37,7 +37,8 @@ public class InnoDbPageFactory implements ByteBeanFactory<InnoDbPage> {
 
 
     @Override
-    public InnoDbPage swap(InnoDbPage bean, byte[] bytes) {
+    public InnoDbPage swap(byte[] bytes) {
+        InnoDbPage bean = new InnoDbPage();
         ConstantSize.PAGE.checkSize(bytes);
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
 
@@ -45,25 +46,25 @@ public class InnoDbPageFactory implements ByteBeanFactory<InnoDbPage> {
         byte[] candidate = new byte[FILE_HEADER.getSize()];
         buffer.get(candidate);
         FileHeaderFactory fileHeaderFactory = new FileHeaderFactory();
-        fileHeaderFactory.swap(bean.getFileHeader(), candidate);
+        bean.setFileHeader(fileHeaderFactory.swap(candidate));
 
         //  page header
         candidate = new byte[PAGE_HEADER.getSize()];
         buffer.get(candidate);
         PageHeaderFactory pageHeaderFactory = new PageHeaderFactory();
-        pageHeaderFactory.swap(bean.getPageHeader(), candidate);
+        bean.setPageHeader(pageHeaderFactory.swap(candidate));
 
         //  infimum
         candidate = new byte[INFIMUM.getSize()];
         buffer.get(candidate);
         InfimumFactory infimumFactory = new InfimumFactory();
-        infimumFactory.swap(bean.getInfimum(), candidate);
+        bean.setInfimum(infimumFactory.swap(candidate));
 
         //  supremum
         candidate = new byte[SUPREMUM.getSize()];
         buffer.get(candidate);
         SupremumFactory supremumFactory = new SupremumFactory();
-        supremumFactory.swap(bean.getSupremum(), candidate);
+        bean.setSupremum(supremumFactory.swap(candidate));
 
         //  user records 使用
         short heapTop = bean.pageHeader.getHeapTop();
@@ -71,7 +72,7 @@ public class InnoDbPageFactory implements ByteBeanFactory<InnoDbPage> {
         candidate = new byte[userRecordLength];
         buffer.get(candidate);
         UserRecordsFactory userRecordsFactory = new UserRecordsFactory();
-        userRecordsFactory.swap(bean.getUserRecords(), candidate);
+        bean.setUserRecords(userRecordsFactory.swap(candidate));
 
         //  此时需要从后面往前读，因为不知道空闲空间有多少
         //  file trailer
@@ -81,7 +82,7 @@ public class InnoDbPageFactory implements ByteBeanFactory<InnoDbPage> {
         candidate = new byte[ConstantSize.FILE_TRAILER.getSize()];
         buffer.get(candidate);
         FileTrailerFactory trailerFactory = new FileTrailerFactory();
-        trailerFactory.swap(bean.getFileTrailer(), candidate);
+        bean.setFileTrailer(trailerFactory.swap(candidate));
         // page directory
         //   减2是因为slot里面是short  一个short 两个字节
         int shortLength = 2;

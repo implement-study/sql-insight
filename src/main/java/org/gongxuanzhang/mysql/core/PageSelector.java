@@ -14,33 +14,21 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.entity.page;
+package org.gongxuanzhang.mysql.core;
 
-import java.nio.ByteBuffer;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 
 /**
- * File Trailer 工厂 {@link FileTrailer}
+ * 页选择器
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class FileTrailerFactory implements ByteBeanFactory<FileTrailer> {
+public interface PageSelector {
 
-    @Override
-    public FileTrailer swap(byte[] bytes) {
-        FileTrailer bean = new FileTrailer();
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        bean.checkSum = buffer.getInt();
-        bean.lsn = buffer.getInt();
-        return bean;
-    }
+    /**
+     * @return 页的字节数组
+     **/
+    byte[] getRootPage() throws MySQLException;
 
-    @Override
-    public FileTrailer create() {
-        FileTrailer fileTrailer = new FileTrailer();
-        fileTrailer.setCheckSum(0);
-        fileTrailer.setLsn(0);
-        return fileTrailer;
-    }
 
 }
-

@@ -14,33 +14,23 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.entity.page;
-
-import java.nio.ByteBuffer;
+package org.gongxuanzhang.mysql.exception;
 
 /**
- * File Trailer 工厂 {@link FileTrailer}
- *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class FileTrailerFactory implements ByteBeanFactory<FileTrailer> {
+public class LambdaExpectionRuntimeWrapper extends RuntimeException {
 
-    @Override
-    public FileTrailer swap(byte[] bytes) {
-        FileTrailer bean = new FileTrailer();
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        bean.checkSum = buffer.getInt();
-        bean.lsn = buffer.getInt();
-        return bean;
+    private final Exception e;
+
+    public LambdaExpectionRuntimeWrapper(Exception e) {
+        super(e);
+        this.e = e;
     }
 
-    @Override
-    public FileTrailer create() {
-        FileTrailer fileTrailer = new FileTrailer();
-        fileTrailer.setCheckSum(0);
-        fileTrailer.setLsn(0);
-        return fileTrailer;
+    public void wrapMySQLException() throws MySQLException {
+        throw new MySQLException(this.e);
     }
+
 
 }
-

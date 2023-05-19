@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.mysql.storage.innodb;
 
+import org.gongxuanzhang.mysql.core.InnoDbPageSelector;
 import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.entity.Cell;
 import org.gongxuanzhang.mysql.entity.Column;
@@ -36,15 +37,19 @@ public class InnoDbInsert implements InsertEngine {
     @Override
     public Result insert(InsertInfo info) throws MySQLException {
         List<Column> columns = info.getTableInfo().getColumns();
+        InnoDbPageSelector selector = InnoDbPageSelector.open(info.getTableInfo());
         for (List<Cell<?>> row : info.getInsertData()) {
             checkAndSwapRow(row, columns);
-            doInsert(row);
+            doInsert(row, selector);
         }
         return Result.info("成功插入" + columns.size() + "条数据");
     }
 
-    private void doInsert(List<Cell<?>> row) {
-        //  todo
+    private void doInsert(List<Cell<?>> row, InnoDbPageSelector selector) throws MySQLException {
+        //  拿到此条对应的insert page
+        //  修改byte[]
+        byte[] rootPage = selector.getRootPage();
+
         System.out.println(row);
     }
 

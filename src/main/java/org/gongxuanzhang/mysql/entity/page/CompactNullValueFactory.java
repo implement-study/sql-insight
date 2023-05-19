@@ -27,11 +27,10 @@ public class CompactNullValueFactory implements ByteBeanFactory<CompactNullValue
 
 
     @Override
-    public CompactNullValue swap(CompactNullValue bean, byte[] bytes) {
+    public CompactNullValue swap(byte[] bytes) {
         ConstantSize.COMPACT_NULL.checkSize(bytes);
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        bean.value = buffer.getShort();
-        return bean;
+        return new CompactNullValue(buffer.getShort());
     }
 
     @Override

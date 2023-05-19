@@ -26,8 +26,8 @@ public class VariablesFactory implements ByteBeanFactory<Variables> {
 
 
     @Override
-    public Variables swap(Variables bean, byte[] bytes) {
-        bean.varBytes = bytes;
+    public Variables swap(byte[] bytes) {
+        Variables bean = new Variables(bytes);
         return bean;
     }
 

@@ -27,32 +27,33 @@ import java.nio.ByteBuffer;
 public class CompactFactory implements ByteBeanFactory<Compact> {
 
     @Override
-    public Compact swap(Compact bean, byte[] bytes) {
+    public Compact swap(byte[] bytes) {
+        Compact compact = new Compact();
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         byte[] headBuffer = new byte[ConstantSize.RECORD_HEADER.getSize()];
         buffer.get(headBuffer);
-        bean.recordHeader = new RecordHeader(headBuffer);
+        compact.recordHeader = new RecordHeader(headBuffer);
         byte varLength = buffer.get();
         VariablesFactory variablesFactory = new VariablesFactory();
         if (varLength == 0) {
-            variablesFactory.swap(bean.variables, new byte[0]);
+            compact.variables = variablesFactory.swap(new byte[0]);
         } else {
             byte[] varBytes = new byte[varLength];
             buffer.get(varBytes);
-            variablesFactory.swap(bean.variables, varBytes);
+            compact.variables = variablesFactory.swap(varBytes);
         }
-        bean.nullValues = new CompactNullValue(buffer.getShort());
+        compact.nullValues = new CompactNullValue(buffer.getShort());
         byte[] candidateBuffer = new byte[6];
         buffer.get(candidateBuffer);
-        bean.rowId = BitUtils.joinLong(candidateBuffer);
+        compact.rowId = BitUtils.joinLong(candidateBuffer);
         buffer.get(candidateBuffer);
-        bean.transactionId = BitUtils.joinLong(candidateBuffer);
+        compact.transactionId = BitUtils.joinLong(candidateBuffer);
         candidateBuffer = new byte[7];
         buffer.get(candidateBuffer);
-        bean.rollPointer = BitUtils.joinLong(candidateBuffer);
-        bean.body = new byte[buffer.remaining()];
-        buffer.get(bean.body);
-        return bean;
+        compact.rollPointer = BitUtils.joinLong(candidateBuffer);
+        compact.body = new byte[buffer.remaining()];
+        buffer.get(compact.body);
+        return compact;
     }
 
     @Override

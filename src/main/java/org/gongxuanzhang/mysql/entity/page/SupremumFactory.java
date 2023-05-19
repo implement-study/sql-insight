@@ -30,7 +30,8 @@ import java.nio.charset.StandardCharsets;
 public class SupremumFactory implements ByteBeanFactory<Supremum> {
 
     @Override
-    public Supremum swap(Supremum bean, byte[] bytes) {
+    public Supremum swap(byte[] bytes) {
+        Supremum bean = new Supremum();
         ConstantSize.SUPREMUM.checkSize(bytes);
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         byte[] headBuffer = new byte[ConstantSize.RECORD_HEADER.getSize()];

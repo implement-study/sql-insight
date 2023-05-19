@@ -18,6 +18,7 @@ package org.gongxuanzhang.mysql.entity;
 
 /**
  * null cell
+ *
  * @author gxz gongxuanzhang@foxmail.com
  **/
 public final class NullCell implements Cell<Object> {

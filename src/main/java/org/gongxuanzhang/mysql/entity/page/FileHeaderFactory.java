@@ -33,7 +33,8 @@ public class FileHeaderFactory implements ByteBeanFactory<FileHeader> {
 
 
     @Override
-    public FileHeader swap(FileHeader bean, byte[] bytes) {
+    public FileHeader swap(byte[] bytes) {
+        FileHeader bean = new FileHeader();
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         bean.checkSum = buffer.getInt();
         bean.offset = buffer.getInt();

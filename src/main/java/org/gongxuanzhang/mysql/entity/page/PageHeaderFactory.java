@@ -28,7 +28,8 @@ import java.nio.ByteBuffer;
 public class PageHeaderFactory implements ByteBeanFactory<PageHeader> {
 
     @Override
-    public PageHeader swap(PageHeader bean, byte[] bytes) {
+    public PageHeader swap(byte[] bytes) {
+        PageHeader bean = new PageHeader();
         ConstantSize.PAGE_HEADER.checkSize(bytes);
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         bean.slotCount = buffer.getShort();

@@ -339,7 +339,6 @@ public class TokenSupport {
     }
 
 
-
     /**
      * 分析token  解析出 数据库和表名
      * 填充到表信息中

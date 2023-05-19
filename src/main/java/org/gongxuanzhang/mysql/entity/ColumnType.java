@@ -20,6 +20,7 @@ package org.gongxuanzhang.mysql.entity;
 /**
  * 列类型
  * 有一个默认长度，如果默认长度是-1 表示用户必须输入
+ *
  * @author gxz gongxuanzhang@foxmail.com
  **/
 public enum ColumnType {
@@ -31,7 +32,7 @@ public enum ColumnType {
     /**
      * 字符串
      **/
-    VARCHAR(255),
+    VARCHAR(255, true),
     /**
      * 时间戳
      **/
@@ -44,9 +45,21 @@ public enum ColumnType {
 
     private final int length;
 
+    /**
+     * 是否是变长字段
+     **/
+    private final boolean dynamic;
+
+    ColumnType(int length, boolean dynamic) {
+        this.length = length;
+        this.dynamic = dynamic;
+    }
+
     ColumnType(int length) {
         this.length = length;
+        this.dynamic = false;
     }
+
 
     public int getLength() {
         return length;

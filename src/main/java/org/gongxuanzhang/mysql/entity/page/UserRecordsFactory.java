@@ -25,9 +25,8 @@ public class UserRecordsFactory implements ByteBeanFactory<UserRecords> {
 
 
     @Override
-    public UserRecords swap(UserRecords bean, byte[] bytes) {
-        bean.source = bytes;
-        return bean;
+    public UserRecords swap(byte[] bytes) {
+        return new UserRecords(bytes);
     }
 
     /**
