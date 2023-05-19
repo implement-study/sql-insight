@@ -37,7 +37,11 @@ public enum PageType {
     /**
      * 数据页，这个值是按照MySQL标准来的
      **/
-    FIL_PAGE_INDEX((short) 0X45bf);
+    FIL_PAGE_INDEX((short) 0X45bf),
+    /**
+     * 索引页
+     **/
+    FIL_PAGE_INODE((short) 0x0003);
 
 
     private final short value;

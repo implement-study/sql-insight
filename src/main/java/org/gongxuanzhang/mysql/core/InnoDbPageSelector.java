@@ -18,6 +18,9 @@ package org.gongxuanzhang.mysql.core;
 
 import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
+import org.gongxuanzhang.mysql.entity.page.InnoDbPageFactory;
+import org.gongxuanzhang.mysql.entity.page.PageType;
 import org.gongxuanzhang.mysql.exception.LambdaExceptionRuntimeWrapper;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.tool.ExceptionThrower;
@@ -35,12 +38,11 @@ public class InnoDbPageSelector implements PageSelector {
 
     private final static Map<String, InnoDbPageSelector> INSTANCE_CACHE = new ConcurrentHashMap<>();
 
-    private final TableInfo tableInfo;
-
     private final RandomAccessFile pageFile;
 
+    private final InnoDbPageFactory innoDbPageFactory = new InnoDbPageFactory();
+
     private InnoDbPageSelector(TableInfo tableInfo) throws MySQLException {
-        this.tableInfo = tableInfo;
         try {
             this.pageFile = new RandomAccessFile(tableInfo.dataFile(), "rw");
         } catch (FileNotFoundException e) {
@@ -75,5 +77,17 @@ public class InnoDbPageSelector implements PageSelector {
             ExceptionThrower.errorSwap(e);
         }
         return rootPage;
+    }
+
+    @Override
+    public byte[] getLastPage() throws MySQLException {
+        byte[] rootPageBuffer = getRootPage();
+        InnoDbPage rootPage = this.innoDbPageFactory.swap(rootPageBuffer);
+        if (rootPage.getFileHeader().getPageType() == PageType.FIL_PAGE_INDEX.getValue()) {
+            return rootPageBuffer;
+        }
+        //  todo  这里如果是目录  需要继续找
+        return null;
+
     }
 }

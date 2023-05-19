@@ -50,8 +50,14 @@ public class InnoDbInsert implements InsertEngine {
     private void doInsert(List<Cell<?>> row, InnoDbPageSelector selector) throws MySQLException {
         //  拿到此条对应的insert page
         //  修改byte[]
-        byte[] rootPageByte = selector.getRootPage();
-        InnoDbPage rootPage = new InnoDbPageFactory().swap(rootPageByte);
+        byte[] lastPageBuffer = selector.getLastPage();
+        InnoDbPage lastPage = new InnoDbPageFactory().swap(lastPageBuffer);
+        //  判断这里是否还有空
+
+        //  插入之后转换
+
+        //  变成字节数组写回去
+
         System.out.println(row);
     }
 

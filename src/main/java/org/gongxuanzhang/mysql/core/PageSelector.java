@@ -26,9 +26,20 @@ import org.gongxuanzhang.mysql.exception.MySQLException;
 public interface PageSelector {
 
     /**
+     * 拿到根页
+     *
      * @return 页的字节数组
+     * @throws MySQLException 过程中可能出现异常
      **/
     byte[] getRootPage() throws MySQLException;
+
+    /**
+     * 拿到当前最后一页
+     *
+     * @return 页的字节数组
+     * @throws MySQLException 过程中可能出现异常
+     **/
+    byte[] getLastPage() throws MySQLException;
 
 
 }
