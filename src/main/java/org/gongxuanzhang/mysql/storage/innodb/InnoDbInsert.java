@@ -45,6 +45,7 @@ public class InnoDbInsert implements InsertEngine {
 
     private void doInsert(List<Cell<?>> row) {
         //  todo
+        System.out.println(row);
     }
 
 

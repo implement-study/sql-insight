@@ -51,7 +51,6 @@ public class InsertInfo implements ExecuteInfo, TableInfoBox {
     public InsertInfo(MySqlInsertStatement insertStatement) throws MySQLException {
         this.tableInfo = TableInfoUtils.selectTableInfo(insertStatement.getTableName().toString());
         fillInsertColumns(insertStatement);
-        System.out.println(1);
     }
 
     private void fillInsertColumns(MySqlInsertStatement insertStatement) throws MySQLException {

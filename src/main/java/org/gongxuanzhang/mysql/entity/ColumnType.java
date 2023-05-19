@@ -19,7 +19,7 @@ package org.gongxuanzhang.mysql.entity;
 
 /**
  * 列类型
- *
+ * 有一个默认长度，如果默认长度是-1 表示用户必须输入
  * @author gxz gongxuanzhang@foxmail.com
  **/
 public enum ColumnType {
@@ -27,19 +27,28 @@ public enum ColumnType {
     /**
      * 数字
      **/
-    INT,
+    INT(4),
     /**
      * 字符串
      **/
-    VARCHAR,
+    VARCHAR(255),
     /**
      * 时间戳
      **/
-    TIMESTAMP,
+    TIMESTAMP(-1),
     /**
      * null
      **/
-    NULL,
+    NULL(-1);
 
 
+    private final int length;
+
+    ColumnType(int length) {
+        this.length = length;
+    }
+
+    public int getLength() {
+        return length;
+    }
 }

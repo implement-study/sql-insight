@@ -27,6 +27,7 @@ import com.alibaba.druid.sql.ast.statement.SQLNotNullConstraint;
 import lombok.Data;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.SqlParseException;
+import org.gongxuanzhang.mysql.tool.SqlAssert;
 import org.gongxuanzhang.mysql.tool.SqlUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -58,9 +59,9 @@ public class Column implements ExecuteInfo {
 
     public Column(SQLColumnDefinition definition) throws SqlParseException {
         this.autoIncrement = definition.isAutoIncrement();
+        this.name = SqlUtils.trimSqlEsc(definition.getColumnName());
         analysisType(definition.getDataType());
         analysisConstraint(definition.getConstraints());
-        this.name = SqlUtils.trimSqlEsc(definition.getColumnName());
         analysisDefault(definition.getDefaultExpr());
         if (definition.getComment() != null) {
             this.comment = SqlUtils.trimSqlEsc(definition.getComment().toString());
@@ -121,15 +122,14 @@ public class Column implements ExecuteInfo {
 
     private void analysisType(SQLDataType dataType) throws SqlParseException {
         this.type = ColumnType.valueOf(dataType.getName().toUpperCase());
-        if (!CollectionUtils.isEmpty(dataType.getArguments())) {
-            SQLExpr sqlExpr = dataType.getArguments().get(0);
-            if (sqlExpr instanceof SQLIntegerExpr) {
-                this.length = (Integer) ((SQLIntegerExpr) sqlExpr).getValue();
-                if (this.length >= MAX_SIZE) {
-                    throw new SqlParseException("暂不支持超过" + MAX_SIZE + "长度的字符串");
-                }
-            }
+        if (!dataType.hasKeyLength()) {
+            SqlAssert.isTure(length != 1, this.name + " type: " + dataType.getName() + "没有长度");
+            this.length = type.getLength();
+            return;
         }
+        SQLExpr sqlExpr = dataType.getArguments().get(0);
+        this.length = (Integer) ((SQLIntegerExpr) sqlExpr).getValue();
+        SqlAssert.between(1, MAX_SIZE, this.length);
     }
 
 }
