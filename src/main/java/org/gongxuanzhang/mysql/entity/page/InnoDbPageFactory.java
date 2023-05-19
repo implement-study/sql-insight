@@ -19,8 +19,6 @@ package org.gongxuanzhang.mysql.entity.page;
 import org.gongxuanzhang.mysql.constant.ConstantSize;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.gongxuanzhang.mysql.constant.ConstantSize.FILE_HEADER;
 import static org.gongxuanzhang.mysql.constant.ConstantSize.INFIMUM;
@@ -74,37 +72,23 @@ public class InnoDbPageFactory implements ByteBeanFactory<InnoDbPage> {
         UserRecordsFactory userRecordsFactory = new UserRecordsFactory();
         bean.setUserRecords(userRecordsFactory.swap(candidate));
 
-        //  此时需要从后面往前读，因为不知道空闲空间有多少
-        //  file trailer
-        int freeMark = buffer.position();
+        short slotCount = bean.pageHeader.slotCount;
+        short slotByteLength = (short) (slotCount * 2);
 
-        buffer.position(buffer.capacity() - candidate.length);
+        short freeLength = (short) (buffer.remaining() - slotByteLength - ConstantSize.FILE_TRAILER.getSize());
+        buffer.position(buffer.position() + freeLength);
+        bean.setFreeSpace(freeLength);
+
+        candidate = new byte[slotByteLength];
+        buffer.get(candidate);
+        PageDirectory pd = new PageDirectoryFactory().swap(candidate);
+        bean.setPageDirectory(pd);
+
         candidate = new byte[ConstantSize.FILE_TRAILER.getSize()];
         buffer.get(candidate);
         FileTrailerFactory trailerFactory = new FileTrailerFactory();
-        bean.setFileTrailer(trailerFactory.swap(candidate));
-        // page directory
-        //   减2是因为slot里面是short  一个short 两个字节
-        int shortLength = 2;
-        buffer.position(buffer.capacity() - candidate.length - shortLength);
-        int position = buffer.position();
-        List<Short> slots = new ArrayList<>();
-        while (true) {
-            short slot = buffer.getShort();
-            slots.add(slot);
-            //  当槽位指向上确界的时候跳出循环 上确界的位置是 file header + page header 剩下的都是空闲空间
-            if (slot == FILE_HEADER.getSize() + PAGE_HEADER.getSize()) {
-                break;
-            }
-            position = position - shortLength;
-            buffer.position(position);
-        }
-        short[] finalSlots = new short[slots.size()];
-        for (int i = 0; i < slots.size(); i++) {
-            finalSlots[i] = slots.get(i);
-        }
-        bean.pageDirectory.setSlots(finalSlots);
-        bean.freeSpace = (short) (position - freeMark);
+        FileTrailer fileTrailer = trailerFactory.swap(candidate);
+        bean.setFileTrailer(fileTrailer);
         return bean;
     }
 

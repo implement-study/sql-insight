@@ -18,7 +18,7 @@ package org.gongxuanzhang.mysql.core;
 
 import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.entity.TableInfo;
-import org.gongxuanzhang.mysql.exception.LambdaExpectionRuntimeWrapper;
+import org.gongxuanzhang.mysql.exception.LambdaExceptionRuntimeWrapper;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.tool.ExceptionThrower;
 
@@ -55,10 +55,10 @@ public class InnoDbPageSelector implements PageSelector {
                 try {
                     return new InnoDbPageSelector(tableInfo);
                 } catch (MySQLException e) {
-                    throw new LambdaExpectionRuntimeWrapper(e);
+                    throw new LambdaExceptionRuntimeWrapper(e);
                 }
             });
-        } catch (LambdaExpectionRuntimeWrapper e) {
+        } catch (LambdaExceptionRuntimeWrapper e) {
             e.wrapMySQLException();
         }
         return null;

@@ -59,4 +59,9 @@ public class Infimum implements ByteSwappable, ShowLength {
         buffer.put(this.body);
         return buffer.array();
     }
+
+    @Override
+    public String toString() {
+        return this.recordHeader.toString() + "[body:" + new String(this.body) + "]";
+    }
 }

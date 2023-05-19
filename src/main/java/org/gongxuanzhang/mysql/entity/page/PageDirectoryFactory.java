@@ -37,8 +37,8 @@ public class PageDirectoryFactory implements ByteBeanFactory<PageDirectory> {
         PageDirectory bean = new PageDirectory();
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         short[] slots = new short[bytes.length / 2];
-        for (int i = bytes.length / 2; i > 0; i--) {
-            slots[i] = buffer.getShort();
+        for (int i = 0; i < (bytes.length / 2); i++) {
+            slots[slots.length - 1 - i] = buffer.getShort();
         }
         bean.slots = slots;
         return bean;

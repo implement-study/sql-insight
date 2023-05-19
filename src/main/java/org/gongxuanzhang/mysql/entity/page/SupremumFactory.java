@@ -53,7 +53,7 @@ public class SupremumFactory implements ByteBeanFactory<Supremum> {
 
     private byte[] infimumInitBody() {
         ByteBuffer bodyBuffer = ByteBuffer.allocate(ConstantSize.INFIMUM_BODY.getSize());
-        bodyBuffer.put(Infimum.INFIMUM_BODY.getBytes(StandardCharsets.UTF_8));
+        bodyBuffer.put(Supremum.SUPREMUM_BODY.getBytes(StandardCharsets.UTF_8));
         return bodyBuffer.array();
     }
 }

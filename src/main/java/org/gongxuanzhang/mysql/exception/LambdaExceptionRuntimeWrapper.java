@@ -19,11 +19,11 @@ package org.gongxuanzhang.mysql.exception;
 /**
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class LambdaExpectionRuntimeWrapper extends RuntimeException {
+public class LambdaExceptionRuntimeWrapper extends RuntimeException {
 
     private final Exception e;
 
-    public LambdaExpectionRuntimeWrapper(Exception e) {
+    public LambdaExceptionRuntimeWrapper(Exception e) {
         super(e);
         this.e = e;
     }

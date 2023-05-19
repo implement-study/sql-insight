@@ -18,6 +18,8 @@ package org.gongxuanzhang.mysql.tool;
 
 import org.springframework.util.Assert;
 
+import java.nio.ByteBuffer;
+
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
@@ -101,6 +103,43 @@ public class BitUtils {
             result |= aByte;
         }
         return result;
+    }
+
+
+    public static byte[] readLast(ByteBuffer byteBuffer, int length) {
+        return readLast(byteBuffer, length, 0);
+    }
+
+
+    /**
+     * 把一个长度为2的字节数组转成一个short
+     *
+     * @param shortBytes 字节数组 长度必须是2
+     * @return short
+     **/
+    public static short swapShort(byte[] shortBytes) {
+        if (shortBytes.length != 2) {
+            throw new IllegalArgumentException("shortBytes 长度必须是2");
+        }
+        return (short) ((shortBytes[0] << 8) | (shortBytes[1] & 0xff));
+    }
+
+    /**
+     * 从后读取buffer
+     * 不会调整buffer中的指针
+     *
+     * @param byteBuffer buffer
+     * @param length     长度
+     * @param offset     尾部偏移
+     * @return 返回长度读取的byte
+     **/
+    public static byte[] readLast(ByteBuffer byteBuffer, int length, int offset) {
+        if (byteBuffer.capacity() < length + offset) {
+            throw new IllegalArgumentException("byte buffer 没有这么长！ " + (length + offset));
+        }
+        byte[] resultBuffer = new byte[length];
+        byteBuffer.get(resultBuffer, byteBuffer.capacity() - length - offset, length);
+        return resultBuffer;
     }
 
 

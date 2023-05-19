@@ -21,6 +21,8 @@ import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.entity.Cell;
 import org.gongxuanzhang.mysql.entity.Column;
 import org.gongxuanzhang.mysql.entity.InsertInfo;
+import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
+import org.gongxuanzhang.mysql.entity.page.InnoDbPageFactory;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.storage.InsertEngine;
 
@@ -48,8 +50,8 @@ public class InnoDbInsert implements InsertEngine {
     private void doInsert(List<Cell<?>> row, InnoDbPageSelector selector) throws MySQLException {
         //  拿到此条对应的insert page
         //  修改byte[]
-        byte[] rootPage = selector.getRootPage();
-
+        byte[] rootPageByte = selector.getRootPage();
+        InnoDbPage rootPage = new InnoDbPageFactory().swap(rootPageByte);
         System.out.println(row);
     }
 

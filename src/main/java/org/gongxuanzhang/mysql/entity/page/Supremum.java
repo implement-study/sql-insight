@@ -29,6 +29,8 @@ import java.nio.ByteBuffer;
  **/
 public class Supremum implements ShowLength, ByteSwappable {
 
+    public static final String SUPREMUM_BODY = "supremum";
+
     /**
      * 记录头信息 5字节
      **/
@@ -51,5 +53,10 @@ public class Supremum implements ShowLength, ByteSwappable {
         buffer.put(recordHeader.toBytes());
         buffer.put(body);
         return buffer.array();
+    }
+
+    @Override
+    public String toString() {
+        return this.recordHeader.toString() + "[body:" + new String(this.body) + "]";
     }
 }
