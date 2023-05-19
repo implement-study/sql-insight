@@ -40,7 +40,7 @@ public class InnoDbInsert implements InsertEngine {
             checkAndSwapRow(row, columns);
             doInsert(row);
         }
-        return Result.info("成功插入"+columns.size()+"条数据");
+        return Result.info("成功插入" + columns.size() + "条数据");
     }
 
     private void doInsert(List<Cell<?>> row) {

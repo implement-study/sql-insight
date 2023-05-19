@@ -128,14 +128,14 @@ class CreateTableTest {
         assertEquals(select.database.databaseName, database)
         assertEquals(select.tableName, tableName)
         assertEquals(select.comment, "用户表")
-        assertEquals(select.columnInfos[0], run {
+        assertEquals(select.columns[0], run {
             val column = Column()
             column.name = "id"
             column.type = ColumnType.INT
             column.isAutoIncrement = true
             column
         })
-        assertEquals(select.columnInfos[1], run {
+        assertEquals(select.columns[1], run {
             val column = Column()
             column.name = "name"
             column.type = ColumnType.VARCHAR
@@ -143,7 +143,7 @@ class CreateTableTest {
             column.length = 200
             column
         })
-        assertEquals(select.columnInfos[2], run {
+        assertEquals(select.columns[2], run {
             val column = Column()
             column.name = "gender"
             column.type = ColumnType.VARCHAR
@@ -152,14 +152,14 @@ class CreateTableTest {
             column.length = 200
             column
         })
-        assertEquals(select.columnInfos[3], run {
+        assertEquals(select.columns[3], run {
             val column = Column()
             column.name = "age"
             column.type = ColumnType.INT
             column.comment = "年龄"
             column
         })
-        assertEquals(select.columnInfos[4], run {
+        assertEquals(select.columns[4], run {
             val column = Column()
             column.name = "id_card"
             column.type = ColumnType.VARCHAR
