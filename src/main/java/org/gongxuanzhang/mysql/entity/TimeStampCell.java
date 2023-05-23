@@ -30,4 +30,8 @@ public class TimeStampCell implements Cell<Long> {
 
     private final Long value;
 
+    @Override
+    public byte[] toBytes() {
+        throw new UnsupportedOperationException("还不支持");
+    }
 }

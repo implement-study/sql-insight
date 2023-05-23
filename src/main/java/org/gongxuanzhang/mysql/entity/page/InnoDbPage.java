@@ -19,10 +19,18 @@ package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
 import org.gongxuanzhang.mysql.constant.ConstantSize;
+import org.gongxuanzhang.mysql.core.ByteBody;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
+import org.gongxuanzhang.mysql.core.Refreshable;
+import org.gongxuanzhang.mysql.entity.Cell;
+import org.gongxuanzhang.mysql.entity.Column;
+import org.gongxuanzhang.mysql.entity.InsertRow;
 import org.gongxuanzhang.mysql.entity.ShowLength;
+import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 /**
  * InnoDb 页结构
@@ -32,7 +40,7 @@ import java.nio.ByteBuffer;
  * @see InnoDbPageFactory
  **/
 @Data
-public class InnoDbPage implements ShowLength, ByteSwappable {
+public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable {
 
 
     /**
@@ -86,5 +94,54 @@ public class InnoDbPage implements ShowLength, ByteSwappable {
         buffer.put(pageDirectory.toBytes());
         buffer.put(fileTrailer.toBytes());
         return buffer.array();
+    }
+
+    /**
+     * 判断当前空闲空间是否足够
+     *
+     * @param length 需要的空间大小
+     * @return true 是足够
+     **/
+    public boolean isEnough(int length) {
+        return this.freeSpace >= length;
+    }
+
+    public void insert(InsertRow insertRow) throws MySQLException {
+        Compact compact = new Compact();
+        List<Cell<?>> cellList = insertRow.getCellList();
+        TableInfo tableInfo = insertRow.getTableInfo();
+        CompactNullValue compactNullValue = new CompactNullValue();
+        ByteBody body = new ByteBody();
+        for (int i = 0; i < cellList.size(); i++) {
+            Column column = tableInfo.getColumns().get(i);
+            Cell<?> cell = cellList.get(i);
+            if (cell.getValue() == null) {
+                compactNullValue.setNull(column.getNullIndex());
+            }
+            for (byte b : cell.toBytes()) {
+                body.add(b);
+            }
+        }
+        compact.setBody(body.toArray());
+    }
+
+    /**
+     * 创建下一个记录头
+     * @return 下一个记录头
+     **/
+    private RecordHeader createNextRecordHeader(){
+        //  todo
+        return null;
+    }
+
+
+
+    /**
+     * 刷新表示整理数据头,比如页从数据页变成了目录页之后
+     *
+     **/
+    @Override
+    public void refresh() throws MySQLException {
+
     }
 }

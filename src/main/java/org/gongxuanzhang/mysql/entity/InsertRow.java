@@ -16,44 +16,24 @@
 
 package org.gongxuanzhang.mysql.entity;
 
+
+import org.gongxuanzhang.mysql.entity.page.UserRecord;
 import org.gongxuanzhang.mysql.exception.MySQLException;
-import org.gongxuanzhang.mysql.tool.BitUtils;
 
 /**
- * int单元格
+ * 插入行，cellList中永远保存表中所有内容
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class IntCell implements Cell<Integer> {
+public interface InsertRow extends Row {
 
 
-    private final Integer value;
+    /**
+     * 插入行转换成用户行
+     *
+     * @param recordType 用户行的类型
+     * @return 具体的用户行
+     **/
+    <R extends UserRecord> R toUserRecord(Class<R> recordType) throws MySQLException;
 
-    public IntCell(Integer value) {
-        this.value = value;
-    }
-
-    public IntCell(Cell<?> cell) throws MySQLException {
-        try {
-            this.value = Integer.parseInt(cell.getValue().toString());
-        } catch (NumberFormatException e) {
-            throw new MySQLException(cell.getValue() + "不能转换成int");
-        }
-
-    }
-
-    @Override
-    public ColumnType getType() {
-        return ColumnType.INT;
-    }
-
-    @Override
-    public Integer getValue() {
-        return value;
-    }
-
-    @Override
-    public byte[] toBytes() {
-        return BitUtils.cutToByteArray(this.value, 4);
-    }
 }

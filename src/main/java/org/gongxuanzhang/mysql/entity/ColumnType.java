@@ -64,4 +64,8 @@ public enum ColumnType {
     public int getLength() {
         return length;
     }
+
+    public boolean isDynamic(){
+        return this.dynamic;
+    }
 }

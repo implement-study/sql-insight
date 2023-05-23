@@ -16,44 +16,36 @@
 
 package org.gongxuanzhang.mysql.entity;
 
-import org.gongxuanzhang.mysql.exception.MySQLException;
-import org.gongxuanzhang.mysql.tool.BitUtils;
+import org.gongxuanzhang.mysql.core.TableInfoBox;
+
+import java.util.List;
 
 /**
- * int单元格
+ * 一行数据
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class IntCell implements Cell<Integer> {
+public interface Row extends ExecuteInfo, TableInfoBox {
 
 
-    private final Integer value;
+    /**
+     * @return 一行数据
+     **/
+    List<Cell<?>> getCellList();
 
-    public IntCell(Integer value) {
-        this.value = value;
-    }
-
-    public IntCell(Cell<?> cell) throws MySQLException {
-        try {
-            this.value = Integer.parseInt(cell.getValue().toString());
-        } catch (NumberFormatException e) {
-            throw new MySQLException(cell.getValue() + "不能转换成int");
-        }
-
-    }
-
+    /**
+     * 表信息
+     *
+     * @return 不能为null
+     **/
     @Override
-    public ColumnType getType() {
-        return ColumnType.INT;
-    }
+    TableInfo getTableInfo();
 
+    /**
+     * 设置表信息
+     *
+     * @param tableInfo 不会为null
+     **/
     @Override
-    public Integer getValue() {
-        return value;
-    }
-
-    @Override
-    public byte[] toBytes() {
-        return BitUtils.cutToByteArray(this.value, 4);
-    }
+    void setTableInfo(TableInfo tableInfo);
 }

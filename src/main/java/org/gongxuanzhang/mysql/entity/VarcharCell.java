@@ -40,4 +40,10 @@ public class VarcharCell implements Cell<String> {
     public String getValue() {
         return value;
     }
+
+    @Override
+    public byte[] toBytes() {
+        return this.value.getBytes();
+    }
+
 }

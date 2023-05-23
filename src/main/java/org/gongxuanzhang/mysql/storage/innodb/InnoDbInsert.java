@@ -21,6 +21,7 @@ import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.entity.Cell;
 import org.gongxuanzhang.mysql.entity.Column;
 import org.gongxuanzhang.mysql.entity.InsertInfo;
+import org.gongxuanzhang.mysql.entity.InsertRow;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPageFactory;
 import org.gongxuanzhang.mysql.exception.MySQLException;
@@ -40,18 +41,20 @@ public class InnoDbInsert implements InsertEngine {
     public Result insert(InsertInfo info) throws MySQLException {
         List<Column> columns = info.getTableInfo().getColumns();
         InnoDbPageSelector selector = InnoDbPageSelector.open(info.getTableInfo());
-        for (List<Cell<?>> row : info.getInsertData()) {
+        for (InsertRow row : info.getInsertData()) {
             checkAndSwapRow(row, columns);
             doInsert(row, selector);
         }
         return Result.info("成功插入" + columns.size() + "条数据");
     }
 
-    private void doInsert(List<Cell<?>> row, InnoDbPageSelector selector) throws MySQLException {
+    private void doInsert(InsertRow row, InnoDbPageSelector selector) throws MySQLException {
         //  拿到此条对应的insert page
         //  修改byte[]
         byte[] lastPageBuffer = selector.getLastPage();
         InnoDbPage lastPage = new InnoDbPageFactory().swap(lastPageBuffer);
+//        lastPage.insert();
+
         //  判断这里是否还有空
 
         //  插入之后转换
@@ -62,16 +65,15 @@ public class InnoDbInsert implements InsertEngine {
     }
 
 
-    private void checkAndSwapRow(List<Cell<?>> row, List<Column> columns) throws MySQLException {
+    private void checkAndSwapRow(InsertRow row, List<Column> columns) throws MySQLException {
+        List<Cell<?>> cellList = row.getCellList();
         //  columns 和cell的数量一定是一样的
-        for (int i = 0; i < row.size(); i++) {
-            Cell<?> cell = row.get(i);
-            Cell<?> swapCell = columns.get(i).checkCellAndSwap(cell);
-            if (cell != swapCell) {
-                row.set(i, swapCell);
-            }
+        for (int i = 0; i < cellList.size(); i++) {
+            Cell<?> cell = cellList.get(i);
+            columns.get(i).check(cell);
         }
     }
+
 
 
 }

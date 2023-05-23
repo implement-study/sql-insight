@@ -18,6 +18,7 @@ package org.gongxuanzhang.mysql.entity.page;
 
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.entity.ShowLength;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +34,14 @@ public class CompactNullValue implements ByteSwappable, ShowLength {
 
     short value;
 
+    public CompactNullValue() {
+        this((short) 0);
+    }
+
     public CompactNullValue(short value) {
         this.value = value;
     }
+
 
     @Override
     public int length() {
@@ -48,6 +54,14 @@ public class CompactNullValue implements ByteSwappable, ShowLength {
         result[1] = (byte) value;
         result[0] = (byte) (value >> 8);
         return result;
+    }
+
+
+    public void setNull(int index) throws MySQLException {
+        if (index > 15) {
+            throw new MySQLException("目前最多支持16个null列");
+        }
+        this.value |= (1 << index);
     }
 
 

@@ -50,6 +50,10 @@ public class Column implements ExecuteInfo {
     private boolean notNull;
     private boolean unique;
     private DefaultValue<?> defaultValue;
+    /**
+     * 如果此字段可以为null 作为整个表null值列表中的第几个
+     **/
+    private Integer nullIndex;
     private Integer length;
 
 
@@ -72,24 +76,9 @@ public class Column implements ExecuteInfo {
      * 约束校验 如果错误会抛异常
      * 如果有类型转换会转换
      **/
-    public Cell<?> checkCellAndSwap(Cell<?> cell) throws MySQLException {
+    public void check(Cell<?> cell) throws MySQLException {
         if (this.notNull && cell.getValue() == null) {
             throw new MySQLException(String.format("%s列不允许为null", this.getName()));
-        }
-        if (cell.getValue() == null) {
-            return cell;
-        }
-        switch (this.type) {
-            case INT:
-                if (cell.getType() != ColumnType.INT) {
-                    return new IntCell(cell);
-                }
-            case VARCHAR:
-                if (cell.getType() != ColumnType.VARCHAR) {
-                    return new VarcharCell(cell.getValue().toString());
-                }
-            default:
-                return cell;
         }
     }
 

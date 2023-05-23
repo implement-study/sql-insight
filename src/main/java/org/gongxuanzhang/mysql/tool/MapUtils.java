@@ -14,22 +14,26 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.core;
+package org.gongxuanzhang.mysql.tool;
 
-import org.gongxuanzhang.mysql.exception.MySQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * 可刷新组件
- *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface Refreshable {
+public class MapUtils {
+
+    public static <T, V> Map<T, V> newHashMapWithExpectSize(int expectedSize) {
+        return new HashMap<>(capacity(expectedSize));
+    }
 
 
-    /**
-     * 更新
-     * 不同组件有不同意义
-     * @throws MySQLException 刷新过程可能抛出异常
-     **/
-    void refresh() throws MySQLException;
+    private static int capacity(int expectedSize) {
+        if (expectedSize < 3) {
+            return expectedSize + 1;
+        }
+        return (int) ((float) expectedSize / 0.75F + 1.0F);
+    }
+
 }

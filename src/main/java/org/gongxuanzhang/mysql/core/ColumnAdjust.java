@@ -22,6 +22,7 @@ import org.gongxuanzhang.mysql.entity.Cell;
 import org.gongxuanzhang.mysql.entity.IncrementKey;
 import org.gongxuanzhang.mysql.entity.InsertData;
 import org.gongxuanzhang.mysql.entity.InsertInfo;
+import org.gongxuanzhang.mysql.entity.InsertRow;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 
@@ -72,9 +73,9 @@ public class ColumnAdjust {
 
     public InsertData adjust() throws MySQLException {
         List<JSONObject> insertBox = new ArrayList<>();
-        List<List<Cell<?>>> allInputRow = insertInfo.getInsertData();
+        List<InsertRow> allInputRow = insertInfo.getInsertData();
         //  填充用户内容
-        for (List<Cell<?>> inputRow : allInputRow) {
+        for (InsertRow inputRow : allInputRow) {
             insertBox.add(fillInputData(inputRow));
         }
         //  填充自增主键
@@ -98,10 +99,11 @@ public class ColumnAdjust {
      * @param inputRow 输入数据
      * @return 返回填充之后的一行数据
      */
-    public JSONObject fillInputData(List<Cell<?>> inputRow) throws MySQLException {
+    public JSONObject fillInputData(InsertRow inputRow) throws MySQLException {
         JSONObject rowData = new JSONObject();
-        for (int i = 0; i < inputRow.size(); i++) {
-            Cell<?> cell = inputRow.get(i);
+        List<Cell<?>> cellList = inputRow.getCellList();
+        for (int i = 0; i < cellList.size(); i++) {
+            Cell<?> cell = cellList.get(i);
             rowData.put(indexColMap.get(i), cell.getValue());
         }
         return rowData;

@@ -38,4 +38,10 @@ public interface Cell<T> extends ExecuteInfo {
      **/
     T getValue();
 
+    /**
+     * 单元格转换成字节数组
+     * @return 字节数组 如果是null返回byte[0]
+     **/
+    byte[] toBytes();
+
 }

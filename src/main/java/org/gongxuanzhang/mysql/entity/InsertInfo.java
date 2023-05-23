@@ -23,11 +23,11 @@ import lombok.Data;
 import org.gongxuanzhang.mysql.core.TableInfoBox;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.tool.CollectionUtils;
+import org.gongxuanzhang.mysql.tool.MapUtils;
 import org.gongxuanzhang.mysql.tool.SqlUtils;
 import org.gongxuanzhang.mysql.tool.TableInfoUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +45,7 @@ public class InsertInfo implements ExecuteInfo, TableInfoBox {
     /**
      * 保存解析之后的 所有列的所有数据  包括null
      **/
-    private List<List<Cell<?>>> insertData;
+    private List<InsertRow> insertData;
 
 
     public InsertInfo(MySqlInsertStatement insertStatement) throws MySQLException {
@@ -54,35 +54,40 @@ public class InsertInfo implements ExecuteInfo, TableInfoBox {
     }
 
     private void fillInsertColumns(MySqlInsertStatement insertStatement) throws MySQLException {
+        Map<Integer, Integer> tableUserIndexMap = indexColumn(insertStatement);
+        insertData = new ArrayList<>(insertStatement.getValuesList().size());
+        for (SQLInsertStatement.ValuesClause valuesClause : insertStatement.getValuesList()) {
+            List<Cell<?>> rowCellList = new ArrayList<>(this.tableInfo.getColumns().size());
+            List<SQLExpr> rowValues = valuesClause.getValues();
+            for (int i = 0; i < this.tableInfo.getColumns().size(); i++) {
+                Integer userIndex = tableUserIndexMap.get(i);
+                Cell<?> currentCell = userIndex == null ? new NullCell() : SqlUtils.cellWrap(rowValues.get(userIndex));
+                rowCellList.add(currentCell);
+            }
+            insertData.add(new InsertRowImpl(rowCellList, this.tableInfo));
+        }
+    }
+
+
+    /**
+     * 把用户输入列和表的列做索引
+     *
+     * @return key: 表中的 col index
+     * value: 用户输入的 col index
+     **/
+    private Map<Integer, Integer> indexColumn(MySqlInsertStatement insertStatement) throws MySQLException {
         List<Column> allColumns = tableInfo.getColumns();
-        Map<String, Integer> nameIndex = CollectionUtils.indexCollection(allColumns, Column::getName);
-        List<Integer> userInsertColIndex = new ArrayList<>(insertStatement.getColumns().size());
-        for (SQLExpr column : insertStatement.getColumns()) {
-            String columnName = column.toString();
-            Integer index = nameIndex.get(columnName);
+        Map<Integer, Integer> result = MapUtils.newHashMapWithExpectSize(allColumns.size());
+        Map<String, Integer> tableNameColIndex = CollectionUtils.indexCollection(allColumns, Column::getName);
+        for (int i = 0; i < insertStatement.getColumns().size(); i++) {
+            String columnName = insertStatement.getColumns().get(i).toString();
+            Integer index = tableNameColIndex.get(columnName);
             if (index == null) {
                 throw new MySQLException(String.format("列%s在表中不存在", columnName));
             }
-            userInsertColIndex.add(index);
+            result.put(index, i);
         }
-        this.insertData = new ArrayList<>(insertStatement.getValuesList().size());
-        for (SQLInsertStatement.ValuesClause valuesClause : insertStatement.getValuesList()) {
-            Cell<?>[] rowCell = new Cell<?>[allColumns.size()];
-            List<SQLExpr> rowValues = valuesClause.getValues();
-            for (int i = 0; i < rowValues.size(); i++) {
-                SQLExpr cellExpr = rowValues.get(i);
-                Integer rowIndex = userInsertColIndex.get(i);
-                Cell<?> cell = SqlUtils.cellWrap(cellExpr);
-                rowCell[rowIndex] = cell;
-            }
-            for (int i = 0; i < rowCell.length; i++) {
-                if (rowCell[i] == null && allColumns.get(i).getDefaultValue() != null) {
-                    rowCell[i] = allColumns.get(i).getDefaultValue().toCell();
-                }
-            }
-            this.insertData.add(Arrays.asList(rowCell));
-        }
-
+        return result;
     }
 
 }

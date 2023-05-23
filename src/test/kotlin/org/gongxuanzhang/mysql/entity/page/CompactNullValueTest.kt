@@ -26,10 +26,23 @@ import org.junit.jupiter.api.Test
 class CompactNullValueTest {
 
     @Test
-    fun nullCol(){
+    fun nullCol() {
         val compactNullValue = CompactNullValue(0x1234)
         val nullColIndex = compactNullValue.nullColIndex()
-        assert(nullColIndex.chaosEquals(listOf(2,4,5,9,12)))
+        assert(nullColIndex.chaosEquals(listOf(2, 4, 5, 9, 12)))
+    }
 
+
+    @Test
+    fun setNull() {
+        val nullValue = CompactNullValue()
+        nullValue.setNull(1)
+        var bytes = nullValue.toBytes()
+        assert(bytes[0] == 0.toByte())
+        assert(bytes[1] == 2.toByte())
+        nullValue.setNull(15)
+        bytes = nullValue.toBytes()
+        assert(bytes[0] == (-128).toByte())
+        assert(bytes[1] == 2.toByte())
     }
 }

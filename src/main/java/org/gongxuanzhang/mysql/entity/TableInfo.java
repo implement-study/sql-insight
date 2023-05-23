@@ -73,6 +73,10 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
     private List<String> primaryKey;
     private String comment;
     private String engineName;
+    /**
+     * 有多少个变长字段
+     **/
+    private Integer variableCount;
 
     /**
      * 自增主键，只能有一个
@@ -89,6 +93,8 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
         if (CollectionUtils.isEmpty(columnDefinitions)) {
             throw new MySQLException("无法获取列信息");
         }
+        int nullIndex = 0;
+        int variableCount = 0;
         Set<String> primaryKey =
                 statement.getPrimaryKeyNames()
                         .stream()
@@ -98,7 +104,14 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
         for (SQLColumnDefinition columnDefinition : columnDefinitions) {
             Column column = new Column(columnDefinition);
             columns.add(column);
-            //  这里使用columnInfo而不是columnDefinition 是以为druid没有转义
+            if (!column.isNotNull()) {
+                column.setNullIndex(nullIndex);
+                nullIndex++;
+            }
+            if (column.getType().isDynamic()) {
+                variableCount++;
+            }
+            //  这里使用column而不是columnDefinition 是以为druid没有转义
             if (columnDefinition.isPrimaryKey() && !primaryKey.add(column.getName())) {
                 throw new MySQLException("主键重复定义");
             }
@@ -114,6 +127,7 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
         } else {
             this.engineName = statement.getEngine().toString();
         }
+        this.variableCount = variableCount;
     }
 
 

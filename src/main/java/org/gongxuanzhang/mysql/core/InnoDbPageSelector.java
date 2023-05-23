@@ -32,9 +32,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * innodb页选择器，针对某一张表的选择器，每张表唯一实例
+ *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class InnoDbPageSelector implements PageSelector {
+public class InnoDbPageSelector implements PageSelector, Refreshable {
 
     private final static Map<String, InnoDbPageSelector> INSTANCE_CACHE = new ConcurrentHashMap<>();
 
@@ -63,7 +65,7 @@ public class InnoDbPageSelector implements PageSelector {
         } catch (LambdaExceptionRuntimeWrapper e) {
             e.wrapMySQLException();
         }
-        return null;
+        throw new MySQLException("选择页出现错误");
     }
 
     @Override
@@ -89,5 +91,18 @@ public class InnoDbPageSelector implements PageSelector {
         //  todo  这里如果是目录  需要继续找
         return null;
 
+    }
+
+
+    public void createNextPage(){
+        //  todo
+    }
+
+    /**
+     * 刷新表示所有页调整
+     **/
+    @Override
+    public void refresh() throws MySQLException {
+        //  todo
     }
 }

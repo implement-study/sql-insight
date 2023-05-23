@@ -32,4 +32,9 @@ public final class NullCell implements Cell<Object> {
     public Object getValue() {
         return null;
     }
+
+    @Override
+    public byte[] toBytes() {
+        return new byte[0];
+    }
 }

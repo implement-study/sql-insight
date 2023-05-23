@@ -16,20 +16,45 @@
 
 package org.gongxuanzhang.mysql.core;
 
-import org.gongxuanzhang.mysql.exception.MySQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * 可刷新组件
  *
+ * 为了方便使用Byte byte数组产生的类
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface Refreshable {
+public class ByteBody {
 
+    private final List<Byte> body;
 
-    /**
-     * 更新
-     * 不同组件有不同意义
-     * @throws MySQLException 刷新过程可能抛出异常
-     **/
-    void refresh() throws MySQLException;
+    public ByteBody() {
+        this.body = new ArrayList<>();
+    }
+
+    public ByteBody(byte[] bytes) {
+        this.body = new ArrayList<>(bytes.length);
+        for (byte aByte : bytes) {
+            this.body.add(aByte);
+        }
+    }
+
+    public void add(byte b) {
+        this.body.add(b);
+    }
+
+    public void add(byte[] body) {
+        for (byte b : body) {
+            this.body.add(b);
+        }
+    }
+
+    public byte[] toArray() {
+        byte[] body = new byte[this.body.size()];
+        for (int i = 0; i < body.length; i++) {
+            body[i] = this.body.get(i);
+        }
+        return body;
+    }
+
 }
