@@ -18,6 +18,7 @@ package org.gongxuanzhang.mysql.entity.page;
 
 
 import org.gongxuanzhang.mysql.constant.Constant;
+import org.gongxuanzhang.mysql.entity.BeanSupplier;
 
 import java.nio.ByteBuffer;
 
@@ -27,7 +28,7 @@ import java.nio.ByteBuffer;
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class FileHeaderFactory implements ByteBeanFactory<FileHeader> {
+public class FileHeaderFactory implements ByteBeanSwapper<FileHeader>, BeanSupplier<FileHeader> {
 
     public static final int FILE_HEADER_INIT_CHECKSUM = Constant.INIT_CHECKSUM;
 

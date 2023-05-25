@@ -29,6 +29,7 @@ public interface Refreshable {
     /**
      * 更新
      * 不同组件有不同意义
+     *
      * @throws MySQLException 刷新过程可能抛出异常
      **/
     void refresh() throws MySQLException;

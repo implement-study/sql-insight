@@ -17,6 +17,7 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import org.gongxuanzhang.mysql.constant.ConstantSize;
+import org.gongxuanzhang.mysql.entity.BeanSupplier;
 
 import java.nio.ByteBuffer;
 
@@ -31,8 +32,17 @@ import static org.gongxuanzhang.mysql.constant.ConstantSize.SUPREMUM;
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public class InnoDbPageFactory implements ByteBeanFactory<InnoDbPage> {
+public class InnoDbPageFactory implements ByteBeanSwapper<InnoDbPage>, BeanSupplier<InnoDbPage> {
 
+    public static final InnoDbPageFactory INSTANCE = new InnoDbPageFactory();
+
+    private InnoDbPageFactory() {
+
+    }
+
+    public static InnoDbPageFactory getInstance() {
+        return INSTANCE;
+    }
 
     @Override
     public InnoDbPage swap(byte[] bytes) {
@@ -94,7 +104,7 @@ public class InnoDbPageFactory implements ByteBeanFactory<InnoDbPage> {
 
 
     /**
-     * 创建新页
+     * 创建一个新页
      **/
     @Override
     public InnoDbPage create() {

@@ -16,33 +16,37 @@
 
 package org.gongxuanzhang.mysql.core.factory
 
-import org.gongxuanzhang.mysql.entity.page.InnoDbPageFactory
+import org.gongxuanzhang.mysql.entity.page.RecordHeader
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import java.io.File
 
 
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-class InnoDbPageFactoryTest {
+class RecordHeaderTest {
 
 
     @Test
-    fun testInnodbPageRead(){
-
+    fun setOwn() {
+        val recordHeader = RecordHeader()
+        recordHeader.setnOwned(8)
+        assert(recordHeader.source[0] == 0x08.toByte())
     }
 
     @Test
-    fun createInnodbPage(){
-        val innoDbPage = InnoDbPageFactory.getInstance().create()
-        println(1)
-
+    fun testSetHeapNo() {
+        val recordHead = RecordHeader()
+        val max = (1 shl 13) - 1
+        for (expect in 1..max) {
+            recordHead.heapNo = expect
+            val high = recordHead.source[1].toInt() and 0xff
+            val low = recordHead.source[2].toInt() and 0xff
+            val actual = (high shl 5) or (low ushr 3)
+            assertEquals(expect, actual)
+        }
     }
 
-    @Test
-    fun testInnodbPageWrite(){
-        val page = InnoDbPageFactory.getInstance().create()
-        File("simpleInnoDbPage").writeBytes(page.toBytes())
-    }
+
 }
 

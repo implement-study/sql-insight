@@ -17,11 +17,12 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 
+import lombok.Getter;
 import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.entity.ShowLength;
-
-import java.nio.ByteBuffer;
+import org.gongxuanzhang.mysql.tool.BitSetter;
+import org.gongxuanzhang.mysql.tool.BitUtils;
 
 /**
  * 记录头信息 占5字节
@@ -39,88 +40,140 @@ import java.nio.ByteBuffer;
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
+@Getter
 public class RecordHeader implements ShowLength, ByteSwappable {
 
     /**
      * 记录头本质上只有5个字节 但是40bit有不同作用
      **/
-    final ByteBuffer source;
+    private final byte[] source;
+    private boolean delete;
+    private boolean minRec;
+    private int nOwned;
+    private int heapNo;
+    private int nextRecordOffset;
+    private RecordType recordType;
 
+    public RecordHeader() {
+        this.source = new byte[5];
+    }
 
     public RecordHeader(byte[] source) {
         ConstantSize.RECORD_HEADER.checkSize(source);
-        this.source = ByteBuffer.wrap(source);
+        this.source = source;
+        swapProperties();
     }
 
-
-    /**
-     * 是否删除
-     *
-     * @return true删除
-     **/
-    public boolean isDelete() {
+    private void swapProperties() {
         final int deleteMask = 1 << 5;
-        return (source.get(0) & deleteMask) == deleteMask;
-    }
+        this.delete = (source[0] & deleteMask) == deleteMask;
 
+        final int minRecMask = 1 << 4;
+        this.minRec = (source[0] & minRecMask) == minRecMask;
 
-    /**
-     * 是否是非叶子结点的最小记录
-     **/
-    public boolean minRec() {
-        final int deleteMask = 1 << 4;
-        return (source.get(0) & deleteMask) == deleteMask;
-    }
-
-
-    /**
-     * 返回当前节点被引用次数
-     **/
-    public int nOwned() {
         final int nOwned = 0x0F;
-        return source.get(0) & nOwned;
+        this.nOwned = source[0] & nOwned;
+
+        byte high = source[1];
+        byte low = source[2];
+        this.heapNo = ((high << 8 | low) >> 3);
+
+        high = source[3];
+        low = source[4];
+        this.nextRecordOffset = (high << 8 | low);
+
+        initType();
     }
 
-    /**
-     * 返回节点在当前页中的顺序
-     **/
-    public int heapNo() {
-        byte high = source.get(1);
-        byte low = source.get(2);
-        return (high << 8 | low) >> 3;
-    }
-
-
-    /**
-     * 返回记录类型
-     **/
-    public RecordType recordType() {
-        int type = source.get(2) & 0x07;
+    private void initType() {
+        int type = source[2] & 0x07;
         for (RecordType recordType : RecordType.values()) {
             if (recordType.value == type) {
-                return recordType;
+                this.recordType = recordType;
+                return;
             }
         }
         throw new IllegalArgumentException("非法");
     }
 
-    /**
-     * 返回下一条记录的偏移量
-     **/
-    public int nextRecordOffset() {
-        byte high = source.get(3);
-        byte low = source.get(4);
-        return (high << 8 | low);
+    public RecordHeader setDelete(boolean delete) {
+        if (this.delete == delete) {
+            return this;
+        }
+        this.delete = delete;
+        if (delete) {
+            this.source[0] = BitSetter.setBitToOne(this.source[0], 5);
+        } else {
+            this.source[0] = BitSetter.setBitToZero(this.source[0], 5);
+        }
+        return this;
+    }
+
+    public RecordHeader setMinRec(boolean minRec) {
+        if (this.minRec == minRec) {
+            return this;
+        }
+        this.minRec = minRec;
+        if (minRec) {
+            this.source[0] = BitSetter.setBitToOne(this.source[0], 4);
+        } else {
+            this.source[0] = BitSetter.setBitToZero(this.source[0], 4);
+        }
+        return this;
+    }
+
+    public RecordHeader setnOwned(int nOwned) {
+        if (this.nOwned == nOwned) {
+            return this;
+        }
+        //  清零source[0]的后四位
+        this.source[0] &= 0xF0;
+        this.source[0] |= nOwned;
+        this.nOwned = nOwned;
+        return this;
+    }
+
+    public RecordHeader setHeapNo(int heapNo) {
+        if (this.heapNo == heapNo) {
+            return this;
+        }
+        this.heapNo = heapNo;
+        this.source[1] = (byte)(heapNo >> 5);
+        this.source[2] &= 0b00000111;
+        this.source[2] |= (byte)(heapNo << 3);
+        return this;
     }
 
 
+    public RecordHeader setNextRecordOffset(int nextRecordOffset) {
+        if(this.nextRecordOffset == nextRecordOffset){
+            return this;
+        }
+        this.nextRecordOffset = nextRecordOffset;
+        byte[] bytes = BitUtils.cutToByteArray(nextRecordOffset, 2);
+        this.source[3] = bytes[0];
+        this.source[4] = bytes[1];
+        return this;
+    }
+
+    public RecordHeader setRecordType(RecordType recordType) {
+        if(this.recordType == recordType){
+            return this;
+        }
+        this.recordType = recordType;
+        // 后三位置0
+        this.source[2] &= 0b11111000;
+        this.source[2] |= recordType.value;
+        return this;
+    }
+
     @Override
     public byte[] toBytes() {
-        return this.source.array();
+        return this.source;
     }
 
     @Override
     public int length() {
-        return this.source.capacity();
+        return this.source.length;
     }
 }

@@ -32,6 +32,7 @@ public class BitUtils {
 
     /**
      * 把一个int转换成想要的字节数组
+     * 从后往前切
      * 最多切成4个字节
      *
      * @param integer 数字

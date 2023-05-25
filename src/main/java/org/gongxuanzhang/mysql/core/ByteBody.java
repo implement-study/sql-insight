@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * 为了方便使用Byte byte数组产生的类
+ *
  * @author gxz gongxuanzhang@foxmail.com
  **/
 public class ByteBody {

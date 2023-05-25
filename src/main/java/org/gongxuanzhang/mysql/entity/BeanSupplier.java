@@ -14,30 +14,18 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.entity.page;
-
-import org.gongxuanzhang.mysql.entity.BeanSupplier;
+package org.gongxuanzhang.mysql.entity;
 
 /**
- * UserRecords 用户组 工厂
- *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class UserRecordsFactory implements ByteBeanSwapper<UserRecords>, BeanSupplier<UserRecords> {
+public interface BeanSupplier<T> {
 
-
-    @Override
-    public UserRecords swap(byte[] bytes) {
-        return new UserRecords(bytes);
-    }
 
     /**
-     * 新建的用户组没有任何信息
-     * 页的使用情况在pageHeader中 {@link PageHeader}
+     * 创建一个初始化对象
+     *
+     * @return 得到初始化对象
      **/
-    @Override
-    public UserRecords create() {
-        return new UserRecords(new byte[0]);
-    }
-
+    T create();
 }

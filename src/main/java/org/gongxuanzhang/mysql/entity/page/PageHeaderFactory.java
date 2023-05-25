@@ -17,6 +17,7 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import org.gongxuanzhang.mysql.constant.ConstantSize;
+import org.gongxuanzhang.mysql.entity.BeanSupplier;
 
 import java.nio.ByteBuffer;
 
@@ -25,7 +26,7 @@ import java.nio.ByteBuffer;
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class PageHeaderFactory implements ByteBeanFactory<PageHeader> {
+public class PageHeaderFactory implements ByteBeanSwapper<PageHeader>, BeanSupplier<PageHeader> {
 
     @Override
     public PageHeader swap(byte[] bytes) {

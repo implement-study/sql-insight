@@ -29,10 +29,12 @@ public interface InsertRow extends Row {
 
 
     /**
-     * 插入行转换成用户行
+     * 插入行转换成用户行,不保证是最终的内容(比如RecordHeader无法获知)
+     * 转换出来的RecordHeader 可以为null
      *
      * @param recordType 用户行的类型
      * @return 具体的用户行
+     * @throws MySQLException 过程中可能有异常
      **/
     <R extends UserRecord> R toUserRecord(Class<R> recordType) throws MySQLException;
 

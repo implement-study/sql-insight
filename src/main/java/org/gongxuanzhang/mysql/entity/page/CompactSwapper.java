@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
 /**
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class CompactFactory implements ByteBeanFactory<Compact> {
+public class CompactSwapper implements ByteBeanSwapper<Compact> {
 
     @Override
     public Compact swap(byte[] bytes) {
@@ -56,8 +56,4 @@ public class CompactFactory implements ByteBeanFactory<Compact> {
         return compact;
     }
 
-    @Override
-    public Compact create() {
-        return null;
-    }
 }

@@ -22,6 +22,7 @@ import org.gongxuanzhang.mysql.entity.Cell;
 import org.gongxuanzhang.mysql.entity.Column;
 import org.gongxuanzhang.mysql.entity.InsertInfo;
 import org.gongxuanzhang.mysql.entity.InsertRow;
+import org.gongxuanzhang.mysql.entity.page.Compact;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPageFactory;
 import org.gongxuanzhang.mysql.exception.MySQLException;
@@ -49,10 +50,17 @@ public class InnoDbInsert implements InsertEngine {
     }
 
     private void doInsert(InsertRow row, InnoDbPageSelector selector) throws MySQLException {
-        //  拿到此条对应的insert page
-        //  修改byte[]
         byte[] lastPageBuffer = selector.getLastPage();
-        InnoDbPage lastPage = new InnoDbPageFactory().swap(lastPageBuffer);
+        InnoDbPageFactory factory = InnoDbPageFactory.getInstance();
+        InnoDbPage lastPage = factory.swap(lastPageBuffer);
+        //   可选择的行格式
+        Compact compact = row.toUserRecord(Compact.class);
+        int length = compact.length();
+        if (lastPage.isEnough(length)) {
+            lastPage.insert(compact);
+        } else {
+
+        }
 //        lastPage.insert();
 
         //  判断这里是否还有空
@@ -73,7 +81,6 @@ public class InnoDbInsert implements InsertEngine {
             columns.get(i).check(cell);
         }
     }
-
 
 
 }

@@ -20,6 +20,8 @@ import lombok.Data;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.entity.ShowLength;
 
+import java.nio.ByteBuffer;
+
 /**
  * 用户数据组合
  *
@@ -32,6 +34,12 @@ public class UserRecords implements ShowLength, ByteSwappable {
 
     public UserRecords(byte[] source) {
         this.source = source;
+    }
+
+    public void add(byte[] newRecord) {
+        ByteBuffer allocate = ByteBuffer.allocate(source.length + newRecord.length);
+        allocate.put(this.source).put(newRecord);
+        this.source = allocate.array();
     }
 
 

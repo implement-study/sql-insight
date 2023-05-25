@@ -18,6 +18,7 @@ package org.gongxuanzhang.mysql.entity.page;
 
 
 import org.gongxuanzhang.mysql.constant.ConstantSize;
+import org.gongxuanzhang.mysql.entity.BeanSupplier;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -27,7 +28,7 @@ import java.nio.charset.StandardCharsets;
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class SupremumFactory implements ByteBeanFactory<Supremum> {
+public class SupremumFactory implements ByteBeanSwapper<Supremum>, BeanSupplier<Supremum> {
 
     @Override
     public Supremum swap(byte[] bytes) {

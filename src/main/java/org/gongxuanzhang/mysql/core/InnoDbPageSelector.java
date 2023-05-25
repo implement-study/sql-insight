@@ -20,14 +20,11 @@ import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPageFactory;
-import org.gongxuanzhang.mysql.entity.page.PageType;
 import org.gongxuanzhang.mysql.exception.LambdaExceptionRuntimeWrapper;
 import org.gongxuanzhang.mysql.exception.MySQLException;
-import org.gongxuanzhang.mysql.tool.ExceptionThrower;
+import org.gongxuanzhang.mysql.tool.PageReader;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -40,16 +37,12 @@ public class InnoDbPageSelector implements PageSelector, Refreshable {
 
     private final static Map<String, InnoDbPageSelector> INSTANCE_CACHE = new ConcurrentHashMap<>();
 
-    private final RandomAccessFile pageFile;
+    private final File dataFile;
 
-    private final InnoDbPageFactory innoDbPageFactory = new InnoDbPageFactory();
+    private final InnoDbPageFactory innoDbPageFactory = InnoDbPageFactory.getInstance();
 
     private InnoDbPageSelector(TableInfo tableInfo) throws MySQLException {
-        try {
-            this.pageFile = new RandomAccessFile(tableInfo.dataFile(), "rw");
-        } catch (FileNotFoundException e) {
-            throw new MySQLException(e);
-        }
+        this.dataFile = tableInfo.dataFile();
     }
 
     public static InnoDbPageSelector open(TableInfo tableInfo) throws MySQLException {
@@ -71,12 +64,9 @@ public class InnoDbPageSelector implements PageSelector, Refreshable {
     @Override
     public byte[] getRootPage() throws MySQLException {
         byte[] rootPage = ConstantSize.PAGE.emptyBuff();
-        try {
-            if (pageFile.read(rootPage) != rootPage.length) {
-                throw new MySQLException("根页读取错误");
-            }
-        } catch (IOException e) {
-            ExceptionThrower.errorSwap(e);
+        int length = PageReader.read(this.dataFile, rootPage);
+        if (length != rootPage.length) {
+            throw new MySQLException("根页读取错误");
         }
         return rootPage;
     }
@@ -85,7 +75,7 @@ public class InnoDbPageSelector implements PageSelector, Refreshable {
     public byte[] getLastPage() throws MySQLException {
         byte[] rootPageBuffer = getRootPage();
         InnoDbPage rootPage = this.innoDbPageFactory.swap(rootPageBuffer);
-        if (rootPage.getFileHeader().getPageType() == PageType.FIL_PAGE_INDEX.getValue()) {
+        if (rootPage.isDataPage()) {
             return rootPageBuffer;
         }
         //  todo  这里如果是目录  需要继续找
@@ -93,9 +83,15 @@ public class InnoDbPageSelector implements PageSelector, Refreshable {
 
     }
 
+    @Override
+    public void addNewPage(byte[] newPage) throws MySQLException {
+        InnoDbPage swap = this.innoDbPageFactory.swap(newPage);
+        insertInnoDbPage(swap);
+    }
 
-    public void createNextPage(){
+    private void insertInnoDbPage(InnoDbPage swap) {
         //  todo
+        System.out.println("insert innodb page .. ");
     }
 
     /**

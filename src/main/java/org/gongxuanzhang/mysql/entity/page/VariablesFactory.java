@@ -16,13 +16,15 @@
 
 package org.gongxuanzhang.mysql.entity.page;
 
+import org.gongxuanzhang.mysql.entity.BeanSupplier;
+
 /**
  * Variables 用户组 工厂 {@link Variables}
  *
  * @author gxz gongxuanzhang@foxmail.com
  * @see Compact
  **/
-public class VariablesFactory implements ByteBeanFactory<Variables> {
+public class VariablesFactory implements ByteBeanSwapper<Variables>, BeanSupplier<Variables> {
 
 
     @Override

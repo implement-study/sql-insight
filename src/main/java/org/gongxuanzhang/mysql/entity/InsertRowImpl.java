@@ -19,9 +19,9 @@ package org.gongxuanzhang.mysql.entity;
 import org.gongxuanzhang.mysql.core.ByteBody;
 import org.gongxuanzhang.mysql.entity.page.Compact;
 import org.gongxuanzhang.mysql.entity.page.CompactNullValue;
-import org.gongxuanzhang.mysql.entity.page.RecordHeader;
-import org.gongxuanzhang.mysql.entity.page.RecordHeaderFactory;
 import org.gongxuanzhang.mysql.entity.page.UserRecord;
+import org.gongxuanzhang.mysql.entity.page.Variables;
+import org.gongxuanzhang.mysql.entity.page.VariablesFactory;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 
 import java.util.List;
@@ -48,7 +48,7 @@ public class InsertRowImpl implements InsertRow {
     @Override
     public <R extends UserRecord> R toUserRecord(Class<R> recordType) throws MySQLException {
         if (recordType == Compact.class) {
-            return (R)doToCompact();
+            return (R) doToCompact();
         } else {
             throw new MySQLException("还不支持" + recordType.getName() + "行格式");
         }
@@ -56,22 +56,26 @@ public class InsertRowImpl implements InsertRow {
 
     private Compact doToCompact() throws MySQLException {
         Compact compact = new Compact();
-        CompactNullValue compactNullValue = new CompactNullValue();
-        RecordHeader recordHeader = new RecordHeaderFactory().create();
-
         ByteBody body = new ByteBody();
+        Variables variables = new VariablesFactory().create();
+        CompactNullValue compactNullValue = new CompactNullValue();
         for (int i = 0; i < this.cellList.size(); i++) {
             Column column = this.tableInfo.getColumns().get(i);
             Cell<?> cell = this.cellList.get(i);
-            if (cell.getValue() == null) {
-                compactNullValue.setNull(column.getNullIndex());
-            }
             for (byte b : cell.toBytes()) {
                 body.add(b);
             }
+            if (cell.getValue() == null) {
+                compactNullValue.setNull(column.getNullIndex());
+            }
+            if (column.getType().isDynamic()) {
+                variables.add(cell.toBytes());
+            }
+
         }
         compact.setBody(body.toArray());
-
+        compact.setNullValues(compactNullValue);
+        compact.setVariables(variables);
         return compact;
     }
 

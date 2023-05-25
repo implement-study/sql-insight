@@ -16,28 +16,21 @@
 
 package org.gongxuanzhang.mysql.entity.page;
 
-import org.gongxuanzhang.mysql.entity.BeanSupplier;
-
 /**
- * UserRecords 用户组 工厂
+ * 通过字节数组转换工厂
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class UserRecordsFactory implements ByteBeanSwapper<UserRecords>, BeanSupplier<UserRecords> {
+public interface ByteBeanSwapper<T> {
 
-
-    @Override
-    public UserRecords swap(byte[] bytes) {
-        return new UserRecords(bytes);
-    }
 
     /**
-     * 新建的用户组没有任何信息
-     * 页的使用情况在pageHeader中 {@link PageHeader}
+     * 通过字节转换内容
+     *
+     * @param bytes 字节数组
+     * @return 得到的结果对象
      **/
-    @Override
-    public UserRecords create() {
-        return new UserRecords(new byte[0]);
-    }
+    T swap(byte[] bytes);
+
 
 }

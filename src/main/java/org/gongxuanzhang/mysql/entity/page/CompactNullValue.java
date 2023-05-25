@@ -34,12 +34,12 @@ public class CompactNullValue implements ByteSwappable, ShowLength {
 
     short value;
 
-    public CompactNullValue() {
-        this((short) 0);
-    }
-
     public CompactNullValue(short value) {
         this.value = value;
+    }
+
+    public CompactNullValue() {
+        this((short) 0);
     }
 
 

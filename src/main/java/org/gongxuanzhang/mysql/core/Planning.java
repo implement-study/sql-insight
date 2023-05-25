@@ -14,30 +14,21 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.entity.page;
+package org.gongxuanzhang.mysql.core;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * 通过字节数组转换工厂
- *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface ByteBeanFactory<T> {
+@Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
+@Retention(RetentionPolicy.SOURCE)
+@Documented
+public @interface Planning {
 
-
-    /**
-     * 通过字节转换内容
-     *
-     * @param bytes 字节数组
-     * @return 得到的结果对象
-     **/
-    T swap(byte[] bytes);
-
-    /**
-     * 创建一个初始化对象
-     *
-     * @return 得到初始化对象
-     **/
-    T create();
-
-
+    String value();
 }

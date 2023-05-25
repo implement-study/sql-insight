@@ -14,30 +14,32 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.entity.page;
+package org.gongxuanzhang.mysql.tool;
 
-import org.gongxuanzhang.mysql.entity.BeanSupplier;
+import org.gongxuanzhang.mysql.exception.MySQLException;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 /**
- * UserRecords 用户组 工厂
- *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class UserRecordsFactory implements ByteBeanSwapper<UserRecords>, BeanSupplier<UserRecords> {
+public class PageReader {
 
-
-    @Override
-    public UserRecords swap(byte[] bytes) {
-        return new UserRecords(bytes);
+    public static int read(File file, byte[] buffer, int skip) throws MySQLException {
+        try (RandomAccessFile target = new RandomAccessFile(file, "r")) {
+            if (skip == 0) {
+                return target.read(buffer);
+            }
+            target.skipBytes(skip);
+            return target.read(buffer);
+        } catch (IOException e) {
+            return ExceptionThrower.errorSwap(e);
+        }
     }
 
-    /**
-     * 新建的用户组没有任何信息
-     * 页的使用情况在pageHeader中 {@link PageHeader}
-     **/
-    @Override
-    public UserRecords create() {
-        return new UserRecords(new byte[0]);
+    public static int read(File file, byte[] buffer) throws MySQLException {
+        return read(file, buffer, 0);
     }
-
 }

@@ -16,6 +16,8 @@
 
 package org.gongxuanzhang.mysql.entity.page;
 
+import org.gongxuanzhang.mysql.entity.BeanSupplier;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -23,7 +25,7 @@ import java.nio.ByteBuffer;
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class FileTrailerFactory implements ByteBeanFactory<FileTrailer> {
+public class FileTrailerFactory implements ByteBeanSwapper<FileTrailer>, BeanSupplier<FileTrailer> {
 
     @Override
     public FileTrailer swap(byte[] bytes) {

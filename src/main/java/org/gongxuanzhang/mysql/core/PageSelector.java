@@ -42,4 +42,12 @@ public interface PageSelector {
     byte[] getLastPage() throws MySQLException;
 
 
+    /**
+     * 添加一个新页
+     *
+     * @param newPage 新页的数组
+     **/
+    void addNewPage(byte[] newPage) throws MySQLException;
+
+
 }

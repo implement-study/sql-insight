@@ -34,4 +34,13 @@ public class Dynamic implements UserRecord, ByteSwappable {
         return new byte[0];
     }
 
+    @Override
+    public RecordHeader getRecordHeader() {
+        return null;
+    }
+
+    @Override
+    public int length() {
+        return 0;
+    }
 }

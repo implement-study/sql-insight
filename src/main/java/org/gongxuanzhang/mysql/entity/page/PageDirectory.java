@@ -17,6 +17,7 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
+import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.entity.ShowLength;
 
@@ -37,10 +38,26 @@ import java.nio.ByteBuffer;
 @Data
 public class PageDirectory implements ShowLength, ByteSwappable {
 
+    private static final int INFIMUM_OFFSET;
+    private static final int SUPREMUM_OFFSET;
+
+    static {
+        INFIMUM_OFFSET = ConstantSize.PAGE_HEADER.getSize() + ConstantSize.FILE_HEADER.getSize();
+        SUPREMUM_OFFSET = INFIMUM_OFFSET + ConstantSize.INFIMUM.getSize();
+    }
+
     /**
      * slot的每个数字记录每个槽中最大数据的偏移位置
      **/
     short[] slots;
+
+    public int supremumOffset() {
+        return SUPREMUM_OFFSET;
+    }
+
+    public int infimumOffset() {
+        return INFIMUM_OFFSET;
+    }
 
 
     @Override

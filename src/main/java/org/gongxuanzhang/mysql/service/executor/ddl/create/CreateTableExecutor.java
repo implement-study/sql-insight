@@ -19,7 +19,9 @@ package org.gongxuanzhang.mysql.service.executor.ddl.create;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.entity.CreateTableInfo;
+import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPageFactory;
+import org.gongxuanzhang.mysql.entity.page.PageType;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.executor.ddl.DdlExecutor;
@@ -59,8 +61,10 @@ public class CreateTableExecutor extends DdlExecutor<CreateTableInfo> {
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
             objectOutputStream.writeObject(tableInfo);
             File dataFile = tableInfo.dataFile();
-            InnoDbPageFactory innoDbPageFactory = new InnoDbPageFactory();
-            byte[] pageBytes = innoDbPageFactory.create().toBytes();
+            InnoDbPageFactory innoDbPageFactory = InnoDbPageFactory.getInstance();
+            InnoDbPage rootPage = innoDbPageFactory.create();
+            rootPage.getFileHeader().setPageType(PageType.FIL_PAGE_INDEX.getValue());
+            byte[] pageBytes = rootPage.toBytes();
             Files.write(dataFile.toPath(), pageBytes);
             log.info("创建表{}.{}", tableInfo.getDatabase().getDatabaseName(), tableInfo.getTableName());
             Context.getTableManager().register(tableInfo);

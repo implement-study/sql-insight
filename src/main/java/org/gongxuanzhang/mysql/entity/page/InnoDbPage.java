@@ -19,18 +19,12 @@ package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
 import org.gongxuanzhang.mysql.constant.ConstantSize;
-import org.gongxuanzhang.mysql.core.ByteBody;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.core.Refreshable;
-import org.gongxuanzhang.mysql.entity.Cell;
-import org.gongxuanzhang.mysql.entity.Column;
-import org.gongxuanzhang.mysql.entity.InsertRow;
 import org.gongxuanzhang.mysql.entity.ShowLength;
-import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 
 import java.nio.ByteBuffer;
-import java.util.List;
 
 /**
  * InnoDb 页结构
@@ -106,42 +100,51 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable {
         return this.freeSpace >= length;
     }
 
-    public void insert(InsertRow insertRow) throws MySQLException {
-        Compact compact = new Compact();
-        List<Cell<?>> cellList = insertRow.getCellList();
-        TableInfo tableInfo = insertRow.getTableInfo();
-        CompactNullValue compactNullValue = new CompactNullValue();
-        ByteBody body = new ByteBody();
-        for (int i = 0; i < cellList.size(); i++) {
-            Column column = tableInfo.getColumns().get(i);
-            Cell<?> cell = cellList.get(i);
-            if (cell.getValue() == null) {
-                compactNullValue.setNull(column.getNullIndex());
-            }
-            for (byte b : cell.toBytes()) {
-                body.add(b);
-            }
-        }
-        compact.setBody(body.toArray());
+    public void insert(Compact insertData) throws MySQLException {
+        RecordHeader nextRecordHeader = createNextRecordHeader();
+        insertData.setRecordHeader(nextRecordHeader);
+        byte[] insertBytes = insertData.toBytes();
+        this.userRecords.add(insertBytes);
+        this.freeSpace -= insertBytes.length;
     }
 
     /**
      * 创建下一个记录头
+     * 这个记录头不会因为组内数量多而进行组分裂，
+     * 组分裂是由refresh操作的
+     *
      * @return 下一个记录头
      **/
-    private RecordHeader createNextRecordHeader(){
-        //  todo
-        return null;
+    private RecordHeader createNextRecordHeader() {
+        short recordCount = this.pageHeader.recordCount;
+        RecordHeader recordHeader = new RecordHeader();
+        recordHeader.setHeapNo(recordCount + 1);
+        //  暂时指向supremum
+        recordHeader.setNextRecordOffset(this.pageDirectory.supremumOffset());
+        return recordHeader;
     }
 
 
-
     /**
-     * 刷新表示整理数据头,比如页从数据页变成了目录页之后
-     *
+     * 整理记录头
+     * 调整页目录之类的
      **/
     @Override
     public void refresh() throws MySQLException {
+        //  todo 刷新目录页
+    }
 
+    /**
+     * 是否是索引页
+     **/
+    public boolean isIndexPage() {
+        return this.getFileHeader().getPageType() == PageType.FIL_PAGE_INODE.getValue();
+    }
+
+    /**
+     * 是否是数据页
+     **/
+    public boolean isDataPage() {
+        return this.getFileHeader().getPageType() == PageType.FIL_PAGE_INDEX.getValue();
     }
 }

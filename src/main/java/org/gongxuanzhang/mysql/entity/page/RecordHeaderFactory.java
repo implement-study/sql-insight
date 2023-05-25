@@ -24,7 +24,7 @@ import org.gongxuanzhang.mysql.constant.ConstantSize;
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class RecordHeaderFactory implements ByteBeanFactory<RecordHeader> {
+public class RecordHeaderFactory implements ByteBeanSwapper<RecordHeader> {
 
     /**
      * heap_no 13位序号  最小值是0 最大值是1
@@ -37,11 +37,6 @@ public class RecordHeaderFactory implements ByteBeanFactory<RecordHeader> {
     public RecordHeader swap(byte[] bytes) {
         ConstantSize.RECORD_HEADER.checkSize(bytes);
         return new RecordHeader(bytes);
-    }
-
-    @Override
-    public RecordHeader create() {
-        throw new UnsupportedOperationException("should be use createInfimumHeader() or createSupremumHeader()");
     }
 
 

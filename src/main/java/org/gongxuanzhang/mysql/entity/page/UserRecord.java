@@ -16,11 +16,22 @@
 
 package org.gongxuanzhang.mysql.entity.page;
 
+import org.gongxuanzhang.mysql.core.ByteSwappable;
+import org.gongxuanzhang.mysql.entity.ShowLength;
+
 /**
  * 抽象的用户记录，具体由行格式去实现
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public interface UserRecord {
+public interface UserRecord extends ShowLength, ByteSwappable {
+
+
+    /**
+     * 记录头信息
+     *
+     * @return 返回个啥
+     **/
+    RecordHeader getRecordHeader();
 
 }

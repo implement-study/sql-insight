@@ -23,7 +23,7 @@ import java.nio.ByteBuffer;
 /**
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class CompactNullValueFactory implements ByteBeanFactory<CompactNullValue> {
+public class CompactNullValueFactory implements ByteBeanSwapper<CompactNullValue> {
 
 
     @Override
@@ -33,8 +33,4 @@ public class CompactNullValueFactory implements ByteBeanFactory<CompactNullValue
         return new CompactNullValue(buffer.getShort());
     }
 
-    @Override
-    public CompactNullValue create() {
-        return null;
-    }
 }

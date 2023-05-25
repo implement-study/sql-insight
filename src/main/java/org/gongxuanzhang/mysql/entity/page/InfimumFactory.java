@@ -17,6 +17,7 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import org.gongxuanzhang.mysql.constant.ConstantSize;
+import org.gongxuanzhang.mysql.entity.BeanSupplier;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -27,7 +28,7 @@ import java.nio.charset.StandardCharsets;
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class InfimumFactory implements ByteBeanFactory<Infimum> {
+public class InfimumFactory implements ByteBeanSwapper<Infimum>, BeanSupplier<Infimum> {
 
     @Override
     public Infimum swap(byte[] bytes) {
