@@ -51,7 +51,7 @@ public class Variables implements ByteSwappable {
     }
 
     /**
-     * 添加内容你
+     * 添加内容
      **/
     public void add(byte[] toBytes) {
         if (toBytes.length == 0) {

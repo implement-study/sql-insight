@@ -21,6 +21,7 @@ import lombok.Data;
 import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.core.Refreshable;
+import org.gongxuanzhang.mysql.entity.InsertRow;
 import org.gongxuanzhang.mysql.entity.ShowLength;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 
@@ -100,13 +101,31 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable {
         return this.freeSpace >= length;
     }
 
-    public void insert(Compact insertData) throws MySQLException {
-        RecordHeader nextRecordHeader = createNextRecordHeader();
-        insertData.setRecordHeader(nextRecordHeader);
-        byte[] insertBytes = insertData.toBytes();
-        this.userRecords.add(insertBytes);
-        this.freeSpace -= insertBytes.length;
+    /**
+     * 外部需要判断空间是否足够  否则会有问题
+     * 插入目标位置
+     * @param row 插入数据
+     **/
+    public void insert(InsertRow row) throws MySQLException {
+        if (!isEnough(row.length())) {
+            throw new MySQLException("页选择异常");
+        }
+
+
+
+//
+//
+//
+//
+//        RecordHeader nextRecordHeader = createNextRecordHeader();
+//        insertData.setRecordHeader(nextRecordHeader);
+//        byte[] insertBytes = insertData.toBytes();
+//        this.userRecords.add(insertBytes);
+//        this.freeSpace -= insertBytes.length;
+
     }
+
+
 
     /**
      * 创建下一个记录头

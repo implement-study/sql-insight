@@ -14,46 +14,27 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.entity;
+package org.gongxuanzhang.mysql.tool;
 
+import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
+import org.gongxuanzhang.mysql.entity.page.PageType;
 
 /**
- * 一个单元格的数据
+ * 页相关工具类
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface Cell<T> extends ExecuteInfo, ShowLength {
+public class PageUtils {
 
-    /**
-     * 数据类型
-     *
-     * @return 不能为空
-     **/
-    ColumnType getType();
+    private PageUtils() {
 
-    /**
-     * 返回具体值
-     *
-     * @return 可以为空
-     **/
-    T getValue();
-
-    /**
-     * 单元格转换成字节数组
-     *
-     * @return 字节数组 如果是null返回byte[0]
-     **/
-    byte[] toBytes();
+    }
 
 
     /**
-     * 一个cell的长度
-     *
-     * @return 字节数组的长度。如果是动态长度返回-1
+     * 把页设置为索引页
      **/
-    @Override
-    int length();
+    public static void setIndexPageType(InnoDbPage page) {
+        page.getFileHeader().setPageType(PageType.FIL_PAGE_INODE.getValue());
+    }
 }
-
-
-

@@ -25,7 +25,7 @@ import org.gongxuanzhang.mysql.exception.MySQLException;
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface InsertRow extends Row {
+public interface InsertRow extends Row, ShowLength {
 
 
     /**
@@ -38,4 +38,12 @@ public interface InsertRow extends Row {
      **/
     <R extends UserRecord> R toUserRecord(Class<R> recordType) throws MySQLException;
 
+
+    /**
+     * 一行数据的字节长度
+     *
+     * @return 长度
+     **/
+    @Override
+    int length();
 }

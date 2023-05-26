@@ -37,4 +37,11 @@ public final class NullCell implements Cell<Object> {
     public byte[] toBytes() {
         return new byte[0];
     }
+
+    @Override
+    public int length() {
+        return 0;
+    }
+
+
 }

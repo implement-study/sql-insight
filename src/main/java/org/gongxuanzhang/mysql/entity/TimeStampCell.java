@@ -17,6 +17,7 @@
 package org.gongxuanzhang.mysql.entity;
 
 import lombok.Data;
+import org.gongxuanzhang.mysql.core.Planning;
 
 /**
  * time stamp 单元格
@@ -24,6 +25,7 @@ import lombok.Data;
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Data
+@Planning("还不支持时间戳呢")
 public class TimeStampCell implements Cell<Long> {
 
     private final ColumnType type = ColumnType.TIMESTAMP;
@@ -33,5 +35,10 @@ public class TimeStampCell implements Cell<Long> {
     @Override
     public byte[] toBytes() {
         throw new UnsupportedOperationException("还不支持");
+    }
+
+    @Override
+    public int length() {
+        return 0;
     }
 }

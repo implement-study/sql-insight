@@ -14,46 +14,20 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.entity;
+package org.gongxuanzhang.mysql.entity.page;
 
+import java.util.Comparator;
 
 /**
- * 一个单元格的数据
  *
+ * 聚簇索引
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface Cell<T> extends ExecuteInfo, ShowLength {
-
-    /**
-     * 数据类型
-     *
-     * @return 不能为空
-     **/
-    ColumnType getType();
-
-    /**
-     * 返回具体值
-     *
-     * @return 可以为空
-     **/
-    T getValue();
-
-    /**
-     * 单元格转换成字节数组
-     *
-     * @return 字节数组 如果是null返回byte[0]
-     **/
-    byte[] toBytes();
+public class ClusteredIndex implements TableIndex{
 
 
-    /**
-     * 一个cell的长度
-     *
-     * @return 字节数组的长度。如果是动态长度返回-1
-     **/
     @Override
-    int length();
+    public Comparator<UserRecord> getComparator() {
+        return null;
+    }
 }
-
-
-

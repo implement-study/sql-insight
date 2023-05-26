@@ -17,12 +17,14 @@
 package org.gongxuanzhang.mysql.core;
 
 import org.gongxuanzhang.mysql.constant.ConstantSize;
+import org.gongxuanzhang.mysql.entity.InsertRow;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPageFactory;
 import org.gongxuanzhang.mysql.exception.LambdaExceptionRuntimeWrapper;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.tool.PageReader;
+import org.gongxuanzhang.mysql.tool.PageUtils;
 
 import java.io.File;
 import java.util.Map;
@@ -96,9 +98,45 @@ public class InnoDbPageSelector implements PageSelector, Refreshable {
 
     /**
      * 刷新表示所有页调整
+     * 同时写回
      **/
     @Override
     public void refresh() throws MySQLException {
-        //  todo
+
     }
+
+    /**
+     * 根据一个数据查看目标页
+     * 返回的页一定有足够的位置
+     **/
+    public InnoDbPage selectPage(InsertRow row) throws MySQLException {
+        byte[] rootPage = getRootPage();
+        InnoDbPage root = innoDbPageFactory.swap(rootPage);
+        if (root.isIndexPage()) {
+            return findOrCreatePage(root, row);
+        }
+        if (!root.isDataPage()) {
+            throw new MySQLException("页状态错误");
+        }
+        if (root.isEnough(row.length())) {
+            return root;
+        }
+        return pageSplitting(root);
+    }
+
+    /**
+     * root页从数据页变成索引页
+     **/
+    private InnoDbPage pageSplitting(InnoDbPage root) {
+        InnoDbPage newDataPage = this.innoDbPageFactory.create();
+        PageUtils.setIndexPageType(root);
+        return null;
+    }
+
+
+    private InnoDbPage findOrCreatePage(InnoDbPage root, InsertRow row) {
+        return null;
+    }
+
+
 }

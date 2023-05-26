@@ -56,4 +56,11 @@ public class IntCell implements Cell<Integer> {
     public byte[] toBytes() {
         return BitUtils.cutToByteArray(this.value, 4);
     }
+
+    @Override
+    public int length() {
+        return 4;
+    }
+
+
 }

@@ -27,7 +27,7 @@ import java.nio.ByteBuffer;
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public class Supremum implements ShowLength, ByteSwappable {
+public class Supremum implements UserRecord, ShowLength, ByteSwappable {
 
     public static final String SUPREMUM_BODY = "supremum";
 
@@ -58,5 +58,10 @@ public class Supremum implements ShowLength, ByteSwappable {
     @Override
     public String toString() {
         return this.recordHeader.toString() + "[body:" + new String(this.body) + "]";
+    }
+
+    @Override
+    public RecordHeader getRecordHeader() {
+        return this.recordHeader;
     }
 }

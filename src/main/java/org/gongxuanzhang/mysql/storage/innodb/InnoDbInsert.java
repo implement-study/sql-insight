@@ -22,9 +22,7 @@ import org.gongxuanzhang.mysql.entity.Cell;
 import org.gongxuanzhang.mysql.entity.Column;
 import org.gongxuanzhang.mysql.entity.InsertInfo;
 import org.gongxuanzhang.mysql.entity.InsertRow;
-import org.gongxuanzhang.mysql.entity.page.Compact;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
-import org.gongxuanzhang.mysql.entity.page.InnoDbPageFactory;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.storage.InsertEngine;
 
@@ -46,29 +44,31 @@ public class InnoDbInsert implements InsertEngine {
             checkAndSwapRow(row, columns);
             doInsert(row, selector);
         }
-        return Result.info("成功插入" + columns.size() + "条数据");
+        return Result.info("成功插入" + info.getInsertData() + "条数据");
     }
 
     private void doInsert(InsertRow row, InnoDbPageSelector selector) throws MySQLException {
-        byte[] lastPageBuffer = selector.getLastPage();
-        InnoDbPageFactory factory = InnoDbPageFactory.getInstance();
-        InnoDbPage lastPage = factory.swap(lastPageBuffer);
-        //   可选择的行格式
-        Compact compact = row.toUserRecord(Compact.class);
-        int length = compact.length();
-        if (lastPage.isEnough(length)) {
-            lastPage.insert(compact);
-        } else {
-
-        }
-//        lastPage.insert();
-
-        //  判断这里是否还有空
-
-        //  插入之后转换
-
-        //  变成字节数组写回去
-
+        //  选择需要插入到哪个页,如果没有就得创建
+        InnoDbPage targetPage = selector.selectPage(row);
+        targetPage.insert(row);
+//
+//        //  选择插入到链表哪个位置 哪个slot 插入,页整理
+//        targetPage.insert(row);
+//        selector.adjustRoot(targetPage);
+//        selector.refresh();
+//
+//        byte[] lastPageBuffer = selector.getLastPage();
+//        InnoDbPageFactory factory = InnoDbPageFactory.getInstance();
+//        InnoDbPage lastPage = factory.swap(lastPageBuffer);
+//        //   可选择的行格式
+//
+//        Compact compact = row.toUserRecord(Compact.class);
+//        int length = compact.length();
+//        if (lastPage.isEnough(length)) {
+//            lastPage.insert(compact);
+//        } else {
+//
+//        }
         System.out.println(row);
     }
 

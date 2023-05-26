@@ -74,6 +74,10 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
     private String comment;
     private String engineName;
     /**
+     * 主键的index 如果此表没有主键 是 int[0]
+     **/
+    private int[] primaryKeyIndex;
+    /**
      * 有多少个变长字段
      **/
     private Integer variableCount;
@@ -94,14 +98,13 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
             throw new MySQLException("无法获取列信息");
         }
         int nullIndex = 0;
-        int variableCount = 0;
+        this.variableCount = 0;
         Set<String> primaryKey =
-                statement.getPrimaryKeyNames()
-                        .stream()
-                        .map(SqlUtils::trimSqlEsc)
-                        .collect(Collectors.toSet());
+                statement.getPrimaryKeyNames().stream().map(SqlUtils::trimSqlEsc).collect(Collectors.toSet());
         columns = new ArrayList<>();
-        for (SQLColumnDefinition columnDefinition : columnDefinitions) {
+        List<Integer> primaryKeyIndex = new ArrayList<>();
+        for (int i = 0; i < columnDefinitions.size(); i++) {
+            SQLColumnDefinition columnDefinition = columnDefinitions.get(i);
             Column column = new Column(columnDefinition);
             columns.add(column);
             if (!column.isNotNull()) {
@@ -112,9 +115,22 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
                 variableCount++;
             }
             //  这里使用column而不是columnDefinition 是以为druid没有转义
-            if (columnDefinition.isPrimaryKey() && !primaryKey.add(column.getName())) {
-                throw new MySQLException("主键重复定义");
+            if (columnDefinition.isPrimaryKey()) {
+                if (primaryKey.add(column.getName())) {
+                    primaryKeyIndex.add(i);
+                } else {
+                    throw new MySQLException("主键重复定义");
+                }
             }
+        }
+        if (primaryKeyIndex.isEmpty()) {
+            this.primaryKeyIndex = new int[0];
+        } else {
+            int[] primaryKeyIndexArray = new int[primaryKeyIndex.size()];
+            for (int i = 0; i < primaryKeyIndexArray.length; i++) {
+                primaryKeyIndexArray[i] = primaryKeyIndex.get(i);
+            }
+            this.primaryKeyIndex = primaryKeyIndexArray;
         }
         this.primaryKey = new ArrayList<>(primaryKey);
         TableInfoUtils.fillTableInfo(this, statement.getTableSource().toString());
@@ -127,7 +143,6 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
         } else {
             this.engineName = statement.getEngine().toString();
         }
-        this.variableCount = variableCount;
     }
 
 

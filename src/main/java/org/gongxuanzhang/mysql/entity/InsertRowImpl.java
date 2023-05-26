@@ -19,6 +19,7 @@ package org.gongxuanzhang.mysql.entity;
 import org.gongxuanzhang.mysql.core.ByteBody;
 import org.gongxuanzhang.mysql.entity.page.Compact;
 import org.gongxuanzhang.mysql.entity.page.CompactNullValue;
+import org.gongxuanzhang.mysql.entity.page.TableIndex;
 import org.gongxuanzhang.mysql.entity.page.UserRecord;
 import org.gongxuanzhang.mysql.entity.page.Variables;
 import org.gongxuanzhang.mysql.entity.page.VariablesFactory;
@@ -33,7 +34,9 @@ public class InsertRowImpl implements InsertRow {
 
     private final List<Cell<?>> cellList;
 
-    private TableInfo tableInfo;
+    private final TableInfo tableInfo;
+
+    private final int length;
 
     public InsertRowImpl(List<Cell<?>> cellList) {
         this(cellList, null);
@@ -42,6 +45,7 @@ public class InsertRowImpl implements InsertRow {
     public InsertRowImpl(List<Cell<?>> cellList, TableInfo tableInfo) {
         this.cellList = cellList;
         this.tableInfo = tableInfo;
+        this.length = cellList.stream().mapToInt(Cell::length).sum();
     }
 
 
@@ -89,8 +93,14 @@ public class InsertRowImpl implements InsertRow {
         return this.tableInfo;
     }
 
+
     @Override
-    public void setTableInfo(TableInfo tableInfo) {
-        this.tableInfo = tableInfo;
+    public TableIndex getPrimaryKey() {
+        return null;
+    }
+
+    @Override
+    public int length() {
+        return this.length;
     }
 }

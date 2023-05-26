@@ -46,4 +46,10 @@ public class VarcharCell implements Cell<String> {
         return this.value.getBytes();
     }
 
+    @Override
+    public int length() {
+        return -1;
+    }
+
+
 }

@@ -17,7 +17,6 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 
-import lombok.Data;
 import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.entity.ShowLength;
@@ -30,8 +29,7 @@ import java.nio.ByteBuffer;
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-@Data
-public class Infimum implements ByteSwappable, ShowLength {
+public class Infimum implements UserRecord, ByteSwappable, ShowLength {
 
     public static final String INFIMUM_BODY = "infimum";
 
@@ -63,5 +61,11 @@ public class Infimum implements ByteSwappable, ShowLength {
     @Override
     public String toString() {
         return this.recordHeader.toString() + "[body:" + new String(this.body) + "]";
+    }
+
+
+    @Override
+    public RecordHeader getRecordHeader() {
+        return this.recordHeader;
     }
 }
