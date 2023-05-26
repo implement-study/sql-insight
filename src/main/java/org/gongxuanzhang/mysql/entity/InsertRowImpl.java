@@ -22,9 +22,9 @@ import org.gongxuanzhang.mysql.entity.page.CompactNullValue;
 import org.gongxuanzhang.mysql.entity.page.TableIndex;
 import org.gongxuanzhang.mysql.entity.page.UserRecord;
 import org.gongxuanzhang.mysql.entity.page.Variables;
-import org.gongxuanzhang.mysql.entity.page.VariablesFactory;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 
 /**
@@ -61,7 +61,7 @@ public class InsertRowImpl implements InsertRow {
     private Compact doToCompact() throws MySQLException {
         Compact compact = new Compact();
         ByteBody body = new ByteBody();
-        Variables variables = new VariablesFactory().create();
+        ByteBuffer variablesBuffer = ByteBuffer.allocate(this.tableInfo.getVariableCount());
         CompactNullValue compactNullValue = new CompactNullValue();
         for (int i = 0; i < this.cellList.size(); i++) {
             Column column = this.tableInfo.getColumns().get(i);
@@ -73,13 +73,13 @@ public class InsertRowImpl implements InsertRow {
                 compactNullValue.setNull(column.getNullIndex());
             }
             if (column.getType().isDynamic()) {
-                variables.add(cell.toBytes());
+                variablesBuffer.put((byte) cell.length());
             }
 
         }
         compact.setBody(body.toArray());
         compact.setNullValues(compactNullValue);
-        compact.setVariables(variables);
+        compact.setVariables(new Variables(variablesBuffer.array()));
         return compact;
     }
 

@@ -21,9 +21,6 @@ import org.gongxuanzhang.mysql.entity.BeanSupplier;
 
 import java.nio.ByteBuffer;
 
-import static org.gongxuanzhang.mysql.constant.ConstantSize.FILE_HEADER;
-import static org.gongxuanzhang.mysql.constant.ConstantSize.PAGE_HEADER;
-
 /**
  * PageDirectory 工厂
  * {@link PageDirectory}
@@ -31,6 +28,14 @@ import static org.gongxuanzhang.mysql.constant.ConstantSize.PAGE_HEADER;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 public class PageDirectoryFactory implements ByteBeanSwapper<PageDirectory>, BeanSupplier<PageDirectory> {
+
+    public static final int INFIMUM_OFFSET;
+    public static final int SUPREMUM_OFFSET;
+
+    static {
+        INFIMUM_OFFSET = ConstantSize.PAGE_HEADER.getSize() + ConstantSize.FILE_HEADER.getSize();
+        SUPREMUM_OFFSET = INFIMUM_OFFSET + ConstantSize.INFIMUM.getSize();
+    }
 
 
     @Override
@@ -51,18 +56,14 @@ public class PageDirectoryFactory implements ByteBeanSwapper<PageDirectory>, Bea
      * 一个是最小记录 一个是最大记录
      * 偏移量
      *
-     * @return 返回个啥
+     * @return builder
      **/
     @Override
     public PageDirectory create() {
         PageDirectory pageDirectory = new PageDirectory();
         short[] slots = new short[2];
-        //  下确界偏移量是  page header + file header
-        short infimumOffset = (short) (PAGE_HEADER.getSize() + FILE_HEADER.getSize());
-        //  上确捷是 下确界offset+下确界size
-        short supremumOffset = (short) (infimumOffset + ConstantSize.INFIMUM.getSize());
-        slots[0] = infimumOffset;
-        slots[1] = supremumOffset;
+        slots[0] = (short) INFIMUM_OFFSET;
+        slots[1] = (short) SUPREMUM_OFFSET;
         pageDirectory.setSlots(slots);
         return pageDirectory;
     }

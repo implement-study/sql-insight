@@ -17,6 +17,7 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import org.gongxuanzhang.mysql.constant.ConstantSize;
+import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.tool.BitUtils;
 
 import java.nio.ByteBuffer;
@@ -26,6 +27,12 @@ import java.nio.ByteBuffer;
  **/
 public class CompactSwapper implements ByteBeanSwapper<Compact> {
 
+    private final TableInfo tableInfo;
+
+    public CompactSwapper(TableInfo tableInfo){
+        this.tableInfo = tableInfo;
+    }
+
     @Override
     public Compact swap(byte[] bytes) {
         Compact compact = new Compact();
@@ -33,14 +40,13 @@ public class CompactSwapper implements ByteBeanSwapper<Compact> {
         byte[] headBuffer = new byte[ConstantSize.RECORD_HEADER.getSize()];
         buffer.get(headBuffer);
         compact.recordHeader = new RecordHeader(headBuffer);
-        byte varLength = buffer.get();
-        VariablesFactory variablesFactory = new VariablesFactory();
+        byte varLength = tableInfo.getVariableCount().byteValue();
         if (varLength == 0) {
-            compact.variables = variablesFactory.swap(new byte[0]);
+            compact.variables = new Variables(new byte[0]);
         } else {
             byte[] varBytes = new byte[varLength];
             buffer.get(varBytes);
-            compact.variables = variablesFactory.swap(varBytes);
+            compact.variables = new Variables(varBytes);
         }
         compact.nullValues = new CompactNullValue(buffer.getShort());
         byte[] candidateBuffer = new byte[6];
