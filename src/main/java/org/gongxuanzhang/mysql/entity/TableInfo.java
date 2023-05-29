@@ -83,8 +83,14 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
     private Integer variableCount;
 
     /**
+     * 主键定义
+     **/
+    private PrimaryKeyDefinition primaryKeyDefinition;
+
+    /**
      * 自增主键，只能有一个
      */
+    @Deprecated
     private IncrementKey incrementKey;
 
 

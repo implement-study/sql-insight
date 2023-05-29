@@ -16,35 +16,37 @@
 
 package org.gongxuanzhang.mysql.entity;
 
-import lombok.Data;
-import org.gongxuanzhang.mysql.core.Planning;
-import org.gongxuanzhang.mysql.exception.MySQLException;
+import org.jetbrains.annotations.NotNull;
+
 
 /**
- * time stamp 单元格
+ * varchar主键
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-@Data
-@Planning("还不支持时间戳呢")
-public class TimeStampCell implements Cell<Long> {
+public class VarcharPrimaryKey implements PrimaryKey {
 
-    private final ColumnType type = ColumnType.TIMESTAMP;
+    private String value;
 
-    private final Long value;
+    public VarcharPrimaryKey(String value) {
+        this.value = value;
+    }
 
-    @Override
-    public byte[] toBytes() {
-        throw new UnsupportedOperationException("还不支持");
+    public String getValue() {
+        return value;
     }
 
     @Override
-    public int length() {
-        return 0;
-    }
-
-    @Override
-    public PrimaryKey toPrimaryKey() throws MySQLException {
-        return null;
+    public int compareTo(@NotNull PrimaryKey other) {
+        if (other instanceof SupremumPrimaryKey) {
+            return -1;
+        }
+        if (other instanceof InfimumPrimaryKey) {
+            return 1;
+        }
+        if (!(other instanceof VarcharPrimaryKey)) {
+            throw new IllegalArgumentException("主键异常");
+        }
+        return this.value.compareTo(((VarcharPrimaryKey) other).value);
     }
 }

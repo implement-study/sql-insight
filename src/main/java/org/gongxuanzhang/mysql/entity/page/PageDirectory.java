@@ -56,4 +56,11 @@ public class PageDirectory implements ShowLength, ByteSwappable {
         }
         return buffer.array();
     }
+
+    /**
+     * 页中有多少个组(槽)
+     **/
+    public int slotCount() {
+        return slots.length;
+    }
 }

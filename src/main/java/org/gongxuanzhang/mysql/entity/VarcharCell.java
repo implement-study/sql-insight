@@ -51,5 +51,10 @@ public class VarcharCell implements Cell<String> {
         return -1;
     }
 
+    @Override
+    public PrimaryKey toPrimaryKey() {
+        return new VarcharPrimaryKey(this.value);
+    }
+
 
 }

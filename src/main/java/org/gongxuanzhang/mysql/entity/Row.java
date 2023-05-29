@@ -17,7 +17,6 @@
 package org.gongxuanzhang.mysql.entity;
 
 import org.gongxuanzhang.mysql.core.TableInfoBox;
-import org.gongxuanzhang.mysql.entity.page.TableIndex;
 
 import java.util.List;
 
@@ -43,11 +42,6 @@ public interface Row extends ExecuteInfo, TableInfoBox {
      **/
     @Override
     TableInfo getTableInfo();
-
-    /**
-     * 这一行的主键
-     **/
-    TableIndex getPrimaryKey();
 
     /**
      * 设置表信息

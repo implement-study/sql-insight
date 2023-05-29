@@ -29,7 +29,7 @@ public class CompactSwapper implements ByteBeanSwapper<Compact> {
 
     private final TableInfo tableInfo;
 
-    public CompactSwapper(TableInfo tableInfo){
+    public CompactSwapper(TableInfo tableInfo) {
         this.tableInfo = tableInfo;
     }
 

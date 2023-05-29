@@ -30,8 +30,9 @@ public interface UserRecord extends ShowLength, ByteSwappable {
     /**
      * 记录头信息
      *
-     * @return 返回个啥
+     * @return 记录头
      **/
     RecordHeader getRecordHeader();
+
 
 }

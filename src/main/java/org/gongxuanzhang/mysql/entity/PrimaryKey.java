@@ -16,35 +16,22 @@
 
 package org.gongxuanzhang.mysql.entity;
 
-import lombok.Data;
-import org.gongxuanzhang.mysql.core.Planning;
-import org.gongxuanzhang.mysql.exception.MySQLException;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * time stamp 单元格
+ * 主键
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-@Data
-@Planning("还不支持时间戳呢")
-public class TimeStampCell implements Cell<Long> {
+public interface PrimaryKey extends ExecuteInfo, Comparable<PrimaryKey> {
 
-    private final ColumnType type = ColumnType.TIMESTAMP;
 
-    private final Long value;
-
+    /**
+     * 主键是可以比较的
+     *
+     * @param other 同 compare
+     * @return 同compare to
+     **/
     @Override
-    public byte[] toBytes() {
-        throw new UnsupportedOperationException("还不支持");
-    }
-
-    @Override
-    public int length() {
-        return 0;
-    }
-
-    @Override
-    public PrimaryKey toPrimaryKey() throws MySQLException {
-        return null;
-    }
+    int compareTo(@NotNull PrimaryKey other);
 }

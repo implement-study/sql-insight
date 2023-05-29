@@ -16,6 +16,8 @@
 
 package org.gongxuanzhang.mysql.entity;
 
+import org.gongxuanzhang.mysql.exception.MySQLException;
+
 /**
  * null cell
  *
@@ -41,6 +43,11 @@ public final class NullCell implements Cell<Object> {
     @Override
     public int length() {
         return 0;
+    }
+
+    @Override
+    public PrimaryKey toPrimaryKey() throws MySQLException {
+        throw new MySQLException("主键不能为空");
     }
 
 

@@ -19,7 +19,6 @@ package org.gongxuanzhang.mysql.entity;
 import org.gongxuanzhang.mysql.core.ByteBody;
 import org.gongxuanzhang.mysql.entity.page.Compact;
 import org.gongxuanzhang.mysql.entity.page.CompactNullValue;
-import org.gongxuanzhang.mysql.entity.page.TableIndex;
 import org.gongxuanzhang.mysql.entity.page.UserRecord;
 import org.gongxuanzhang.mysql.entity.page.Variables;
 import org.gongxuanzhang.mysql.exception.MySQLException;
@@ -83,6 +82,7 @@ public class InsertRowImpl implements InsertRow {
         return compact;
     }
 
+
     @Override
     public List<Cell<?>> getCellList() {
         return this.cellList;
@@ -93,11 +93,6 @@ public class InsertRowImpl implements InsertRow {
         return this.tableInfo;
     }
 
-
-    @Override
-    public TableIndex getPrimaryKey() {
-        return null;
-    }
 
     @Override
     public int length() {

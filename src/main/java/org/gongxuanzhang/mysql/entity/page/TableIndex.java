@@ -28,6 +28,7 @@ public interface TableIndex {
 
     /**
      * 索引有的唯一比较器
+     *
      * @return 返回比较器
      **/
     Comparator<UserRecord> getComparator();

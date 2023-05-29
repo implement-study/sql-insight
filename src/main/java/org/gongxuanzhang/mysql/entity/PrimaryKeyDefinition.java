@@ -17,34 +17,32 @@
 package org.gongxuanzhang.mysql.entity;
 
 import lombok.Data;
-import org.gongxuanzhang.mysql.core.Planning;
-import org.gongxuanzhang.mysql.exception.MySQLException;
+
+import java.util.List;
 
 /**
- * time stamp 单元格
+ * 主键定义
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Data
-@Planning("还不支持时间戳呢")
-public class TimeStampCell implements Cell<Long> {
+public class PrimaryKeyDefinition {
 
-    private final ColumnType type = ColumnType.TIMESTAMP;
 
-    private final Long value;
+    private boolean autoIncrement;
 
-    @Override
-    public byte[] toBytes() {
-        throw new UnsupportedOperationException("还不支持");
-    }
+    /**
+     * 主键是由多少个列组成的
+     * 如果是独立主键，此值是1
+     * 如果没有指定主键，此值是0
+     **/
+    private int colCount;
 
-    @Override
-    public int length() {
-        return 0;
-    }
+    /**
+     * 列名
+     * 如果没有指定主键，此属性是空集合
+     **/
+    private List<String> columnNames;
 
-    @Override
-    public PrimaryKey toPrimaryKey() throws MySQLException {
-        return null;
-    }
+
 }

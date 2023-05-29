@@ -19,11 +19,11 @@ package org.gongxuanzhang.mysql.entity.page;
 import java.util.Comparator;
 
 /**
- *
  * 聚簇索引
+ *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class ClusteredIndex implements TableIndex{
+public class ClusteredIndex implements TableIndex {
 
 
     @Override

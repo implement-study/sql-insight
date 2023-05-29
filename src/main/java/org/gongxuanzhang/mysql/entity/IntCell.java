@@ -62,5 +62,10 @@ public class IntCell implements Cell<Integer> {
         return 4;
     }
 
+    @Override
+    public PrimaryKey toPrimaryKey() {
+        return new IntegerPrimaryKey(this.value);
+    }
+
 
 }

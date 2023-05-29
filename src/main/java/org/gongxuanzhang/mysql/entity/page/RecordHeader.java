@@ -138,15 +138,15 @@ public class RecordHeader implements ShowLength, ByteSwappable {
             return this;
         }
         this.heapNo = heapNo;
-        this.source[1] = (byte)(heapNo >> 5);
+        this.source[1] = (byte) (heapNo >> 5);
         this.source[2] &= 0b00000111;
-        this.source[2] |= (byte)(heapNo << 3);
+        this.source[2] |= (byte) (heapNo << 3);
         return this;
     }
 
 
     public RecordHeader setNextRecordOffset(int nextRecordOffset) {
-        if(this.nextRecordOffset == nextRecordOffset){
+        if (this.nextRecordOffset == nextRecordOffset) {
             return this;
         }
         this.nextRecordOffset = nextRecordOffset;
@@ -157,7 +157,7 @@ public class RecordHeader implements ShowLength, ByteSwappable {
     }
 
     public RecordHeader setRecordType(RecordType recordType) {
-        if(this.recordType == recordType){
+        if (this.recordType == recordType) {
             return this;
         }
         this.recordType = recordType;

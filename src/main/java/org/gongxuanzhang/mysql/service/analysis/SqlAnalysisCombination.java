@@ -43,7 +43,7 @@ public class SqlAnalysisCombination implements SqlAnalysis, ApplicationContextAw
 
     @Override
     public Executor analysis(String sql) throws MySQLException {
-        SQLStatement sqlStatement = null;
+        SQLStatement sqlStatement;
         try {
             sqlStatement = SQLUtils.parseSingleMysqlStatement(sql);
         } catch (Exception e) {

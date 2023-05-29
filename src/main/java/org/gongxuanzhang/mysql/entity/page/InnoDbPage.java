@@ -21,13 +21,16 @@ import lombok.Data;
 import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.core.Refreshable;
+import org.gongxuanzhang.mysql.core.TableInfoBox;
 import org.gongxuanzhang.mysql.entity.InsertRow;
 import org.gongxuanzhang.mysql.entity.ShowLength;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.tool.BitUtils;
+import org.gongxuanzhang.mysql.tool.PrimaryKeyExtractor;
 
 import java.nio.ByteBuffer;
+import java.util.Comparator;
 
 /**
  * InnoDb 页结构
@@ -36,8 +39,9 @@ import java.nio.ByteBuffer;
  * @author gxz gongxuanzhangmelt@gmail.com
  * @see InnoDbPageFactory
  **/
+
 @Data
-public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable {
+public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Comparator<UserRecord>, TableInfoBox {
 
 
     /**
@@ -72,6 +76,12 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable {
      * 文件尾 8字节
      **/
     FileTrailer fileTrailer;
+
+
+    /**
+     * 所属表，这是通过上下文存储的  不是页本身携带的信息
+     **/
+    TableInfo tableInfo;
 
 
     @Override
@@ -113,15 +123,18 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable {
         if (!isEnough(row.length())) {
             throw new MySQLException("页选择异常");
         }
-
         Compact insertCompact = row.toUserRecord(Compact.class);
+        int insertSlot = findInsertSlot(insertCompact);
+        //  拿到槽的上一个偏移量  插入链表
+        short offset = this.pageDirectory.getSlots()[insertSlot - 1];
+        insertLinkedList(insertCompact, offset);
+
+
+        System.out.println(insertSlot);
+        //   调整组
+
         TableInfo tableInfo = row.getTableInfo();
         tableInfo.getVariableCount();
-
-        for (int i = this.pageDirectory.getSlots().length - 1; i >= 0; i--) {
-            short slot = this.pageDirectory.getSlots()[i];
-            getUserRecordBySlot(slot, tableInfo);
-        }
 
 
 //
@@ -138,11 +151,59 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable {
 
 
     /**
-     * 通过slot的偏移量直接拿到目标位置的用户记录
+     * 按照长度插入链表
+     **/
+    private void insertLinkedList(Compact insertCompact, short offset) {
+        UserRecord pre = getUserRecordByOffset(offset);
+        UserRecord next = getUserRecordByOffset((short) pre.getRecordHeader().getNextRecordOffset());
+        while (this.compare(insertCompact, next) > 0) {
+            pre = next;
+            next = getUserRecordByOffset((short) pre.getRecordHeader().getNextRecordOffset());
+        }
+        System.out.println(pre);
+        System.out.println(next);
+    }
+
+    /**
+     * 找到最终插到哪个slot中
+     *
+     * @return 返回需要插入的slot 必不可能是第0个槽 至少返回1
+     **/
+    private int findInsertSlot(Compact insertCompact) throws MySQLException {
+        int left = 0;
+        int right = pageDirectory.slotCount() - 1;
+        while (left < right - 1) {
+            int mid = (right + left) / 2;
+            short offset = this.pageDirectory.getSlots()[mid];
+            UserRecord base = getUserRecordByOffset(offset);
+            int compare = this.compare(insertCompact, base);
+            if (compare == 0) {
+                throw new MySQLException("主键重复");
+            }
+            if (compare < 0) {
+                right = mid;
+            } else {
+                left = mid;
+            }
+        }
+        UserRecord base = getUserRecordByOffset(this.pageDirectory.getSlots()[left]);
+        int compare = this.compare(insertCompact, base);
+        if (compare == 0) {
+            throw new MySQLException("主键重复");
+        }
+        if (compare < 0) {
+            return left;
+        }
+        return right;
+    }
+
+
+    /**
+     * 通过偏移量直接拿到目标位置的用户记录
      *
      * @param offset slot里保存的偏移量
      **/
-    private UserRecord getUserRecordBySlot(short offset, TableInfo tableInfo) {
+    private UserRecord getUserRecordByOffset(short offset) {
         if (offset == PageDirectoryFactory.INFIMUM_OFFSET) {
             return this.infimum;
         }
@@ -163,13 +224,18 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable {
         byte[] body = new byte[bodyLength];
         wrap.get(body);
         Compact compact = new Compact();
-
         long rowId = BitUtils.readLong(wrap, 6);
         long transactionId = BitUtils.readLong(wrap, 6);
         long rollPointer = BitUtils.readLong(wrap, 7);
-        //   todo
-        return null;
+        compact.setBody(body);
+        compact.setNullValues(compactNullValue);
+        compact.setRecordHeader(recordHeader);
+        compact.setRollPointer(rollPointer);
+        compact.setRowId(rowId);
+        compact.setTransactionId(transactionId);
+        return compact;
     }
+
 
     private int bodyLength(Variables variables, CompactNullValue compactNullValue, TableInfo tableInfo) {
         //  todo
@@ -215,5 +281,20 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable {
      **/
     public boolean isDataPage() {
         return this.getFileHeader().getPageType() == PageType.FIL_PAGE_INDEX.getValue();
+    }
+
+    @Override
+    public int compare(UserRecord r1, UserRecord r2) {
+        return PrimaryKeyExtractor.extract(r1, tableInfo).compareTo(PrimaryKeyExtractor.extract(r2, tableInfo));
+    }
+
+    @Override
+    public TableInfo getTableInfo() {
+        return this.tableInfo;
+    }
+
+    @Override
+    public void setTableInfo(TableInfo tableInfo) {
+        this.tableInfo = tableInfo;
     }
 }

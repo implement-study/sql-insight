@@ -19,6 +19,7 @@ package org.gongxuanzhang.mysql.entity.page;
 
 import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
+import org.gongxuanzhang.mysql.entity.PrimaryKey;
 import org.gongxuanzhang.mysql.entity.ShowLength;
 
 import java.nio.ByteBuffer;
@@ -67,5 +68,10 @@ public class Infimum implements UserRecord, ByteSwappable, ShowLength {
     @Override
     public RecordHeader getRecordHeader() {
         return this.recordHeader;
+    }
+
+    @Override
+    public PrimaryKey getPrimaryKey() {
+        return null;
     }
 }

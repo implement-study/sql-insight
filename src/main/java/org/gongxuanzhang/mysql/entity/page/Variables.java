@@ -44,4 +44,8 @@ public class Variables implements ByteSwappable {
         return varBytes;
     }
 
+    public byte get(int index) {
+        return this.varBytes[index];
+    }
+
 }

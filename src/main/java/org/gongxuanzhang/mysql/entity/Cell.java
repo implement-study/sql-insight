@@ -17,6 +17,8 @@
 package org.gongxuanzhang.mysql.entity;
 
 
+import org.gongxuanzhang.mysql.exception.MySQLException;
+
 /**
  * 一个单元格的数据
  *
@@ -53,6 +55,14 @@ public interface Cell<T> extends ExecuteInfo, ShowLength {
      **/
     @Override
     int length();
+
+
+    /**
+     * 单元格转换成主键
+     *
+     * @return 转成主键
+     **/
+    PrimaryKey toPrimaryKey() throws MySQLException;
 }
 
 

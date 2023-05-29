@@ -16,35 +16,37 @@
 
 package org.gongxuanzhang.mysql.entity;
 
-import lombok.Data;
-import org.gongxuanzhang.mysql.core.Planning;
-import org.gongxuanzhang.mysql.exception.MySQLException;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+
 
 /**
- * time stamp 单元格
+ * 组合主键
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-@Data
-@Planning("还不支持时间戳呢")
-public class TimeStampCell implements Cell<Long> {
+public class CompositePrimaryKey implements PrimaryKey {
 
-    private final ColumnType type = ColumnType.TIMESTAMP;
+    private List<PrimaryKey> list;
 
-    private final Long value;
-
-    @Override
-    public byte[] toBytes() {
-        throw new UnsupportedOperationException("还不支持");
+    public CompositePrimaryKey(List<PrimaryKey> list) {
+        this.list = list;
     }
 
     @Override
-    public int length() {
+    public int compareTo(@NotNull PrimaryKey other) {
+        if (!(other instanceof CompositePrimaryKey)) {
+            throw new IllegalArgumentException("主键异常");
+        }
+        for (int i = 0; i < this.list.size(); i++) {
+            PrimaryKey thisPrimaryKey = this.list.get(i);
+            PrimaryKey otherPrimaryKey = ((CompositePrimaryKey) other).list.get(i);
+            int compare = thisPrimaryKey.compareTo(otherPrimaryKey);
+            if (compare != 0) {
+                return compare;
+            }
+        }
         return 0;
-    }
-
-    @Override
-    public PrimaryKey toPrimaryKey() throws MySQLException {
-        return null;
     }
 }
