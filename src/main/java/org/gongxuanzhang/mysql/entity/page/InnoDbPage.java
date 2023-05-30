@@ -18,6 +18,7 @@ package org.gongxuanzhang.mysql.entity.page;
 
 
 import lombok.Data;
+import org.gongxuanzhang.mysql.constant.Constant;
 import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.core.Refreshable;
@@ -26,6 +27,7 @@ import org.gongxuanzhang.mysql.entity.InsertRow;
 import org.gongxuanzhang.mysql.entity.ShowLength;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
+import org.gongxuanzhang.mysql.tool.ArrayUtils;
 import org.gongxuanzhang.mysql.tool.BitUtils;
 import org.gongxuanzhang.mysql.tool.Context;
 import org.gongxuanzhang.mysql.tool.PrimaryKeyExtractor;
@@ -120,9 +122,20 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
         }
         Compact insertCompact = row.toUserRecord(Compact.class);
         int insertSlot = findInsertSlot(insertCompact);
-        //  拿到槽的上一个偏移量  插入链表
-        short offset = this.pageDirectory.getSlots()[insertSlot - 1];
-        insertLinkedList(insertCompact, offset);
+        //  插入链表
+        short preOffset = this.pageDirectory.getSlots()[insertSlot - 1];
+        UserRecord preGroupMax = getUserRecordByOffset(preOffset);
+        insertLinkedList(insertCompact, preGroupMax);
+
+        //  调整组
+        UserRecord insertGroupMax = getUserRecordByOffset(this.pageDirectory.getSlots()[insertSlot]);
+        int currentOwned = insertGroupMax.getRecordHeader().getNOwned()+1;
+        insertGroupMax.getRecordHeader().setnOwned(currentOwned);
+        if(currentOwned > Constant.RECORD_SPLIT_SIZE){
+            groupSplit(insertSlot);
+        }
+
+        //  修改pageHeader
 
 
         System.out.println(insertSlot);
@@ -146,20 +159,65 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
 
 
     /**
-     * 按照长度插入链表
+     * 组分裂
+     * @param slotIndex 第几个组
      **/
-    private void insertLinkedList(Compact insertCompact, short offset) {
-        UserRecord pre = getUserRecordByOffset(offset);
+    private void groupSplit(int slotIndex) {
+        short rightMaxOffset = this.pageDirectory.getSlots()[slotIndex];
+        UserRecord rightMax = getUserRecordByOffset(rightMaxOffset);
+        rightMax.getRecordHeader().setnOwned(5);
+        UserRecord preSlotMax = getUserRecordByOffset(this.pageDirectory.getSlots()[slotIndex - 1]);
+        UserRecord leftMaxPre = null;
+        //  找到第四个 变成一组，偏移量需要用第三个
+        for (int i = 0; i < 3; i++) {
+            leftMaxPre = getNextUserRecord(preSlotMax);
+        }
+        int nextRecordOffset = leftMaxPre.getRecordHeader().getNextRecordOffset();
+        short[] slots = this.pageDirectory.getSlots();
+        short[] newSlots  = ArrayUtils.insert(slots,slotIndex,(short) nextRecordOffset);
+        this.pageDirectory.setSlots(newSlots);
+        this.pageHeader.slotCount++;
+    }
+
+
+    /**
+     * 按照长度插入链表
+     *
+     * @param preGroupMax 插入的当前组的上一组的最大记录。也就是说当前记录一定比这个记录大
+     **/
+    private void insertLinkedList(Compact insertCompact, UserRecord preGroupMax) {
+        UserRecord pre = preGroupMax;
         UserRecord next = getNextUserRecord(pre);
         while (this.compare(insertCompact, next) > 0) {
             pre = next;
             next = getUserRecordByOffset((short) pre.getRecordHeader().getNextRecordOffset());
         }
-        System.out.println(pre);
-        System.out.println(next);
+        RecordHeader nextRecordHeader = nextRecordHeader();
+        nextRecordHeader.setNextRecordOffset(pre.getRecordHeader().getNextRecordOffset());
+        pre.getRecordHeader().setNextRecordOffset(this.pageHeader.lastInsertOffset);
     }
 
+    /**
+     * 创建下一个插入的数据头
+     **/
+    private RecordHeader nextRecordHeader() {
+        RecordHeader insertHeader = new RecordHeader();
+        this.pageHeader.absoluteRecordCount++;
+        insertHeader.setHeapNo(this.pageHeader.absoluteRecordCount);
+        this.pageHeader.recordCount++;
+        return insertHeader;
+    }
+
+    /**
+     * 拿到目标记录的下一个记录
+     *
+     * @param userRecord 目标记录
+     * @return 返回记录的下一个
+     **/
     private UserRecord getNextUserRecord(UserRecord userRecord) {
+        if (userRecord instanceof Supremum) {
+            throw new NullPointerException("supremum 没有下一个");
+        }
         int nextRecordOffset = userRecord.getRecordHeader().getNextRecordOffset();
         return getUserRecordByOffset((short) nextRecordOffset);
     }
@@ -204,13 +262,13 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
      * @param offset slot里保存的偏移量
      **/
     private UserRecord getUserRecordByOffset(short offset) {
-        if (offset == PageDirectoryFactory.INFIMUM_OFFSET) {
+        if (offset == ConstantSize.INFIMUM.offset()) {
             return this.infimum;
         }
-        if (offset == PageDirectoryFactory.SUPREMUM_OFFSET) {
+        if (offset == ConstantSize.SUPREMUM.offset()) {
             return this.supremum;
         }
-        int bodyOffset = offset - PageDirectoryFactory.SUPREMUM_OFFSET;
+        int bodyOffset = offset - ConstantSize.SUPREMUM.offset();
         byte[] bodySource = userRecords.getSource();
         ByteBuffer wrap = ByteBuffer.wrap(bodySource, bodyOffset, bodySource.length - bodyOffset);
         byte[] recordBuffer = ConstantSize.RECORD_HEADER.emptyBuff();
@@ -255,7 +313,7 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
         RecordHeader recordHeader = new RecordHeader();
         recordHeader.setHeapNo(recordCount + 1);
         //  暂时指向supremum
-        recordHeader.setNextRecordOffset(PageDirectoryFactory.SUPREMUM_OFFSET);
+        recordHeader.setNextRecordOffset(ConstantSize.SUPREMUM.offset());
         return recordHeader;
     }
 

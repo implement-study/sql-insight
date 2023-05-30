@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.constant;
+package org.gongxuanzhang.mysql
+
 
 /**
- * 通用常量
- *
- * @author gxz gongxuanzhang@foxmail.com
+ * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public interface Constant {
 
-    int INIT_CHECKSUM = 12345;
-    /**
-     * 用户组超过多少之后开始分裂
-     **/
-    int RECORD_SPLIT_SIZE = 8;
+fun <T> assertArrayEquals(array1: Array<T>, array2: Array<T>) {
+    assert(array1.size == array2.size)
+    for (i in array1.indices) {
+        assert(array1[i] == array2[i])
+    }
+}
 
-
+fun assertArrayEquals(array1: ShortArray, array2: ShortArray) {
+    assert(array1.size == array2.size)
+    for (i in array1.indices) {
+        assert(array1[i] == array2[i])
+    }
 }

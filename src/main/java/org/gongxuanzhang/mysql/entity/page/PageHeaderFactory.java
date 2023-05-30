@@ -39,7 +39,7 @@ public class PageHeaderFactory implements ByteBeanSwapper<PageHeader>, BeanSuppl
         bean.recordCount = buffer.getShort();
         bean.free = buffer.getShort();
         bean.garbage = buffer.getShort();
-        bean.lastInsert = buffer.getShort();
+        bean.lastInsertOffset = buffer.getShort();
         bean.direction = buffer.getShort();
         bean.directionCount = buffer.getShort();
         bean.maxTransactionId = buffer.getLong();
@@ -62,7 +62,7 @@ public class PageHeaderFactory implements ByteBeanSwapper<PageHeader>, BeanSuppl
         pageHeader.setFree((short) 0);
         pageHeader.setGarbage((short) 0);
         //  最后插入的地址
-        pageHeader.setLastInsert(initHeapTop());
+        pageHeader.setLastInsertOffset(initHeapTop());
         //  默认先是0层
         pageHeader.setLevel((short) 0);
 

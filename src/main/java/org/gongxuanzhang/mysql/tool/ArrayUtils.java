@@ -14,20 +14,26 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.constant;
+package org.gongxuanzhang.mysql.tool;
+
 
 /**
- * 通用常量
- *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface Constant {
+public class ArrayUtils {
 
-    int INIT_CHECKSUM = 12345;
-    /**
-     * 用户组超过多少之后开始分裂
-     **/
-    int RECORD_SPLIT_SIZE = 8;
+    private ArrayUtils() {
 
+    }
+
+    public static short[] insert(short[] array, int index, short element) {
+        short[] newArray = new short[array.length + 1];
+        System.arraycopy(array, 0, newArray, 0, index);
+        newArray[index] = element;
+        for (int i = 0; i < array.length - index; i++) {
+            newArray[newArray.length - i - 1] = array[array.length - i - 1];
+        }
+        return newArray;
+    }
 
 }

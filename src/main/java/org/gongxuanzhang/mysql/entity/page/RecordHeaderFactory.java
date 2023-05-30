@@ -18,6 +18,7 @@ package org.gongxuanzhang.mysql.entity.page;
 
 
 import org.gongxuanzhang.mysql.constant.ConstantSize;
+import org.gongxuanzhang.mysql.tool.BitUtils;
 
 /**
  * RecordHeader 工厂 {@link RecordHeader}
@@ -40,18 +41,20 @@ public class RecordHeaderFactory implements ByteBeanSwapper<RecordHeader> {
     }
 
 
+
     /**
      * 创建下确界记录头
      **/
     public RecordHeader createInfimumHeader() {
         //  unuseful(1) │ unuseful(1)│delete_mask(1)│min_rec_mask(1)│n_owned(4)│heap_no(13)│record_type(3)
         //  │next_record(16)│
+        byte[] supremumOffset = BitUtils.cutToByteArray(ConstantSize.SUPREMUM.offset(), 2);
         return new RecordHeader(new byte[]{
                 (byte) 0x01,
                 (byte) 0x00,
                 MIN_RECORD_HEAP_NO,
-                (byte) 0b0000_0001,
-                (byte) 0b0000_0001,
+                supremumOffset[0],
+                supremumOffset[1],
         });
     }
 

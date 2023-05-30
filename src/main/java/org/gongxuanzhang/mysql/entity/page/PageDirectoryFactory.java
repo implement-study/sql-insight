@@ -29,14 +29,6 @@ import java.nio.ByteBuffer;
  **/
 public class PageDirectoryFactory implements ByteBeanSwapper<PageDirectory>, BeanSupplier<PageDirectory> {
 
-    public static final int INFIMUM_OFFSET;
-    public static final int SUPREMUM_OFFSET;
-
-    static {
-        INFIMUM_OFFSET = ConstantSize.PAGE_HEADER.getSize() + ConstantSize.FILE_HEADER.getSize();
-        SUPREMUM_OFFSET = INFIMUM_OFFSET + ConstantSize.INFIMUM.getSize();
-    }
-
 
     @Override
     public PageDirectory swap(byte[] bytes) {
@@ -62,8 +54,8 @@ public class PageDirectoryFactory implements ByteBeanSwapper<PageDirectory>, Bea
     public PageDirectory create() {
         PageDirectory pageDirectory = new PageDirectory();
         short[] slots = new short[2];
-        slots[0] = (short) INFIMUM_OFFSET;
-        slots[1] = (short) SUPREMUM_OFFSET;
+        slots[0] = (short) ConstantSize.INFIMUM.offset();
+        slots[1] = (short) ConstantSize.SUPREMUM.offset();
         pageDirectory.setSlots(slots);
         return pageDirectory;
     }

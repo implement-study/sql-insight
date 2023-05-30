@@ -68,9 +68,9 @@ public class PageHeader implements ShowLength, ByteSwappable {
     short garbage;
     /**
      * 2字节/最后插入记录的位置
+     * 理论上和空闲空间保持一致，但是如果删除记录被释放的时候就不一样了
      **/
-    @Unused("理论上和空闲空间保持一致，但是如果删除记录被释放的时候就不一样了")
-    short lastInsert;
+    short lastInsertOffset;
     /**
      * 2字节/记录插入的方向
      **/
@@ -124,7 +124,7 @@ public class PageHeader implements ShowLength, ByteSwappable {
         buffer.putShort(recordCount);
         buffer.putShort(free);
         buffer.putShort(garbage);
-        buffer.putShort(lastInsert);
+        buffer.putShort(lastInsertOffset);
         buffer.putShort(direction);
         buffer.putShort(directionCount);
         buffer.putLong(maxTransactionId);

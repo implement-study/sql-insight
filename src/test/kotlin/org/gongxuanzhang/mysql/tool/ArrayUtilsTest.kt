@@ -14,20 +14,29 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.constant;
+package org.gongxuanzhang.mysql.tool
+
+import org.gongxuanzhang.mysql.assertArrayEquals
+import org.junit.jupiter.api.Test
+
 
 /**
- * 通用常量
- *
- * @author gxz gongxuanzhang@foxmail.com
+ * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public interface Constant {
+class ArrayUtilsTest {
 
-    int INIT_CHECKSUM = 12345;
-    /**
-     * 用户组超过多少之后开始分裂
-     **/
-    int RECORD_SPLIT_SIZE = 8;
+    @Test
+    fun insertTest() {
+        val shortArray = shortArrayOf(1, 2, 3, 4, 5)
+        var result = ArrayUtils.insert(shortArray, 1, 1)
 
+        assertArrayEquals(result, shortArrayOf(1, 1, 2, 3, 4, 5))
+
+        result = ArrayUtils.insert(shortArray, 2, 1)
+
+        assertArrayEquals(result, shortArrayOf(1, 2, 1, 3, 4, 5))
+
+
+    }
 
 }

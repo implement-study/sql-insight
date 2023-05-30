@@ -24,10 +24,10 @@ package org.gongxuanzhang.mysql.constant;
 
 public enum ConstantSize {
     PAGE("页", 16 * 1024),
-    FILE_HEADER("文件头", 38),
-    PAGE_HEADER("页头", 56),
-    INFIMUM("下确界", 13),
-    SUPREMUM("上确界", 13),
+    FILE_HEADER("文件头", 38, 0),
+    PAGE_HEADER("页头", 56, FILE_HEADER.size),
+    INFIMUM("下确界", 13, PAGE_HEADER.offset + PAGE_HEADER.size),
+    SUPREMUM("上确界", 13, INFIMUM.size + INFIMUM.offset),
     SUPREMUM_BODY("上确界内容", 8),
     INFIMUM_BODY("下确界内容", 8),
     FILE_TRAILER("文件尾", 8),
@@ -36,11 +36,20 @@ public enum ConstantSize {
 
     private final String desc;
     private final int size;
+    private final int offset;
+
+    ConstantSize(String desc, int size, int offset) {
+        this.desc = desc;
+        this.size = size;
+        this.offset = offset;
+    }
 
     ConstantSize(String desc, int size) {
         this.desc = desc;
         this.size = size;
+        this.offset = -1;
     }
+
 
     public String getDesc() {
         return desc;
@@ -48,6 +57,10 @@ public enum ConstantSize {
 
     public int getSize() {
         return size;
+    }
+
+    public int offset() {
+        return this.offset;
     }
 
     public void checkSize(byte[] bytes) {
