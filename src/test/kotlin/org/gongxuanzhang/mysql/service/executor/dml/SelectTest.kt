@@ -16,32 +16,26 @@
 
 package org.gongxuanzhang.mysql.service.executor.dml
 
-import org.gongxuanzhang.mysql.doSql
-import org.gongxuanzhang.mysql.tool.TestGod
+import org.gongxuanzhang.mysql.core.InnoDbPageSelector
+import org.gongxuanzhang.mysql.tool.Context
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 
 
 /**
- * @author gongxuanzhangmelt@gmail.com
+ * @author gongxuanzhang
  */
 @SpringBootTest
-class InsertTest {
+class SelectTest {
 
     var database: String = "testDatabase"
 
     @Test
-    fun simpleInsert() {
-        val testGod = TestGod()
-        testGod.prepareGodTable()
-        """
-            insert into ${testGod.fullName} (id,age,name,gender,id_card) 
-            values(1,18,'zhangsan','男','abcd'),
-               (2,24,'lisi','女','abcd'),
-               (3,25,'wangwu','女','afff')
-            
-        """.doSql()
+    fun selectAll() {
+        val open = InnoDbPageSelector.open(Context.getTableManager().select("god_test_db.god_test_table"))
+        var rootPage = open.rootPage
     }
+
 
 
 

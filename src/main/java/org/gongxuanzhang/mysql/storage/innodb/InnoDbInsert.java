@@ -51,25 +51,6 @@ public class InnoDbInsert implements InsertEngine {
         //  选择需要插入到哪个页,如果没有就得创建
         InnoDbPage targetPage = selector.selectPage(row);
         targetPage.insert(row);
-//
-//        //  选择插入到链表哪个位置 哪个slot 插入,页整理
-//        targetPage.insert(row);
-//        selector.adjustRoot(targetPage);
-//        selector.refresh();
-//
-//        byte[] lastPageBuffer = selector.getLastPage();
-//        InnoDbPageFactory factory = InnoDbPageFactory.getInstance();
-//        InnoDbPage lastPage = factory.swap(lastPageBuffer);
-//        //   可选择的行格式
-//
-//        Compact compact = row.toUserRecord(Compact.class);
-//        int length = compact.length();
-//        if (lastPage.isEnough(length)) {
-//            lastPage.insert(compact);
-//        } else {
-//
-//        }
-        System.out.println(row);
     }
 
 

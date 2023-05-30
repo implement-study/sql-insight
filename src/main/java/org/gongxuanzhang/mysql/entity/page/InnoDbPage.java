@@ -30,6 +30,7 @@ import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.tool.ArrayUtils;
 import org.gongxuanzhang.mysql.tool.BitUtils;
 import org.gongxuanzhang.mysql.tool.Context;
+import org.gongxuanzhang.mysql.tool.PageWriter;
 import org.gongxuanzhang.mysql.tool.PrimaryKeyExtractor;
 
 import java.nio.ByteBuffer;
@@ -126,40 +127,23 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
         short preOffset = this.pageDirectory.getSlots()[insertSlot - 1];
         UserRecord preGroupMax = getUserRecordByOffset(preOffset);
         insertLinkedList(insertCompact, preGroupMax);
-
+        this.freeSpace -= insertCompact.length();
+        this.userRecords.add(insertCompact.toBytes());
         //  调整组
         UserRecord insertGroupMax = getUserRecordByOffset(this.pageDirectory.getSlots()[insertSlot]);
-        int currentOwned = insertGroupMax.getRecordHeader().getNOwned()+1;
+        int currentOwned = insertGroupMax.getRecordHeader().getNOwned() + 1;
         insertGroupMax.getRecordHeader().setnOwned(currentOwned);
-        if(currentOwned > Constant.RECORD_SPLIT_SIZE){
+        if (currentOwned > Constant.RECORD_SPLIT_SIZE) {
             groupSplit(insertSlot);
+            this.freeSpace -= 2;
         }
-
-        //  修改pageHeader
-
-
-        System.out.println(insertSlot);
-        //   调整组
-
-        TableInfo tableInfo = row.getTableInfo();
-        tableInfo.getVariableCount();
-
-
-//
-//
-//
-//
-//        RecordHeader nextRecordHeader = createNextRecordHeader();
-//        insertData.setRecordHeader(nextRecordHeader);
-//        byte[] insertBytes = insertData.toBytes();
-//        this.userRecords.add(insertBytes);
-//        this.freeSpace -= insertBytes.length;
-
+        this.refresh();
     }
 
 
     /**
      * 组分裂
+     *
      * @param slotIndex 第几个组
      **/
     private void groupSplit(int slotIndex) {
@@ -174,7 +158,7 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
         }
         int nextRecordOffset = leftMaxPre.getRecordHeader().getNextRecordOffset();
         short[] slots = this.pageDirectory.getSlots();
-        short[] newSlots  = ArrayUtils.insert(slots,slotIndex,(short) nextRecordOffset);
+        short[] newSlots = ArrayUtils.insert(slots, slotIndex, (short) nextRecordOffset);
         this.pageDirectory.setSlots(newSlots);
         this.pageHeader.slotCount++;
     }
@@ -192,9 +176,10 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
             pre = next;
             next = getUserRecordByOffset((short) pre.getRecordHeader().getNextRecordOffset());
         }
-        RecordHeader nextRecordHeader = nextRecordHeader();
-        nextRecordHeader.setNextRecordOffset(pre.getRecordHeader().getNextRecordOffset());
+        RecordHeader insertHeader = nextRecordHeader();
+        insertHeader.setNextRecordOffset(pre.getRecordHeader().getNextRecordOffset());
         pre.getRecordHeader().setNextRecordOffset(this.pageHeader.lastInsertOffset);
+        insertCompact.setRecordHeader(insertHeader);
     }
 
     /**
@@ -324,7 +309,7 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
      **/
     @Override
     public void refresh() throws MySQLException {
-        //  todo 刷新目录页
+        PageWriter.write(this);
     }
 
     /**
