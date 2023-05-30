@@ -39,7 +39,7 @@ public abstract class AbstractManager<T> implements MySQLManager<T> {
 
     @Override
     public void register(T t) {
-        cache.put(toId(t), t);
+        cache.put(toName(t), t);
     }
 
     @Override

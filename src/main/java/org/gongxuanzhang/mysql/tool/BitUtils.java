@@ -147,12 +147,11 @@ public class BitUtils {
     /**
      * 从buffer中读取N位 然后转成long
      **/
-    public static long readLong(ByteBuffer byteBuffer,int length){
+    public static long readLong(ByteBuffer byteBuffer, int length) {
         byte[] buffer = new byte[length];
         byteBuffer.get(buffer);
         return joinLong(buffer);
     }
-
 
 
 }

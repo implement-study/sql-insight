@@ -29,6 +29,7 @@ import org.gongxuanzhang.mysql.core.select.As;
 import org.gongxuanzhang.mysql.core.select.SelectCol;
 import org.gongxuanzhang.mysql.exception.ExecuteException;
 import org.gongxuanzhang.mysql.exception.MySQLException;
+import org.gongxuanzhang.mysql.tool.Context;
 import org.gongxuanzhang.mysql.tool.SqlUtils;
 import org.gongxuanzhang.mysql.tool.TableInfoUtils;
 import org.springframework.util.CollectionUtils;
@@ -65,9 +66,8 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
     public final static String GFRM_SUFFIX = ".gfrm";
 
     public final static String GIBD_SUFFIX = ".gibd";
-
+    private int spaceId;
     private DatabaseInfo database;
-
     private String tableName;
     private List<Column> columns;
     private List<String> primaryKey;
@@ -99,6 +99,7 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
     }
 
     protected TableInfo(MySqlCreateTableStatement statement) throws MySQLException {
+        this.spaceId = Context.getTableManager().getNextSpaceId();
         List<SQLColumnDefinition> columnDefinitions = statement.getColumnDefinitions();
         if (CollectionUtils.isEmpty(columnDefinitions)) {
             throw new MySQLException("无法获取列信息");

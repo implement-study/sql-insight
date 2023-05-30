@@ -40,11 +40,20 @@ public interface MySQLManager<T> {
      *
      * @param name 信息标识
      * @return null 或者是信息
+     * @throws MySQLException 选取异常
      **/
     T select(String name) throws MySQLException;
 
+
+    /**
+     * 用信息查询
+     *
+     * @param t 实体信息
+     * @return 同 {@link MySQLManager#select(String)}
+     * @throws MySQLException 选取异常
+     **/
     default T select(T t) throws MySQLException {
-        return select(toId(t));
+        return select(toName(t));
     }
 
     /**
@@ -65,6 +74,8 @@ public interface MySQLManager<T> {
 
     /**
      * 当内容有变动时刷新
+     *
+     * @throws MySQLException 选取异常
      **/
     void refresh() throws MySQLException;
 
@@ -74,6 +85,6 @@ public interface MySQLManager<T> {
      * @param t 被注册的内容
      * @return id
      **/
-    String toId(T t);
+    String toName(T t);
 
 }

@@ -43,7 +43,7 @@ public class EngineManager extends AbstractManager<StorageEngine> {
     }
 
     @Override
-    public String toId(StorageEngine engine) {
+    public String toName(StorageEngine engine) {
         return engine.getEngineName();
     }
 }

@@ -26,7 +26,10 @@ import org.gongxuanzhang.mysql.exception.MySQLInitException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -44,8 +47,41 @@ public class TableManager extends AbstractManager<TableInfo> {
 
     private final DatabaseManager databaseManager;
 
+    private final Map<Integer, TableInfo> spaceIdCache;
+
+    private final AtomicInteger spaceId = new AtomicInteger();
+
     public TableManager(DatabaseManager databaseManager) throws MySQLException {
         this.databaseManager = databaseManager;
+        this.spaceIdCache = new ConcurrentHashMap<>();
+    }
+
+    /**
+     * 表空间查询
+     *
+     * @param spaceId 表空间
+     * @return 表信息
+     **/
+    public TableInfo select(int spaceId) {
+        return spaceIdCache.get(spaceId);
+    }
+
+
+    @Override
+    public void register(TableInfo tableInfo) {
+        super.register(tableInfo);
+        this.spaceId.set(Integer.max(spaceId.get(), tableInfo.getSpaceId()));
+        spaceIdCache.put(tableInfo.getSpaceId(), tableInfo);
+    }
+
+
+    /**
+     * 拿到下一个spaceId
+     *
+     * @return 表空间id
+     **/
+    public int getNextSpaceId() {
+        return spaceId.incrementAndGet();
     }
 
     @Override
@@ -84,7 +120,7 @@ public class TableManager extends AbstractManager<TableInfo> {
     }
 
     @Override
-    public String toId(TableInfo info) {
+    public String toName(TableInfo info) {
         return info.absoluteName();
     }
 }

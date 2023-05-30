@@ -49,7 +49,7 @@ public class DatabaseManager extends AbstractManager<DatabaseInfo> {
     }
 
     @Override
-    public String toId(DatabaseInfo databaseInfo) {
+    public String toName(DatabaseInfo databaseInfo) {
         return databaseInfo.getDatabaseName();
     }
 
