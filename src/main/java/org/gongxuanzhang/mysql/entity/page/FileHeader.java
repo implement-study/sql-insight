@@ -71,7 +71,6 @@ public class FileHeader implements ByteSwappable, ShowLength {
     /**
      * 所属表空间
      **/
-    @Unused
     int spaceId;
 
 

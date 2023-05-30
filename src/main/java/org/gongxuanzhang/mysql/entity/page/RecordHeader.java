@@ -64,6 +64,17 @@ public class RecordHeader implements ShowLength, ByteSwappable {
         swapProperties();
     }
 
+    private void initType() {
+        int type = source[2] & 0x07;
+        for (RecordType recordType : RecordType.values()) {
+            if (recordType.value == type) {
+                this.recordType = recordType;
+                return;
+            }
+        }
+        throw new IllegalArgumentException("非法");
+    }
+
     private void swapProperties() {
         final int deleteMask = 1 << 5;
         this.delete = (source[0] & deleteMask) == deleteMask;
@@ -83,17 +94,6 @@ public class RecordHeader implements ShowLength, ByteSwappable {
         this.nextRecordOffset = (high << 8 | low);
 
         initType();
-    }
-
-    private void initType() {
-        int type = source[2] & 0x07;
-        for (RecordType recordType : RecordType.values()) {
-            if (recordType.value == type) {
-                this.recordType = recordType;
-                return;
-            }
-        }
-        throw new IllegalArgumentException("非法");
     }
 
     public RecordHeader setDelete(boolean delete) {

@@ -63,6 +63,7 @@ public class CreateTableExecutor extends DdlExecutor<CreateTableInfo> {
             File dataFile = tableInfo.dataFile();
             InnoDbPageFactory innoDbPageFactory = InnoDbPageFactory.getInstance();
             InnoDbPage rootPage = innoDbPageFactory.create();
+            rootPage.getFileHeader().setSpaceId(tableInfo.getSpaceId());
             rootPage.getFileHeader().setPageType(PageType.FIL_PAGE_INDEX.getValue());
             byte[] pageBytes = rootPage.toBytes();
             Files.write(dataFile.toPath(), pageBytes);

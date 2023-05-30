@@ -44,7 +44,7 @@ public class PageDirectoryFactory implements ByteBeanSwapper<PageDirectory>, Bea
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         short[] slots = new short[bytes.length / 2];
         for (int i = 0; i < (bytes.length / 2); i++) {
-            slots[slots.length - 1 - i] = buffer.getShort();
+            slots[i] = buffer.getShort();
         }
         bean.slots = slots;
         return bean;

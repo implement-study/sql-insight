@@ -63,8 +63,8 @@ public class RecordHeaderFactory implements ByteBeanSwapper<RecordHeader> {
                 (byte) 0x01,
                 (byte) 0x00,
                 MAX_RECORD_HEAP_NO,
-                (byte) 0b0000_0001,
-                (byte) 0b0000_0001,
+                (byte) 0b0000_0000,
+                (byte) 0b0000_0000,
         });
     }
 

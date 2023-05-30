@@ -27,6 +27,7 @@ import org.gongxuanzhang.mysql.entity.ShowLength;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.tool.BitUtils;
+import org.gongxuanzhang.mysql.tool.Context;
 import org.gongxuanzhang.mysql.tool.PrimaryKeyExtractor;
 
 import java.nio.ByteBuffer;
@@ -76,12 +77,6 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
      * 文件尾 8字节
      **/
     FileTrailer fileTrailer;
-
-
-    /**
-     * 所属表，这是通过上下文存储的  不是页本身携带的信息
-     **/
-    TableInfo tableInfo;
 
 
     @Override
@@ -155,13 +150,18 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
      **/
     private void insertLinkedList(Compact insertCompact, short offset) {
         UserRecord pre = getUserRecordByOffset(offset);
-        UserRecord next = getUserRecordByOffset((short) pre.getRecordHeader().getNextRecordOffset());
+        UserRecord next = getNextUserRecord(pre);
         while (this.compare(insertCompact, next) > 0) {
             pre = next;
             next = getUserRecordByOffset((short) pre.getRecordHeader().getNextRecordOffset());
         }
         System.out.println(pre);
         System.out.println(next);
+    }
+
+    private UserRecord getNextUserRecord(UserRecord userRecord) {
+        int nextRecordOffset = userRecord.getRecordHeader().getNextRecordOffset();
+        return getUserRecordByOffset((short) nextRecordOffset);
     }
 
     /**
@@ -216,11 +216,11 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
         byte[] recordBuffer = ConstantSize.RECORD_HEADER.emptyBuff();
         wrap.get(recordBuffer);
         RecordHeader recordHeader = new RecordHeaderFactory().swap(recordBuffer);
-        byte[] variablesBuffer = new byte[tableInfo.getVariableCount()];
+        byte[] variablesBuffer = new byte[getTableInfo().getVariableCount()];
         wrap.get(variablesBuffer);
         Variables variables = new Variables(variablesBuffer);
         CompactNullValue compactNullValue = new CompactNullValue(wrap.getShort());
-        int bodyLength = bodyLength(variables, compactNullValue, tableInfo);
+        int bodyLength = bodyLength(variables, compactNullValue, getTableInfo());
         byte[] body = new byte[bodyLength];
         wrap.get(body);
         Compact compact = new Compact();
@@ -285,16 +285,17 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
 
     @Override
     public int compare(UserRecord r1, UserRecord r2) {
+        TableInfo tableInfo = getTableInfo();
         return PrimaryKeyExtractor.extract(r1, tableInfo).compareTo(PrimaryKeyExtractor.extract(r2, tableInfo));
     }
 
     @Override
     public TableInfo getTableInfo() {
-        return this.tableInfo;
+        return Context.getTableManager().select(this.fileHeader.spaceId);
     }
 
     @Override
     public void setTableInfo(TableInfo tableInfo) {
-        this.tableInfo = tableInfo;
+        throw new UnsupportedOperationException();
     }
 }
