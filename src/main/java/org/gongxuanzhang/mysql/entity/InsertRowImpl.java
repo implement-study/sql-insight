@@ -70,11 +70,11 @@ public class InsertRowImpl implements InsertRow {
             }
             if (cell.getValue() == null) {
                 compactNullValue.setNull(column.getNullIndex());
+                continue;
             }
-            if (column.getType().isDynamic()) {
+            if (column.isDynamic()) {
                 variablesBuffer.put((byte) cell.length());
             }
-
         }
         compact.setBody(body.toArray());
         compact.setNullValues(compactNullValue);

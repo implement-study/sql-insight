@@ -23,10 +23,14 @@ import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.core.Refreshable;
 import org.gongxuanzhang.mysql.core.TableInfoBox;
+import org.gongxuanzhang.mysql.entity.Column;
 import org.gongxuanzhang.mysql.entity.InsertRow;
+import org.gongxuanzhang.mysql.entity.PrimaryKey;
 import org.gongxuanzhang.mysql.entity.ShowLength;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
+import org.gongxuanzhang.mysql.exception.RepetitionPrimaryKeyException;
+import org.gongxuanzhang.mysql.service.executor.session.show.PageShower;
 import org.gongxuanzhang.mysql.tool.ArrayUtils;
 import org.gongxuanzhang.mysql.tool.BitUtils;
 import org.gongxuanzhang.mysql.tool.Context;
@@ -129,6 +133,8 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
         insertLinkedList(insertCompact, preGroupMax);
         this.freeSpace -= insertCompact.length();
         this.userRecords.add(insertCompact.toBytes());
+        this.pageHeader.heapTop += insertCompact.length();
+        this.pageHeader.lastInsertOffset += insertCompact.length();
         //  调整组
         UserRecord insertGroupMax = getUserRecordByOffset(this.pageDirectory.getSlots()[insertSlot]);
         int currentOwned = insertGroupMax.getRecordHeader().getNOwned() + 1;
@@ -253,9 +259,10 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
         if (offset == ConstantSize.SUPREMUM.offset()) {
             return this.supremum;
         }
-        int bodyOffset = offset - ConstantSize.SUPREMUM.offset();
+        int bodyOffset = offset - ConstantSize.SUPREMUM.offset() - ConstantSize.SUPREMUM.getSize();
         byte[] bodySource = userRecords.getSource();
-        ByteBuffer wrap = ByteBuffer.wrap(bodySource, bodyOffset, bodySource.length - bodyOffset);
+        ByteBuffer wrap = ByteBuffer.wrap(bodySource);
+        wrap.position(bodyOffset);
         byte[] recordBuffer = ConstantSize.RECORD_HEADER.emptyBuff();
         wrap.get(recordBuffer);
         RecordHeader recordHeader = new RecordHeaderFactory().swap(recordBuffer);
@@ -263,14 +270,15 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
         wrap.get(variablesBuffer);
         Variables variables = new Variables(variablesBuffer);
         CompactNullValue compactNullValue = new CompactNullValue(wrap.getShort());
-        int bodyLength = bodyLength(variables, compactNullValue, getTableInfo());
-        byte[] body = new byte[bodyLength];
-        wrap.get(body);
         Compact compact = new Compact();
         long rowId = BitUtils.readLong(wrap, 6);
         long transactionId = BitUtils.readLong(wrap, 6);
         long rollPointer = BitUtils.readLong(wrap, 7);
+        int bodyLength = bodyLength(variables, compactNullValue, getTableInfo());
+        byte[] body = new byte[bodyLength];
+        wrap.get(body);
         compact.setBody(body);
+        compact.setVariables(variables);
         compact.setNullValues(compactNullValue);
         compact.setRecordHeader(recordHeader);
         compact.setRollPointer(rollPointer);
@@ -280,9 +288,30 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
     }
 
 
+    /**
+     * 拿到body真正的长度
+     * 一个列只有三种情况，是null，可变，固定
+     * 所以把null和固定的加起来，然后把可边长总长度加起来就oK
+     *
+     * @param variables        可变长度
+     * @param compactNullValue null值列表
+     * @param tableInfo        表结构
+     * @return body 长度
+     **/
     private int bodyLength(Variables variables, CompactNullValue compactNullValue, TableInfo tableInfo) {
-        //  todo
-        return 0;
+        int bodyLength = 0;
+        for (int i = 0; i < tableInfo.getColumns().size(); i++) {
+            Column currentCol = tableInfo.getColumns().get(i);
+            Integer nullIndex = currentCol.getNullIndex();
+            if (nullIndex != null && compactNullValue.isNull(nullIndex)) {
+                continue;
+            }
+            if (!currentCol.isDynamic()) {
+                bodyLength += currentCol.getLength();
+            }
+        }
+        bodyLength += variables.variableLength();
+        return bodyLength;
     }
 
 
@@ -329,7 +358,13 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
     @Override
     public int compare(UserRecord r1, UserRecord r2) {
         TableInfo tableInfo = getTableInfo();
-        return PrimaryKeyExtractor.extract(r1, tableInfo).compareTo(PrimaryKeyExtractor.extract(r2, tableInfo));
+        PrimaryKey primaryKey1 = PrimaryKeyExtractor.extract(r1, tableInfo);
+        PrimaryKey primaryKey2 = PrimaryKeyExtractor.extract(r2, tableInfo);
+        int compare = primaryKey1.compareTo(primaryKey2);
+        if (compare == 0) {
+            throw new RepetitionPrimaryKeyException(primaryKey1 + "已经存在");
+        }
+        return compare;
     }
 
     @Override
@@ -340,5 +375,10 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
     @Override
     public void setTableInfo(TableInfo tableInfo) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String toString() {
+        return new PageShower(this).pageString();
     }
 }

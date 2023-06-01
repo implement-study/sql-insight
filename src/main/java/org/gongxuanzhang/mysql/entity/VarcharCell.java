@@ -27,8 +27,11 @@ public class VarcharCell implements Cell<String> {
 
     private final String value;
 
+    private final byte[] bytes;
+
     public VarcharCell(String value) {
         this.value = value;
+        this.bytes = value.getBytes();
     }
 
     @Override
@@ -43,12 +46,12 @@ public class VarcharCell implements Cell<String> {
 
     @Override
     public byte[] toBytes() {
-        return this.value.getBytes();
+        return bytes;
     }
 
     @Override
     public int length() {
-        return -1;
+        return bytes.length;
     }
 
     @Override
@@ -56,5 +59,10 @@ public class VarcharCell implements Cell<String> {
         return new VarcharPrimaryKey(this.value);
     }
 
+
+    @Override
+    public String toString() {
+        return value;
+    }
 
 }

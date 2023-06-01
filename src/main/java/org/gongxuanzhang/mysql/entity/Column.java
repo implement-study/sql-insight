@@ -50,11 +50,13 @@ public class Column implements ExecuteInfo {
     private boolean notNull;
     private boolean unique;
     private DefaultValue<?> defaultValue;
+    private boolean dynamic;
     /**
      * 如果此字段可以为null 作为整个表null值列表中的第几个
      **/
     private Integer nullIndex;
     private Integer length;
+
 
 
     public Column() {
@@ -111,6 +113,7 @@ public class Column implements ExecuteInfo {
 
     private void analysisType(SQLDataType dataType) throws SqlParseException {
         this.type = ColumnType.valueOf(dataType.getName().toUpperCase());
+        this.dynamic = type.isDynamic();
         if (CollectionUtils.isEmpty(dataType.getArguments())) {
             this.length = type.getLength();
             SqlAssert.isTure(length != 1, this.name + " type: " + dataType.getName() + "没有长度");
@@ -119,6 +122,7 @@ public class Column implements ExecuteInfo {
         SQLExpr sqlExpr = dataType.getArguments().get(0);
         this.length = (Integer) ((SQLIntegerExpr) sqlExpr).getValue();
         SqlAssert.between(1, MAX_SIZE, this.length);
+
     }
 
 }

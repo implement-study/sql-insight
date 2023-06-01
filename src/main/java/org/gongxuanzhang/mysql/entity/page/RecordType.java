@@ -32,13 +32,13 @@ public enum RecordType {
      **/
     PAGE(0x01),
     /**
-     * 上确界
-     **/
-    SUPREMUM(0x02),
-    /**
      * 下确界
      **/
-    INFIMUM(0x03);
+    INFIMUM(0x02),
+    /**
+     * 上确界
+     **/
+    SUPREMUM(0x03);
 
 
     final int value;

@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
  **/
 public class IntegerPrimaryKey implements PrimaryKey {
 
-    private int value;
+    private final int value;
 
     public IntegerPrimaryKey(int value) {
         this.value = value;
@@ -48,5 +48,11 @@ public class IntegerPrimaryKey implements PrimaryKey {
             throw new IllegalArgumentException("主键异常");
         }
         return Integer.compare(this.value, ((IntegerPrimaryKey) other).value);
+    }
+
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
     }
 }

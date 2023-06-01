@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.mysql.entity.page;
 
+import lombok.EqualsAndHashCode;
 import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.entity.ShowLength;
@@ -27,6 +28,7 @@ import java.nio.ByteBuffer;
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
+@EqualsAndHashCode
 public class Supremum implements UserRecord, ShowLength, ByteSwappable {
 
     public static final String SUPREMUM_BODY = "supremum";

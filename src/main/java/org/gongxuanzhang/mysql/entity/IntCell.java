@@ -68,4 +68,8 @@ public class IntCell implements Cell<Integer> {
     }
 
 
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
 }

@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
  **/
 public class VarcharPrimaryKey implements PrimaryKey {
 
-    private String value;
+    private final String value;
 
     public VarcharPrimaryKey(String value) {
         this.value = value;
@@ -48,5 +48,11 @@ public class VarcharPrimaryKey implements PrimaryKey {
             throw new IllegalArgumentException("主键异常");
         }
         return this.value.compareTo(((VarcharPrimaryKey) other).value);
+    }
+
+
+    @Override
+    public String toString() {
+        return value;
     }
 }

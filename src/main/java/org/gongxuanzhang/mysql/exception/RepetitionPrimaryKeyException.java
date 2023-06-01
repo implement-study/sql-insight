@@ -14,29 +14,15 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.entity;
-
-import org.jetbrains.annotations.NotNull;
+package org.gongxuanzhang.mysql.exception;
 
 /**
- * 主键
- *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface PrimaryKey extends ExecuteInfo, Comparable<PrimaryKey> {
+public class RepetitionPrimaryKeyException extends MySQLRuntimeException{
 
 
-    /**
-     * 主键是可以比较的
-     *
-     * @param other 同 compare
-     * @return 同compare to
-     **/
-    @Override
-    int compareTo(@NotNull PrimaryKey other);
-
-
-
-
-
+    public RepetitionPrimaryKeyException(String message) {
+        super(message);
+    }
 }

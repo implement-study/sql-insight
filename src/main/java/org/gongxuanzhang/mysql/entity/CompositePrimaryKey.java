@@ -49,4 +49,10 @@ public class CompositePrimaryKey implements PrimaryKey {
         }
         return 0;
     }
+
+
+    @Override
+    public String toString() {
+        return this.list.toString();
+    }
 }

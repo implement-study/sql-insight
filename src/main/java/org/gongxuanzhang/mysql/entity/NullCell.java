@@ -50,5 +50,10 @@ public final class NullCell implements Cell<Object> {
         throw new MySQLException("主键不能为空");
     }
 
+    @Override
+    public String toString() {
+        return "(null)";
+    }
+
 
 }

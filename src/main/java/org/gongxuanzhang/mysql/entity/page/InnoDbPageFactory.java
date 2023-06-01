@@ -88,7 +88,6 @@ public class InnoDbPageFactory implements ByteBeanSwapper<InnoDbPage>, BeanSuppl
         short freeLength = (short) (buffer.remaining() - slotByteLength - ConstantSize.FILE_TRAILER.getSize());
         buffer.position(buffer.position() + freeLength);
         bean.setFreeSpace(freeLength);
-
         candidate = new byte[slotByteLength];
         buffer.get(candidate);
         PageDirectory pd = new PageDirectoryFactory().swap(candidate);

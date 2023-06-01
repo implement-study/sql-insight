@@ -36,7 +36,7 @@ class InsertTest {
         testGod.prepareGodTable()
         """
             insert into ${testGod.fullName} (id,age,name,gender,id_card) 
-            values(1,18,'zhangsan','男','abcd'),
+            values
                (2,24,'lisi','女','abcd'),
                (3,25,'wangwu','女','afff')
             

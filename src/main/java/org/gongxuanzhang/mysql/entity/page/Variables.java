@@ -48,4 +48,15 @@ public class Variables implements ByteSwappable {
         return this.varBytes[index];
     }
 
+    /**
+     * 所有变长字段的总长度
+     **/
+    public int variableLength() {
+        int sumLength = 0;
+        for (byte varByte : this.varBytes) {
+            sumLength += varByte;
+        }
+        return sumLength;
+    }
+
 }

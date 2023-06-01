@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.entity;
-
-import org.jetbrains.annotations.NotNull;
+package org.gongxuanzhang.mysql.exception;
 
 /**
- * 主键
- *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface PrimaryKey extends ExecuteInfo, Comparable<PrimaryKey> {
+public class MySQLRuntimeException extends RuntimeException{
 
+    public MySQLRuntimeException() {
+    }
 
-    /**
-     * 主键是可以比较的
-     *
-     * @param other 同 compare
-     * @return 同compare to
-     **/
-    @Override
-    int compareTo(@NotNull PrimaryKey other);
+    public MySQLRuntimeException(String message) {
+        super(message);
+    }
 
+    public MySQLRuntimeException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
+    public MySQLRuntimeException(Throwable cause) {
+        super(cause);
+    }
 
-
-
+    public MySQLRuntimeException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }

@@ -84,7 +84,7 @@ public class PrimaryKeyExtractor {
         if (primaryKeyIndex.length == 1) {
             int primaryLength;
             Column primaryCol = tableInfo.getColumns().get(0);
-            if (primaryCol.getType().isDynamic()) {
+            if (primaryCol.isDynamic()) {
                 primaryLength = compact.getVariables().get(0);
             } else {
                 primaryLength = primaryCol.getLength();

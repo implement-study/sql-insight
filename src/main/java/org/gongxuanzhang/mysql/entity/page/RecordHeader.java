@@ -24,6 +24,8 @@ import org.gongxuanzhang.mysql.entity.ShowLength;
 import org.gongxuanzhang.mysql.tool.BitSetter;
 import org.gongxuanzhang.mysql.tool.BitUtils;
 
+import java.util.Arrays;
+
 /**
  * 记录头信息 占5字节
  * 一共40位
@@ -175,5 +177,23 @@ public class RecordHeader implements ShowLength, ByteSwappable {
     @Override
     public int length() {
         return this.source.length;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        RecordHeader that = (RecordHeader) o;
+        return Arrays.equals(source, that.source);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(source);
     }
 }

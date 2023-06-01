@@ -113,7 +113,7 @@ class CreateTableTest {
 
     fun doCreateTable(database: String, tableName: String): Result {
         return """
-                    create table `$database.$tableName`(
+                    create table if not exists `$database.$tableName`(
                     `id` int primary key auto_increment,
                     name varchar(200) not null,
                     gender varchar(200) default '张三' not null,
