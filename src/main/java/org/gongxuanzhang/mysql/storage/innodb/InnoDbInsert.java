@@ -50,7 +50,8 @@ public class InnoDbInsert implements InsertEngine {
     private void doInsert(InsertRow row, InnoDbPageSelector selector) throws MySQLException {
         //  选择需要插入到哪个页,如果没有就得创建
         InnoDbPage targetPage = selector.selectPage(row);
-        targetPage.insert(row);
+        InnodbPageSupport support = new InnodbPageSupport(targetPage);
+        support.insert(row);
     }
 
 
