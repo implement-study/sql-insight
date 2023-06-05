@@ -23,18 +23,17 @@ import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.entity.page.Compact;
 import org.gongxuanzhang.mysql.entity.page.CompactNullValue;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
-import org.gongxuanzhang.mysql.entity.page.RecordHeader;
-import org.gongxuanzhang.mysql.entity.page.RecordHeaderFactory;
 import org.gongxuanzhang.mysql.entity.page.Supremum;
 import org.gongxuanzhang.mysql.entity.page.UserRecord;
 import org.gongxuanzhang.mysql.entity.page.Variables;
-import org.gongxuanzhang.mysql.tool.BitUtils;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
+
+import static org.gongxuanzhang.mysql.tool.PageUtils.getUserRecordByOffset;
 
 /**
  * 展示一个页
@@ -59,7 +58,7 @@ public class PageShower {
         }
         short offset = (short) ConstantSize.INFIMUM.offset();
         while (true) {
-            UserRecord userRecord = getUserRecordByOffset(offset, tableInfo);
+            UserRecord userRecord = getUserRecordByOffset(page, offset);
             if (userRecord instanceof Supremum) {
                 break;
             }
@@ -101,56 +100,6 @@ public class PageShower {
         return context;
     }
 
-    private UserRecord getUserRecordByOffset(short offset, TableInfo tableInfo) {
-        if (offset == ConstantSize.INFIMUM.offset()) {
-            return this.page.getInfimum();
-        }
-        if (offset == ConstantSize.SUPREMUM.offset()) {
-            return this.page.getSupremum();
-        }
-        int bodyOffset = offset - ConstantSize.SUPREMUM.offset() - ConstantSize.SUPREMUM.getSize();
-        byte[] bodySource = this.page.getUserRecords().getSource();
-        ByteBuffer wrap = ByteBuffer.wrap(bodySource);
-        wrap.position(bodyOffset);
-        byte[] recordBuffer = ConstantSize.RECORD_HEADER.emptyBuff();
-        wrap.get(recordBuffer);
-        RecordHeader recordHeader = new RecordHeaderFactory().swap(recordBuffer);
-        byte[] variablesBuffer = new byte[tableInfo.getVariableCount()];
-        wrap.get(variablesBuffer);
-        Variables variables = new Variables(variablesBuffer);
-        CompactNullValue compactNullValue = new CompactNullValue(wrap.getShort());
-        Compact compact = new Compact();
-        long rowId = BitUtils.readLong(wrap, 6);
-        long transactionId = BitUtils.readLong(wrap, 6);
-        long rollPointer = BitUtils.readLong(wrap, 7);
-        int bodyLength = bodyLength(variables, compactNullValue, tableInfo);
-        byte[] body = new byte[bodyLength];
-        wrap.get(body);
-        compact.setBody(body);
-        compact.setVariables(variables);
-        compact.setNullValues(compactNullValue);
-        compact.setRecordHeader(recordHeader);
-        compact.setRollPointer(rollPointer);
-        compact.setRowId(rowId);
-        compact.setTransactionId(transactionId);
-        return compact;
-    }
-
-    private int bodyLength(Variables variables, CompactNullValue compactNullValue, TableInfo tableInfo) {
-        int bodyLength = 0;
-        for (int i = 0; i < tableInfo.getColumns().size(); i++) {
-            Column currentCol = tableInfo.getColumns().get(i);
-            Integer nullIndex = currentCol.getNullIndex();
-            if (nullIndex != null && compactNullValue.isNull(nullIndex)) {
-                continue;
-            }
-            if (!currentCol.isDynamic()) {
-                bodyLength += currentCol.getLength();
-            }
-        }
-        bodyLength += variables.variableLength();
-        return bodyLength;
-    }
 
     private String join(List<List<String>> tableList, List<Integer> maxLength) {
         String breakStr = breakStr(maxLength);

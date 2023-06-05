@@ -63,4 +63,9 @@ public class PageDirectory implements ShowLength, ByteSwappable {
     public int slotCount() {
         return slots.length;
     }
+
+
+    public short indexSlot(int index) {
+        return this.slots[index];
+    }
 }
