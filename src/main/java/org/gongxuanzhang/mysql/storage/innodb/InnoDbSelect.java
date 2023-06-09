@@ -16,8 +16,12 @@
 
 package org.gongxuanzhang.mysql.storage.innodb;
 
+import org.gongxuanzhang.mysql.core.InnoDbPageSelector;
 import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.entity.SingleSelectInfo;
+import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
+import org.gongxuanzhang.mysql.entity.page.InnoDbPageFactory;
+import org.gongxuanzhang.mysql.entity.page.InnodbPageInfoVisitor;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.storage.SelectEngine;
 
@@ -31,6 +35,20 @@ public class InnoDbSelect implements SelectEngine {
 
     @Override
     public Result select(SingleSelectInfo info) throws MySQLException {
+        InnoDbPageSelector selector = InnoDbPageSelector.open(info);
+        byte[] rootPageBuffer = selector.getRootPage();
+        InnoDbPageFactory factory = InnoDbPageFactory.getInstance();
+        InnoDbPage rootPage = factory.swap(rootPageBuffer);
+        InnodbPageInfoVisitor rootInfo = new InnodbPageInfoVisitor(rootPage);
+        if (rootInfo.isDataPage()) {
+            return singlePage(rootInfo, info);
+        }
+        throw new UnsupportedOperationException("这是目录页，需要分裂了");
+    }
+
+    private Result singlePage(InnodbPageInfoVisitor pageInfoVisitor, SingleSelectInfo info) {
+        InnoDbPage rootPage = pageInfoVisitor.getPage();
         return null;
+
     }
 }

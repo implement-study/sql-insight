@@ -53,7 +53,7 @@ public class UpdateAnalysis implements TokenAnalysis {
         offset += TokenSupport.fillWhere(updateInfo, sqlTokenList.subList(offset, sqlTokenList.size()));
         ExceptionThrower.ifNotThrow(offset == sqlTokenList.size());
         StorageEngine engine = Context.selectStorageEngine(updateInfo.getTableInfo());
-        return new UpdateExecutor(engine, updateInfo);
+        return new UpdateExecutor(updateInfo);
     }
 
     private int fillSet(UpdateInfo updateInfo, List<SqlToken> tokenList, int offset) throws SqlAnalysisException {

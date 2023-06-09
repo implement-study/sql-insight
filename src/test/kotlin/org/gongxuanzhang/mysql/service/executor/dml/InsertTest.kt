@@ -34,13 +34,14 @@ class InsertTest {
     fun simpleInsert() {
         val testGod = TestGod()
         testGod.prepareGodTable()
-        """
+        val insertResult = """
             insert into ${testGod.fullName} (id,age,name,gender,id_card) 
             values
                (2,24,'lisi','女','abcd'),
                (3,25,'wangwu','女','afff')
             
         """.doSql()
+
     }
 
 

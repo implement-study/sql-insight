@@ -58,7 +58,6 @@ public class Column implements ExecuteInfo {
     private Integer length;
 
 
-
     public Column() {
 
     }

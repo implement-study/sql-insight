@@ -21,18 +21,30 @@ import org.gongxuanzhang.mysql.entity.SingleSelectInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.executor.EngineExecutor;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
+import org.gongxuanzhang.mysql.tool.Context;
 
 /**
+ * 单表查询
+ *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class SelectExecutor extends EngineExecutor<SingleSelectInfo> {
+public class SingleSelectExecutor extends EngineExecutor<SingleSelectInfo> {
 
-    public SelectExecutor(StorageEngine engine, SingleSelectInfo info) {
-        super(engine, info);
+    private final StorageEngine storageEngine;
+
+    public SingleSelectExecutor(SingleSelectInfo info) throws MySQLException {
+        super(info);
+        this.storageEngine = Context.selectStorageEngine(info.getFrom());
+    }
+
+
+    @Override
+    public StorageEngine getEngine() {
+        return storageEngine;
     }
 
     @Override
-    public Result doEngine(StorageEngine engine, SingleSelectInfo info) throws MySQLException {
-        return engine.select(info);
+    public Result doExecute() throws MySQLException {
+        return this.storageEngine.select(this.getInfo());
     }
 }

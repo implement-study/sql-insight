@@ -16,14 +16,16 @@
 
 package org.gongxuanzhang.mysql.entity;
 
+import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import lombok.Data;
-import org.gongxuanzhang.mysql.core.FromBox;
 import org.gongxuanzhang.mysql.core.OrderBox;
+import org.gongxuanzhang.mysql.core.TableInfoBox;
 import org.gongxuanzhang.mysql.core.WhereBox;
 import org.gongxuanzhang.mysql.core.select.As;
-import org.gongxuanzhang.mysql.core.select.From;
 import org.gongxuanzhang.mysql.core.select.Order;
 import org.gongxuanzhang.mysql.core.select.Where;
+import org.gongxuanzhang.mysql.exception.MySQLException;
+import org.gongxuanzhang.mysql.tool.TableInfoUtils;
 
 /**
  * 单表查询信息
@@ -31,10 +33,13 @@ import org.gongxuanzhang.mysql.core.select.Where;
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Data
-public class SingleSelectInfo implements ExecuteInfo, FromBox, WhereBox, OrderBox {
+public class SingleSelectInfo implements ExecuteInfo, TableInfoBox, WhereBox, OrderBox {
 
+    public SingleSelectInfo(MySqlSelectQueryBlock select) throws MySQLException {
+        setTableInfo(TableInfoUtils.selectTableInfo(select.getFrom().toString()));
+    }
 
-    private From from;
+    private TableInfo from;
 
     private As as;
 
@@ -43,4 +48,13 @@ public class SingleSelectInfo implements ExecuteInfo, FromBox, WhereBox, OrderBo
     private Order<?> order;
 
 
+    @Override
+    public TableInfo getTableInfo() {
+        return from;
+    }
+
+    @Override
+    public void setTableInfo(TableInfo tableInfo) {
+        this.from = tableInfo;
+    }
 }

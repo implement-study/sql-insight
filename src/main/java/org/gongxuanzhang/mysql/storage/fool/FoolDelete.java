@@ -18,7 +18,7 @@ package org.gongxuanzhang.mysql.storage.fool;
 
 import com.alibaba.fastjson2.JSONObject;
 import org.gongxuanzhang.mysql.core.result.Result;
-import org.gongxuanzhang.mysql.core.select.From;
+import org.gongxuanzhang.mysql.core.select.SingleFrom;
 import org.gongxuanzhang.mysql.core.select.Where;
 import org.gongxuanzhang.mysql.entity.DeleteInfo;
 import org.gongxuanzhang.mysql.entity.TableInfo;
@@ -42,7 +42,7 @@ public class FoolDelete implements DeleteEngine {
 
     @Override
     public Result delete(DeleteInfo info) throws MySQLException {
-        From from = info.getFrom();
+        SingleFrom from = info.getFrom();
         TableInfo main = from.getMain();
         Where where = info.getWhere();
         File file = main.dataFile();

@@ -19,7 +19,7 @@ package org.gongxuanzhang.mysql.exception;
 /**
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class RepetitionPrimaryKeyException extends MySQLRuntimeException{
+public class RepetitionPrimaryKeyException extends MySQLRuntimeException {
 
 
     public RepetitionPrimaryKeyException(String message) {

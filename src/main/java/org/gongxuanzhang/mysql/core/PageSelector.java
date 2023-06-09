@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.mysql.core;
 
+import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 
 /**
@@ -48,6 +49,16 @@ public interface PageSelector {
      * @param newPage 新页的数组
      **/
     void addNewPage(byte[] newPage) throws MySQLException;
+
+
+    /**
+     * 拿到一个页的下一个页。
+     * 如果参数是目录页，将指向下一个目录页
+     *
+     * @param page 基准页
+     * @return 当没有下一个页时 将指向下一个页
+     **/
+    byte[] getNextPage(InnoDbPage page) throws MySQLException;
 
 
 }

@@ -16,7 +16,7 @@
 
 package org.gongxuanzhang.mysql.core;
 
-import org.gongxuanzhang.mysql.core.select.From;
+import org.gongxuanzhang.mysql.core.select.SingleFrom;
 
 /**
  * @author gxz gongxuanzhang@foxmail.com
@@ -28,7 +28,7 @@ public interface FromBox {
      *
      * @param from from实体
      **/
-    void setFrom(From from);
+    void setFrom(SingleFrom from);
 
 
     /**
@@ -36,5 +36,5 @@ public interface FromBox {
      *
      * @return from实体
      **/
-    From getFrom();
+    SingleFrom getFrom();
 }

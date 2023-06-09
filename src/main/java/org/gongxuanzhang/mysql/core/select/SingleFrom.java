@@ -23,14 +23,14 @@ import org.gongxuanzhang.mysql.core.TableInfoBox;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 
 /**
- * select 中的from内容
+ * 单表from
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class From implements TableInfoBox {
+public class SingleFrom implements TableInfoBox {
 
     /**
      * 查询主表

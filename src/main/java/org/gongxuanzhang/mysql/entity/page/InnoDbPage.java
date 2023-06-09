@@ -244,19 +244,6 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
         PageWriter.write(this);
     }
 
-    /**
-     * 是否是索引页
-     **/
-    public boolean isIndexPage() {
-        return this.getFileHeader().getPageType() == PageType.FIL_PAGE_INODE.getValue();
-    }
-
-    /**
-     * 是否是数据页
-     **/
-    public boolean isDataPage() {
-        return this.getFileHeader().getPageType() == PageType.FIL_PAGE_INDEX.getValue();
-    }
 
     @Override
     public int compare(UserRecord r1, UserRecord r2) {

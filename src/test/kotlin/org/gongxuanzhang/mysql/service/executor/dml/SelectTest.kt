@@ -16,8 +16,8 @@
 
 package org.gongxuanzhang.mysql.service.executor.dml
 
-import org.gongxuanzhang.mysql.core.InnoDbPageSelector
-import org.gongxuanzhang.mysql.tool.Context
+import org.gongxuanzhang.mysql.doSql
+import org.gongxuanzhang.mysql.tool.TestGod
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 
@@ -32,8 +32,9 @@ class SelectTest {
 
     @Test
     fun selectAll() {
-        val open = InnoDbPageSelector.open(Context.getTableManager().select("god_test_db.god_test_table"))
-        var rootPage = open.rootPage
+        val testGod = TestGod()
+        testGod.prepareGodTable()
+        "select * from ${testGod.fullName}".doSql()
     }
 
 

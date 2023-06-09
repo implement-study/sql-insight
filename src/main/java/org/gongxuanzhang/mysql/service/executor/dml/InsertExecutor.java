@@ -1,6 +1,6 @@
 /*
- * Copyright 2023 java-mysql  and the original author or authors <gongxuanzhangmelt@gmail.com>.
  *
+ * Copyright 2023 java-mysql  and the original author or authors <gongxuanzhangmelt@gmail.com>.
  * Licensed under the GNU Affero General Public License v3.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,18 +21,27 @@ import org.gongxuanzhang.mysql.entity.InsertInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.executor.EngineExecutor;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
+import org.gongxuanzhang.mysql.tool.Context;
 
 /**
  * @author gxz gongxuanzhang@foxmail.com
  **/
 public class InsertExecutor extends EngineExecutor<InsertInfo> {
 
-    public InsertExecutor(StorageEngine engine, InsertInfo info) {
-        super(engine, info);
+    private final StorageEngine engine;
+
+    public InsertExecutor(InsertInfo info) throws MySQLException {
+        super(info);
+        this.engine = Context.getEngineManager().select(info.getTableInfo().getEngineName());
     }
 
     @Override
-    public Result doEngine(StorageEngine engine, InsertInfo info) throws MySQLException {
-        return engine.insert(info);
+    public StorageEngine getEngine() {
+        return this.engine;
+    }
+
+    @Override
+    public Result doExecute() throws MySQLException {
+        return this.engine.insert(this.getInfo());
     }
 }

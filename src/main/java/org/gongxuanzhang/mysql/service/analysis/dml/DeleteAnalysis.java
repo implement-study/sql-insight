@@ -49,7 +49,7 @@ public class DeleteAnalysis implements StandaloneSqlAnalysis {
         MySqlDeleteStatement deleteStatement = (MySqlDeleteStatement) sqlStatement;
         DeleteInfo deleteInfo = warp(deleteStatement);
         StorageEngine engine = Context.selectStorageEngine(deleteInfo.getFrom().getTableInfo().getEngineName());
-        return new DeleteExecutor(engine, deleteInfo);
+        return new DeleteExecutor(deleteInfo);
     }
 
     private DeleteInfo warp(MySqlDeleteStatement deleteStatement) throws MySQLException {

@@ -19,7 +19,7 @@ package org.gongxuanzhang.mysql.exception;
 /**
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class MySQLRuntimeException extends RuntimeException{
+public class MySQLRuntimeException extends RuntimeException {
 
     public MySQLRuntimeException() {
     }
@@ -36,7 +36,8 @@ public class MySQLRuntimeException extends RuntimeException{
         super(cause);
     }
 
-    public MySQLRuntimeException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public MySQLRuntimeException(String message, Throwable cause, boolean enableSuppression,
+                                 boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

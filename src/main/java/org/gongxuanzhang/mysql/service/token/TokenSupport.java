@@ -23,9 +23,9 @@ import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.core.TableInfoBox;
 import org.gongxuanzhang.mysql.core.WhereBox;
 import org.gongxuanzhang.mysql.core.select.Condition;
-import org.gongxuanzhang.mysql.core.select.From;
 import org.gongxuanzhang.mysql.core.select.Order;
 import org.gongxuanzhang.mysql.core.select.OrderEnum;
+import org.gongxuanzhang.mysql.core.select.SingleFrom;
 import org.gongxuanzhang.mysql.core.select.Where;
 import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.entity.TableInfo;
@@ -163,7 +163,7 @@ public class TokenSupport {
      * @return 返回偏移量
      **/
     public static int fillFrom(FromBox fromBox, List<SqlToken> sqlTokenList) throws MySQLException {
-        From from = new From();
+        SingleFrom from = new SingleFrom();
         TokenSupport.mustTokenKind(sqlTokenList.get(0), TokenKind.FROM);
         fromBox.setFrom(from);
         int tableOffset = TokenSupport.fillTableInfo(from, sqlTokenList, 1);

@@ -23,8 +23,6 @@ import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.analysis.StandaloneSqlAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
 import org.gongxuanzhang.mysql.service.executor.dml.InsertExecutor;
-import org.gongxuanzhang.mysql.storage.StorageEngine;
-import org.gongxuanzhang.mysql.tool.Context;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,85 +34,6 @@ import org.springframework.stereotype.Component;
 public class InsertAnalysis implements StandaloneSqlAnalysis {
 
 
-//    @Override
-//    public Executor analysis(List<SqlToken> sqlTokenList) throws MySQLException {
-//        TokenSupport.mustTokenKind(sqlTokenList.get(1), TokenKind.INTO);
-//        InsertInfo info = new InsertInfo();
-//        int offset = 2;
-//        offset += TokenSupport.fillTableInfo(info, sqlTokenList, offset);
-//        final int finalOffset = offset;
-//        TokenSupport.token(sqlTokenList.get(finalOffset))
-//                .when(TokenKind.LEFT_PAREN)
-//                .then(() -> haveColumns(info, sqlTokenList, finalOffset))
-//                .when(TokenKind.VALUES)
-//                .then(() -> withoutColumns(info, sqlTokenList, finalOffset))
-//                .get();
-//        StorageEngine engine = Context.selectStorageEngine(info.getTableInfo());
-//        return new InsertExecutor(engine, info);
-//    }
-//
-//
-//    private void haveColumns(InsertInfo info, List<SqlToken> sqlTokenList, int offset) throws MySQLException {
-//        TokenSupport.mustTokenKind(sqlTokenList.get(offset), TokenKind.LEFT_PAREN);
-//        offset++;
-//        while (!TokenSupport.isTokenKind(sqlTokenList.get(offset), TokenKind.RIGHT_PAREN)) {
-//            switch (sqlTokenList.get(offset).getTokenKind()) {
-//                case COMMA:
-//                    offset++;
-//                    break;
-//                case VAR:
-//                    info.getColumns().add(sqlTokenList.get(offset).getValue());
-//                    offset++;
-//                    break;
-//                default:
-//                    ExceptionThrower.errorToken(sqlTokenList.get(offset));
-//            }
-//        }
-//        offset++;
-//        withoutColumns(info, sqlTokenList, offset);
-//    }
-//
-//    private void withoutColumns(InsertInfo info, List<SqlToken> sqlTokenList, int offset) throws MySQLException {
-//        TokenSupport.mustTokenKind(sqlTokenList.get(offset), TokenKind.VALUES);
-//        int subOffset = 0;
-//        do {
-//            subOffset += addValue(info, sqlTokenList, offset + subOffset + 1);
-//        }
-//        while (subOffset + offset + 1 < sqlTokenList.size());
-//    }
-//
-//    /**
-//     * 添加一行记录，返回偏移量
-//     *
-//     * @return 偏移量
-//     **/
-//    private int addValue(InsertInfo info, List<SqlToken> sqlTokenList, int offset) throws MySQLException {
-//        List<Cell<?>> row = new ArrayList<>();
-//        TokenSupport.mustTokenKind(sqlTokenList.get(offset), TokenKind.LEFT_PAREN);
-//        int currentOffset = 1;
-//        while (!TokenSupport.isTokenKind(sqlTokenList.get(offset + currentOffset), TokenKind.RIGHT_PAREN)) {
-//            if (currentOffset % 2 == 1) {
-//                Cell<?> cell = TokenSupport.parseCell(sqlTokenList.get(offset + currentOffset));
-//                row.add(cell);
-//            } else {
-//                TokenSupport.mustTokenKind(sqlTokenList.get(offset + currentOffset), TokenKind.COMMA);
-//            }
-//            currentOffset++;
-//        }
-//        if (info.getInsertData() == null) {
-//            info.setInsertData(new ArrayList<>());
-//        }
-//        info.getInsertData().add(row);
-//        // 最后偏移 右括号
-//        currentOffset++;
-//        //  如果还没有结束 判断下一个token是不是 ","
-//        if (currentOffset + offset + 1 < sqlTokenList.size()) {
-//            TokenSupport.mustTokenKind(sqlTokenList.get(offset + currentOffset), TokenKind.COMMA);
-//            currentOffset++;
-//        }
-//        return currentOffset;
-//    }
-
     @Override
     public Class<? extends SQLStatement> support() {
         return MySqlInsertStatement.class;
@@ -124,7 +43,6 @@ public class InsertAnalysis implements StandaloneSqlAnalysis {
     public Executor doAnalysis(SQLStatement sqlStatement) throws MySQLException {
         MySqlInsertStatement insertStatement = (MySqlInsertStatement) sqlStatement;
         InsertInfo info = new InsertInfo(insertStatement);
-        StorageEngine engine = Context.getEngineManager().select(info.getTableInfo().getEngineName());
-        return new InsertExecutor(engine, info);
+        return new InsertExecutor(info);
     }
 }

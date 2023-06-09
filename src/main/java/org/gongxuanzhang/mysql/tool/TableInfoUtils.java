@@ -19,7 +19,7 @@ package org.gongxuanzhang.mysql.tool;
 import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import org.gongxuanzhang.mysql.core.FromBox;
 import org.gongxuanzhang.mysql.core.SessionManager;
-import org.gongxuanzhang.mysql.core.select.From;
+import org.gongxuanzhang.mysql.core.select.SingleFrom;
 import org.gongxuanzhang.mysql.entity.DatabaseInfo;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
@@ -45,7 +45,7 @@ public abstract class TableInfoUtils {
      **/
     public static void assembleTableInfo(FromBox box, String tableName) throws MySQLException {
         TableInfo tableInfo = selectTableInfo(tableName);
-        box.setFrom(new From(tableInfo));
+        box.setFrom(new SingleFrom(tableInfo));
     }
 
     /**

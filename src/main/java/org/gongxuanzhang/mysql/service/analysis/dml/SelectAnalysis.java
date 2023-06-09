@@ -16,113 +16,46 @@
 
 package org.gongxuanzhang.mysql.service.analysis.dml;
 
-import org.gongxuanzhang.mysql.core.select.As;
-import org.gongxuanzhang.mysql.core.select.JsonOrder;
-import org.gongxuanzhang.mysql.core.select.SelectCol;
+import com.alibaba.druid.sql.ast.SQLStatement;
+import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
+import com.alibaba.druid.sql.ast.statement.SQLSelect;
+import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
+import com.alibaba.druid.sql.ast.statement.SQLTableSource;
+import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import org.gongxuanzhang.mysql.entity.SingleSelectInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
-import org.gongxuanzhang.mysql.service.analysis.TokenAnalysis;
+import org.gongxuanzhang.mysql.service.analysis.StandaloneSqlAnalysis;
 import org.gongxuanzhang.mysql.service.executor.Executor;
-import org.gongxuanzhang.mysql.service.executor.dml.SelectExecutor;
-import org.gongxuanzhang.mysql.service.token.SqlToken;
-import org.gongxuanzhang.mysql.service.token.TokenKind;
-import org.gongxuanzhang.mysql.service.token.TokenSupport;
-import org.gongxuanzhang.mysql.storage.StorageEngine;
-import org.gongxuanzhang.mysql.tool.Context;
-import org.gongxuanzhang.mysql.tool.ExceptionThrower;
-
-import java.util.List;
+import org.gongxuanzhang.mysql.service.executor.dml.SingleSelectExecutor;
+import org.springframework.stereotype.Component;
 
 /**
  * select 解析器
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class SelectAnalysis implements TokenAnalysis {
+@Component
+public class SelectAnalysis implements StandaloneSqlAnalysis {
 
 
     @Override
-    public Executor analysis(List<SqlToken> sqlTokenList) throws MySQLException {
-        SingleSelectInfo singleSelectInfo = new SingleSelectInfo();
-        int offset = 1;
-        offset += fillAs(singleSelectInfo, sqlTokenList.subList(1, sqlTokenList.size()));
-        offset += TokenSupport.fillFrom(singleSelectInfo, sqlTokenList.subList(offset, sqlTokenList.size()));
-        offset += TokenSupport.fillWhere(singleSelectInfo, sqlTokenList.subList(offset, sqlTokenList.size()));
-        singleSelectInfo.setOrder(new JsonOrder());
-        offset += TokenSupport.fillOrderBy(singleSelectInfo, sqlTokenList.subList(offset, sqlTokenList.size()));
-        ExceptionThrower.ifNotThrow(offset == sqlTokenList.size(), "sql解析失败");
-        StorageEngine engine = Context.selectStorageEngine(singleSelectInfo.getFrom().getMain());
-        return new SelectExecutor(engine, singleSelectInfo);
+    public Class<? extends SQLStatement> support() {
+        return SQLSelectStatement.class;
     }
 
-
-    /**
-     * 解析别名
-     */
-    private int fillAs(SingleSelectInfo singleSelectInfo, List<SqlToken> sqlTokenList) throws MySQLException {
-        int offset = 0;
-        As as = new As();
-        while (offset < sqlTokenList.size() && TokenSupport.isNotTokenKind(sqlTokenList.get(offset), TokenKind.FROM)) {
-            //  *
-            if (TokenSupport.isTokenKind(sqlTokenList.get(offset), TokenKind.MULTI)) {
-                offset += multiAs(as, sqlTokenList, offset);
-            } else {
-                offset += singleAs(as, sqlTokenList, offset);
-            }
+    @Override
+    public Executor doAnalysis(SQLStatement sqlStatement) throws MySQLException {
+        SQLSelectStatement selectStatement = (SQLSelectStatement) sqlStatement;
+        SQLSelect select = selectStatement.getSelect();
+        MySqlSelectQueryBlock query = (MySqlSelectQueryBlock) select.getQueryBlock();
+        SQLTableSource from = query.getFrom();
+        if (from instanceof SQLExprTableSource) {
+            return new SingleSelectExecutor(singleSelectInfo(query));
         }
-        if (as.isEmpty()) {
-            throw new MySQLException("无法解析列");
-        }
-        singleSelectInfo.setAs(as);
-        return offset;
+        throw new UnsupportedOperationException("还不支持连表查询");
     }
 
-
-    /**
-     * 解析带*号的as
-     *
-     * @return 返回偏移量
-     **/
-    private int multiAs(As as, List<SqlToken> sqlTokenList, int start) throws MySQLException {
-        int offset = 0;
-        TokenSupport.mustTokenKind(sqlTokenList.get(offset + start), TokenKind.MULTI);
-        offset++;
-        if (offset + start < sqlTokenList.size() &&
-                TokenSupport.isTokenKind(sqlTokenList.get(offset + start), TokenKind.COMMA)) {
-            offset++;
-        }
-        as.addSelectCol(SelectCol.allCol());
-        return offset;
+    private SingleSelectInfo singleSelectInfo(MySqlSelectQueryBlock sqlSelectQueryBlock) throws MySQLException {
+        return new SingleSelectInfo(sqlSelectQueryBlock);
     }
-
-
-    /**
-     * 解析单列
-     *
-     * @return 返回偏移量
-     **/
-    private int singleAs(As as, List<SqlToken> sqlTokenList, int start) throws MySQLException {
-        int offset = 0;
-        String key = TokenSupport.getString(sqlTokenList.get(start + offset));
-        offset++;
-        if (offset + start < sqlTokenList.size() &&
-                TokenSupport.isTokenKind(sqlTokenList.get(start + offset), TokenKind.AS)) {
-            offset++;
-        }
-        String value = null;
-        if (offset + start < sqlTokenList.size() &&
-                TokenSupport.isTokenKind(sqlTokenList.get(start + offset), TokenKind.LITERACY, TokenKind.VAR)) {
-            value = TokenSupport.getString(sqlTokenList.get(start + offset));
-            offset++;
-        }
-        as.addSelectCol(SelectCol.single(key, value));
-        //  判断下一个是否是逗号或者结束
-        if (offset + start < sqlTokenList.size() && TokenSupport.isTokenKind(sqlTokenList.get(start + offset),
-                TokenKind.COMMA)) {
-            offset++;
-        }
-        return offset;
-    }
-
-
 }

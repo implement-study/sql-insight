@@ -14,32 +14,40 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.service.executor.dml;
+package org.gongxuanzhang.mysql.entity;
 
-import org.gongxuanzhang.mysql.core.result.Result;
-import org.gongxuanzhang.mysql.entity.UpdateInfo;
-import org.gongxuanzhang.mysql.exception.MySQLException;
-import org.gongxuanzhang.mysql.service.executor.EngineExecutor;
-import org.gongxuanzhang.mysql.storage.StorageEngine;
+import java.util.List;
 
 /**
- * update 执行器
+ * 单表查询行
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class UpdateExecutor extends EngineExecutor<UpdateInfo> {
+public class SingleSelectRowImpl implements Row {
 
-    public UpdateExecutor(UpdateInfo info) {
-        super(info);
+    private final List<Cell<?>> cellList;
+
+    private final TableInfo tableInfo;
+
+    public SingleSelectRowImpl(List<Cell<?>> cellList) {
+        this(cellList, null);
+    }
+
+    public SingleSelectRowImpl(List<Cell<?>> cellList, TableInfo tableInfo) {
+        this.cellList = cellList;
+        this.tableInfo = tableInfo;
+    }
+
+
+    @Override
+    public List<Cell<?>> getCellList() {
+        return this.cellList;
     }
 
     @Override
-    public StorageEngine getEngine() {
-        return null;
+    public TableInfo getTableInfo() {
+        return this.tableInfo;
     }
 
-    @Override
-    public Result doExecute() throws MySQLException {
-        return null;
-    }
+
 }

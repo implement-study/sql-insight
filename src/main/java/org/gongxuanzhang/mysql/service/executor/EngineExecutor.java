@@ -16,9 +16,7 @@
 
 package org.gongxuanzhang.mysql.service.executor;
 
-import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.entity.ExecuteInfo;
-import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
 
 /**
@@ -28,37 +26,24 @@ import org.gongxuanzhang.mysql.storage.StorageEngine;
  **/
 public abstract class EngineExecutor<T extends ExecuteInfo> implements Executor {
 
-    private final StorageEngine engine;
     private final T info;
 
-    public EngineExecutor(StorageEngine engine, T info) {
-        this.engine = engine;
+    public EngineExecutor(T info) {
         this.info = info;
     }
 
 
     /**
-     * 引擎执行
+     * 返回此执行器的执行引擎
      *
-     * @param info   执行信息
-     * @param engine 执行引擎
-     * @return 统一返回值
-     * @throws MySQLException 执行过程出现问题
+     * @return 返回个啥
      **/
-    public abstract Result doEngine(StorageEngine engine, T info) throws MySQLException;
+    public abstract StorageEngine getEngine();
 
-
-    @Override
-    public Result doExecute() throws MySQLException {
-        return this.doEngine(engine, info);
-    }
-
-
-    public StorageEngine getEngine() {
-        return engine;
-    }
 
     public T getInfo() {
         return info;
     }
+
+
 }

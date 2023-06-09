@@ -42,7 +42,7 @@ public class CompactNullValue implements ByteSwappable, ShowLength {
         this((short) 0);
     }
 
-    public boolean isNull(int index){
+    public boolean isNull(int index) {
         int mask = 1 << index;
         return (mask & this.value) == mask;
     }

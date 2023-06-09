@@ -21,6 +21,7 @@ import org.gongxuanzhang.mysql.entity.InsertRow;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPageFactory;
+import org.gongxuanzhang.mysql.entity.page.InnodbPageInfoVisitor;
 import org.gongxuanzhang.mysql.exception.LambdaExceptionRuntimeWrapper;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.tool.PageReader;
@@ -32,6 +33,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * innodb页选择器，针对某一张表的选择器，每张表唯一实例
+ * <p>
+ * InnoDbPageSelector.open(); 获得实例
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
@@ -47,6 +50,16 @@ public class InnoDbPageSelector implements PageSelector, Refreshable {
         this.dataFile = tableInfo.dataFile();
     }
 
+
+    public static InnoDbPageSelector open(TableInfoBox tableInfoBox) throws MySQLException {
+        return open(tableInfoBox.getTableInfo());
+    }
+
+    /**
+     * 获得一个 inno db selector
+     *
+     * @param tableInfo
+     **/
     public static InnoDbPageSelector open(TableInfo tableInfo) throws MySQLException {
         String tableName = tableInfo.getTableName();
         try {
@@ -77,7 +90,8 @@ public class InnoDbPageSelector implements PageSelector, Refreshable {
     public byte[] getLastPage() throws MySQLException {
         byte[] rootPageBuffer = getRootPage();
         InnoDbPage rootPage = this.innoDbPageFactory.swap(rootPageBuffer);
-        if (rootPage.isDataPage()) {
+        InnodbPageInfoVisitor rootInfo = new InnodbPageInfoVisitor(rootPage);
+        if (rootInfo.isDataPage()) {
             return rootPageBuffer;
         }
         //  todo  这里如果是目录  需要继续找
@@ -85,11 +99,24 @@ public class InnoDbPageSelector implements PageSelector, Refreshable {
 
     }
 
+
     @Override
     public void addNewPage(byte[] newPage) throws MySQLException {
         InnoDbPage swap = this.innoDbPageFactory.swap(newPage);
         insertInnoDbPage(swap);
     }
+
+    @Override
+    public byte[] getNextPage(InnoDbPage page) throws MySQLException {
+        int next = page.getFileHeader().getNext();
+        if (next == 0) {
+            return null;
+        }
+        byte[] pageBuffer = ConstantSize.PAGE.emptyBuff();
+        PageReader.read(this.dataFile, pageBuffer, next);
+        return pageBuffer;
+    }
+
 
     private void insertInnoDbPage(InnoDbPage swap) {
         //  todo
@@ -112,10 +139,11 @@ public class InnoDbPageSelector implements PageSelector, Refreshable {
     public InnoDbPage selectPage(InsertRow row) throws MySQLException {
         byte[] rootPage = getRootPage();
         InnoDbPage root = innoDbPageFactory.swap(rootPage);
-        if (root.isIndexPage()) {
+        InnodbPageInfoVisitor rootInfo = new InnodbPageInfoVisitor(root);
+        if (rootInfo.isIndexPage()) {
             return findOrCreatePage(root, row);
         }
-        if (!root.isDataPage()) {
+        if (!rootInfo.isDataPage()) {
             throw new MySQLException("页状态错误");
         }
         if (root.isEnough(row.length())) {

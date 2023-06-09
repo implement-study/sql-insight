@@ -14,32 +14,36 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql.service.executor.dml;
-
-import org.gongxuanzhang.mysql.core.result.Result;
-import org.gongxuanzhang.mysql.entity.UpdateInfo;
-import org.gongxuanzhang.mysql.exception.MySQLException;
-import org.gongxuanzhang.mysql.service.executor.EngineExecutor;
-import org.gongxuanzhang.mysql.storage.StorageEngine;
+package org.gongxuanzhang.mysql.entity.page;
 
 /**
- * update 执行器
- *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class UpdateExecutor extends EngineExecutor<UpdateInfo> {
+public class InnodbPageInfoVisitor {
 
-    public UpdateExecutor(UpdateInfo info) {
-        super(info);
+    private final InnoDbPage page;
+
+    public InnodbPageInfoVisitor(InnoDbPage page){
+        this.page = page;
     }
 
-    @Override
-    public StorageEngine getEngine() {
-        return null;
+
+    /**
+     * 是否是索引页
+     **/
+    public boolean isIndexPage() {
+        return page.getFileHeader().getPageType() == PageType.FIL_PAGE_INODE.getValue();
     }
 
-    @Override
-    public Result doExecute() throws MySQLException {
-        return null;
+    /**
+     * 是否是数据页
+     **/
+    public boolean isDataPage() {
+        return page.getFileHeader().getPageType() == PageType.FIL_PAGE_INDEX.getValue();
+    }
+
+
+    public InnoDbPage getPage() {
+        return page;
     }
 }

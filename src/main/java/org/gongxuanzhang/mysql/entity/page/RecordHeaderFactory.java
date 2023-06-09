@@ -41,7 +41,6 @@ public class RecordHeaderFactory implements ByteBeanSwapper<RecordHeader> {
     }
 
 
-
     /**
      * 创建下确界记录头
      **/

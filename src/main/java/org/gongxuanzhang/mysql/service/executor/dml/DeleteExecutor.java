@@ -29,12 +29,18 @@ import org.gongxuanzhang.mysql.storage.StorageEngine;
  **/
 public class DeleteExecutor extends EngineExecutor<DeleteInfo> {
 
-    public DeleteExecutor(StorageEngine engine, DeleteInfo info) {
-        super(engine, info);
+
+    public DeleteExecutor(DeleteInfo info) {
+        super(info);
     }
 
     @Override
-    public Result doEngine(StorageEngine engine, DeleteInfo info) throws MySQLException {
-        return engine.delete(info);
+    public StorageEngine getEngine() {
+        return null;
+    }
+
+    @Override
+    public Result doExecute() throws MySQLException {
+        return null;
     }
 }
