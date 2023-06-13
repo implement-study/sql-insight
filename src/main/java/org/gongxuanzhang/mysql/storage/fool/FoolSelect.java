@@ -28,7 +28,9 @@ import org.gongxuanzhang.mysql.storage.SelectEngine;
 import org.gongxuanzhang.mysql.tool.FileUtils;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * fool 的 查询引擎
@@ -43,7 +45,7 @@ public class FoolSelect implements SelectEngine {
         TableInfo tableInfo = info.getFrom();
         Where where = info.getWhere();
         List<SelectCol> selectCols = tableInfo.scatterCol(info.getAs());
-        List<JSONObject> viewJson = new ArrayList<>();
+        List<Map<String, String>> viewJson = new ArrayList<>();
 
         FileUtils.readAllLines(tableInfo.dataFile().toPath(), (line) -> {
             JSONObject jsonObject = JSONObject.parseObject(line);
@@ -51,7 +53,9 @@ public class FoolSelect implements SelectEngine {
             if (where.available() && !where.hit(jsonObject)) {
                 return;
             }
-            viewJson.add(jsonObject);
+            Map<String, String> map = new LinkedHashMap<>();
+            jsonObject.forEach((k, v) -> map.put(k, v.toString()));
+            viewJson.add(map);
         });
         //  as
         viewJson.forEach((json) -> {
@@ -62,12 +66,12 @@ public class FoolSelect implements SelectEngine {
         // order
         Order<?> order = info.getOrder();
         if (order.available()) {
-            viewJson.sort((Order<JSONObject>) order);
+            viewJson.sort((Order<Map<String,String>>) order);
         }
         List<String> colNames = new ArrayList<>();
         for (SelectCol selectCol : selectCols) {
             colNames.add(selectCol.getAlias());
         }
-        return Result.select(colNames.toArray(new String[]{}), viewJson);
+        return Result.select(colNames, viewJson);
     }
 }

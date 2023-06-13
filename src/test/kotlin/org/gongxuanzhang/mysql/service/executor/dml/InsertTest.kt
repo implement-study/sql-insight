@@ -39,11 +39,23 @@ class InsertTest {
             values
                (2,24,'lisi','女','abcd'),
                (3,25,'wangwu','女','afff')
-            
         """.doSql()
-
     }
 
+    @Test
+    fun batchInsert() {
+        val testGod = TestGod()
+        testGod.prepareGodTable()
+        for (i in 0..100 step 2) {
+            """
+            insert into ${testGod.fullName} (id,age,name,gender,id_card) 
+            values
+               (${i},24,'lisi','女','abcd'),
+               (${i+1},25,'wangwu','女','afff')
+        """.doSql()
+        }
+
+    }
 
 
 }

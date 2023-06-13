@@ -16,7 +16,6 @@
 
 package org.gongxuanzhang.mysql.service.executor.session.show;
 
-import com.alibaba.fastjson2.JSONObject;
 import org.gongxuanzhang.mysql.core.MySqlSession;
 import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.core.result.Result;
@@ -38,9 +37,14 @@ import static org.gongxuanzhang.mysql.tool.ExceptionThrower.errorSwap;
  **/
 public class VariablesShower implements Shower {
 
-    private final static String[] HEAD = new String[]{"variable_name", "value"};
+    private final static List<String> HEAD = new ArrayList<>();
 
     private final ShowVarInfo info;
+
+    static {
+        HEAD.add("variable_name");
+        HEAD.add("value");
+    }
 
     public VariablesShower(ShowVarInfo info) {
         this.info = info;
@@ -88,13 +92,13 @@ public class VariablesShower implements Shower {
     }
 
     private Result returnVar(Map<String, String> allAttr) {
-        List<JSONObject> data = new ArrayList<>();
+        List<Map<String, String>> dataList = new ArrayList<>();
         allAttr.forEach((k, v) -> {
-            JSONObject jsonObject = new JSONObject(4);
-            jsonObject.put(HEAD[0], k);
-            jsonObject.put(HEAD[1], v);
-            data.add(jsonObject);
+            Map<String, String> data = new HashMap<>(8);
+            data.put(HEAD.get(0), k);
+            data.put(HEAD.get(1), v);
+            dataList.add(data);
         });
-        return Result.select(HEAD, data);
+        return Result.select(HEAD, dataList);
     }
 }

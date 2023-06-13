@@ -16,13 +16,13 @@
 
 package org.gongxuanzhang.mysql.tool;
 
-import com.alibaba.fastjson2.JSONObject;
 import org.gongxuanzhang.mysql.core.ErrorResult;
 import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.core.result.SelectResult;
 import org.gongxuanzhang.mysql.core.result.SuccessResult;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author gxz gongxuanzhang@foxmail.com
@@ -41,7 +41,7 @@ public class Console {
     }
 
     private static void selectInfo(SelectResult selectResult) {
-        List<JSONObject> data = selectResult.getData();
+        List<Map<String, String>> data = selectResult.getData();
         data.forEach(System.out::println);
     }
 

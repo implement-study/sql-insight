@@ -16,10 +16,10 @@
 
 package org.gongxuanzhang.mysql.core.result;
 
-import com.alibaba.fastjson2.JSONObject;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 查询结果返回实体
@@ -29,9 +29,9 @@ import java.util.List;
 @Data
 public class SelectResult implements Result {
 
-    private final String[] head;
+    private final List<String> head;
 
-    private final List<JSONObject> data;
+    private final List<Map<String, String>> data;
 
     private String sqlTime;
 

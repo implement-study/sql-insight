@@ -24,6 +24,9 @@ import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.service.executor.dcl.DclExecutor;
 import org.gongxuanzhang.mysql.tool.Context;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 展示表结构
  *
@@ -31,9 +34,18 @@ import org.gongxuanzhang.mysql.tool.Context;
  **/
 public class DescTableExecutor extends DclExecutor<TableInfo> {
 
-    private static final String[] TABLE_DESC_HEAD = new String[]{
-            "field", "type", "notNull", "primary key", "default", "auto_increment", "unique", "comment"};
+    private static final List<String> TABLE_DESC_HEAD = new ArrayList<>();
 
+    static {
+        TABLE_DESC_HEAD.add("field");
+        TABLE_DESC_HEAD.add("type");
+        TABLE_DESC_HEAD.add("notNull");
+        TABLE_DESC_HEAD.add("primary key");
+        TABLE_DESC_HEAD.add("default");
+        TABLE_DESC_HEAD.add("auto_increment");
+        TABLE_DESC_HEAD.add("unique");
+        TABLE_DESC_HEAD.add("comment");
+    }
 
     public DescTableExecutor(TableInfo info) {
         super(info);

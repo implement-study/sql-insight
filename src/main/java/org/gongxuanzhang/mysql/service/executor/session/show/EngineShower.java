@@ -16,12 +16,14 @@
 
 package org.gongxuanzhang.mysql.service.executor.session.show;
 
-import com.alibaba.fastjson2.JSONObject;
 import org.gongxuanzhang.mysql.core.result.Result;
 import org.gongxuanzhang.mysql.storage.StorageEngine;
 import org.gongxuanzhang.mysql.tool.Context;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -32,12 +34,16 @@ import java.util.stream.Collectors;
 public class EngineShower implements Shower {
 
 
-    private static final String[] HEAD = new String[]{"name", "transaction"};
+    private static final List<String> HEAD = new ArrayList<>();
 
+    static {
+        HEAD.add("name");
+        HEAD.add("transaction");
+    }
 
     @Override
     public Result show() {
-        List<JSONObject> data =
+        List<Map<String, String>> data =
                 Context.getEngineList()
                         .stream()
                         .map(this::engineToResult)
@@ -45,10 +51,10 @@ public class EngineShower implements Shower {
         return Result.select(HEAD, data);
     }
 
-    private JSONObject engineToResult(StorageEngine engine) {
-        JSONObject jsonObject = new JSONObject(8);
-        jsonObject.put(HEAD[0], engine.getEngineName());
-        jsonObject.put(HEAD[1], Boolean.toString(engine.supportTransaction()));
-        return jsonObject;
+    private Map<String, String> engineToResult(StorageEngine engine) {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put(HEAD.get(0), engine.getEngineName());
+        map.put(HEAD.get(1), Boolean.toString(engine.supportTransaction()));
+        return map;
     }
 }

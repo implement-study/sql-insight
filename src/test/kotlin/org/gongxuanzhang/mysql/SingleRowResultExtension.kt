@@ -19,10 +19,23 @@ package org.gongxuanzhang.mysql
 import org.gongxuanzhang.mysql.core.result.SingleRowResult
 
 
-fun SingleRowResult.destructuringEquals(other: Collection<String>?): Boolean {
+fun SingleRowResult.destructuringEquals(other: List<String>?): Boolean {
     if (this.data.size != other?.size) {
         return false
     }
-    val selectData = this.data.map { jsonObject -> jsonObject.getObject(this.head[0], String::class.java) }
+    val selectData = this.data.map { map -> map[this.head[0]] }
+
     return selectData.chaosEquals(other)
+}
+
+fun <E> List<E>.chaosEquals(other: List<String>): Boolean {
+    if (this.size != other.size) {
+        return false
+    }
+    for (i in 0..size) {
+        if (this[i] != other[i]) {
+            return false
+        }
+    }
+    return true
 }

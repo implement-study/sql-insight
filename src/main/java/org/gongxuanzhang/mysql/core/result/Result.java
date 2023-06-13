@@ -17,13 +17,13 @@
 package org.gongxuanzhang.mysql.core.result;
 
 
-import com.alibaba.fastjson2.JSONObject;
 import org.gongxuanzhang.mysql.core.ErrorResult;
 import org.gongxuanzhang.mysql.core.SessionManager;
 import org.gongxuanzhang.mysql.exception.SessionException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * service返回的统一实体
@@ -130,7 +130,7 @@ public interface Result {
      * @param dataList 元数据
      * @return 结果
      **/
-    static Result select(String[] head, List<JSONObject> dataList) {
+    static Result select(List<String> head, List<Map<String,String>> dataList) {
         try {
             String sql = SessionManager.currentSession().getSql();
             SelectResult selectResult = new SelectResult(head, dataList);
@@ -139,8 +139,10 @@ public interface Result {
         } catch (SessionException e) {
             return new ErrorResult("会话异常", "unknown");
         }
-
     }
+
+
+
 
     /**
      * 返回单列结果

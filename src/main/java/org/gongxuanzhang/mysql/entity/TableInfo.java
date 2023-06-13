@@ -18,7 +18,6 @@ package org.gongxuanzhang.mysql.entity;
 
 import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlCreateTableStatement;
-import com.alibaba.fastjson2.JSONObject;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.mysql.annotation.DependOnContext;
@@ -41,6 +40,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -262,16 +262,16 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
         }
     }
 
-    public List<JSONObject> descTable() {
-        List<JSONObject> result = new ArrayList<>();
+    public List<Map<String,String>> descTable() {
+        List<Map<String,String>> result = new ArrayList<>();
         Set<String> primary = primaryKey == null ? new HashSet<>() : new HashSet<>(primaryKey);
         for (Column column : columns) {
-            JSONObject colInfo = new JSONObject(8);
+            Map<String,String> colInfo = new LinkedHashMap<>(8);
             colInfo.put("field", column.getName());
-            colInfo.put("type", column.getType());
+            colInfo.put("type", column.getType().toString());
             colInfo.put("notNull", Boolean.toString(!column.isNotNull()));
             colInfo.put("primary key", Boolean.toString(primary.contains(column.getName())));
-            colInfo.put("default", column.getDefaultValue());
+            colInfo.put("default", column.getDefaultValue().toString());
             colInfo.put("auto_increment", Boolean.toString(column.isAutoIncrement()));
             colInfo.put("unique", Boolean.toString(column.isUnique()));
             colInfo.put("comment", column.getComment());
