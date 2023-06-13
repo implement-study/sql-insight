@@ -30,6 +30,7 @@ public enum ConstantSize {
     SUPREMUM("上确界", 13, INFIMUM.size + INFIMUM.offset),
     SUPREMUM_BODY("上确界内容", 8),
     INFIMUM_BODY("下确界内容", 8),
+    USER_RECORDS("用户数据初始", -1, SUPREMUM.size + SUPREMUM.offset),
     FILE_TRAILER("文件尾", 8),
     COMPACT_NULL("compact null值列表", 8),
     RECORD_HEADER("记录头", 5);

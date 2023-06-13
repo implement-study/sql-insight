@@ -44,7 +44,7 @@ public class InnoDbInsert implements InsertEngine {
             checkAndSwapRow(row, columns);
             doInsert(row, selector);
         }
-        return Result.info("成功插入" + info.getInsertData() + "条数据");
+        return Result.info("成功插入" + info.getInsertData().size() + "条数据");
     }
 
     private void doInsert(InsertRow row, InnoDbPageSelector selector) throws MySQLException {

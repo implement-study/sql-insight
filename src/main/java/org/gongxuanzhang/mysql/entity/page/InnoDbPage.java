@@ -31,6 +31,7 @@ import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.exception.RepetitionPrimaryKeyException;
 import org.gongxuanzhang.mysql.service.executor.session.show.PageShower;
 import org.gongxuanzhang.mysql.tool.ArrayUtils;
+import org.gongxuanzhang.mysql.tool.BitUtils;
 import org.gongxuanzhang.mysql.tool.Context;
 import org.gongxuanzhang.mysql.tool.PageWriter;
 import org.gongxuanzhang.mysql.tool.PrimaryKeyExtractor;
@@ -186,6 +187,14 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
         RecordHeader insertHeader = nextRecordHeader();
         insertHeader.setNextRecordOffset(pre.getRecordHeader().getNextRecordOffset());
         pre.getRecordHeader().setNextRecordOffset(this.pageHeader.lastInsertOffset);
+        short pageOffset = pre.getRecordHeader().getPageOffset();
+        //  把上一个偏移量写回页
+        if (pageOffset >= ConstantSize.USER_RECORDS.offset()) {
+            int bodyOffset = pageOffset - ConstantSize.USER_RECORDS.offset();
+            byte[] nextOffsetBytes = BitUtils.cutToByteArray(this.pageHeader.lastInsertOffset, 2);
+            this.userRecords.source[bodyOffset + 3] = nextOffsetBytes[0];
+            this.userRecords.source[bodyOffset + 4] = nextOffsetBytes[1];
+        }
         insertCompact.setRecordHeader(insertHeader);
     }
 

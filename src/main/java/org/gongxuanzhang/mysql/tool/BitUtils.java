@@ -31,6 +31,25 @@ public class BitUtils {
     }
 
     /**
+     * 把一个short转换成想要的字节数组
+     * 从后往前切
+     * 最多切成2个字节
+     *
+     * @param s       short 数字
+     * @param bitSize 目标的字节数组长度
+     * @return 字节数组
+     **/
+    public static byte[] cutToByteArray(Short s, int bitSize) {
+        if (bitSize == 1) {
+            return new byte[]{s.byteValue()};
+        }
+        if (bitSize == 2) {
+            return new byte[]{(byte) ((s >>> 8)), s.byteValue()};
+        }
+        throw new IllegalArgumentException("short 只能切割成 1或2 长度的数组");
+    }
+
+    /**
      * 把一个int转换成想要的字节数组
      * 从后往前切
      * 最多切成4个字节

@@ -72,6 +72,7 @@ public class PageUtils {
         byte[] recordBuffer = ConstantSize.RECORD_HEADER.emptyBuff();
         wrap.get(recordBuffer);
         RecordHeader recordHeader = new RecordHeaderFactory().swap(recordBuffer);
+        recordHeader.setPageOffset(offset);
         byte[] variablesBuffer = new byte[tableInfo.getVariableCount()];
         wrap.get(variablesBuffer);
         Variables variables = new Variables(variablesBuffer);

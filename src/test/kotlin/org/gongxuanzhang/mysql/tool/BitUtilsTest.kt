@@ -69,4 +69,14 @@ class BitUtilsTest {
         assert(cutByteArray[7] == 0xef.toByte())
     }
 
+    @Test
+    fun bitTest4(){
+        val short = 0x451f.toShort()
+        var cutByteArray = BitUtils.cutToByteArray(short,1)
+        assert(cutByteArray[0] == 0x1f.toByte())
+        cutByteArray = BitUtils.cutToByteArray(short,2)
+        assert(cutByteArray[0] == 0x45.toByte())
+        assert(cutByteArray[1] == 0x1f.toByte())
+    }
+
 }

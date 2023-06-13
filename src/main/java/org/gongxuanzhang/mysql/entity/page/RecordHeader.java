@@ -18,6 +18,7 @@ package org.gongxuanzhang.mysql.entity.page;
 
 
 import lombok.Getter;
+import org.gongxuanzhang.mysql.annotation.NotInPage;
 import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.entity.ShowLength;
@@ -56,6 +57,9 @@ public class RecordHeader implements ShowLength, ByteSwappable {
     private int nextRecordOffset;
     private RecordType recordType;
 
+    @NotInPage("表示记录在页中的偏移量，并不在页中真实存储")
+    private short pageOffset;
+
     public RecordHeader() {
         this.source = new byte[5];
     }
@@ -87,12 +91,12 @@ public class RecordHeader implements ShowLength, ByteSwappable {
         final int nOwned = 0x0F;
         this.nOwned = source[0] & nOwned;
 
-        byte high = source[1];
-        byte low = source[2];
+        int high = Byte.toUnsignedInt(source[1]);
+        int low = Byte.toUnsignedInt(source[2]);
         this.heapNo = ((high << 8 | low) >> 3);
 
-        high = source[3];
-        low = source[4];
+        high = Byte.toUnsignedInt(source[3]);
+        low = Byte.toUnsignedInt(source[4]);
         this.nextRecordOffset = (high << 8 | low);
 
         initType();
@@ -179,6 +183,15 @@ public class RecordHeader implements ShowLength, ByteSwappable {
         return this.source.length;
     }
 
+
+    public short getPageOffset() {
+        return pageOffset;
+    }
+
+    public RecordHeader setPageOffset(short pageOffset) {
+        this.pageOffset = pageOffset;
+        return this;
+    }
 
     @Override
     public boolean equals(Object o) {

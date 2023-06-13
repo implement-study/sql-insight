@@ -16,6 +16,16 @@
 
 package org.gongxuanzhang.mysql.entity.page;
 
+import org.gongxuanzhang.mysql.constant.ConstantSize;
+import org.gongxuanzhang.mysql.entity.SelectRow;
+import org.gongxuanzhang.mysql.entity.SelectRowImpl;
+import org.gongxuanzhang.mysql.entity.TableInfo;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.gongxuanzhang.mysql.tool.PageUtils.getUserRecordByOffset;
+
 /**
  * @author gxz gongxuanzhang@foxmail.com
  **/
@@ -23,8 +33,13 @@ public class InnodbPageInfoVisitor {
 
     private final InnoDbPage page;
 
-    public InnodbPageInfoVisitor(InnoDbPage page){
+    private final TableInfo tableInfo;
+
+    private List<SelectRow> selectRows;
+
+    public InnodbPageInfoVisitor(InnoDbPage page) {
         this.page = page;
+        this.tableInfo = page.getTableInfo();
     }
 
 
@@ -45,5 +60,26 @@ public class InnodbPageInfoVisitor {
 
     public InnoDbPage getPage() {
         return page;
+    }
+
+
+    public List<SelectRow> showRows() {
+        if (selectRows != null) {
+            return selectRows;
+        }
+        selectRows = new ArrayList<>();
+        short offset = (short) ConstantSize.INFIMUM.offset();
+        while (true) {
+            UserRecord userRecord = getUserRecordByOffset(page, offset);
+            if (userRecord instanceof Supremum) {
+                break;
+            }
+            offset = (short) userRecord.getRecordHeader().getNextRecordOffset();
+            if (userRecord instanceof Compact) {
+                SelectRowImpl selectRow = new SelectRowImpl(tableInfo, (Compact) userRecord);
+                selectRows.add(selectRow);
+            }
+        }
+        return selectRows;
     }
 }

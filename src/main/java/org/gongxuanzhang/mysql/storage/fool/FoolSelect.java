@@ -40,7 +40,7 @@ public class FoolSelect implements SelectEngine {
 
     @Override
     public Result select(SingleSelectInfo info) throws MySQLException {
-        TableInfo tableInfo = info.getFrom().getTableInfo();
+        TableInfo tableInfo = info.getFrom();
         Where where = info.getWhere();
         List<SelectCol> selectCols = tableInfo.scatterCol(info.getAs());
         List<JSONObject> viewJson = new ArrayList<>();
