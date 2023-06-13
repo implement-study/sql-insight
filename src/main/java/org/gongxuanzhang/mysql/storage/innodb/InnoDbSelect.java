@@ -18,6 +18,7 @@ package org.gongxuanzhang.mysql.storage.innodb;
 
 import org.gongxuanzhang.mysql.core.InnoDbPageSelector;
 import org.gongxuanzhang.mysql.core.result.Result;
+import org.gongxuanzhang.mysql.entity.Column;
 import org.gongxuanzhang.mysql.entity.SelectRow;
 import org.gongxuanzhang.mysql.entity.SingleSelectInfo;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
@@ -26,7 +27,7 @@ import org.gongxuanzhang.mysql.entity.page.InnodbPageInfoVisitor;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.storage.SelectEngine;
 
-import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * innodb 的 查询引擎
@@ -50,11 +51,8 @@ public class InnoDbSelect implements SelectEngine {
     }
 
     private Result singlePage(InnodbPageInfoVisitor pageInfoVisitor, SingleSelectInfo info) {
-        List<SelectRow> selectRows = pageInfoVisitor.showRows();
-        for (SelectRow selectRow : selectRows) {
-            System.out.println(selectRow.showMap());
-        }
-        return Result.success();
+        return Result.select(info.getFrom().getColumns().stream().map(Column::getName).collect(Collectors.toList()),
+                pageInfoVisitor.showRows().stream().map(SelectRow::showMap).collect(Collectors.toList()));
 
     }
 }

@@ -17,6 +17,7 @@
 package org.gongxuanzhang.mysql.service.executor.dml
 
 import org.gongxuanzhang.mysql.doSql
+import org.gongxuanzhang.mysql.tool.Console
 import org.gongxuanzhang.mysql.tool.TestGod
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
@@ -34,7 +35,8 @@ class SelectTest {
     fun selectAll() {
         val testGod = TestGod()
         testGod.prepareGodTable()
-        "select * from ${testGod.fullName}".doSql()
+        val doSql = "select * from ${testGod.fullName}".doSql()
+        Console.infoResult(doSql)
     }
 
 

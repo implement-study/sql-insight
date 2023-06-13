@@ -26,12 +26,6 @@ import org.gongxuanzhang.mysql.tool.ApplicationUtils
  **/
 
 fun String.doSql(): Result {
-//    val tokenAnalysis = SubSqlAnalysis()
-//    tokenAnalysis.init()
-//    val tokenizer = SqlTokenizer(this)
-//    val process = tokenizer.process()
-//    val executor: Executor = tokenAnalysis.analysis(process)
-//    return executor.doExecute()
     val applicationContext = ApplicationUtils.applicationContext
     val sqlAnalysis = applicationContext.getBean(SqlAnalysis::class.java)
     return sqlAnalysis.analysis(this).doExecute()
