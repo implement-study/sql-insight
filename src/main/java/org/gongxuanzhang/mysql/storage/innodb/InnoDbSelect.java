@@ -27,6 +27,8 @@ import org.gongxuanzhang.mysql.entity.page.InnodbPageInfoVisitor;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.storage.SelectEngine;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -44,10 +46,22 @@ public class InnoDbSelect implements SelectEngine {
         InnoDbPageFactory factory = InnoDbPageFactory.getInstance();
         InnoDbPage rootPage = factory.swap(rootPageBuffer);
         InnodbPageInfoVisitor rootInfo = new InnodbPageInfoVisitor(rootPage);
-        if (rootInfo.isDataPage()) {
-            return singlePage(rootInfo, info);
+        return selectAll(rootInfo, info);
+    }
+
+    private Result selectAll(InnodbPageInfoVisitor pageInfoVisitor, SingleSelectInfo info) throws MySQLException {
+        List<String> head = info.getFrom().getColumns().stream().map(Column::getName).collect(Collectors.toList());
+        if (pageInfoVisitor.isDataPage()) {
+            return Result.select(head,
+                    pageInfoVisitor.showRows().stream().map(SelectRow::showMap).collect(Collectors.toList()));
         }
-        throw new UnsupportedOperationException("这是目录页，需要分裂了");
+        List<SelectRow> data = new ArrayList<>();
+        if (pageInfoVisitor.isIndexPage()) {
+            while (pageInfoVisitor.nextPage() != null) {
+                data.addAll(pageInfoVisitor.showRows());
+            }
+        }
+        return Result.select(head, data.stream().map(SelectRow::showMap).collect(Collectors.toList()));
     }
 
     private Result singlePage(InnodbPageInfoVisitor pageInfoVisitor, SingleSelectInfo info) {

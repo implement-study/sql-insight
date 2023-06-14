@@ -34,5 +34,12 @@ public interface UserRecord extends ShowLength, ByteSwappable {
      **/
     RecordHeader getRecordHeader();
 
+    /**
+     * 当前记录在页中的偏移量
+     *
+     * @return 偏移量，此记录不在实际存储内容中
+     **/
+    int pageOffset();
+
 
 }

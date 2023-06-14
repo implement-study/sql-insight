@@ -50,6 +50,16 @@ public class VarcharPrimaryKey implements PrimaryKey {
         return this.value.compareTo(((VarcharPrimaryKey) other).value);
     }
 
+    @Override
+    public int length() {
+        return value.length();
+    }
+
+    @Override
+    public boolean isDynamic() {
+        return true;
+    }
+
 
     @Override
     public String toString() {

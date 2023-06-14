@@ -137,7 +137,7 @@ public class InnoDbPageSelector implements PageSelector, Refreshable {
      * 返回的页一定有足够的位置
      **/
     public InnoDbPage selectPage(InsertRow row) throws MySQLException {
-        if (ConstantSize.INIT_PAGE_FREE_SPACE.getSize() > row.length()) {
+        if (ConstantSize.INIT_PAGE_FREE_SPACE.getSize() < row.length()) {
             throw new MySQLException(String.format("暂不支持如此大的用户记录[%s]", row.length()));
         }
         byte[] rootPage = getRootPage();
@@ -152,17 +152,9 @@ public class InnoDbPageSelector implements PageSelector, Refreshable {
         if (root.isEnough(row.length())) {
             return root;
         }
-        return pageSplitting(root);
+        return PageUtils.rootDataPageToIndex(root);
     }
 
-    /**
-     * root页从数据页变成索引页
-     **/
-    private InnoDbPage pageSplitting(InnoDbPage root) {
-        InnoDbPage newDataPage = this.innoDbPageFactory.create();
-        PageUtils.setIndexPageType(root);
-        return null;
-    }
 
 
     private InnoDbPage findOrCreatePage(InnoDbPage root, InsertRow row) {

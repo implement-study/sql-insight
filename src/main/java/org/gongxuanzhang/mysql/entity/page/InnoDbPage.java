@@ -133,10 +133,6 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
         short preOffset = this.pageDirectory.getSlots()[insertSlot - 1];
         UserRecord preGroupMax = getUserRecordByOffset(this, preOffset);
         insertLinkedList(insertCompact, preGroupMax);
-        this.freeSpace -= insertCompact.length();
-        this.userRecords.add(insertCompact.toBytes());
-        this.pageHeader.heapTop += insertCompact.length();
-        this.pageHeader.lastInsertOffset += insertCompact.length();
         //  调整组
         UserRecord insertGroupMax = getUserRecordByOffset(this, pageDirectory.getSlots()[insertSlot]);
         int currentOwned = insertGroupMax.getRecordHeader().getNOwned() + 1;
@@ -182,12 +178,12 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
         UserRecord next = getNextUserRecord(this, pre);
         while (this.compare(insertCompact, next) > 0) {
             pre = next;
-            next = getUserRecordByOffset(this, (short) pre.getRecordHeader().getNextRecordOffset());
+            next = getNextUserRecord(this, pre);
         }
         RecordHeader insertHeader = nextRecordHeader();
         insertHeader.setNextRecordOffset(pre.getRecordHeader().getNextRecordOffset());
         pre.getRecordHeader().setNextRecordOffset(this.pageHeader.lastInsertOffset);
-        short pageOffset = pre.getRecordHeader().getPageOffset();
+        short pageOffset = (short) pre.pageOffset();
         //  把上一个偏移量写回页
         if (pageOffset >= ConstantSize.USER_RECORDS.offset()) {
             int bodyOffset = pageOffset - ConstantSize.USER_RECORDS.offset();
@@ -196,6 +192,10 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
             this.userRecords.source[bodyOffset + 4] = nextOffsetBytes[1];
         }
         insertCompact.setRecordHeader(insertHeader);
+        this.freeSpace -= insertCompact.length();
+        this.userRecords.add(insertCompact.toBytes());
+        this.pageHeader.heapTop += insertCompact.length();
+        this.pageHeader.lastInsertOffset += insertCompact.length();
     }
 
     /**

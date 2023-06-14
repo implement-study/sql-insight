@@ -57,6 +57,12 @@ public class Supremum implements UserRecord, ShowLength, ByteSwappable {
         return buffer.array();
     }
 
+
+    @Override
+    public int pageOffset() {
+        return ConstantSize.SUPREMUM.offset();
+    }
+
     @Override
     public String toString() {
         return this.recordHeader.toString() + "[body:" + new String(this.body) + "]";

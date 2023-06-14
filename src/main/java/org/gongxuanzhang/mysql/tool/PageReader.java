@@ -16,6 +16,9 @@
 
 package org.gongxuanzhang.mysql.tool;
 
+import org.gongxuanzhang.mysql.constant.ConstantSize;
+import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
+import org.gongxuanzhang.mysql.entity.page.InnoDbPageFactory;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 
 import java.io.File;
@@ -42,4 +45,23 @@ public class PageReader {
     public static int read(File file, byte[] buffer) throws MySQLException {
         return read(file, buffer, 0);
     }
+
+    public static InnoDbPage readInnodbPage(File file, int offset) throws MySQLException {
+        byte[] pageBuffer = ConstantSize.PAGE.emptyBuff();
+        try (RandomAccessFile target = new RandomAccessFile(file, "r")) {
+            if (offset != 0) {
+                target.skipBytes(offset);
+            }
+            int readLength = target.read(pageBuffer);
+            if (readLength != pageBuffer.length) {
+                throw new MySQLException("错误的偏移量：" + offset);
+            }
+            InnoDbPageFactory factory = InnoDbPageFactory.getInstance();
+            return factory.swap(pageBuffer);
+        } catch (IOException e) {
+            return ExceptionThrower.errorSwap(e);
+        }
+    }
+
+
 }

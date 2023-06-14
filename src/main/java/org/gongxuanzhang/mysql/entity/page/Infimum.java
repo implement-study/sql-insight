@@ -67,8 +67,15 @@ public class Infimum implements UserRecord, ByteSwappable, ShowLength {
     }
 
     @Override
+    public int pageOffset() {
+        return ConstantSize.INFIMUM.offset();
+    }
+
+    @Override
     public String toString() {
         return this.recordHeader.toString() + "[body:" + new String(this.body) + "]";
     }
+
+
 
 }

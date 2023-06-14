@@ -34,4 +34,14 @@ public class SupremumPrimaryKey implements PrimaryKey {
         }
         return 1;
     }
+
+    @Override
+    public int length() {
+        return -1;
+    }
+
+    @Override
+    public boolean isDynamic() {
+        return false;
+    }
 }

@@ -17,6 +17,7 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
+import org.gongxuanzhang.mysql.annotation.NotInPage;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 
 import java.nio.ByteBuffer;
@@ -45,7 +46,9 @@ public class Index implements UserRecord, ByteSwappable {
     /**
      * 这一页对应的偏移量
      **/
+    @NotInPage("表示记录在页中的偏移量，并不在页中真实存储")
     int pageOffset;
+
 
     @Override
     public byte[] toBytes() {
@@ -61,6 +64,15 @@ public class Index implements UserRecord, ByteSwappable {
         return this.recordHeader;
     }
 
+    @Override
+    public int pageOffset() {
+        return this.pageOffset;
+    }
+
+    public Index setPageOffset(int pageOffset) {
+        this.pageOffset = pageOffset;
+        return this;
+    }
 
     @Override
     public int length() {

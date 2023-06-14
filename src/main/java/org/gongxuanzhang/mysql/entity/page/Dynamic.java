@@ -39,6 +39,11 @@ public class Dynamic implements UserRecord, ByteSwappable {
         return null;
     }
 
+    @Override
+    public int pageOffset() {
+        return 0;
+    }
+
 
     @Override
     public int length() {

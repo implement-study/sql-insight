@@ -30,8 +30,18 @@ public class CompositePrimaryKey implements PrimaryKey {
 
     private List<PrimaryKey> list;
 
+    private int length;
+
+    private boolean dynamic;
+
     public CompositePrimaryKey(List<PrimaryKey> list) {
         this.list = list;
+        for (PrimaryKey primaryKey : list) {
+            this.length += primaryKey.length();
+            if (primaryKey.isDynamic()) {
+                dynamic = true;
+            }
+        }
     }
 
     @Override
@@ -48,6 +58,16 @@ public class CompositePrimaryKey implements PrimaryKey {
             }
         }
         return 0;
+    }
+
+    @Override
+    public int length() {
+        return this.length;
+    }
+
+    @Override
+    public boolean isDynamic() {
+        return this.dynamic;
     }
 
 

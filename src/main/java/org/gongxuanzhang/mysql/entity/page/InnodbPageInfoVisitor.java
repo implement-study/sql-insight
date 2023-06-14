@@ -20,6 +20,8 @@ import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.entity.SelectRow;
 import org.gongxuanzhang.mysql.entity.SelectRowImpl;
 import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.exception.MySQLException;
+import org.gongxuanzhang.mysql.tool.PageReader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +33,7 @@ import static org.gongxuanzhang.mysql.tool.PageUtils.getUserRecordByOffset;
  **/
 public class InnodbPageInfoVisitor {
 
-    private final InnoDbPage page;
+    private InnoDbPage page;
 
     private final TableInfo tableInfo;
 
@@ -64,6 +66,20 @@ public class InnodbPageInfoVisitor {
 
     public InnoDbPage getPage() {
         return page;
+    }
+
+    /**
+     * 返回下一页，如果是数据页返回下一页 如果是目录页返回第一个数据页
+     * 同时修改持有的page
+     *
+     * @return 可能为null 表示没有下一页
+     **/
+    public InnoDbPage nextPage() throws MySQLException {
+        if (this.page.getFileHeader().next == 0) {
+            return null;
+        }
+        this.page = PageReader.readInnodbPage(this.tableInfo.dataFile(), this.page.getFileHeader().next);
+        return this.page;
     }
 
 

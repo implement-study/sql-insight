@@ -50,6 +50,16 @@ public class IntegerPrimaryKey implements PrimaryKey {
         return Integer.compare(this.value, ((IntegerPrimaryKey) other).value);
     }
 
+    @Override
+    public int length() {
+        return 4;
+    }
+
+    @Override
+    public boolean isDynamic() {
+        return false;
+    }
+
 
     @Override
     public String toString() {

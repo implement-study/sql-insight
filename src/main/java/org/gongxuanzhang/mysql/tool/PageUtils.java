@@ -19,15 +19,8 @@ package org.gongxuanzhang.mysql.tool;
 import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.entity.Column;
 import org.gongxuanzhang.mysql.entity.TableInfo;
-import org.gongxuanzhang.mysql.entity.page.Compact;
-import org.gongxuanzhang.mysql.entity.page.CompactNullValue;
-import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
-import org.gongxuanzhang.mysql.entity.page.PageType;
-import org.gongxuanzhang.mysql.entity.page.RecordHeader;
-import org.gongxuanzhang.mysql.entity.page.RecordHeaderFactory;
-import org.gongxuanzhang.mysql.entity.page.Supremum;
-import org.gongxuanzhang.mysql.entity.page.UserRecord;
-import org.gongxuanzhang.mysql.entity.page.Variables;
+import org.gongxuanzhang.mysql.entity.page.*;
+import org.gongxuanzhang.mysql.exception.MySQLException;
 
 import java.nio.ByteBuffer;
 
@@ -44,11 +37,38 @@ public class PageUtils {
 
 
     /**
-     * 把页设置为索引页
+     * 从数据页转换成索引页
+     * <p>
+     * 调用此方法一定是从数据页 转换成索引页
+     *
+     * @param candidatePage 等待被转换的页
+     * @return 新的数据页
      **/
-    public static void setIndexPageType(InnoDbPage page) {
-        page.getFileHeader().setPageType(PageType.FIL_PAGE_INODE.getValue());
+    public static InnoDbPage rootDataPageToIndex(InnoDbPage candidatePage) throws MySQLException {
+        InnoDbPageFactory factory = InnoDbPageFactory.getInstance();
+        InnoDbPage newDataPage = factory.copyPage(candidatePage);
+        InnoDbPage newIndexPage = factory.create();
+        //  连接
+        newIndexPage.getFileHeader().setNext(ConstantSize.PAGE.getSize());
+        newDataPage.getFileHeader().setOffset(ConstantSize.PAGE.getSize());
+        //  调整状态
+        newIndexPage.getFileHeader().setPageType(PageType.FIL_PAGE_INODE.getValue());
+
+
+        UserRecord minUserData = PageUtils.getNextUserRecord(newDataPage, newDataPage.getInfimum());
+        Index indexRow = new Index();
+        RecordHeader indexHeader = new RecordHeader();
+        indexHeader.setRecordType(RecordType.PAGE);
+        indexHeader.setNextRecordOffset(ConstantSize.SUPREMUM.offset());
+        indexHeader.setHeapNo(2);
+        indexHeader.setMinRec(true);
+        newIndexPage.getSupremum().getRecordHeader().setnOwned(2);
+        indexRow.setRecordHeader(indexHeader);
+
+        return newDataPage;
+
     }
+
 
     /**
      * 根据偏移量拿到页中的用户记录
@@ -72,7 +92,6 @@ public class PageUtils {
         byte[] recordBuffer = ConstantSize.RECORD_HEADER.emptyBuff();
         wrap.get(recordBuffer);
         RecordHeader recordHeader = new RecordHeaderFactory().swap(recordBuffer);
-        recordHeader.setPageOffset(offset);
         byte[] variablesBuffer = new byte[tableInfo.getVariableCount()];
         wrap.get(variablesBuffer);
         Variables variables = new Variables(variablesBuffer);
@@ -91,6 +110,7 @@ public class PageUtils {
         compact.setRollPointer(rollPointer);
         compact.setRowId(rowId);
         compact.setTransactionId(transactionId);
+        compact.setPageOffset(offset);
         return compact;
     }
 

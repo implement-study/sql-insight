@@ -44,6 +44,17 @@ public class InnoDbPageFactory implements ByteBeanSwapper<InnoDbPage>, BeanSuppl
         return INSTANCE;
     }
 
+
+    /**
+     * 复制一个页
+     *
+     * @param source 复制的源
+     * @return 返回复制的页
+     **/
+    public InnoDbPage copyPage(InnoDbPage source) {
+        return swap(source.toBytes());
+    }
+
     @Override
     public InnoDbPage swap(byte[] bytes) {
         InnoDbPage bean = new InnoDbPage();

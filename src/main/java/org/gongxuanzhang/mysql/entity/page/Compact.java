@@ -17,6 +17,7 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
+import org.gongxuanzhang.mysql.annotation.NotInPage;
 import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.gongxuanzhang.mysql.entity.ShowLength;
 import org.gongxuanzhang.mysql.tool.BitUtils;
@@ -63,6 +64,9 @@ public class Compact implements UserRecord, ByteSwappable, ShowLength {
     byte[] body;
 
 
+    @NotInPage("表示记录在页中的偏移量，并不在页中真实存储")
+    private short pageOffset;
+
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(length());
@@ -91,5 +95,9 @@ public class Compact implements UserRecord, ByteSwappable, ShowLength {
     }
 
 
+    @Override
+    public int pageOffset() {
+        return this.pageOffset;
+    }
 }
 

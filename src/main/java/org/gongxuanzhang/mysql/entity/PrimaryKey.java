@@ -36,4 +36,20 @@ public interface PrimaryKey extends ExecuteInfo, Comparable<PrimaryKey> {
     int compareTo(@NotNull PrimaryKey other);
 
 
+    /**
+     * 主键长度
+     *
+     * @return 如果是动态长度主键返回具体长度
+     **/
+    int length();
+
+
+    /**
+     * 是否是动态主键
+     *
+     * @return true 是动态主键
+     **/
+    boolean isDynamic();
+
+
 }
