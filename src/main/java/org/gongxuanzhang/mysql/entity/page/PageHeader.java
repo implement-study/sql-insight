@@ -1,11 +1,11 @@
 /*
- * Copyright 2023 java-mysql  and the original author or authors <gongxuanzhangmelt@gmail.com>.
+ * Copyright 2023 sql-insight  and the original author or authors <gongxuanzhangmelt@gmail.com>.
  *
  * Licensed under the GNU Affero General Public License v3.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      https://github.com/implement-study/java-mysql/blob/main/LICENSE
+ *      https://github.com/implement-study/sql-insight/blob/main/LICENSE
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -56,7 +56,7 @@ public class PageHeader implements ShowLength, ByteSwappable {
     short recordCount;
     /**
      * 第一个被标记删除的地址，可以通过next_record找到删除列表
-     * java-mysql中约定如果没有删除记录此字段为0
+     * sql-insight中约定如果没有删除记录此字段为0
      * 2字节
      **/
     @Unused("暂不支持释放删除地址")

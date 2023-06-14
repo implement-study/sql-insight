@@ -1,4 +1,4 @@
-# Java-MySQL
+# SQL-Insight
 
 
 ## 这个项目能做什么
