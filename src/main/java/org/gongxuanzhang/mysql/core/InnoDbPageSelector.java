@@ -137,6 +137,9 @@ public class InnoDbPageSelector implements PageSelector, Refreshable {
      * 返回的页一定有足够的位置
      **/
     public InnoDbPage selectPage(InsertRow row) throws MySQLException {
+        if (ConstantSize.INIT_PAGE_FREE_SPACE.getSize() > row.length()) {
+            throw new MySQLException(String.format("暂不支持如此大的用户记录[%s]", row.length()));
+        }
         byte[] rootPage = getRootPage();
         InnoDbPage root = innoDbPageFactory.swap(rootPage);
         InnodbPageInfoVisitor rootInfo = new InnodbPageInfoVisitor(root);

@@ -42,6 +42,10 @@ public class InnodbPageInfoVisitor {
         this.tableInfo = page.getTableInfo();
     }
 
+    public InnodbPageInfoVisitor(byte[] pageBuffer) {
+        this(InnoDbPageFactory.getInstance().swap(pageBuffer));
+    }
+
 
     /**
      * 是否是索引页

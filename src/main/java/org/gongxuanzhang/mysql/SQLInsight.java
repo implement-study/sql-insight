@@ -20,12 +20,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
+ *
+ * 开启你的神奇之旅吧
+ *
  * @author gxz gongxuanzhang@foxmail.com
  **/
 @SpringBootApplication
-public class JavaMySQL {
+public class SQLInsight {
     public static void main(String[] args) {
 
-        SpringApplication.run(JavaMySQL.class);
+        SpringApplication.run(SQLInsight.class);
     }
 }

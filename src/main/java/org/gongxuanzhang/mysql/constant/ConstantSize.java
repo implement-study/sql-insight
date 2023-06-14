@@ -33,7 +33,9 @@ public enum ConstantSize {
     USER_RECORDS("用户数据初始", -1, SUPREMUM.size + SUPREMUM.offset),
     FILE_TRAILER("文件尾", 8),
     COMPACT_NULL("compact null值列表", 8),
-    RECORD_HEADER("记录头", 5);
+    RECORD_HEADER("记录头", 5),
+    INIT_PAGE_FREE_SPACE("刚初始化时的页的空闲空间",
+            PAGE.size - FILE_HEADER.size - PAGE_HEADER.size - INFIMUM.size * 2 - FILE_TRAILER.size);
 
     private final String desc;
     private final int size;
