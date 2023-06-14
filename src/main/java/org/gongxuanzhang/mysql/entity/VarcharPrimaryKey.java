@@ -65,4 +65,10 @@ public class VarcharPrimaryKey implements PrimaryKey {
     public String toString() {
         return value;
     }
+
+
+    @Override
+    public byte[] toBytes() {
+        return this.value.getBytes();
+    }
 }

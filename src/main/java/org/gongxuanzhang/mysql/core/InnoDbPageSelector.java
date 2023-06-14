@@ -152,12 +152,15 @@ public class InnoDbPageSelector implements PageSelector, Refreshable {
         if (root.isEnough(row.length())) {
             return root;
         }
-        return PageUtils.rootDataPageToIndex(root);
+        PageUtils.rootDataPageToIndex(root);
+        return selectPage(row);
     }
 
 
 
     private InnoDbPage findOrCreatePage(InnoDbPage root, InsertRow row) {
+
+        System.out.println("");
         return null;
     }
 

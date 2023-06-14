@@ -46,7 +46,7 @@ class InsertTest {
     fun batchInsert() {
         val testGod = TestGod()
         testGod.prepareGodTable()
-        for (i in 0..100 step 2) {
+        for (i in 0..600 step 2) {
             """
             insert into ${testGod.fullName} (id,age,name,gender,id_card) 
             values

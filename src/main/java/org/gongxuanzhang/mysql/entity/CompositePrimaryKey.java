@@ -18,6 +18,7 @@ package org.gongxuanzhang.mysql.entity;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 
 
@@ -28,7 +29,7 @@ import java.util.List;
  **/
 public class CompositePrimaryKey implements PrimaryKey {
 
-    private List<PrimaryKey> list;
+    private final List<PrimaryKey> list;
 
     private int length;
 
@@ -74,5 +75,14 @@ public class CompositePrimaryKey implements PrimaryKey {
     @Override
     public String toString() {
         return this.list.toString();
+    }
+
+    @Override
+    public byte[] toBytes() {
+        ByteBuffer buffer = ByteBuffer.allocate(this.length);
+        for (PrimaryKey primaryKey : this.list) {
+            buffer.put(primaryKey.toBytes());
+        }
+        return buffer.array();
     }
 }

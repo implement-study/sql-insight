@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.mysql.entity;
 
+import org.gongxuanzhang.mysql.core.ByteSwappable;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -23,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface PrimaryKey extends ExecuteInfo, Comparable<PrimaryKey> {
+public interface PrimaryKey extends ExecuteInfo, Comparable<PrimaryKey>, ByteSwappable {
 
 
     /**

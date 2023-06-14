@@ -18,6 +18,7 @@ package org.gongxuanzhang.mysql.tool;
 
 import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.entity.Column;
+import org.gongxuanzhang.mysql.entity.PrimaryKey;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.entity.page.*;
 import org.gongxuanzhang.mysql.exception.MySQLException;
@@ -54,7 +55,6 @@ public class PageUtils {
         //  调整状态
         newIndexPage.getFileHeader().setPageType(PageType.FIL_PAGE_INODE.getValue());
 
-
         UserRecord minUserData = PageUtils.getNextUserRecord(newDataPage, newDataPage.getInfimum());
         Index indexRow = new Index();
         RecordHeader indexHeader = new RecordHeader();
@@ -62,11 +62,19 @@ public class PageUtils {
         indexHeader.setNextRecordOffset(ConstantSize.SUPREMUM.offset());
         indexHeader.setHeapNo(2);
         indexHeader.setMinRec(true);
+        newIndexPage.getFileHeader().setSpaceId(candidatePage.getTableInfo().getSpaceId());
         newIndexPage.getSupremum().getRecordHeader().setnOwned(2);
         indexRow.setRecordHeader(indexHeader);
+        PrimaryKey primaryKey = PrimaryKeyExtractor.extract(minUserData, candidatePage.getTableInfo());
+        indexRow.setIndexBody(primaryKey.toBytes());
+        indexRow.setIndexLength((short) primaryKey.length());
 
+        newIndexPage.setUserRecords(new UserRecords(indexRow.toBytes()));
+        newIndexPage.setFreeSpace((short) (newIndexPage.getFreeSpace() - indexRow.length()));
+
+        newIndexPage.refresh();
+        newDataPage.refresh();
         return newDataPage;
-
     }
 
 

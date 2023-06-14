@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.mysql.entity;
 
+import org.gongxuanzhang.mysql.tool.BitUtils;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -64,5 +65,11 @@ public class IntegerPrimaryKey implements PrimaryKey {
     @Override
     public String toString() {
         return String.valueOf(value);
+    }
+
+
+    @Override
+    public byte[] toBytes() {
+        return BitUtils.cutToByteArray(this.value, 4);
     }
 }

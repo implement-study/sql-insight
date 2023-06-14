@@ -44,4 +44,9 @@ public class SupremumPrimaryKey implements PrimaryKey {
     public boolean isDynamic() {
         return false;
     }
+
+    @Override
+    public byte[] toBytes() {
+        throw new UnsupportedOperationException("上确界主键不支持to bytes");
+    }
 }

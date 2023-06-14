@@ -44,4 +44,10 @@ public class InfimumPrimaryKey implements PrimaryKey {
     public boolean isDynamic() {
         return false;
     }
+
+
+    @Override
+    public byte[] toBytes() {
+        throw new UnsupportedOperationException("下确界主键不支持to bytes");
+    }
 }
