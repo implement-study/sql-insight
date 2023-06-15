@@ -34,7 +34,6 @@ import org.gongxuanzhang.mysql.tool.ArrayUtils;
 import org.gongxuanzhang.mysql.tool.BitUtils;
 import org.gongxuanzhang.mysql.tool.Context;
 import org.gongxuanzhang.mysql.tool.PageWriter;
-import org.gongxuanzhang.mysql.tool.PrimaryKeyExtractor;
 
 import java.nio.ByteBuffer;
 import java.util.Comparator;
@@ -257,8 +256,8 @@ public class InnoDbPage implements ShowLength, ByteSwappable, Refreshable, Compa
     @Override
     public int compare(UserRecord r1, UserRecord r2) {
         TableInfo tableInfo = getTableInfo();
-        PrimaryKey primaryKey1 = PrimaryKeyExtractor.extract(r1, tableInfo);
-        PrimaryKey primaryKey2 = PrimaryKeyExtractor.extract(r2, tableInfo);
+        PrimaryKey primaryKey1 = r1.getPrimaryKey(tableInfo);
+        PrimaryKey primaryKey2 = r2.getPrimaryKey(tableInfo);
         int compare = primaryKey1.compareTo(primaryKey2);
         if (compare == 0) {
             throw new RepetitionPrimaryKeyException(primaryKey1 + "已经存在");

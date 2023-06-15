@@ -17,7 +17,6 @@
 package org.gongxuanzhang.mysql.entity;
 
 import org.gongxuanzhang.mysql.tool.BitUtils;
-import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -37,19 +36,6 @@ public class IntegerPrimaryKey implements PrimaryKey {
         return value;
     }
 
-    @Override
-    public int compareTo(@NotNull PrimaryKey other) {
-        if (other instanceof SupremumPrimaryKey) {
-            return -1;
-        }
-        if (other instanceof InfimumPrimaryKey) {
-            return 1;
-        }
-        if (!(other instanceof IntegerPrimaryKey)) {
-            throw new IllegalArgumentException("主键异常");
-        }
-        return Integer.compare(this.value, ((IntegerPrimaryKey) other).value);
-    }
 
     @Override
     public int length() {

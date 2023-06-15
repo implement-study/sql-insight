@@ -17,6 +17,7 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import org.gongxuanzhang.mysql.constant.ConstantSize;
+import org.gongxuanzhang.mysql.entity.PrimaryKey;
 import org.gongxuanzhang.mysql.entity.SelectRow;
 import org.gongxuanzhang.mysql.entity.SelectRowImpl;
 import org.gongxuanzhang.mysql.entity.TableInfo;
@@ -80,6 +81,43 @@ public class InnodbPageInfoVisitor {
         }
         this.page = PageReader.readInnodbPage(this.tableInfo.dataFile(), this.page.getFileHeader().next);
         return this.page;
+    }
+
+
+    /**
+     * 索引页找到主键最终落在哪个页
+     *
+     * @param targetKey 目标key
+     * @return 返回页的偏移量
+     **/
+    public int binarySearchSlotIndex(PrimaryKey targetKey) throws MySQLException {
+        if (!this.isIndexPage()) {
+            throw new IllegalStateException("当前页不是索引页");
+        }
+        short[] slots = this.page.pageDirectory.getSlots();
+        IndexRecordFactory recordFactory = new IndexRecordFactory();
+        int left = 0;
+        int right = slots.length - 1;
+        while (right - left <= 1) {
+            int mid = (right + left) >> 1;
+            short offset = slots[mid];
+            Index index = recordFactory.swap(this.page, offset);
+            PrimaryKey baseKey = index.getPrimaryKey(this.tableInfo);
+            int compare = targetKey.compareTo(baseKey);
+            if (compare == 0) {
+                return index.getPageOffset();
+            }
+            if (compare < 0) {
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+        Index rightIndex = recordFactory.swap(this.page, slots[right]);
+        if (targetKey.compareTo(rightIndex.getPrimaryKey(this.tableInfo)) >= 0) {
+            return slots[right];
+        }
+        return slots[left];
     }
 
 

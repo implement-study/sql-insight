@@ -17,7 +17,8 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.Data;
-import org.gongxuanzhang.mysql.core.ByteSwappable;
+import org.gongxuanzhang.mysql.entity.PrimaryKey;
+import org.gongxuanzhang.mysql.entity.TableInfo;
 
 /**
  * dynamic行格式
@@ -25,7 +26,7 @@ import org.gongxuanzhang.mysql.core.ByteSwappable;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class Dynamic implements UserRecord, ByteSwappable {
+public class Dynamic implements UserRecord {
 
 
     @Override
@@ -48,5 +49,10 @@ public class Dynamic implements UserRecord, ByteSwappable {
     @Override
     public int length() {
         return 0;
+    }
+
+    @Override
+    public PrimaryKey getPrimaryKey(TableInfo tableInfo) {
+        return null;
     }
 }

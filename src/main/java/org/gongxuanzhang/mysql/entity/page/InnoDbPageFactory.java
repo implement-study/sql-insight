@@ -126,7 +126,7 @@ public class InnoDbPageFactory implements ByteBeanSwapper<InnoDbPage>, BeanSuppl
         innoDbPage.setUserRecords(new UserRecordsFactory().create());
         innoDbPage.setPageDirectory(new PageDirectoryFactory().create());
         innoDbPage.setFileTrailer(new FileTrailerFactory().create());
-        innoDbPage.setFreeSpace(initFreeSpaceLength(innoDbPage));
+        innoDbPage.setFreeSpace((short) ConstantSize.INIT_PAGE_FREE_SPACE.getSize());
         return innoDbPage;
     }
 

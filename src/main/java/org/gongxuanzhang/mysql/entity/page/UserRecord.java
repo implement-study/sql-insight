@@ -17,6 +17,7 @@
 package org.gongxuanzhang.mysql.entity.page;
 
 import org.gongxuanzhang.mysql.core.ByteSwappable;
+import org.gongxuanzhang.mysql.core.HavePrimaryKey;
 import org.gongxuanzhang.mysql.entity.ShowLength;
 
 /**
@@ -24,7 +25,7 @@ import org.gongxuanzhang.mysql.entity.ShowLength;
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public interface UserRecord extends ShowLength, ByteSwappable {
+public interface UserRecord extends ShowLength, ByteSwappable , HavePrimaryKey {
 
 
     /**

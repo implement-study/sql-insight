@@ -16,8 +16,6 @@
 
 package org.gongxuanzhang.mysql.entity;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -45,21 +43,6 @@ public class CompositePrimaryKey implements PrimaryKey {
         }
     }
 
-    @Override
-    public int compareTo(@NotNull PrimaryKey other) {
-        if (!(other instanceof CompositePrimaryKey)) {
-            throw new IllegalArgumentException("主键异常");
-        }
-        for (int i = 0; i < this.list.size(); i++) {
-            PrimaryKey thisPrimaryKey = this.list.get(i);
-            PrimaryKey otherPrimaryKey = ((CompositePrimaryKey) other).list.get(i);
-            int compare = thisPrimaryKey.compareTo(otherPrimaryKey);
-            if (compare != 0) {
-                return compare;
-            }
-        }
-        return 0;
-    }
 
     @Override
     public int length() {

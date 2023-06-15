@@ -19,8 +19,9 @@ package org.gongxuanzhang.mysql.entity.page;
 
 import lombok.EqualsAndHashCode;
 import org.gongxuanzhang.mysql.constant.ConstantSize;
-import org.gongxuanzhang.mysql.core.ByteSwappable;
-import org.gongxuanzhang.mysql.entity.ShowLength;
+import org.gongxuanzhang.mysql.entity.InfimumPrimaryKey;
+import org.gongxuanzhang.mysql.entity.PrimaryKey;
+import org.gongxuanzhang.mysql.entity.TableInfo;
 
 import java.nio.ByteBuffer;
 
@@ -31,7 +32,7 @@ import java.nio.ByteBuffer;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @EqualsAndHashCode
-public class Infimum implements UserRecord, ByteSwappable, ShowLength {
+public class Infimum implements UserRecord {
 
     public static final String INFIMUM_BODY = "infimum";
 
@@ -77,5 +78,8 @@ public class Infimum implements UserRecord, ByteSwappable, ShowLength {
     }
 
 
-
+    @Override
+    public PrimaryKey getPrimaryKey(TableInfo tableInfo) {
+        return new InfimumPrimaryKey();
+    }
 }

@@ -36,4 +36,26 @@ public class ArrayUtils {
         return newArray;
     }
 
+
+    /**
+     * 比较两个字节数组
+     * 当完全相等时返回0
+     * 长度相同 自然排序
+     * 长度不同 比较有内容的部分
+     * 有内容的部分不同，自然排序
+     * 有内容的部分相同 按长度自然排序
+     **/
+    public static int compare(byte[] aBytes,byte[] otherBytes){
+        int length1 = aBytes.length;
+        int length2 = otherBytes.length;
+        int minLength = Math.min(length1, length2);
+        for (int i = 0; i < minLength; i++) {
+            int cmp = Byte.compare(aBytes[i], otherBytes[i]);
+            if (cmp != 0) {
+                return cmp;
+            }
+        }
+        return Integer.compare(length1, length2);
+    }
+
 }

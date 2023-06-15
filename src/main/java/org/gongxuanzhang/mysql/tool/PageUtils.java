@@ -65,7 +65,7 @@ public class PageUtils {
         newIndexPage.getFileHeader().setSpaceId(candidatePage.getTableInfo().getSpaceId());
         newIndexPage.getSupremum().getRecordHeader().setnOwned(2);
         indexRow.setRecordHeader(indexHeader);
-        PrimaryKey primaryKey = PrimaryKeyExtractor.extract(minUserData, candidatePage.getTableInfo());
+        PrimaryKey primaryKey = minUserData.getPrimaryKey(candidatePage.getTableInfo());
         indexRow.setIndexBody(primaryKey.toBytes());
         indexRow.setIndexLength((short) primaryKey.length());
 
@@ -162,5 +162,31 @@ public class PageUtils {
         int nextRecordOffset = userRecord.getRecordHeader().getNextRecordOffset();
         return getUserRecordByOffset(page, (short) nextRecordOffset);
     }
+
+    /**
+     * 根据主键确认此主键落在哪个页中
+     * 传入的必须是索引页
+     *
+     * @param page       索引页
+     * @param primaryKey 主键
+     * @return 返回数据页的偏移量
+     **/
+    public static int findByPrimaryKey(InnoDbPage page, PrimaryKey primaryKey) {
+        PageDirectory pageDirectory = page.getPageDirectory();
+        short[] slots = pageDirectory.getSlots();
+        int left = 0;
+        int right = slots.length - 1;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            Index index = new IndexRecordFactory().swap(page,
+                    slots[mid] - ConstantSize.SUPREMUM.offset() - ConstantSize.SUPREMUM.getSize());
+            int compare = ArrayUtils.compare(index.toBytes(), primaryKey.toBytes());
+            if (compare == 0) {
+
+            }
+        }
+        return 1;
+    }
+
 
 }

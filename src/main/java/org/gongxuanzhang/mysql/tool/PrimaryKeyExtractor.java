@@ -16,23 +16,12 @@
 
 package org.gongxuanzhang.mysql.tool;
 
-import org.gongxuanzhang.mysql.entity.Column;
 import org.gongxuanzhang.mysql.entity.CompositePrimaryKey;
-import org.gongxuanzhang.mysql.entity.InfimumPrimaryKey;
 import org.gongxuanzhang.mysql.entity.InsertRow;
-import org.gongxuanzhang.mysql.entity.IntegerPrimaryKey;
 import org.gongxuanzhang.mysql.entity.PrimaryKey;
-import org.gongxuanzhang.mysql.entity.SupremumPrimaryKey;
-import org.gongxuanzhang.mysql.entity.TableInfo;
-import org.gongxuanzhang.mysql.entity.VarcharPrimaryKey;
-import org.gongxuanzhang.mysql.entity.page.Compact;
-import org.gongxuanzhang.mysql.entity.page.Infimum;
-import org.gongxuanzhang.mysql.entity.page.Supremum;
-import org.gongxuanzhang.mysql.entity.page.UserRecord;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -62,48 +51,5 @@ public class PrimaryKeyExtractor {
         }
         return new CompositePrimaryKey(list);
     }
-
-    public static PrimaryKey extract(UserRecord userRecord, TableInfo tableInfo) {
-        if (userRecord instanceof Infimum) {
-            return new InfimumPrimaryKey();
-        }
-        if (userRecord instanceof Supremum) {
-            return new SupremumPrimaryKey();
-        }
-        if (userRecord instanceof Compact) {
-            return compactPrimaryKeyExtract((Compact) userRecord, tableInfo);
-        }
-        throw new UnsupportedOperationException("暂不支持" + userRecord.getClass().getName() + "行格式");
-    }
-
-    private static PrimaryKey compactPrimaryKeyExtract(Compact compact, TableInfo tableInfo) {
-        int[] primaryKeyIndex = tableInfo.getPrimaryKeyIndex();
-        if (primaryKeyIndex.length == 0) {
-            throw new UnsupportedOperationException("暂不支持无主键");
-        }
-        if (primaryKeyIndex.length == 1) {
-            int primaryLength;
-            Column primaryCol = tableInfo.getColumns().get(0);
-            if (primaryCol.isDynamic()) {
-                primaryLength = compact.getVariables().get(0);
-            } else {
-                primaryLength = primaryCol.getLength();
-            }
-            byte[] primaryBody = Arrays.copyOfRange(compact.getBody(), 0, primaryLength);
-            switch (primaryCol.getType()) {
-                case INT:
-                    return new IntegerPrimaryKey(BitUtils.joinInt(primaryBody));
-                case VARCHAR:
-                    return new VarcharPrimaryKey(new String(primaryBody));
-                default:
-                    throw new UnsupportedOperationException("不支持" + primaryCol.getType() + "类型主键");
-            }
-        } else {
-            throw new UnsupportedOperationException("暂不支持联合主键");
-        }
-    }
-
-    //  找到目标位置的
-
 
 }

@@ -17,6 +17,8 @@
 package org.gongxuanzhang.mysql.entity;
 
 import org.gongxuanzhang.mysql.core.ByteSwappable;
+import org.gongxuanzhang.mysql.core.HavePrimaryKey;
+import org.gongxuanzhang.mysql.tool.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -24,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public interface PrimaryKey extends ExecuteInfo, Comparable<PrimaryKey>, ByteSwappable {
+public interface PrimaryKey extends ExecuteInfo, Comparable<PrimaryKey>, ByteSwappable, HavePrimaryKey {
 
 
     /**
@@ -34,8 +36,28 @@ public interface PrimaryKey extends ExecuteInfo, Comparable<PrimaryKey>, ByteSwa
      * @return 同compare to
      **/
     @Override
-    int compareTo(@NotNull PrimaryKey other);
+    default int compareTo(@NotNull PrimaryKey other) {
+        if (other instanceof SupremumPrimaryKey) {
+            return -1;
+        }
+        if (other instanceof InfimumPrimaryKey) {
+            return 1;
+        }
 
+        return ArrayUtils.compare(this.toBytes(), other.toBytes());
+    }
+
+
+    /**
+     * 自己也同时是容器
+     *
+     * @param tableInfo {@link HavePrimaryKey#getPrimaryKey(TableInfo)}
+     * @return 主键
+     **/
+    @Override
+    default PrimaryKey getPrimaryKey(TableInfo tableInfo) {
+        return this;
+    }
 
     /**
      * 主键长度

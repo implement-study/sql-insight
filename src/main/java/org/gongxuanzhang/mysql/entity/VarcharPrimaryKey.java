@@ -16,9 +16,6 @@
 
 package org.gongxuanzhang.mysql.entity;
 
-import org.jetbrains.annotations.NotNull;
-
-
 /**
  * varchar主键
  *
@@ -36,19 +33,6 @@ public class VarcharPrimaryKey implements PrimaryKey {
         return value;
     }
 
-    @Override
-    public int compareTo(@NotNull PrimaryKey other) {
-        if (other instanceof SupremumPrimaryKey) {
-            return -1;
-        }
-        if (other instanceof InfimumPrimaryKey) {
-            return 1;
-        }
-        if (!(other instanceof VarcharPrimaryKey)) {
-            throw new IllegalArgumentException("主键异常");
-        }
-        return this.value.compareTo(((VarcharPrimaryKey) other).value);
-    }
 
     @Override
     public int length() {

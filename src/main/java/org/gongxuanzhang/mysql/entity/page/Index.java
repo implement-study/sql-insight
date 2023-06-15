@@ -16,9 +16,13 @@
 
 package org.gongxuanzhang.mysql.entity.page;
 
-import lombok.Data;
 import org.gongxuanzhang.mysql.annotation.NotInPage;
-import org.gongxuanzhang.mysql.core.ByteSwappable;
+import org.gongxuanzhang.mysql.entity.Column;
+import org.gongxuanzhang.mysql.entity.IntegerPrimaryKey;
+import org.gongxuanzhang.mysql.entity.PrimaryKey;
+import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.entity.VarcharPrimaryKey;
+import org.gongxuanzhang.mysql.tool.BitUtils;
 
 import java.nio.ByteBuffer;
 
@@ -27,8 +31,7 @@ import java.nio.ByteBuffer;
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-@Data
-public class Index implements UserRecord, ByteSwappable {
+public class Index implements UserRecord {
 
 
     RecordHeader recordHeader;
@@ -43,11 +46,22 @@ public class Index implements UserRecord, ByteSwappable {
      **/
     byte[] indexBody;
 
+
+    /**
+     * 链接的具体数据页在文件的偏移量
+     **/
+    int dataPageOffset;
+
     /**
      * 这一页对应的偏移量
      **/
     @NotInPage("表示记录在页中的偏移量，并不在页中真实存储")
     int pageOffset;
+
+    //  不提供get方法 通过HavePrimaryKey接口调用
+
+    @NotInPage("主键是计算出来显示的")
+    private PrimaryKey primaryKey;
 
 
     @Override
@@ -56,6 +70,7 @@ public class Index implements UserRecord, ByteSwappable {
         byteBuffer.put(recordHeader.toBytes());
         byteBuffer.putShort(indexLength);
         byteBuffer.put(indexBody);
+        byteBuffer.putInt(this.dataPageOffset);
         return byteBuffer.array();
     }
 
@@ -76,6 +91,83 @@ public class Index implements UserRecord, ByteSwappable {
 
     @Override
     public int length() {
-        return this.recordHeader.length() + 2 + indexBody.length;
+        return this.recordHeader.length() +
+                // 索引长度
+                2 +
+                indexBody.length +
+                //  数据页偏移量
+                4;
+    }
+
+    @Override
+    public PrimaryKey getPrimaryKey(TableInfo tableInfo) {
+        if (this.primaryKey != null) {
+            return this.primaryKey;
+        }
+        this.primaryKey = calculatePrimaryKey(tableInfo);
+        return primaryKey;
+    }
+
+    private PrimaryKey calculatePrimaryKey(TableInfo tableInfo) {
+        int[] primaryKeyIndex = tableInfo.getPrimaryKeyIndex();
+        if (primaryKeyIndex.length == 0) {
+            throw new UnsupportedOperationException("暂不支持无主键");
+        }
+        if (primaryKeyIndex.length == 1) {
+            Column primaryCol = tableInfo.getColumns().get(0);
+            switch (primaryCol.getType()) {
+                case INT:
+                    return new IntegerPrimaryKey(BitUtils.joinInt(this.indexBody));
+                case VARCHAR:
+                    return new VarcharPrimaryKey(new String(this.indexBody));
+                default:
+                    throw new UnsupportedOperationException("不支持" + primaryCol.getType() + "类型主键");
+            }
+        } else {
+            throw new UnsupportedOperationException("暂不支持联合主键");
+        }
+    }
+
+
+
+    public Index setRecordHeader(RecordHeader recordHeader) {
+        this.recordHeader = recordHeader;
+        return this;
+    }
+
+    public short getIndexLength() {
+        return indexLength;
+    }
+
+    public Index setIndexLength(short indexLength) {
+        this.indexLength = indexLength;
+        return this;
+    }
+
+    public byte[] getIndexBody() {
+        return indexBody;
+    }
+
+    public Index setIndexBody(byte[] indexBody) {
+        this.indexBody = indexBody;
+        return this;
+    }
+
+    public int getDataPageOffset() {
+        return dataPageOffset;
+    }
+
+    public Index setDataPageOffset(int dataPageOffset) {
+        this.dataPageOffset = dataPageOffset;
+        return this;
+    }
+
+    public int getPageOffset() {
+        return pageOffset;
+    }
+
+    public Index setPrimaryKey(PrimaryKey primaryKey) {
+        this.primaryKey = primaryKey;
+        return this;
     }
 }

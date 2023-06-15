@@ -18,6 +18,7 @@ package org.gongxuanzhang.mysql.core;
 
 import org.gongxuanzhang.mysql.constant.ConstantSize;
 import org.gongxuanzhang.mysql.entity.InsertRow;
+import org.gongxuanzhang.mysql.entity.PrimaryKey;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPageFactory;
@@ -26,6 +27,7 @@ import org.gongxuanzhang.mysql.exception.LambdaExceptionRuntimeWrapper;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.tool.PageReader;
 import org.gongxuanzhang.mysql.tool.PageUtils;
+import org.gongxuanzhang.mysql.tool.PrimaryKeyExtractor;
 
 import java.io.File;
 import java.util.Map;
@@ -157,9 +159,18 @@ public class InnoDbPageSelector implements PageSelector, Refreshable {
     }
 
 
+    /**
+     * 可能出现数据页分裂或者创建一个页
+     *
+     * @param indexRootPage 根页  是一个索引页
+     * @param row           插入行
+     * @return 反正目标行应该插入的页
+     **/
+    private InnoDbPage findOrCreatePage(InnoDbPage indexRootPage, InsertRow row) throws MySQLException {
+        InnodbPageInfoVisitor pageInfoVisitor = new InnodbPageInfoVisitor(indexRootPage);
+        PrimaryKey insertPrimaryKey = PrimaryKeyExtractor.extract(row);
 
-    private InnoDbPage findOrCreatePage(InnoDbPage root, InsertRow row) {
-
+        //  select target
         System.out.println("");
         return null;
     }
