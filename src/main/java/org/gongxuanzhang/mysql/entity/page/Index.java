@@ -129,7 +129,6 @@ public class Index implements UserRecord {
     }
 
 
-
     public Index setRecordHeader(RecordHeader recordHeader) {
         this.recordHeader = recordHeader;
         return this;

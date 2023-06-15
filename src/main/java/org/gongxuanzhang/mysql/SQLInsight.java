@@ -20,7 +20,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- *
  * 开启你的神奇之旅吧
  *
  * @author gxz gongxuanzhang@foxmail.com

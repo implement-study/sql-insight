@@ -45,7 +45,7 @@ public class ArrayUtils {
      * 有内容的部分不同，自然排序
      * 有内容的部分相同 按长度自然排序
      **/
-    public static int compare(byte[] aBytes,byte[] otherBytes){
+    public static int compare(byte[] aBytes, byte[] otherBytes) {
         int length1 = aBytes.length;
         int length2 = otherBytes.length;
         int minLength = Math.min(length1, length2);

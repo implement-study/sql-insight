@@ -25,7 +25,7 @@ import org.gongxuanzhang.mysql.entity.ShowLength;
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public interface UserRecord extends ShowLength, ByteSwappable , HavePrimaryKey {
+public interface UserRecord extends ShowLength, ByteSwappable, HavePrimaryKey {
 
 
     /**

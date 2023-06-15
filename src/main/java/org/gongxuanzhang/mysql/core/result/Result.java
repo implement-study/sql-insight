@@ -130,7 +130,7 @@ public interface Result {
      * @param dataList 元数据
      * @return 结果
      **/
-    static Result select(List<String> head, List<Map<String,String>> dataList) {
+    static Result select(List<String> head, List<Map<String, String>> dataList) {
         try {
             String sql = SessionManager.currentSession().getSql();
             SelectResult selectResult = new SelectResult(head, dataList);
@@ -140,8 +140,6 @@ public interface Result {
             return new ErrorResult("会话异常", "unknown");
         }
     }
-
-
 
 
     /**

@@ -262,11 +262,11 @@ public class TableInfo implements ExecuteInfo, EngineSelectable, Refreshable {
         }
     }
 
-    public List<Map<String,String>> descTable() {
-        List<Map<String,String>> result = new ArrayList<>();
+    public List<Map<String, String>> descTable() {
+        List<Map<String, String>> result = new ArrayList<>();
         Set<String> primary = primaryKey == null ? new HashSet<>() : new HashSet<>(primaryKey);
         for (Column column : columns) {
-            Map<String,String> colInfo = new LinkedHashMap<>(8);
+            Map<String, String> colInfo = new LinkedHashMap<>(8);
             colInfo.put("field", column.getName());
             colInfo.put("type", column.getType().toString());
             colInfo.put("notNull", Boolean.toString(!column.isNotNull()));

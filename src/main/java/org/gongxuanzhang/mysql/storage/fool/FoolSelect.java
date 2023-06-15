@@ -66,7 +66,7 @@ public class FoolSelect implements SelectEngine {
         // order
         Order<?> order = info.getOrder();
         if (order.available()) {
-            viewJson.sort((Order<Map<String,String>>) order);
+            viewJson.sort((Order<Map<String, String>>) order);
         }
         List<String> colNames = new ArrayList<>();
         for (SelectCol selectCol : selectCols) {
