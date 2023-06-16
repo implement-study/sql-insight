@@ -42,5 +42,14 @@ public interface UserRecord extends ShowLength, ByteSwappable, HavePrimaryKey {
      **/
     int pageOffset();
 
+    /**
+     * 判断此记录是不是组内的最后一个
+     *
+     * @return true是最后一个
+     **/
+    default boolean isLastInGroup() {
+        return getRecordHeader().getNOwned() != 0;
+    }
+
 
 }

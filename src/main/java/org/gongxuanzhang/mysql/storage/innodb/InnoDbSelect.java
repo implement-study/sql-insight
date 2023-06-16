@@ -23,7 +23,7 @@ import org.gongxuanzhang.mysql.entity.SelectRow;
 import org.gongxuanzhang.mysql.entity.SingleSelectInfo;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPageFactory;
-import org.gongxuanzhang.mysql.entity.page.InnodbPageInfoVisitor;
+import org.gongxuanzhang.mysql.entity.page.InnodbPageOperator;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.storage.SelectEngine;
 
@@ -45,11 +45,11 @@ public class InnoDbSelect implements SelectEngine {
         byte[] rootPageBuffer = selector.getRootPage();
         InnoDbPageFactory factory = InnoDbPageFactory.getInstance();
         InnoDbPage rootPage = factory.swap(rootPageBuffer);
-        InnodbPageInfoVisitor rootInfo = new InnodbPageInfoVisitor(rootPage);
+        InnodbPageOperator rootInfo = new InnodbPageOperator(rootPage);
         return selectAll(rootInfo, info);
     }
 
-    private Result selectAll(InnodbPageInfoVisitor pageInfoVisitor, SingleSelectInfo info) throws MySQLException {
+    private Result selectAll(InnodbPageOperator pageInfoVisitor, SingleSelectInfo info) throws MySQLException {
         List<String> head = info.getFrom().getColumns().stream().map(Column::getName).collect(Collectors.toList());
         if (pageInfoVisitor.isDataPage()) {
             return Result.select(head,
@@ -64,7 +64,7 @@ public class InnoDbSelect implements SelectEngine {
         return Result.select(head, data.stream().map(SelectRow::showMap).collect(Collectors.toList()));
     }
 
-    private Result singlePage(InnodbPageInfoVisitor pageInfoVisitor, SingleSelectInfo info) {
+    private Result singlePage(InnodbPageOperator pageInfoVisitor, SingleSelectInfo info) {
         return Result.select(info.getFrom().getColumns().stream().map(Column::getName).collect(Collectors.toList()),
                 pageInfoVisitor.showRows().stream().map(SelectRow::showMap).collect(Collectors.toList()));
 

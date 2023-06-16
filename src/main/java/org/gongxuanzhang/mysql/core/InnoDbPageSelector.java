@@ -22,7 +22,7 @@ import org.gongxuanzhang.mysql.entity.PrimaryKey;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPage;
 import org.gongxuanzhang.mysql.entity.page.InnoDbPageFactory;
-import org.gongxuanzhang.mysql.entity.page.InnodbPageInfoVisitor;
+import org.gongxuanzhang.mysql.entity.page.InnodbPageOperator;
 import org.gongxuanzhang.mysql.exception.LambdaExceptionRuntimeWrapper;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.tool.PageReader;
@@ -92,8 +92,8 @@ public class InnoDbPageSelector implements PageSelector, Refreshable {
     public byte[] getLastPage() throws MySQLException {
         byte[] rootPageBuffer = getRootPage();
         InnoDbPage rootPage = this.innoDbPageFactory.swap(rootPageBuffer);
-        InnodbPageInfoVisitor rootInfo = new InnodbPageInfoVisitor(rootPage);
-        if (rootInfo.isDataPage()) {
+        InnodbPageOperator operator = new InnodbPageOperator(rootPage);
+        if (operator.isDataPage()) {
             return rootPageBuffer;
         }
         //  todo  这里如果是目录  需要继续找
@@ -144,11 +144,13 @@ public class InnoDbPageSelector implements PageSelector, Refreshable {
         }
         byte[] rootPage = getRootPage();
         InnoDbPage root = innoDbPageFactory.swap(rootPage);
-        InnodbPageInfoVisitor rootInfo = new InnodbPageInfoVisitor(root);
-        if (rootInfo.isIndexPage()) {
+        InnodbPageOperator operator = new InnodbPageOperator(root);
+        if (operator.isIndexPage()) {
+            PrimaryKey insertPrimaryKey = PrimaryKeyExtractor.extract(row);
+            int pageOffset = operator.binarySearchIndex(insertPrimaryKey);
             return findOrCreatePage(root, row);
         }
-        if (!rootInfo.isDataPage()) {
+        if (!operator.isDataPage()) {
             throw new MySQLException("页状态错误");
         }
         if (root.isEnough(row.length())) {
@@ -160,15 +162,22 @@ public class InnoDbPageSelector implements PageSelector, Refreshable {
 
 
     /**
-     * 可能出现数据页分裂或者创建一个页
+     * 找到目标要插入的页
+     * 过程中可能出现页分裂
      *
      * @param indexRootPage 根页  是一个索引页
      * @param row           插入行
      * @return 反正目标行应该插入的页
      **/
     private InnoDbPage findOrCreatePage(InnoDbPage indexRootPage, InsertRow row) throws MySQLException {
-        InnodbPageInfoVisitor pageInfoVisitor = new InnodbPageInfoVisitor(indexRootPage);
+        InnodbPageOperator operator = new InnodbPageOperator(indexRootPage);
         PrimaryKey insertPrimaryKey = PrimaryKeyExtractor.extract(row);
+        int pageOffset = operator.binarySearchIndex(insertPrimaryKey);
+        InnoDbPage targetDataPage = PageReader.readInnodbPage(this.dataFile, pageOffset);
+        if (targetDataPage.isEnough(row.length())) {
+            return targetDataPage;
+        }
+
 
         //  select target
         System.out.println("");

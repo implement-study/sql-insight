@@ -27,6 +27,18 @@ public class IndexRecordFactory implements ByteBeanSwapper<Index> {
         return swap(bytes);
     }
 
+    /**
+     * 拿到下一个page
+     *
+     * @param page  innodb page
+     * @param index 基础index
+     * @return 返回下一个
+     **/
+    public Index nextIndex(InnoDbPage page, Index index) {
+        int nextRecordOffset = index.getRecordHeader().getNextRecordOffset();
+        return swap(page, nextRecordOffset);
+    }
+
     @Override
     public Index swap(byte[] bytes) {
         ByteBuffer buffer = ByteBuffer.wrap(bytes);

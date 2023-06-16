@@ -23,16 +23,18 @@ import org.gongxuanzhang.mysql.entity.SelectRowImpl;
 import org.gongxuanzhang.mysql.entity.TableInfo;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 import org.gongxuanzhang.mysql.tool.PageReader;
+import org.gongxuanzhang.mysql.tool.PageUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 
 import static org.gongxuanzhang.mysql.tool.PageUtils.getUserRecordByOffset;
 
 /**
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public class InnodbPageInfoVisitor {
+public class InnodbPageOperator {
 
     private InnoDbPage page;
 
@@ -40,12 +42,12 @@ public class InnodbPageInfoVisitor {
 
     private List<SelectRow> selectRows;
 
-    public InnodbPageInfoVisitor(InnoDbPage page) {
+    public InnodbPageOperator(InnoDbPage page) {
         this.page = page;
         this.tableInfo = page.getTableInfo();
     }
 
-    public InnodbPageInfoVisitor(byte[] pageBuffer) {
+    public InnodbPageOperator(byte[] pageBuffer) {
         this(InnoDbPageFactory.getInstance().swap(pageBuffer));
     }
 
@@ -85,27 +87,71 @@ public class InnodbPageInfoVisitor {
 
 
     /**
-     * 索引页找到主键最终落在哪个页
+     * 索引页找到主键最终在哪个页中
      *
      * @param targetKey 目标key
      * @return 返回页的偏移量
      **/
-    public int binarySearchSlotIndex(PrimaryKey targetKey) throws MySQLException {
+    public int binarySearchIndex(PrimaryKey targetKey) throws MySQLException {
         if (!this.isIndexPage()) {
             throw new IllegalStateException("当前页不是索引页");
         }
-        short[] slots = this.page.pageDirectory.getSlots();
         IndexRecordFactory recordFactory = new IndexRecordFactory();
+        int slotIndex = binarySearchSlot(targetKey, recordFactory::swap);
+        short[] slots = this.page.pageDirectory.slots;
+        short preOffset = slots[slotIndex - 1];
+        Index pre = recordFactory.swap(this.page, preOffset);
+        Index next = recordFactory.nextIndex(this.page, pre);
+        while (targetKey.compareTo(next.getPrimaryKey(this.tableInfo)) > 0) {
+            pre = next;
+            next = recordFactory.nextIndex(this.page, pre);
+        }
+        return next.getDataPageOffset();
+    }
+
+    /**
+     * 数据页找到主键最终在哪个slot中
+     *
+     * @param targetKey 目标key
+     * @return 返回页在哪个slot中
+     **/
+    public int binarySearchData(PrimaryKey targetKey) throws MySQLException {
+        if (!this.isDataPage()) {
+            throw new IllegalStateException("当前页不是数据页");
+        }
+        return binarySearchSlot(targetKey, PageUtils::getUserRecordByOffset);
+    }
+
+
+//    /**
+//     * 知道目标在哪个slot中，遍历寻找到具体位置
+//     *
+//     * @param targetKey 目标key
+//     * @return 返回目标所在页的offset
+//     **/
+//    public int searchOffsetFromSlot(PrimaryKey targetKey, int slotIndex) {
+//
+//    }
+
+
+    /**
+     * 数据页找到数据具体落在哪个槽
+     *
+     * @param targetKey 目标key
+     * @return 返回页在哪个slot中
+     **/
+    public int binarySearchSlot(PrimaryKey targetKey, BiFunction<InnoDbPage, Short, UserRecord> getRecordFunction) throws MySQLException {
+        short[] slots = this.page.pageDirectory.getSlots();
         int left = 0;
         int right = slots.length - 1;
         while (right - left <= 1) {
             int mid = (right + left) >> 1;
             short offset = slots[mid];
-            Index index = recordFactory.swap(this.page, offset);
-            PrimaryKey baseKey = index.getPrimaryKey(this.tableInfo);
+            UserRecord userRecord = getRecordFunction.apply(this.page, offset);
+            PrimaryKey baseKey = userRecord.getPrimaryKey(this.tableInfo);
             int compare = targetKey.compareTo(baseKey);
             if (compare == 0) {
-                return index.getPageOffset();
+                return mid;
             }
             if (compare < 0) {
                 right = mid - 1;
@@ -113,11 +159,11 @@ public class InnodbPageInfoVisitor {
                 left = mid + 1;
             }
         }
-        Index rightIndex = recordFactory.swap(this.page, slots[right]);
-        if (targetKey.compareTo(rightIndex.getPrimaryKey(this.tableInfo)) >= 0) {
-            return slots[right];
+        UserRecord userRecord = getRecordFunction.apply(this.page, slots[right]);
+        if (targetKey.compareTo(userRecord.getPrimaryKey(this.tableInfo)) >= 0) {
+            return right;
         }
-        return slots[left];
+        return left;
     }
 
 
@@ -140,4 +186,5 @@ public class InnodbPageInfoVisitor {
         }
         return selectRows;
     }
+
 }
