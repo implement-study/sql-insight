@@ -14,23 +14,35 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.object;
+package org.gongxuanzhang.sql.insight.core.optimizer;
 
-import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
-import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
+import org.gongxuanzhang.sql.insight.core.command.Command;
+import org.gongxuanzhang.sql.insight.core.exception.SqlAnalysisException;
 
 /**
- * a object for can be executed by the engine
+ * like mysql query optimizer.
+ * but implementation is so difficult.
+ * perhaps this optimizer only a very simple function
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface EngineObject {
+public interface Optimizer {
 
 
     /**
-     * how to execute
+     * analysis sql to a wrapped sql
      *
-     * @param engine storage engine
+     * @return the command
      **/
-    ResultInterface doEngine(StorageEngine engine);
+    Command analysisSql(String sql) throws SqlAnalysisException;
+
+    /**
+     * make a plan
+     *
+     * @param command from sql
+     * @return execute plan
+     **/
+    ExecutionPlan assign(Command command);
+
+
 }

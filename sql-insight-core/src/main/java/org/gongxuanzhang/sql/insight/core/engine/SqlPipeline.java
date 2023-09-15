@@ -14,30 +14,32 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.executor;
+package org.gongxuanzhang.sql.insight.core.engine;
 
-import com.alibaba.druid.sql.SQLUtils;
-import com.alibaba.druid.sql.ast.SQLStatement;
+import org.gongxuanzhang.sql.insight.core.command.Command;
+import org.gongxuanzhang.sql.insight.core.engine.execute.ExecuteEngine;
+import org.gongxuanzhang.sql.insight.core.exception.SqlInsightException;
+import org.gongxuanzhang.sql.insight.core.optimizer.ExecutionPlan;
+import org.gongxuanzhang.sql.insight.core.optimizer.Optimizer;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 
 /**
+ * sql lifecycle container
+ *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class ExecutorImpl implements Executor{
+public class SqlPipeline {
 
+    private Optimizer optimizer;
 
-    private EngineSelector engineSelector;
+    private ExecuteEngine executeEngine;
 
-    @Override
-    public ResultInterface doExecute(String sql) {
+    public ResultInterface doSql(String sql) throws SqlInsightException {
 
-        SQLStatement sqlStatement = SQLUtils.parseSingleMysqlStatement(sql);
+        Command command = optimizer.analysisSql(sql);
 
+        ExecutionPlan plan = optimizer.assign(command);
 
-
-        return null;
+        return executeEngine.executePlan(plan);
     }
-
-
-
 }

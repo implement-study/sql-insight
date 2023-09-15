@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.executor;
+package org.gongxuanzhang.sql.insight.core.analysis;
 
-import org.gongxuanzhang.sql.insight.core.storage.StorageEngine;
 
 /**
+ * type for sql
+ *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface EngineSelector {
-
-
-    /**
-     * @param engineName name
-     * @return storage engine
-     **/
-    StorageEngine selectEngine(String engineName);
+public enum SqlType {
+    DDL,
+    DML,
+    DCL
 }

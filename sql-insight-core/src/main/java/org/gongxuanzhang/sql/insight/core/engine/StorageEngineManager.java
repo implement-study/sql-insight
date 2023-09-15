@@ -13,24 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gongxuanzhang.sql.insight.core.analysis;
 
-import org.gongxuanzhang.sql.insight.core.exception.SqlAnalysisException;
-import org.gongxuanzhang.sql.insight.core.executor.Executor;
+package org.gongxuanzhang.sql.insight.core.engine;
+
+import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+
+import java.util.List;
 
 /**
- * analysis for sql
- *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface Analyzer {
+public interface StorageEngineManager extends StorageEngineSelector {
 
 
     /**
-     * analysis sql to a executor
-     *
-     * @return the executor
+     * get all engine
      **/
-    Executor analysisSql(String sql) throws SqlAnalysisException;
+    List<StorageEngine> allEngine();
+
+
+    /**
+     * register with the manager
+     **/
+    void registerEngine(StorageEngine engine);
+
+    /**
+     * select engine from engine name
+     *
+     * @param engineName {@link StorageEngineSelector#selectEngine(String)}
+     * @return {@link StorageEngineSelector#selectEngine(String)}
+     **/
+    @Override
+    StorageEngine selectEngine(String engineName);
+
 
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.storage;
+package org.gongxuanzhang.sql.insight.core.engine.storage;
 
 /**
  * @author gongxuanzhangmelt@gmail.com

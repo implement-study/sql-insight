@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.object;
+package org.gongxuanzhang.sql.insight.core.engine;
 
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
-import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 
 /**
- * a object for can be executed by the engine
- *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface EngineObject {
+public interface StorageEngineSelector {
 
 
     /**
-     * how to execute
-     *
-     * @param engine storage engine
+     * @param engineName name
+     * @return storage engine
      **/
-    ResultInterface doEngine(StorageEngine engine);
+    StorageEngine selectEngine(String engineName);
 }

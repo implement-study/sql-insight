@@ -13,26 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gongxuanzhang.sql.insight.core.executor;
+package org.gongxuanzhang.sql.insight.core.engine.execute;
 
+import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+import org.gongxuanzhang.sql.insight.core.optimizer.ExecutionPlan;
+import org.gongxuanzhang.sql.insight.core.optimizer.Optimizer;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 import org.springframework.lang.NonNull;
 
 /**
- * The main flow of sql execution
+ * execute engine differ from {@link StorageEngine}
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface Executor {
+public interface ExecuteEngine {
 
     /**
-     * do a sql
+     * execute plan
      *
-     * @param sql sql
-     * @return return storage engine result in general , return the error result if an error occurred during the sql
+     * @param plan execution plan from {@link Optimizer}
+     * @return return storage engine result in general , if the sql is a dcl,return core executor result.
+     * maybe return the error result if an error occurred during the sql
      * process
      **/
     @NonNull
-    ResultInterface doExecute(String sql);
+    ResultInterface executePlan(ExecutionPlan plan);
 
 }

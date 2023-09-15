@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.storage;
+package org.gongxuanzhang.sql.insight.core.engine.storage;
 
 
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 
 /**
- *
  * storage engine , executor select the engine
  *
  * @author gongxuanzhangmelt@gmail.com
@@ -56,6 +55,7 @@ public interface StorageEngine {
      * insert data
      **/
     ResultInterface insert();
+
     /**
      * update
      **/

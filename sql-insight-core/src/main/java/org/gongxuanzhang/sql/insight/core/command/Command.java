@@ -14,37 +14,35 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.executor;
+package org.gongxuanzhang.sql.insight.core.command;
 
-import org.gongxuanzhang.sql.insight.core.storage.StorageEngine;
-
-import java.util.List;
+import org.gongxuanzhang.sql.insight.core.analysis.SqlType;
+import org.jetbrains.annotations.NotNull;
 
 /**
+ * from sql
+ *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface EngineManager extends EngineSelector {
+public interface Command {
 
 
     /**
-     * get all engine
-     **/
-    List<StorageEngine> allEngine();
-
-
-    /**
-     * register with the manager
-     **/
-    void registerEngine(StorageEngine engine);
-
-    /**
-     * select engine from engine name
+     * the wrapped sql
      *
-     * @param engineName {@link EngineSelector#selectEngine(String)}
-     * @return {@link EngineSelector#selectEngine(String)}
+     * @return the origin
      **/
-    @Override
-    StorageEngine selectEngine(String engineName);
+    @NotNull
+    String getSql();
 
+
+    /**
+     * the type for sql
+     * like {@link SqlType}
+     *
+     * @return not null
+     **/
+    @NotNull
+    SqlType getSqlType();
 
 }
