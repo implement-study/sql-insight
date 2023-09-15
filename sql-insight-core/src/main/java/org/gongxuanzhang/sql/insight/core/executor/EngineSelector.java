@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 sql-insight  and the original author or authors <gongxuanzhangmelt@gmail.com>.
+ * Copyright 2023 java-mysql  and the original author or authors <gongxuanzhangmelt@gmail.com>.
  *
  * Licensed under the GNU Affero General Public License v3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.mysql;
+package org.gongxuanzhang.sql.insight.core.executor;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.gongxuanzhang.sql.insight.core.storage.StorageEngine;
 
 /**
- * 开启你的神奇之旅吧
- *
- * @author gxz gongxuanzhang@foxmail.com
+ * @author gongxuanzhangmelt@gmail.com
  **/
-@SpringBootApplication
-public class SQLInsight {
-    public static void main(String[] args) {
-        SpringApplication.run(SQLInsight.class);
-    }
+public interface EngineSelector {
+
+
+    /**
+     * @param engineName name
+     * @return storage engine
+     **/
+    StorageEngine selectEngine(String engineName);
 }

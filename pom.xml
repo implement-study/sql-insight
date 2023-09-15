@@ -7,11 +7,15 @@
     <groupId>org.gongxuanzhang</groupId>
     <artifactId>sql-insight</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <kotlin.version>1.8.10</kotlin.version>
+        <druid.version>1.2.15</druid.version>
+        <fastjson2.version>2.0.23</fastjson2.version>
         <spring-boot-dependencies.version>2.4.13</spring-boot-dependencies.version>
     </properties>
 
@@ -22,11 +26,6 @@
             <version>1.18.22</version>
         </dependency>
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
-            <version>1.2.15</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
@@ -34,11 +33,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba.fastjson2</groupId>
-            <artifactId>fastjson2</artifactId>
-            <version>2.0.23</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -77,37 +71,11 @@
         </dependencies>
     </dependencyManagement>
 
+    <modules>
+        <module>sql-insight-core</module>
+        <module>sql-insight-spring</module>
+    </modules>
 
-    <build>
-<!--        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>-->
-        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
-        <plugins>
-            <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <compilerPlugins>
-                        <plugin>jpa</plugin>
-                        <plugin>spring</plugin>
-                        <plugin>noarg</plugin>
-                        <plugin>allopen</plugin>
-                    </compilerPlugins>
-                    <args>
-                        <arg>-Xjsr305=strict</arg>
-                    </args>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+
 
 </project>

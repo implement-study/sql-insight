@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 sql-insight  and the original author or authors <gongxuanzhangmelt@gmail.com>.
+ * Copyright 2023 java-mysql  and the original author or authors <gongxuanzhangmelt@gmail.com>.
  *
  * Licensed under the GNU Affero General Public License v3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.gongxuanzhang.sql.insight.core.executor;
 
-package org.gongxuanzhang.mysql;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
+import org.springframework.lang.NonNull;
 
 /**
- * 开启你的神奇之旅吧
+ * The main flow of sql execution
  *
- * @author gxz gongxuanzhang@foxmail.com
+ * @author gongxuanzhangmelt@gmail.com
  **/
-@SpringBootApplication
-public class SQLInsight {
-    public static void main(String[] args) {
-        SpringApplication.run(SQLInsight.class);
-    }
+public interface Executor {
+
+    /**
+     * do a sql
+     *
+     * @param sql sql
+     * @return return storage engine result in general , return the error result if an error occurred during the sql
+     * process
+     **/
+    @NonNull
+    ResultInterface doExecute(String sql);
+
 }
