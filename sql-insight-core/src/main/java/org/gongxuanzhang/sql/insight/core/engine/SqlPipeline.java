@@ -18,9 +18,11 @@ package org.gongxuanzhang.sql.insight.core.engine;
 
 import org.gongxuanzhang.sql.insight.core.command.Command;
 import org.gongxuanzhang.sql.insight.core.engine.execute.ExecuteEngine;
+import org.gongxuanzhang.sql.insight.core.engine.execute.SqlInsightExecuteEngine;
 import org.gongxuanzhang.sql.insight.core.exception.SqlInsightException;
 import org.gongxuanzhang.sql.insight.core.optimizer.ExecutionPlan;
 import org.gongxuanzhang.sql.insight.core.optimizer.Optimizer;
+import org.gongxuanzhang.sql.insight.core.optimizer.OptimizerImpl;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 
 /**
@@ -30,9 +32,9 @@ import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
  **/
 public class SqlPipeline {
 
-    private Optimizer optimizer;
+    private Optimizer optimizer = new OptimizerImpl();
 
-    private ExecuteEngine executeEngine;
+    private ExecuteEngine executeEngine = new SqlInsightExecuteEngine();
 
     public ResultInterface doSql(String sql) throws SqlInsightException {
 

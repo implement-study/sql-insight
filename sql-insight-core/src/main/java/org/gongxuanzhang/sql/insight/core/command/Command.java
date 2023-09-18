@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.command;
 
+import org.gongxuanzhang.sql.insight.core.analysis.OperatorType;
 import org.gongxuanzhang.sql.insight.core.analysis.SqlType;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,5 +45,16 @@ public interface Command {
      **/
     @NotNull
     SqlType getSqlType();
+
+
+    /**
+     * the command can be executed directly without storage engine
+     * default true when sql type is DDL
+     *
+     * @return true can directly
+     **/
+    default boolean directly() {
+        return getSqlType().operatorType() == OperatorType.DDL;
+    }
 
 }

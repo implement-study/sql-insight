@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.optimizer;
+package org.gongxuanzhang.sql.insight.core.exception;
 
-import org.gongxuanzhang.sql.insight.core.engine.execute.ExecuteEngine;
-import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+import java.io.IOException;
 
 /**
- * hand out to {@link StorageEngine} from {@link ExecuteEngine}
- * can also be executed directly from the execute engine
+ * wrapped IoException
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface ExecutionPlan {
+public class RuntimeIoException extends SqlInsightException {
 
 
-    /**
-     * in general,return true when the sql is ddl,because ddl can be execute without storage engine .
-     *
-     * @return true can be without storage engine
-     **/
-    boolean withoutEngine();
-
+    public RuntimeIoException(IOException e) {
+        super(e.getMessage());
+    }
 
 }

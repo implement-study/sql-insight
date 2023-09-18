@@ -14,26 +14,16 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.optimizer;
-
-import org.gongxuanzhang.sql.insight.core.engine.execute.ExecuteEngine;
-import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+package org.gongxuanzhang.sql.insight.core.exception;
 
 /**
- * hand out to {@link StorageEngine} from {@link ExecuteEngine}
- * can also be executed directly from the execute engine
+ * like {@link java.io.FileNotFoundException}
+ * <p>
+ * the only difference is this class is a runtime exception
  *
  * @author gongxuanzhangmelt@gmail.com
+ * @see java.io.FileNotFoundException
  **/
-public interface ExecutionPlan {
-
-
-    /**
-     * in general,return true when the sql is ddl,because ddl can be execute without storage engine .
-     *
-     * @return true can be without storage engine
-     **/
-    boolean withoutEngine();
-
+public class RuntimeFileNotFoundException extends SqlInsightException {
 
 }

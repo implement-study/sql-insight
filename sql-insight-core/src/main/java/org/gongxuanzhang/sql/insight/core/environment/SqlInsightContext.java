@@ -14,26 +14,21 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.optimizer;
+package org.gongxuanzhang.sql.insight.core.environment;
 
-import org.gongxuanzhang.sql.insight.core.engine.execute.ExecuteEngine;
-import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+import org.gongxuanzhang.sql.insight.core.engine.SqlPipeline;
 
 /**
- * hand out to {@link StorageEngine} from {@link ExecuteEngine}
- * can also be executed directly from the execute engine
+ *
+ * a static context
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface ExecutionPlan {
+public class SqlInsightContext {
 
+    private SqlInsightContext context;
 
-    /**
-     * in general,return true when the sql is ddl,because ddl can be execute without storage engine .
-     *
-     * @return true can be without storage engine
-     **/
-    boolean withoutEngine();
+    private SqlPipeline pipeline;
 
 
 }

@@ -31,7 +31,7 @@ class AnalysisTest {
     private var createDbSql: String = "create database testDb"
 
     @Test
-    fun createDb() {
+    fun testCreateDb() {
         val analysisSql = analyzer.analysisSql(createDbSql)
         assertType(analysisSql, CreateDatabase::class.java)
     }

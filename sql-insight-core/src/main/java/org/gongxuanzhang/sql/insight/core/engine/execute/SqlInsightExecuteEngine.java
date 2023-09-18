@@ -14,26 +14,34 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.optimizer;
+package org.gongxuanzhang.sql.insight.core.engine.execute;
 
-import org.gongxuanzhang.sql.insight.core.engine.execute.ExecuteEngine;
-import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+import org.gongxuanzhang.sql.insight.core.engine.StorageEngineManager;
+import org.gongxuanzhang.sql.insight.core.optimizer.ExecutionPlan;
+import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
+import org.springframework.lang.NonNull;
 
 /**
- * hand out to {@link StorageEngine} from {@link ExecuteEngine}
- * can also be executed directly from the execute engine
+ * implementation for execute engine
+ * if the execution plan can be executed without storage engine
+ * use server engine do it
+ * else select storage engine do it
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface ExecutionPlan {
+public class SqlInsightExecuteEngine implements ExecuteEngine {
 
 
-    /**
-     * in general,return true when the sql is ddl,because ddl can be execute without storage engine .
-     *
-     * @return true can be without storage engine
-     **/
-    boolean withoutEngine();
+    private StorageEngineManager storageEngineManager;
+
+    @Override
+    @NonNull
+    public ResultInterface executePlan(ExecutionPlan plan) {
+        if (plan.withoutEngine()) {
+
+        }
+        return null;
+    }
 
 
 }
