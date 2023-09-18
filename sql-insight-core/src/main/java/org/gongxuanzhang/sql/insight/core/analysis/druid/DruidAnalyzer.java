@@ -18,8 +18,8 @@ package org.gongxuanzhang.sql.insight.core.analysis.druid;
 
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLStatement;
-import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlStatement;
 import org.gongxuanzhang.sql.insight.core.analysis.Analyzer;
+import org.gongxuanzhang.sql.insight.core.analysis.ddl.CreateDatabaseAdaptor;
 import org.gongxuanzhang.sql.insight.core.command.Command;
 import org.gongxuanzhang.sql.insight.core.exception.NotSupportSqlTypeException;
 import org.gongxuanzhang.sql.insight.core.exception.SqlAnalysisException;
@@ -35,25 +35,26 @@ import java.util.Map;
 public class DruidAnalyzer implements Analyzer {
 
 
-    private final Map<Class<? extends MySqlStatement>, DruidStatementAdaptor> adaptorMap = new HashMap<>();
+    private final Map<Class<? extends SQLStatement>,
+            DruidStatementAdaptor<?, ? extends Command>> adaptorMap = new HashMap<>();
 
     {
-
+        this.registerAdaptor(new CreateDatabaseAdaptor());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Command analysisSql(String sql) throws SqlAnalysisException {
         SQLStatement sqlStatement = SQLUtils.parseSingleMysqlStatement(sql);
-        DruidStatementAdaptor druidStatementAdaptor = adaptorMap.get(sqlStatement.getClass());
-        if (druidStatementAdaptor == null) {
+        DruidStatementAdaptor<?, ? extends Command> adaptor = adaptorMap.get(sqlStatement.getClass());
+        if (adaptor == null) {
             throw new NotSupportSqlTypeException(sql, sqlStatement.getClass());
         }
-        return druidStatementAdaptor.adaptor((MySqlStatement) sqlStatement);
+        return ((DruidStatementAdaptor<SQLStatement, ? extends Command>) adaptor).adaptor(sql, sqlStatement);
     }
 
-    private void registerAdaptor(DruidStatementAdaptor adaptor) {
-        DruidStatementAdaptor validate = adaptorMap.putIfAbsent(adaptor.supportType(), adaptor);
-        if (validate != adaptor) {
+    private void registerAdaptor(DruidStatementAdaptor<?, ? extends Command> adaptor) {
+        if (adaptorMap.putIfAbsent(adaptor.supportType(), adaptor) != null) {
             throw new IllegalArgumentException(adaptor.supportType() + "duplicate type");
         }
     }

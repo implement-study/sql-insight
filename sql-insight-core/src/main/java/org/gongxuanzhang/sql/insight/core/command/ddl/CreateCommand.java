@@ -14,35 +14,19 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.analysis.druid;
+package org.gongxuanzhang.sql.insight.core.command.ddl;
 
-import com.alibaba.druid.sql.ast.SQLStatement;
-import org.gongxuanzhang.sql.insight.core.command.Command;
+import org.gongxuanzhang.sql.insight.core.command.BaseCommand;
 
 /**
- * after druid parse sql
- * packaging command according to different types
- *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface DruidStatementAdaptor<DRUID_STATE extends SQLStatement, C extends Command> {
+public abstract class CreateCommand extends BaseCommand {
 
 
-    /**
-     * support to druid mysql statement
-     * sole
-     *
-     * @return class for support
-     **/
-    Class<DRUID_STATE> supportType();
+    public CreateCommand(String sql) {
+        super(sql);
+    }
 
 
-    /**
-     * do adaptor
-     *
-     * @param sql            origin
-     * @param mySqlStatement must equals {@link this#supportType()}
-     * @return command
-     **/
-    C adaptor(String sql, DRUID_STATE mySqlStatement);
 }

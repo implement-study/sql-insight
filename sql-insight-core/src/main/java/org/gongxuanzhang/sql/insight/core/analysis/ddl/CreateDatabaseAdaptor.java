@@ -14,35 +14,26 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.analysis.druid;
+package org.gongxuanzhang.sql.insight.core.analysis.ddl;
 
-import com.alibaba.druid.sql.ast.SQLStatement;
-import org.gongxuanzhang.sql.insight.core.command.Command;
+import com.alibaba.druid.sql.ast.statement.SQLCreateDatabaseStatement;
+import org.gongxuanzhang.sql.insight.core.analysis.druid.DruidStatementAdaptor;
+import org.gongxuanzhang.sql.insight.core.command.ddl.CreateDatabase;
 
 /**
- * after druid parse sql
- * packaging command according to different types
- *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface DruidStatementAdaptor<DRUID_STATE extends SQLStatement, C extends Command> {
+public class CreateDatabaseAdaptor implements DruidStatementAdaptor<SQLCreateDatabaseStatement, CreateDatabase> {
+
+    @Override
+    public Class<SQLCreateDatabaseStatement> supportType() {
+        return SQLCreateDatabaseStatement.class;
+    }
+
+    @Override
+    public CreateDatabase adaptor(String sql, SQLCreateDatabaseStatement mySqlStatement) {
+        return new CreateDatabase(sql, mySqlStatement.isIfNotExists(), mySqlStatement.getDatabaseName());
+    }
 
 
-    /**
-     * support to druid mysql statement
-     * sole
-     *
-     * @return class for support
-     **/
-    Class<DRUID_STATE> supportType();
-
-
-    /**
-     * do adaptor
-     *
-     * @param sql            origin
-     * @param mySqlStatement must equals {@link this#supportType()}
-     * @return command
-     **/
-    C adaptor(String sql, DRUID_STATE mySqlStatement);
 }
