@@ -14,40 +14,27 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.analysis;
+package org.gongxuanzhang.sql.insight.core.exception;
 
-
-import static org.gongxuanzhang.sql.insight.core.analysis.OperatorType.DCL;
-import static org.gongxuanzhang.sql.insight.core.analysis.OperatorType.DDL;
-import static org.gongxuanzhang.sql.insight.core.analysis.OperatorType.DML;
+import com.alibaba.druid.sql.ast.SQLStatement;
 
 /**
- * type for sql
+ * a sql after analysis
+ * non implementation for sql type
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public enum SqlType {
-    CREATE(DDL),
-    DROP(DDL),
-    ALTER(DDL),
-    RENAME(DDL),
-    INSERT(DML),
-    UPDATE(DML),
-    SELECT(DML),
-    TRUNCATE(DML),
-    SHOW(DCL),
-    SET(DCL);
+public class NotSupportSqlTypeException extends SqlAnalysisException {
 
 
-    private final OperatorType type;
+    private final Class<? extends SQLStatement> sqlType;
 
-    SqlType(OperatorType type) {
-        this.type = type;
+    public NotSupportSqlTypeException(String sql, Class<? extends SQLStatement> sqlType) {
+        super(sql, sqlType.getName() + " don't have analyzer");
+        this.sqlType = sqlType;
     }
 
-    public OperatorType operatorType() {
-        return type;
+    public Class<? extends SQLStatement> getSqlType() {
+        return sqlType;
     }
-
-
 }

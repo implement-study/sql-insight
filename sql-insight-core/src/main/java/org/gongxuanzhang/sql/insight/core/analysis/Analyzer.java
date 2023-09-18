@@ -16,38 +16,21 @@
 
 package org.gongxuanzhang.sql.insight.core.analysis;
 
-
-import static org.gongxuanzhang.sql.insight.core.analysis.OperatorType.DCL;
-import static org.gongxuanzhang.sql.insight.core.analysis.OperatorType.DDL;
-import static org.gongxuanzhang.sql.insight.core.analysis.OperatorType.DML;
+import org.gongxuanzhang.sql.insight.core.command.Command;
+import org.gongxuanzhang.sql.insight.core.exception.SqlAnalysisException;
 
 /**
- * type for sql
+ * analysis sql to command
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public enum SqlType {
-    CREATE(DDL),
-    DROP(DDL),
-    ALTER(DDL),
-    RENAME(DDL),
-    INSERT(DML),
-    UPDATE(DML),
-    SELECT(DML),
-    TRUNCATE(DML),
-    SHOW(DCL),
-    SET(DCL);
+public interface Analyzer {
 
-
-    private final OperatorType type;
-
-    SqlType(OperatorType type) {
-        this.type = type;
-    }
-
-    public OperatorType operatorType() {
-        return type;
-    }
-
+    /**
+     * analysis sql to a wrapped sql
+     *
+     * @return the command
+     **/
+    Command analysisSql(String sql) throws SqlAnalysisException;
 
 }

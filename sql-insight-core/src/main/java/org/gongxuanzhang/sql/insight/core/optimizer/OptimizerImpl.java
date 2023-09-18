@@ -14,40 +14,31 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.analysis;
+package org.gongxuanzhang.sql.insight.core.optimizer;
 
-
-import static org.gongxuanzhang.sql.insight.core.analysis.OperatorType.DCL;
-import static org.gongxuanzhang.sql.insight.core.analysis.OperatorType.DDL;
-import static org.gongxuanzhang.sql.insight.core.analysis.OperatorType.DML;
+import org.gongxuanzhang.sql.insight.core.analysis.Analyzer;
+import org.gongxuanzhang.sql.insight.core.command.Command;
+import org.gongxuanzhang.sql.insight.core.exception.SqlAnalysisException;
 
 /**
- * type for sql
- *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public enum SqlType {
-    CREATE(DDL),
-    DROP(DDL),
-    ALTER(DDL),
-    RENAME(DDL),
-    INSERT(DML),
-    UPDATE(DML),
-    SELECT(DML),
-    TRUNCATE(DML),
-    SHOW(DCL),
-    SET(DCL);
+public class OptimizerImpl implements Optimizer {
 
+    private Analyzer analyzer;
 
-    private final OperatorType type;
-
-    SqlType(OperatorType type) {
-        this.type = type;
+    @Override
+    public Command analysisSql(String sql) throws SqlAnalysisException {
+        return analyzer.analysisSql(sql);
     }
 
-    public OperatorType operatorType() {
-        return type;
+    @Override
+    public ExecutionPlan assign(Command command) {
+        return null;
     }
 
 
+    public void setAnalyzer(Analyzer analyzer) {
+        this.analyzer = analyzer;
+    }
 }

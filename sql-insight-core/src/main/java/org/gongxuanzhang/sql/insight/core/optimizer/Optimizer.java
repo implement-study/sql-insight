@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.optimizer;
 
+import org.gongxuanzhang.sql.insight.core.analysis.Analyzer;
 import org.gongxuanzhang.sql.insight.core.command.Command;
 import org.gongxuanzhang.sql.insight.core.exception.SqlAnalysisException;
 
@@ -26,11 +27,14 @@ import org.gongxuanzhang.sql.insight.core.exception.SqlAnalysisException;
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface Optimizer {
+public interface Optimizer extends Analyzer {
 
 
     /**
      * analysis sql to a wrapped sql
+     * <p>
+     * <p>
+     * {@link org.gongxuanzhang.sql.insight.core.analysis.Analyzer}
      *
      * @return the command
      **/

@@ -16,38 +16,14 @@
 
 package org.gongxuanzhang.sql.insight.core.analysis;
 
-
-import static org.gongxuanzhang.sql.insight.core.analysis.OperatorType.DCL;
-import static org.gongxuanzhang.sql.insight.core.analysis.OperatorType.DDL;
-import static org.gongxuanzhang.sql.insight.core.analysis.OperatorType.DML;
-
 /**
- * type for sql
+ * SQL TYPE
  *
- * @author gongxuanzhangmelt@gmail.com
- **/
-public enum SqlType {
-    CREATE(DDL),
-    DROP(DDL),
-    ALTER(DDL),
-    RENAME(DDL),
-    INSERT(DML),
-    UPDATE(DML),
-    SELECT(DML),
-    TRUNCATE(DML),
-    SHOW(DCL),
-    SET(DCL);
+ * @author gongxuanzhang
+ */
 
-
-    private final OperatorType type;
-
-    SqlType(OperatorType type) {
-        this.type = type;
-    }
-
-    public OperatorType operatorType() {
-        return type;
-    }
-
-
+public enum OperatorType {
+    DDL,
+    DML,
+    DCL
 }

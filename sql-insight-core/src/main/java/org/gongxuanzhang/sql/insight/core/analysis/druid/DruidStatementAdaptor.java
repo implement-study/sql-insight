@@ -14,40 +14,34 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.analysis;
+package org.gongxuanzhang.sql.insight.core.analysis.druid;
 
-
-import static org.gongxuanzhang.sql.insight.core.analysis.OperatorType.DCL;
-import static org.gongxuanzhang.sql.insight.core.analysis.OperatorType.DDL;
-import static org.gongxuanzhang.sql.insight.core.analysis.OperatorType.DML;
+import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlStatement;
+import org.gongxuanzhang.sql.insight.core.command.Command;
 
 /**
- * type for sql
+ * after druid parse sql
+ * packaging command according to different types
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public enum SqlType {
-    CREATE(DDL),
-    DROP(DDL),
-    ALTER(DDL),
-    RENAME(DDL),
-    INSERT(DML),
-    UPDATE(DML),
-    SELECT(DML),
-    TRUNCATE(DML),
-    SHOW(DCL),
-    SET(DCL);
+public interface DruidStatementAdaptor {
 
 
-    private final OperatorType type;
-
-    SqlType(OperatorType type) {
-        this.type = type;
-    }
-
-    public OperatorType operatorType() {
-        return type;
-    }
+    /**
+     * support to druid mysql statement
+     * sole
+     *
+     * @return class for support
+     **/
+    Class<? extends MySqlStatement> supportType();
 
 
+    /**
+     * do adaptor
+     *
+     * @param mySqlStatement must equals {@link this#supportType()}
+     * @return command
+     **/
+    Command adaptor(MySqlStatement mySqlStatement);
 }

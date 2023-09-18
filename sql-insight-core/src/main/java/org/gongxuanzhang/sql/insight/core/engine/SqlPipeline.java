@@ -42,4 +42,22 @@ public class SqlPipeline {
 
         return executeEngine.executePlan(plan);
     }
+
+    public Optimizer getOptimizer() {
+        return optimizer;
+    }
+
+    public SqlPipeline setOptimizer(Optimizer optimizer) {
+        this.optimizer = optimizer;
+        return this;
+    }
+
+    public ExecuteEngine getExecuteEngine() {
+        return executeEngine;
+    }
+
+    public SqlPipeline setExecuteEngine(ExecuteEngine executeEngine) {
+        this.executeEngine = executeEngine;
+        return this;
+    }
 }
