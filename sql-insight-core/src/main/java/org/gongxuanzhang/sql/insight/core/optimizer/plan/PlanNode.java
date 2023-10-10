@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.optimizer;
+package org.gongxuanzhang.sql.insight.core.optimizer.plan;
 
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;

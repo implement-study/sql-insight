@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.optimizer;
+package org.gongxuanzhang.sql.insight.core.optimizer.plan;
 
 /**
  * @author gongxuanzhangmelt@gmail.com

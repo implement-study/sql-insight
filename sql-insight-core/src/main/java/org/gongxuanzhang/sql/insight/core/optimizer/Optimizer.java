@@ -19,6 +19,7 @@ package org.gongxuanzhang.sql.insight.core.optimizer;
 import org.gongxuanzhang.sql.insight.core.analysis.Analyzer;
 import org.gongxuanzhang.sql.insight.core.command.Command;
 import org.gongxuanzhang.sql.insight.core.exception.SqlAnalysisException;
+import org.gongxuanzhang.sql.insight.core.optimizer.plan.ExecutionPlan;
 
 /**
  * like mysql query optimizer.
@@ -38,6 +39,7 @@ public interface Optimizer extends Analyzer {
      *
      * @return the command
      **/
+    @Override
     Command analysisSql(String sql) throws SqlAnalysisException;
 
     /**

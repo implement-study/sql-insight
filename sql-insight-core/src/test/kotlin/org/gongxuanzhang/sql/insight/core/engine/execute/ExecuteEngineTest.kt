@@ -14,34 +14,22 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.optimizer;
+package org.gongxuanzhang.sql.insight.core.engine.execute
 
-import org.gongxuanzhang.sql.insight.core.engine.execute.ExecuteEngine;
-import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+import org.junit.jupiter.api.Test
+
 
 /**
- * hand out to {@link StorageEngine} from {@link ExecuteEngine}
- * can also be executed directly from the execute engine
- *
- * @author gongxuanzhangmelt@gmail.com
+ * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public interface ExecutionPlan {
+class ExecuteEngineTest {
 
-
-
-    /**
-     * when sql start with explain
-     * show the execute plan to client
-     *
-     * @return explain result
-     **/
-    String showExplain();
-
-    /**
-     *
-     * @return plan chain
-     **/
-    PlanChain getPlanChain();
-
+    @Test
+    fun testCreateDatabase(){
+        val sql = "create database aaa"
+        val createSqlPipeline = InsightFactory.createSqlPipeline()
+        createSqlPipeline.doSql(sql)
+    }
 
 }
+
