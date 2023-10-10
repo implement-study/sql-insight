@@ -19,6 +19,7 @@ package org.gongxuanzhang.sql.insight.core.engine;
 import org.gongxuanzhang.sql.insight.core.command.Command;
 import org.gongxuanzhang.sql.insight.core.engine.execute.ExecuteEngine;
 import org.gongxuanzhang.sql.insight.core.engine.execute.SqlInsightExecuteEngine;
+import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext;
 import org.gongxuanzhang.sql.insight.core.exception.SqlInsightException;
 import org.gongxuanzhang.sql.insight.core.optimizer.ExecutionPlan;
 import org.gongxuanzhang.sql.insight.core.optimizer.Optimizer;
@@ -37,6 +38,7 @@ public class SqlPipeline {
     private ExecuteEngine executeEngine = new SqlInsightExecuteEngine();
 
     public ResultInterface doSql(String sql) throws SqlInsightException {
+
 
         Command command = optimizer.analysisSql(sql);
 
@@ -61,5 +63,9 @@ public class SqlPipeline {
     public SqlPipeline setExecuteEngine(ExecuteEngine executeEngine) {
         this.executeEngine = executeEngine;
         return this;
+    }
+
+    private SqlInsightContext createContext(){
+        return null;
     }
 }

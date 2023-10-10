@@ -14,34 +14,19 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.optimizer;
+package org.gongxuanzhang.sql.insight.core.environment;
 
-import org.gongxuanzhang.sql.insight.core.engine.execute.ExecuteEngine;
-import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 
 /**
- * hand out to {@link StorageEngine} from {@link ExecuteEngine}
- * can also be executed directly from the execute engine
+ * context during execute
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface ExecutionPlan {
+public class ExecuteContext {
 
 
-
-    /**
-     * when sql start with explain
-     * show the execute plan to client
-     *
-     * @return explain result
-     **/
-    String showExplain();
-
-    /**
-     *
-     * @return plan chain
-     **/
-    PlanChain getPlanChain();
-
-
+    public ResultInterface toResult() {
+        return null;
+    }
 }

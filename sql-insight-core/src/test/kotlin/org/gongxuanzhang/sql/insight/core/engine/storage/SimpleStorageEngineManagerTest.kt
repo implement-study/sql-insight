@@ -42,6 +42,7 @@ class SimpleStorageEngineManagerTest {
         manager.registerEngine(testEngine1)
         assert(manager.selectEngine(testEngine.name) == testEngine)
         assert(manager.selectEngine(testEngine1.name) == testEngine1)
+        assert(manager.allEngine() == listOf(testEngine, testEngine1))
     }
 
     @Test

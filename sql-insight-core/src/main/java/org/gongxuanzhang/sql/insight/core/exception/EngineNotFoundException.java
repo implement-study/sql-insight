@@ -14,34 +14,16 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.optimizer;
-
-import org.gongxuanzhang.sql.insight.core.engine.execute.ExecuteEngine;
-import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+package org.gongxuanzhang.sql.insight.core.exception;
 
 /**
- * hand out to {@link StorageEngine} from {@link ExecuteEngine}
- * can also be executed directly from the execute engine
- *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface ExecutionPlan {
+public class EngineNotFoundException extends SqlInsightException {
 
 
-
-    /**
-     * when sql start with explain
-     * show the execute plan to client
-     *
-     * @return explain result
-     **/
-    String showExplain();
-
-    /**
-     *
-     * @return plan chain
-     **/
-    PlanChain getPlanChain();
-
+    public EngineNotFoundException(String engineName) {
+        super("dont have name:" + engineName + "engine ");
+    }
 
 }

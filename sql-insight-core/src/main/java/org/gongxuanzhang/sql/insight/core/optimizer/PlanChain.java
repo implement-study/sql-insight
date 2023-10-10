@@ -14,23 +14,12 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.object;
-
-import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
-import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
+package org.gongxuanzhang.sql.insight.core.optimizer;
 
 /**
- * a object for can be executed by the engine
- *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface EngineObject {
+public interface PlanChain extends Iterable<PlanNode> {
 
-
-    /**
-     * how to execute
-     *
-     * @param engine storage engine
-     **/
-    ResultInterface doEngine(StorageEngine engine);
 }
+

@@ -16,32 +16,37 @@
 
 package org.gongxuanzhang.sql.insight.core.optimizer;
 
-import org.gongxuanzhang.sql.insight.core.engine.execute.ExecuteEngine;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
 
 /**
- * hand out to {@link StorageEngine} from {@link ExecuteEngine}
- * can also be executed directly from the execute engine
- *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface ExecutionPlan {
-
+public interface PlanNode {
 
 
     /**
-     * when sql start with explain
-     * show the execute plan to client
+     * in general,return true when the sql is ddl,because ddl can be execute without storage engine .
      *
-     * @return explain result
+     * @return true can be without storage engine
      **/
-    String showExplain();
+    boolean withoutStorageEngine();
+
 
     /**
+     * engine name needed for this plan
      *
-     * @return plan chain
+     * @return if {@link this#withoutStorageEngine()} is true, ignore the method , can return null
      **/
-    PlanChain getPlanChain();
+    String needStorageEngineName();
 
+    /**
+     * do the plan
+     *
+     * @param storageEngine if {@link this#withoutStorageEngine()} is true, the param is null
+     *                      else is engine what is plan node needed
+     * @param context       execute context ,sharded in chain
+     **/
+    void doPlan(StorageEngine storageEngine, ExecuteContext context);
 
 }

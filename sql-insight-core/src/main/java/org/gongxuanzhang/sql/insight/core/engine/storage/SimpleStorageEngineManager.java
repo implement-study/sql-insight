@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage;
 
 import org.gongxuanzhang.sql.insight.core.engine.StorageEngineManager;
 import org.gongxuanzhang.sql.insight.core.exception.DuplicationEngineNameException;
+import org.gongxuanzhang.sql.insight.core.exception.EngineNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,10 @@ public class SimpleStorageEngineManager implements StorageEngineManager {
 
     @Override
     public StorageEngine selectEngine(String engineName) {
-        return storageEngineMap.get(engineName);
+        StorageEngine engine = storageEngineMap.get(engineName);
+        if (engine == null) {
+            throw new EngineNotFoundException(engineName);
+        }
+        return engine;
     }
 }

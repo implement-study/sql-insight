@@ -17,7 +17,10 @@
 package org.gongxuanzhang.sql.insight.core.engine.execute;
 
 import org.gongxuanzhang.sql.insight.core.engine.StorageEngineManager;
+import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
 import org.gongxuanzhang.sql.insight.core.optimizer.ExecutionPlan;
+import org.gongxuanzhang.sql.insight.core.optimizer.PlanChain;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 import org.springframework.lang.NonNull;
 
@@ -37,11 +40,25 @@ public class SqlInsightExecuteEngine implements ExecuteEngine {
     @Override
     @NonNull
     public ResultInterface executePlan(ExecutionPlan plan) {
-        if (plan.withoutEngine()) {
+        PlanChain planChain = plan.getPlanChain();
 
-        }
-        return null;
+        ExecuteContext context = new ExecuteContext();
+
+        planChain.forEach(node -> {
+            StorageEngine engine = null;
+            if (!node.withoutStorageEngine()) {
+                engine = storageEngineManager.selectEngine(node.needStorageEngineName());
+            }
+            node.doPlan(engine, context);
+        });
+        return context.toResult();
     }
 
+    public void setStorageEngineManager(StorageEngineManager storageEngineManager) {
+        this.storageEngineManager = storageEngineManager;
+    }
 
+    public StorageEngineManager getStorageEngineManager() {
+        return storageEngineManager;
+    }
 }
