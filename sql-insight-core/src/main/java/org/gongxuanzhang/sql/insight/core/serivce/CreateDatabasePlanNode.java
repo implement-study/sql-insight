@@ -49,7 +49,6 @@ public class CreateDatabasePlanNode implements PlanNode {
     /**
     * The actual logic of creating the database folder
     * Return true for success, false for failure
-    * Here is just an example, you need to implement it according to your file system and requirements
     * @param databaseName database name name
     * @return boolean
     */
