@@ -20,6 +20,6 @@ package org.gongxuanzhang.sql.insight.core.optimizer.plan;
  * @author gongxuanzhangmelt@gmail.com
  **/
 public interface PlanChain extends Iterable<PlanNode> {
-
+    public void addNode(PlanNode node);
 }
 
