@@ -29,6 +29,12 @@ public class CreateDatabasePlanNode implements PlanNode {
         return null;
     }
 
+    /**
+     * do plan
+     * @param storageEngine if {@link this#withoutStorageEngine()} is true, the param is null
+     *                      else is engine what is plan node needed
+     * @param context       execute context ,sharded in chain
+     */
     @Override
     public void doPlan(StorageEngine storageEngine, ExecuteContext context) {
         //Create database folder
