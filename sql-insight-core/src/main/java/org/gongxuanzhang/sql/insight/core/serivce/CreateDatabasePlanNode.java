@@ -44,11 +44,11 @@ public class CreateDatabasePlanNode implements PlanNode {
     }
 
     /**
-     * 实际的创建数据库文件夹的逻辑
-     * 返回 true 表示成功，false 表示失败
-     * 这里只是一个示例，您需要根据您的文件系统和需求来实现它
-     * @param databaseName 数据库名字name
-     * @return
+     * The actual logic of creating the database folder
+     * Return true for success, false for failure
+     * Here is just an example, you need to implement it according to your file system and requirements
+     * @param databaseName database name name
+     * @return boolean
      */
     private boolean createDatabaseFolder(String databaseName) {
         File databaseFolder = new File(databaseName);
