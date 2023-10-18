@@ -49,7 +49,7 @@ public class CreateDatabasePlanNode implements PlanNode {
     /**
     * The actual logic of creating the database folder
     * Return true for success, false for failure
-    * @param databaseName database name name
+    * @param databaseName
     * @return boolean
     */
     private boolean createDatabaseFolder(String databaseName) {
