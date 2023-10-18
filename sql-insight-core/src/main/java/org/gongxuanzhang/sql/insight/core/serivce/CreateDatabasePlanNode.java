@@ -7,6 +7,7 @@ import org.gongxuanzhang.sql.insight.core.optimizer.plan.PlanNode;
 import java.io.File;
 
 public class CreateDatabasePlanNode implements PlanNode {
+
     private final String databaseName;
 
     public CreateDatabasePlanNode(String databaseName) {
@@ -25,6 +26,12 @@ public class CreateDatabasePlanNode implements PlanNode {
         return null;
     }
 
+    /**
+     * do plan
+     * @param storageEngine if {@link this#withoutStorageEngine()} is true, the param is null
+     *                      else is engine what is plan node needed
+     * @param context       execute context ,sharded in chain
+     */
     @Override
     public void doPlan(StorageEngine storageEngine, ExecuteContext context) {
         // 创建数据库文件夹的逻辑

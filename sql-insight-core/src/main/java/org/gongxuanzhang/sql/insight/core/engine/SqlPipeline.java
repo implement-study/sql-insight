@@ -38,7 +38,6 @@ public class SqlPipeline {
 
     public ResultInterface doSql(String sql) throws SqlInsightException {
 
-
         Command command = optimizer.analysisSql(sql);
 
         ExecutionPlan plan = optimizer.assign(command);
