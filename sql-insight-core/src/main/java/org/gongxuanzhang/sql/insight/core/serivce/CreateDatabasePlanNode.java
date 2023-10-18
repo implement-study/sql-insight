@@ -27,7 +27,7 @@ public class CreateDatabasePlanNode implements PlanNode {
 
     @Override
     public void doPlan(StorageEngine storageEngine, ExecuteContext context) {
-        // 创建数据库文件夹的逻辑
+        //创建数据库文件夹
         boolean success = createDatabaseFolder(databaseName);
         if (success) {
             //todo Database " + databaseName + " created successfully.
@@ -39,7 +39,6 @@ public class CreateDatabasePlanNode implements PlanNode {
     /**
      * 实际的创建数据库文件夹的逻辑
      * 返回 true 表示成功，false 表示失败
-     * 这里只是一个示例，您需要根据您的文件系统和需求来实现它
      * @param databaseName 数据库名字name
      * @return
      */
