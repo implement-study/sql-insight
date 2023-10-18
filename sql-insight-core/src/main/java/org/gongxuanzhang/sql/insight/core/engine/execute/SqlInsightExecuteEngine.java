@@ -46,7 +46,7 @@ public class SqlInsightExecuteEngine implements ExecuteEngine {
         planChain.forEach(node -> {
             StorageEngine engine = null;
             if (!node.withoutStorageEngine()) {
-                engine = storageEngineManager.selectEngine(node.needStorageEngineName());
+                engine = storageEngineManager.selectEngine(node.neededStorageEngineName());
             }
             node.doPlan(engine, context);
         });

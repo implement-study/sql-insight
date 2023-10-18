@@ -38,7 +38,7 @@ public interface PlanNode {
      *
      * @return if {@link this#withoutStorageEngine()} is true, ignore the method , can return null
      **/
-    String needStorageEngineName();
+    String neededStorageEngineName();
 
     /**
      * do the plan
