@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * @author Bryan yang y51288033@gmail.com
- * Create Create database execution plan
+ * Create database execution plan
  */
 public class CreateDatabaseExecutionPlan implements ExecutionPlan {
     private final String databaseName;
