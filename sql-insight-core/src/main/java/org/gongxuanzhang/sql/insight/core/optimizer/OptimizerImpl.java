@@ -41,8 +41,6 @@ public class OptimizerImpl implements Optimizer {
             CreateDatabase createDatabaseCommand = (CreateDatabase) command;
             // 创建一个用于创建数据库的执行计划并返回
             return new CreateDatabaseExecutionPlan(createDatabaseCommand.getDbName());
-        } else if (true) {
-            System.err.println("其他类型to do");
         }
 
         return null;
