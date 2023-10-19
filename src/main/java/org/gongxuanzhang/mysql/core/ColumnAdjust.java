@@ -18,12 +18,7 @@ package org.gongxuanzhang.mysql.core;
 
 import com.alibaba.fastjson2.JSONObject;
 import org.gongxuanzhang.mysql.annotation.DependOnContext;
-import org.gongxuanzhang.mysql.entity.Cell;
-import org.gongxuanzhang.mysql.entity.IncrementKey;
-import org.gongxuanzhang.mysql.entity.InsertData;
-import org.gongxuanzhang.mysql.entity.InsertInfo;
-import org.gongxuanzhang.mysql.entity.InsertRow;
-import org.gongxuanzhang.mysql.entity.TableInfo;
+import org.gongxuanzhang.mysql.entity.*;
 import org.gongxuanzhang.mysql.exception.MySQLException;
 
 import java.util.ArrayList;
