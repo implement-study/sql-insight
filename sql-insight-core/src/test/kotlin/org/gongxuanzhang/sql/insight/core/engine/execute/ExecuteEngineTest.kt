@@ -16,6 +16,9 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.execute
 
+import org.gongxuanzhang.sql.insight.core.serivce.CreateDatabasePlanNode
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 
@@ -26,10 +29,9 @@ class ExecuteEngineTest {
 
     @Test
     fun testCreateDatabase(){
-        val sql = "create database aaa"
+        val sql = "create database db1"
         val createSqlPipeline = InsightFactory.createSqlPipeline()
-        createSqlPipeline.doSql(sql)
+        createSqlPipeline.doSql(sql);
     }
-
 }
 

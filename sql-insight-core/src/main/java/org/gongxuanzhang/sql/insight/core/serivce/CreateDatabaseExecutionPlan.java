@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * @author Bryan yang y51288033@gmail.com
+ * Create Create database execution plan
+ */
 public class CreateDatabaseExecutionPlan implements ExecutionPlan {
     private final String databaseName;
 
@@ -23,23 +27,25 @@ public class CreateDatabaseExecutionPlan implements ExecutionPlan {
         return "Create database: " + databaseName;
     }
 
+    private class PlanChainImpl implements PlanChain {
+        private List<PlanNode> nodes = new ArrayList<>();
+
+        @NotNull
+        @Override
+        public Iterator<PlanNode> iterator() {
+            return nodes.iterator();
+        }
+
+        @Override
+        public void addNode(PlanNode node) {
+            nodes.add(node);
+        }
+    }
+
     public PlanChain getPlanChain() {
-        PlanChain planChain = new PlanChain() {
-            private List<PlanNode> nodes = new ArrayList<>();
+        PlanChain planChain = new PlanChainImpl();
 
-            @NotNull
-            @Override
-            public Iterator<PlanNode> iterator() {
-                return nodes.iterator();
-            }
-
-            @Override
-            public void addNode(PlanNode node) {
-                nodes.add(node);
-            }
-        };
-
-        // 创建数据库的计划节点
+        // 创建数据库的节点
         PlanNode createDatabaseNode = new CreateDatabasePlanNode(databaseName);
         planChain.addNode(createDatabaseNode);
 

@@ -8,7 +8,7 @@ import java.io.File;
 
 /**
  * @author Bryan yang y51288033@gmail.com
- * Create database plan
+ * Create database plan node
  */
 public class CreateDatabasePlanNode implements PlanNode {
     private final String databaseName;
@@ -41,8 +41,10 @@ public class CreateDatabasePlanNode implements PlanNode {
         boolean success = createDatabaseFolder(databaseName);
         if (success) {
             //todo Database " + databaseName + " created successfully.
+            System.out.println("Database " + databaseName + " created successfully.");
         } else {
             //todo "Failed to create database " + databaseName
+            System.out.println("Failed to create database " + databaseName);
         }
     }
 
@@ -52,7 +54,7 @@ public class CreateDatabasePlanNode implements PlanNode {
     * @param databaseName
     * @return boolean
     */
-    private boolean createDatabaseFolder(String databaseName) {
+    public boolean createDatabaseFolder(String databaseName) {
         File databaseFolder = new File(databaseName);
         if (!databaseFolder.exists() && databaseFolder.mkdirs()) {
             return true;
