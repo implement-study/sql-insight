@@ -41,7 +41,7 @@ public class SqlInsightExecuteEngine implements ExecuteEngine {
     public ResultInterface executePlan(ExecutionPlan plan) {
         PlanChain planChain = plan.getPlanChain();
 
-        ExecuteContext context = new ExecuteContext();
+        ExecuteContext context = new ExecuteContext(plan.getOrginalSql());
 
         planChain.forEach(node -> {
             StorageEngine engine = null;

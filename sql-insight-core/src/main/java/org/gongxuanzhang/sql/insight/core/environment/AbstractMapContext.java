@@ -16,15 +16,42 @@
 
 package org.gongxuanzhang.sql.insight.core.environment;
 
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * a static context
- *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class SqlInsightContext {
+public abstract class AbstractMapContext implements Context {
 
-    private SqlInsightContext context;
+    protected final Map<String, String> container;
 
+    protected AbstractMapContext() {
+        this(new HashMap<>());
+    }
+
+    protected AbstractMapContext(Map<String, String> container) {
+        this.container = container;
+    }
+
+
+    @Override
+    public void put(String key, String value) {
+        container.put(key, value);
+    }
+
+    @Nullable
+    @Override
+    public String get(String key) {
+        return container.get(key);
+    }
+
+    @Nullable
+    @Override
+    public String remove(String key) {
+        return container.remove(key);
+    }
 
 }

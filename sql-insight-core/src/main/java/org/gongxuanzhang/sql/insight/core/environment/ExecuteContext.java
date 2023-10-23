@@ -23,10 +23,21 @@ import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class ExecuteContext {
+public class ExecuteContext extends AbstractMapContext {
 
+    private final String sql;
+
+    public ExecuteContext(String sql) {
+        this.sql = sql;
+    }
+
+    public String getSql() {
+        return sql;
+    }
 
     public ResultInterface toResult() {
         return null;
     }
+
+
 }

@@ -16,15 +16,8 @@
 
 package org.gongxuanzhang.sql.insight.core.environment;
 
-
 /**
- * a static context
- *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class SqlInsightContext {
-
-    private SqlInsightContext context;
-
-
+public class GlobalContext extends AbstractMapContext {
 }

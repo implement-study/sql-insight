@@ -16,15 +16,40 @@
 
 package org.gongxuanzhang.sql.insight.core.environment;
 
+import org.jetbrains.annotations.Nullable;
 
 /**
- * a static context
+ * The top-level interface of the context
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class SqlInsightContext {
+public interface Context {
 
-    private SqlInsightContext context;
+    /**
+     * put a pair in context
+     *
+     * @param key   key unique
+     * @param value value
+     **/
+    void put(String key, String value);
+
+    /**
+     * get value from context
+     *
+     * @param key pair of key
+     * @return maybe null
+     **/
+    @Nullable
+    String get(String key);
+
+    /**
+     * remove pair from context
+     *
+     * @param key
+     * @return return the removed value if exists , else return null
+     **/
+    @Nullable
+    String remove(String key);
 
 
 }

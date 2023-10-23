@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.environment;
-
+package org.gongxuanzhang.sql.insight.core.auth;
 
 /**
- * a static context
- *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class SqlInsightContext {
-
-    private SqlInsightContext context;
-
-
+public interface User {
 }

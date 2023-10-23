@@ -51,6 +51,11 @@ public class DirectlyExecutionPlan implements ExecutionPlan {
         return new SinglePlanChain();
     }
 
+    @Override
+    public String getOrginalSql() {
+        return this.command.getSql();
+    }
+
 
     private class SinglePlanChain implements PlanChain {
 

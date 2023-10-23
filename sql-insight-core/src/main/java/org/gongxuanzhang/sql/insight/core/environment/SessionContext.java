@@ -16,15 +16,16 @@
 
 package org.gongxuanzhang.sql.insight.core.environment;
 
+import org.gongxuanzhang.sql.insight.core.auth.User;
 
 /**
- * a static context
- *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class SqlInsightContext {
+public class SessionContext extends AbstractMapContext {
 
-    private SqlInsightContext context;
 
+    public User getCurrentUser() {
+        return null;
+    }
 
 }
