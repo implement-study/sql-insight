@@ -19,11 +19,11 @@ package org.gongxuanzhang.sql.insight.core.exception;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class DatabaseExistsException extends SqlInsightException {
+public class DatabaseNotExistsException extends SqlInsightException {
 
 
-    public DatabaseExistsException(String dbName) {
-        super("database " + dbName + " already exists");
+    public DatabaseNotExistsException(String dbName) {
+        super("database " + dbName + " not exists");
     }
 
 }
