@@ -14,19 +14,32 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.environment;
+package org.gongxuanzhang.sql.insight.core.optimizer.plan;
 
-import org.gongxuanzhang.sql.insight.core.engine.SqlPipeline;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Iterator;
 
 /**
- * a static context
+ * plan chain that only have a node
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class SqlInsightContext {
+public class SinglePlanChain implements PlanChain {
 
-    private SqlInsightContext context;
 
-    private SqlPipeline pipeline;
+    public SinglePlanChain() {
 
+    }
+
+    @Override
+    public void addNode(PlanNode node) {
+        throw new UnsupportedOperationException("SinglePlanChain can't use this method");
+    }
+
+    @NotNull
+    @Override
+    public Iterator<PlanNode> iterator() {
+        return null;
+    }
 }

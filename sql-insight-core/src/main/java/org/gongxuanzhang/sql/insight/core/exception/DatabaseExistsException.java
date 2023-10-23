@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine.execute
-
-import org.gongxuanzhang.sql.insight.core.serivce.CreateDatabasePlanNode
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
-
+package org.gongxuanzhang.sql.insight.core.exception;
 
 /**
- * @author gxz gongxuanzhangmelt@gmail.com
+ * @author gongxuanzhangmelt@gmail.com
  **/
-class ExecuteEngineTest {
+public class DatabaseExistsException extends SqlInsightException {
 
-    @Test
-    fun testCreateDatabase(){
-        val sql = "create database db1"
-        val createSqlPipeline = InsightFactory.createSqlPipeline()
-        createSqlPipeline.doSql(sql);
+
+    public DatabaseExistsException(String dbName) {
+        super("database " + dbName + "already exists");
     }
-}
 
+}

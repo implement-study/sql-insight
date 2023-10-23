@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.environment;
+package org.gongxuanzhang.sql.insight
 
-import org.gongxuanzhang.sql.insight.core.engine.SqlPipeline;
+import org.junit.jupiter.api.Assertions
+
 
 /**
- * a static context
- *
- * @author gongxuanzhangmelt@gmail.com
+ * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public class SqlInsightContext {
-
-    private SqlInsightContext context;
-
-    private SqlPipeline pipeline;
-
+fun assertFalse(condition: Boolean, message: String = "") {
+    Assertions.assertTrue(!condition, message)
 }
+

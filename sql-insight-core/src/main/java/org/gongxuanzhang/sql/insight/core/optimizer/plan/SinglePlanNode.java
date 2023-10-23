@@ -14,19 +14,31 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.environment;
+package org.gongxuanzhang.sql.insight.core.optimizer.plan;
 
-import org.gongxuanzhang.sql.insight.core.engine.SqlPipeline;
+import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
 
 /**
- * a static context
+ * in order to direct command
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class SqlInsightContext {
+public interface SinglePlanNode extends PlanNode {
 
-    private SqlInsightContext context;
 
-    private SqlPipeline pipeline;
+    @Override
+    default boolean withoutStorageEngine() {
+        return true;
+    }
 
+    @Override
+    default String neededStorageEngineName() {
+        return null;
+    }
+
+    @Override
+    default void doPlan(StorageEngine storageEngine, ExecuteContext context) {
+
+    }
 }

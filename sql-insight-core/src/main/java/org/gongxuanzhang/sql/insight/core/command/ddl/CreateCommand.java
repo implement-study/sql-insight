@@ -16,17 +16,20 @@
 
 package org.gongxuanzhang.sql.insight.core.command.ddl;
 
-import org.gongxuanzhang.sql.insight.core.command.BaseCommand;
+
+import org.gongxuanzhang.sql.insight.core.analysis.SqlType;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public abstract class CreateCommand extends BaseCommand {
+public interface CreateCommand extends DdlCommand {
 
 
-    public CreateCommand(String sql) {
-        super(sql);
+    @NotNull
+    @Override
+    default SqlType getSqlType() {
+        return SqlType.CREATE;
     }
-
 
 }

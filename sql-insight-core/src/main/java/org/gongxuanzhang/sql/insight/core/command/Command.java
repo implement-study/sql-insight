@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.command;
 
 import org.gongxuanzhang.sql.insight.core.analysis.OperatorType;
 import org.gongxuanzhang.sql.insight.core.analysis.SqlType;
+import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -56,5 +57,17 @@ public interface Command {
     default boolean directly() {
         return getSqlType().operatorType() == OperatorType.DDL;
     }
+
+    /**
+     * if {@link  this#directly()} return true
+     * must override this method
+     * engine will invoke this method and ignore execute plan
+     *
+     * @param context context
+     **/
+    default void run(ExecuteContext context) {
+        throw new UnsupportedOperationException("this method must be override");
+    }
+
 
 }

@@ -18,10 +18,9 @@ package org.gongxuanzhang.sql.insight.core.optimizer;
 
 import org.gongxuanzhang.sql.insight.core.analysis.Analyzer;
 import org.gongxuanzhang.sql.insight.core.command.Command;
-import org.gongxuanzhang.sql.insight.core.command.ddl.CreateDatabase;
 import org.gongxuanzhang.sql.insight.core.exception.SqlAnalysisException;
+import org.gongxuanzhang.sql.insight.core.optimizer.plan.DirectlyExecutionPlan;
 import org.gongxuanzhang.sql.insight.core.optimizer.plan.ExecutionPlan;
-import org.gongxuanzhang.sql.insight.core.serivce.CreateDatabaseExecutionPlan;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -37,15 +36,12 @@ public class OptimizerImpl implements Optimizer {
 
     @Override
     public ExecutionPlan assign(Command command) {
-        if (command instanceof CreateDatabase) {
-            CreateDatabase createDatabaseCommand = (CreateDatabase) command;
-            // 创建一个用于创建数据库的执行计划并返回
-            return new CreateDatabaseExecutionPlan(createDatabaseCommand.getDbName());
+        if (command.directly()) {
+            return new DirectlyExecutionPlan(command);
         }
-
+        //  todo indirectly
         return null;
     }
-
 
 
     public void setAnalyzer(Analyzer analyzer) {

@@ -14,19 +14,33 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.environment;
+package org.gongxuanzhang.sql.insight.core.command.ddl;
 
-import org.gongxuanzhang.sql.insight.core.engine.SqlPipeline;
+import org.gongxuanzhang.sql.insight.core.command.Command;
+import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
 
 /**
- * a static context
- *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class SqlInsightContext {
+public interface DdlCommand extends Command {
 
-    private SqlInsightContext context;
 
-    private SqlPipeline pipeline;
+    /**
+     * DDL commands are typically executed directly
+     *
+     * @return always true
+     **/
+    @Override
+    default boolean directly() {
+        return true;
+    }
 
+
+    /**
+     * must override this method
+     *
+     * @param context {@link Command#run(ExecuteContext)}
+     **/
+    @Override
+    void run(ExecuteContext context);
 }

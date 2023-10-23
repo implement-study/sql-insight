@@ -63,7 +63,7 @@ public class SqlPipeline {
         return this;
     }
 
-    private SqlInsightContext createContext(){
+    private SqlInsightContext createContext() {
         return null;
     }
 }

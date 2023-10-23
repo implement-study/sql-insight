@@ -28,7 +28,6 @@ import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
 public interface ExecutionPlan {
 
 
-
     /**
      * when sql start with explain
      * show the execute plan to client
@@ -38,7 +37,6 @@ public interface ExecutionPlan {
     String showExplain();
 
     /**
-     *
      * @return plan chain
      **/
     PlanChain getPlanChain();

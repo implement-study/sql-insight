@@ -28,7 +28,7 @@ public abstract class BaseCommand implements Command {
 
     protected final String sql;
 
-    public BaseCommand(String sql) {
+    protected BaseCommand(String sql) {
         this.sql = sql;
     }
 

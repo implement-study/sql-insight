@@ -16,19 +16,28 @@
 
 package org.gongxuanzhang.sql.insight.core.command.ddl;
 
+import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
+import org.gongxuanzhang.sql.insight.core.exception.DatabaseExistsException;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class CreateDatabase extends CreateCommand {
+public class CreateDatabase implements CreateCommand {
 
     private final boolean ifNotExists;
 
     private final String dbName;
 
+    private final String sql;
+
+
     public CreateDatabase(String sql, boolean ifNotExists, String dbName) {
-        super(sql);
         this.ifNotExists = ifNotExists;
         this.dbName = dbName;
+        this.sql = sql;
     }
 
 
@@ -40,4 +49,25 @@ public class CreateDatabase extends CreateCommand {
         return dbName;
     }
 
+    @NotNull
+    @Override
+    public String getSql() {
+        return this.sql;
+    }
+
+
+    @Override
+    public void run(ExecuteContext context) {
+        File dbFold = getDbFold(context);
+        if (dbFold.exists() && !ifNotExists) {
+            throw new DatabaseExistsException(this.dbName);
+        }
+        dbFold.mkdirs();
+
+    }
+
+    private File getDbFold(ExecuteContext context) {
+        //  todo get path in context
+        return new File(this.dbName);
+    }
 }
