@@ -74,7 +74,7 @@ public class DropDatabase implements DropCommand {
         }
     }
 
-    public void deleteAllFiles(Path directory) {
+    private void deleteAllFiles(Path directory) {
         try (Stream<Path> walk = Files.walk(directory)) {
             walk.sorted(Comparator.reverseOrder())
                     .forEach(path -> {

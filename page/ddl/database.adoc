@@ -1,0 +1,19 @@
+
+== Database
+
+Database相关语句根据 link:https://www.mysqlzh.com/doc/125.html[MySQL中文文档]实现，实现可能有所区别。
+
+
+
+=== link:https://www.mysqlzh.com/doc/125/248.html[Create Database]
+* image:../../image/semi.svg[width=16] 部分完成
+
+=== link:https://www.mysqlzh.com/doc/125/641.html[Drop Database]
+* [*] 完成
+
+=== link:https://www.mysqlzh.com/doc/125/246.html[Alert Database]
+* [ ] 没开始做
+
+
+
+
