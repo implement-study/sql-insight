@@ -6,13 +6,13 @@ Database相关语句根据 link:https://www.mysqlzh.com/doc/125.html[MySQL中文
 
 
 === link:https://www.mysqlzh.com/doc/125/248.html[Create Database]
-image:../../image/semi.svg[width=16] 部分完成
+image:../image/semi.svg[width=16] 部分完成
 
 === link:https://www.mysqlzh.com/doc/125/641.html[Drop Database]
-image:../../image/complete.svg[width=16] 完成
+image:../image/complete.svg[width=16] 完成
 
 === link:https://www.mysqlzh.com/doc/125/246.html[Alert Database]
-image:../../image/game.svg[width=16] 还没做(作者去打游戏了)
+image:../image/game.svg[width=16] 还没做(作者去打游戏了)
 
 
 

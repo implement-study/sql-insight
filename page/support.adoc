@@ -1,0 +1,23 @@
+= 相关功能实现
+
+相关功能根据link:https://www.mysqlzh.com/doc/124.html[MySQL官方中文文档]实现
+
+== DDL
+
+link:database.adoc[数据库语句]
+
+link:index.adoc[索引语句]
+
+== DML
+
+link:table.adoc[表语句]
+
+== DCL
+
+link:grant.adoc[各种控制语句]
+
+
+
+
+
+
