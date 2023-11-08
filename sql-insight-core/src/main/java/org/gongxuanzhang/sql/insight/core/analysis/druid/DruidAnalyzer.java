@@ -20,6 +20,7 @@ import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLStatement;
 import org.gongxuanzhang.sql.insight.core.analysis.Analyzer;
 import org.gongxuanzhang.sql.insight.core.analysis.ddl.CreateDatabaseAdaptor;
+import org.gongxuanzhang.sql.insight.core.analysis.ddl.CreateTableAdaptor;
 import org.gongxuanzhang.sql.insight.core.analysis.ddl.DropDatabaseAdaptor;
 import org.gongxuanzhang.sql.insight.core.command.Command;
 import org.gongxuanzhang.sql.insight.core.exception.NotSupportSqlTypeException;
@@ -42,6 +43,7 @@ public class DruidAnalyzer implements Analyzer {
     {
         this.registerAdaptor(new CreateDatabaseAdaptor());
         this.registerAdaptor(new DropDatabaseAdaptor());
+        this.registerAdaptor(new CreateTableAdaptor());
     }
 
     @SuppressWarnings("unchecked")

@@ -16,17 +16,18 @@
 
 package org.gongxuanzhang.sql.insight.core.object;
 
-import lombok.Data;
-
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-@Data
-public class Table {
-
-    private Database database;
+public class Column {
 
     private String name;
+
+    private DataType dataType;
+
+    private boolean autoIncrement;
+
+
 
 
 }

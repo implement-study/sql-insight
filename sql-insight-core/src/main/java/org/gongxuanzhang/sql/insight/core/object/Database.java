@@ -16,17 +16,9 @@
 
 package org.gongxuanzhang.sql.insight.core.object;
 
-import lombok.Data;
-
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-@Data
-public class Table {
-
-    private Database database;
-
-    private String name;
-
+public class Database {
 
 }
