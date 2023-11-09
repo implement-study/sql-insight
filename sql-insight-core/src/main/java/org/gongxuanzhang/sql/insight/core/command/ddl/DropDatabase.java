@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.command.ddl;
 
+import com.alibaba.druid.sql.ast.statement.SQLDropDatabaseStatement;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseNotExistsException;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
@@ -33,19 +34,22 @@ import java.util.stream.Stream;
  **/
 public class DropDatabase implements DropCommand {
 
-    private final boolean ifIsExists;
+    private boolean ifIsExists;
 
-    private final String dbName;
+    private String dbName;
 
     private final String sql;
 
 
-    public DropDatabase(String sql, boolean ifIsExists, String dbName) {
-        this.ifIsExists = ifIsExists;
-        this.dbName = dbName;
+    public DropDatabase(String sql) {
         this.sql = sql;
     }
 
+    @Override
+    public void endVisit(SQLDropDatabaseStatement x) {
+        this.ifIsExists = x.isIfExists();
+        this.dbName = x.getDatabaseName();
+    }
 
     public boolean getIfIsExists() {
         return ifIsExists;

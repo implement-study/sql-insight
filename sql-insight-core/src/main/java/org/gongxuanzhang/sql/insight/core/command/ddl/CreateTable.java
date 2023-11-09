@@ -16,9 +16,8 @@
 
 package org.gongxuanzhang.sql.insight.core.command.ddl;
 
-import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlCreateTableStatement;
+import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
-import org.gongxuanzhang.sql.insight.core.factory.TableFactory;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,11 +29,10 @@ public class CreateTable implements CreateCommand {
 
     private final String sql;
 
-    private final Table table;
+    private Table table;
 
-    public CreateTable(String sql, MySqlCreateTableStatement statement) {
+    public CreateTable(String sql) {
         this.sql = sql;
-        this.table = TableFactory.fromCreateTable(statement);
     }
 
 
@@ -43,13 +41,17 @@ public class CreateTable implements CreateCommand {
 
     }
 
+
+    @Override
+    public void endVisit(SQLCreateTableStatement x) {
+        this.table = new Table();
+        x.accept(this.table);
+    }
+
     @NotNull
     @Override
     public String getSql() {
         return this.sql;
     }
 
-    public Table getTable() {
-        return table;
-    }
 }

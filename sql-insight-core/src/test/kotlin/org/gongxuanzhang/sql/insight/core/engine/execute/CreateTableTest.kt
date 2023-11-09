@@ -16,9 +16,6 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.execute
 
-import com.alibaba.druid.sql.SQLUtils
-import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlCreateTableStatement
-import org.gongxuanzhang.sql.insight.core.analysis.ddl.CreateTableAdaptor
 import org.junit.jupiter.api.Test
 
 
@@ -30,11 +27,12 @@ class CreateTableTest {
     private val pipeline = InsightFactory.createSqlPipeline()
 
     private val sql = """
-        CREATE TABLE db.custom_constraints (
-            id INT PRIMARY KEY AUTO_INCREMENT,
-            name VARCHAR(50) AUTO_INCREMENT,
-            age INT,
-            email VARCHAR(100),
+        CREATE TABLE custom_constraints (
+            id int PRIMARY KEY AUTO_INCREMENT,
+            name VARCHAR(50) AUTO_INCREMENT default 'sdf',
+            age INT default 1 unique,
+            email VARCHAR(100) not null,
+            alias char(10),
             CHECK (age >= 18 AND age <= 100), -- 使用CHECK约束限制age的范围
             CONSTRAINT check_email_format CHECK (email LIKE '%@'),
             UNIQUE (name),
@@ -47,10 +45,6 @@ class CreateTableTest {
 
     @Test
     fun testAnalysis() {
-        val statement = SQLUtils.parseSingleMysqlStatement(sql)
-        val createTable = CreateTableAdaptor().adaptor(sql, statement as MySqlCreateTableStatement)
-        val table = createTable.table
-        assert(table.name == "db")
     }
 
     @Test

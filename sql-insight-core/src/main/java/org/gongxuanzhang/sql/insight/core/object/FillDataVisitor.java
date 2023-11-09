@@ -14,34 +14,18 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.command;
+package org.gongxuanzhang.sql.insight.core.object;
 
-import org.gongxuanzhang.sql.insight.core.analysis.SqlType;
-import org.jetbrains.annotations.NotNull;
+import com.alibaba.druid.sql.ast.SQLStatement;
+import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 
 /**
- * skeleton implementation of the command
  *
+ * subclass can fill info via visit statement
+ * @see SQLStatement
  * @author gongxuanzhangmelt@gmail.com
  **/
-public abstract class BaseCommand implements Command {
-
-    protected final String sql;
-
-    protected BaseCommand(String sql) {
-        this.sql = sql;
-    }
+public interface FillDataVisitor extends SQLASTVisitor {
 
 
-    @NotNull
-    @Override
-    public String getSql() {
-        return sql;
-    }
-
-    @NotNull
-    @Override
-    public SqlType getSqlType() {
-        return SqlType.CREATE;
-    }
 }

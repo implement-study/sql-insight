@@ -14,26 +14,18 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.analysis.ddl;
-
-import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlCreateTableStatement;
-import org.gongxuanzhang.sql.insight.core.analysis.druid.DruidStatementAdaptor;
-import org.gongxuanzhang.sql.insight.core.command.ddl.CreateTable;
+package org.gongxuanzhang.sql.insight.core.command;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class CreateTableAdaptor implements DruidStatementAdaptor<MySqlCreateTableStatement, CreateTable> {
-
-    @Override
-    public Class<MySqlCreateTableStatement> supportType() {
-        return MySqlCreateTableStatement.class;
-    }
-
-    @Override
-    public CreateTable adaptor(String sql, MySqlCreateTableStatement mySqlStatement) {
-        return new CreateTable(sql, mySqlStatement);
-    }
+public interface CommandContainer {
 
 
+    /**
+     * get a command object
+     *
+     * @return command
+     **/
+    Command getCommand();
 }

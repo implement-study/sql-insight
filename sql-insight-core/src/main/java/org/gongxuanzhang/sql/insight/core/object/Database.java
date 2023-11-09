@@ -16,9 +16,21 @@
 
 package org.gongxuanzhang.sql.insight.core.object;
 
+
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
 public class Database {
+
+    private final String name;
+
+    public Database(String name) {
+        this.name = name;
+    }
+
+
+    public String getName() {
+        return name;
+    }
 
 }

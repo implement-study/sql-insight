@@ -16,17 +16,63 @@
 
 package org.gongxuanzhang.sql.insight.core.object;
 
-import lombok.Data;
+import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
+import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
+import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
+import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
+import com.alibaba.druid.sql.visitor.SQLASTVisitor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-@Data
-public class Table {
+public class Table implements FillDataVisitor {
 
     private Database database;
 
     private String name;
 
+    private final List<Column> columnList = new ArrayList<>();
 
+
+    @Override
+    public void endVisit(SQLColumnDefinition x) {
+        Column column = new Column();
+        x.accept(column);
+        this.columnList.add(column);
+    }
+
+
+    @Override
+    public boolean visit(SQLExprTableSource x) {
+        x.accept(new SQLASTVisitor() {
+            @Override
+            public boolean visit(SQLPropertyExpr x) {
+                Table.this.database = new Database(name);
+                Table.this.name = x.getName();
+                return false;
+            }
+
+            @Override
+            public boolean visit(SQLIdentifierExpr x) {
+                Table.this.name = x.getName();
+                return false;
+            }
+        });
+        return true;
+    }
+
+    public Database getDatabase() {
+        return database;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Column> getColumnList() {
+        return columnList;
+    }
 }

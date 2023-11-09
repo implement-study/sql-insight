@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.command;
 
+import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 import org.gongxuanzhang.sql.insight.core.analysis.OperatorType;
 import org.gongxuanzhang.sql.insight.core.analysis.SqlType;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
@@ -26,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface Command {
+public interface Command extends SQLASTVisitor {
 
 
     /**

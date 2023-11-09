@@ -19,15 +19,9 @@ package org.gongxuanzhang.sql.insight.core.analysis.druid;
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLStatement;
 import org.gongxuanzhang.sql.insight.core.analysis.Analyzer;
-import org.gongxuanzhang.sql.insight.core.analysis.ddl.CreateDatabaseAdaptor;
-import org.gongxuanzhang.sql.insight.core.analysis.ddl.CreateTableAdaptor;
-import org.gongxuanzhang.sql.insight.core.analysis.ddl.DropDatabaseAdaptor;
 import org.gongxuanzhang.sql.insight.core.command.Command;
 import org.gongxuanzhang.sql.insight.core.exception.NotSupportSqlTypeException;
 import org.gongxuanzhang.sql.insight.core.exception.SqlAnalysisException;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * delegate to druid
@@ -37,30 +31,17 @@ import java.util.Map;
 public class DruidAnalyzer implements Analyzer {
 
 
-    private final Map<Class<? extends SQLStatement>,
-            DruidStatementAdaptor<?, ? extends Command>> adaptorMap = new HashMap<>();
-
-    {
-        this.registerAdaptor(new CreateDatabaseAdaptor());
-        this.registerAdaptor(new DropDatabaseAdaptor());
-        this.registerAdaptor(new CreateTableAdaptor());
-    }
-
-    @SuppressWarnings("unchecked")
     @Override
     public Command analysisSql(String sql) throws SqlAnalysisException {
-        SQLStatement sqlStatement = SQLUtils.parseSingleMysqlStatement(sql);
-        DruidStatementAdaptor<?, ? extends Command> adaptor = adaptorMap.get(sqlStatement.getClass());
-        if (adaptor == null) {
+        SQLStatement sqlStatement =  SQLUtils.parseSingleMysqlStatement(sql);
+        DruidAnalyzerAdaptor druidAnalyzerAdaptor = new DruidAnalyzerAdaptor(sql);
+        sqlStatement.accept(druidAnalyzerAdaptor);
+        Command command = druidAnalyzerAdaptor.getCommand();
+        if (command == null) {
             throw new NotSupportSqlTypeException(sql, sqlStatement.getClass());
         }
-        return ((DruidStatementAdaptor<SQLStatement, ? extends Command>) adaptor).adaptor(sql, sqlStatement);
+        return command;
     }
 
-    private void registerAdaptor(DruidStatementAdaptor<?, ? extends Command> adaptor) {
-        if (adaptorMap.putIfAbsent(adaptor.supportType(), adaptor) != null) {
-            throw new IllegalArgumentException(adaptor.supportType() + "duplicate type");
-        }
-    }
 
 }

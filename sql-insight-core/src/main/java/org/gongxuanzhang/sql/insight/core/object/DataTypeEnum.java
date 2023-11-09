@@ -14,26 +14,15 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.analysis.ddl;
+package org.gongxuanzhang.sql.insight.core.object;
 
-import com.alibaba.druid.sql.ast.statement.SQLDropDatabaseStatement;
-import org.gongxuanzhang.sql.insight.core.analysis.druid.DruidStatementAdaptor;
-import org.gongxuanzhang.sql.insight.core.command.ddl.DropDatabase;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class DropDatabaseAdaptor implements DruidStatementAdaptor<SQLDropDatabaseStatement, DropDatabase> {
+public enum DataTypeEnum {
 
-    @Override
-    public Class<SQLDropDatabaseStatement> supportType() {
-        return SQLDropDatabaseStatement.class;
-    }
 
-    @Override
-    public DropDatabase adaptor(String sql, SQLDropDatabaseStatement mySqlStatement) {
-        return new DropDatabase(sql, mySqlStatement.isIfExists(), mySqlStatement.getDatabaseName());
-    }
-
+    INT,VARCHAR,CHAR,TIME
 
 }
