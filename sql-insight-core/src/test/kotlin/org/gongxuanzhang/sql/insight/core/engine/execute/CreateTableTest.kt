@@ -94,10 +94,9 @@ class CreateTableTest {
                                     (
                                     id int primary key auto_increment,
                                     name varchar not null,
-                                    gender varchar default '张三' not null,
-                                    age int comment '年龄',
-                                    id_card varchar UNIQUE
-                                    ) comment = 用户表
+                                    gender varchar(20) default '男' not null comment '性别',
+                                    id_card char UNIQUE
+                                    ) comment = '用户表'
                                 """.trimIndent()
     }
 
@@ -120,6 +119,38 @@ class CreateTableTest {
             dataType.type = DataType.Type.INT
             dataType.length = 8
             column.dataType = dataType
+            column
+        })
+        assertEquals(table.columnList[1],run {
+            val column = Column()
+            column.isNotNull = true
+            column.name = "name"
+            val dataType = DataType()
+            dataType.type = DataType.Type.VARCHAR
+            dataType.length = 255
+            column.dataType = dataType
+            column
+        })
+        assertEquals(table.columnList[2],run {
+            val column = Column()
+            column.isNotNull = true
+            column.name = "gender"
+            val dataType = DataType()
+            dataType.type = DataType.Type.VARCHAR
+            dataType.length = 20
+            column.defaultValue = "男"
+            column.dataType = dataType
+            column.comment = "性别"
+            column
+        })
+        assertEquals(table.columnList[3],run {
+            val column = Column()
+            column.name = "id_card"
+            val dataType = DataType()
+            dataType.type = DataType.Type.CHAR
+            dataType.length = 255
+            column.dataType = dataType
+            column.isUnique = true
             column
         })
     }

@@ -43,11 +43,14 @@ public class DataType implements FillDataVisitor {
     public void endVisit(SQLCharacterDataType x) {
         type = Type.valueOf(x.getName().toUpperCase());
         this.length = x.getLength();
+        if (this.length < 0) {
+            this.length = type.length;
+        }
     }
 
 
     public enum Type {
-        INT(8), VARCHAR(-1), CHAR(-1), TIME(-1);
+        INT(8), VARCHAR(255), CHAR(255), TIME(-1);
 
 
         final int length;
