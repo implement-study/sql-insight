@@ -41,6 +41,9 @@ public class CreateTable implements CreateCommand {
 
     }
 
+    public Table getTable() {
+        return table;
+    }
 
     @Override
     public void endVisit(SQLCreateTableStatement x) {

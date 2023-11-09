@@ -17,12 +17,45 @@
 package org.gongxuanzhang.sql.insight.core.object;
 
 
+import com.alibaba.druid.sql.ast.SQLDataType;
+import com.alibaba.druid.sql.ast.statement.SQLCharacterDataType;
+import lombok.Data;
+
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public enum DataTypeEnum {
+@Data
+public class DataType implements FillDataVisitor {
+
+    private Type type;
+
+    private int length;
 
 
-    INT,VARCHAR,CHAR,TIME
+    @Override
+    public void endVisit(SQLDataType x) {
+        type = Type.valueOf(x.getName().toUpperCase());
+        this.length = type.length;
+    }
+
+
+    @Override
+    public void endVisit(SQLCharacterDataType x) {
+        type = Type.valueOf(x.getName().toUpperCase());
+        this.length = x.getLength();
+    }
+
+
+    public enum Type {
+        INT(8), VARCHAR(-1), CHAR(-1), TIME(-1);
+
+
+        final int length;
+
+        Type(int length) {
+            this.length = length;
+        }
+    }
+
 
 }

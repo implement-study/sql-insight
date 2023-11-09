@@ -19,6 +19,7 @@ package org.gongxuanzhang.sql.insight.core.object;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
 import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
+import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement;
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 
@@ -36,6 +37,8 @@ public class Table implements FillDataVisitor {
 
     private final List<Column> columnList = new ArrayList<>();
 
+    private String comment;
+
 
     @Override
     public void endVisit(SQLColumnDefinition x) {
@@ -46,22 +49,34 @@ public class Table implements FillDataVisitor {
 
 
     @Override
-    public boolean visit(SQLExprTableSource x) {
-        x.accept(new SQLASTVisitor() {
-            @Override
-            public boolean visit(SQLPropertyExpr x) {
-                Table.this.database = new Database(name);
-                Table.this.name = x.getName();
-                return false;
-            }
-
-            @Override
-            public boolean visit(SQLIdentifierExpr x) {
-                Table.this.name = x.getName();
-                return false;
-            }
-        });
+    public boolean visit(SQLCreateTableStatement x) {
+        if (x.getComment() != null) {
+            this.comment = x.getComment().toString();
+        }
         return true;
+    }
+
+    @Override
+    public boolean visit(SQLExprTableSource x) {
+        x.accept(new NameVisitor());
+        return true;
+    }
+
+
+    private class NameVisitor implements SQLASTVisitor {
+
+        @Override
+        public boolean visit(SQLPropertyExpr x) {
+            Table.this.database = new Database(x.getOwnerName());
+            Table.this.name = x.getName();
+            return false;
+        }
+
+        @Override
+        public boolean visit(SQLIdentifierExpr x) {
+            Table.this.name = x.getName();
+            return false;
+        }
     }
 
     public Database getDatabase() {
@@ -74,5 +89,9 @@ public class Table implements FillDataVisitor {
 
     public List<Column> getColumnList() {
         return columnList;
+    }
+
+    public String getComment() {
+        return comment;
     }
 }

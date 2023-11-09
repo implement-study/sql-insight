@@ -16,24 +16,25 @@
 
 package org.gongxuanzhang.sql.insight.core.object;
 
-import com.alibaba.druid.sql.ast.SQLDataType;
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
-import com.alibaba.druid.sql.ast.statement.SQLCharacterDataType;
 import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
 import com.alibaba.druid.sql.ast.statement.SQLColumnPrimaryKey;
 import com.alibaba.druid.sql.ast.statement.SQLColumnUniqueKey;
 import com.alibaba.druid.sql.ast.statement.SQLNotNullConstraint;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
+import lombok.Data;
+
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
+@Data
 public class Column implements FillDataVisitor {
 
     private String name;
 
-    private DataTypeEnum dataTypeEnum;
+    private DataType dataType;
 
     private boolean autoIncrement;
 
@@ -47,11 +48,13 @@ public class Column implements FillDataVisitor {
 
     private String comment;
 
+
     @Override
     public void endVisit(SQLColumnDefinition x) {
         this.name = x.getColumnName();
         this.autoIncrement = x.isAutoIncrement();
-        x.accept(new DataTypeVisitor());
+        this.dataType = new DataType();
+        x.accept(dataType);
         x.accept(new ConstraintVisitor());
         if (x.getComment() != null) {
             this.comment = x.getComment().toString();
@@ -63,24 +66,6 @@ public class Column implements FillDataVisitor {
 
     }
 
-
-    /**
-     * create a data type via visitor
-     **/
-    private class DataTypeVisitor implements SQLASTVisitor {
-
-
-        @Override
-        public void endVisit(SQLDataType x) {
-            dataTypeEnum = DataTypeEnum.valueOf(x.getName().toUpperCase());
-        }
-
-
-        @Override
-        public void endVisit(SQLCharacterDataType x) {
-            int length = x.getLength();
-        }
-    }
 
     private class ConstraintVisitor implements SQLASTVisitor {
         @Override
@@ -108,35 +93,4 @@ public class Column implements FillDataVisitor {
         }
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public DataTypeEnum getDataTypeEnum() {
-        return dataTypeEnum;
-    }
-
-    public boolean isAutoIncrement() {
-        return autoIncrement;
-    }
-
-    public boolean isNotNull() {
-        return notNull;
-    }
-
-    public boolean isPrimaryKey() {
-        return primaryKey;
-    }
-
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public boolean isUnique() {
-        return unique;
-    }
 }
