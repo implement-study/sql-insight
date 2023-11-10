@@ -14,22 +14,26 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.exception;
+package org.gongxuanzhang.sql.insight.core.environment
+
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Test
+
 
 /**
- * like {@link java.io.FileNotFoundException}
- * <p>
- * the only difference is this class is a runtime exception
- *
- * @author gongxuanzhangmelt@gmail.com
- * @see java.io.FileNotFoundException
+ * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public class RuntimeFileNotFoundException extends SqlInsightException {
+class GlobalContextTest {
 
-    public RuntimeFileNotFoundException() {
+    @Test
+    fun testGlobalContext() {
+        System.setProperty("default-file", "/test-mysql.properties")
+        val instance = GlobalContext.getInstance()
+        assertEquals(instance["test"], "ok")
+        assertNull(instance["a"])
+        instance.put("a", "b")
+        assertEquals("b", instance["a"])
     }
 
-    public RuntimeFileNotFoundException(String message) {
-        super(message);
-    }
 }

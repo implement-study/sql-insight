@@ -16,8 +16,47 @@
 
 package org.gongxuanzhang.sql.insight.core.environment;
 
+import org.gongxuanzhang.sql.insight.core.exception.RuntimeFileNotFoundException;
+import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class GlobalContext extends AbstractMapContext {
+public class GlobalContext
+        extends AbstractMapContext {
+
+    private GlobalContext(Map<String, String> map) {
+        super(map);
+    }
+
+
+    private static final GlobalContext INSTANCE = createGlobalContext();
+
+    private static GlobalContext createGlobalContext() {
+        String configFileName = System.getProperty("default-file", "/mysql.properties");
+        InputStream inputStream = GlobalContext.class.getResourceAsStream(configFileName);
+        if (inputStream == null) {
+            throw new RuntimeFileNotFoundException("check your default-file property " + configFileName);
+        }
+        try {
+            Properties config = new Properties();
+            config.load(inputStream);
+            Map<String, String> map = new HashMap<>(config.size() / 3 * 4 + 1);
+            config.forEach((k, v) -> map.put(k.toString(), v.toString()));
+            return new GlobalContext(map);
+        } catch (IOException e) {
+            throw new RuntimeIoException(e);
+        }
+    }
+
+    public static GlobalContext getInstance() {
+        return INSTANCE;
+    }
+
 }

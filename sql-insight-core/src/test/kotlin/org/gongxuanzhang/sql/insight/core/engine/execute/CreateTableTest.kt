@@ -156,52 +156,6 @@ class CreateTableTest {
     }
 
 
-//    private fun checkTableInfo(select: TableInfo, database: String, tableName: String) {
-//        Assertions.assertEquals(select.database.databaseName, database)
-//        Assertions.assertEquals(select.tableName, tableName)
-//        Assertions.assertEquals(select.comment, "用户表")
-//        assertEquals(select.columns[0], run {
-//            val column = Column()
-//            column.name = "id"
-//            column.type = ColumnType.INT
-//            column.isAutoIncrement = true
-//            column
-//        })
-//        assertEquals(select.columns[1], run {
-//            val column = Column()
-//            column.name = "name"
-//            column.type = ColumnType.VARCHAR
-//            column.isNotNull = true
-//            column.length = 200
-//            column
-//        })
-//        assertEquals(select.columns[2], run {
-//            val column = Column()
-//            column.name = "gender"
-//            column.type = ColumnType.VARCHAR
-//            column.isNotNull = true
-//            column.defaultValue = StringDefaultValue("张三")
-//            column.length = 200
-//            column
-//        })
-//        assertEquals(select.columns[3], run {
-//            val column = Column()
-//            column.name = "age"
-//            column.type = ColumnType.INT
-//            column.comment = "年龄"
-//            column
-//        })
-//        assertEquals(select.columns[4], run {
-//            val column = Column()
-//            column.name = "id_card"
-//            column.type = ColumnType.VARCHAR
-//            column.isUnique = true
-//            column
-//        })
-//        Assertions.assertEquals(select.comment, "用户表")
-//        Assertions.assertEquals(select.primaryKey, arrayListOf("id"))
-//    }
-
 
 }
 

@@ -22,6 +22,7 @@ import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
 import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement;
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
+import org.gongxuanzhang.sql.insight.core.analysis.druid.CommentVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ import java.util.List;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class Table implements FillDataVisitor {
+public class Table implements FillDataVisitor, CommentContainer {
 
     private Database database;
 
@@ -51,7 +52,7 @@ public class Table implements FillDataVisitor {
     @Override
     public boolean visit(SQLCreateTableStatement x) {
         if (x.getComment() != null) {
-            this.comment = x.getComment().toString();
+            x.getComment().accept(new CommentVisitor(this));
         }
         return true;
     }
@@ -89,6 +90,12 @@ public class Table implements FillDataVisitor {
 
     public List<Column> getColumnList() {
         return columnList;
+    }
+
+    @Override
+    public Table setComment(String comment) {
+        this.comment = comment;
+        return this;
     }
 
     public String getComment() {
