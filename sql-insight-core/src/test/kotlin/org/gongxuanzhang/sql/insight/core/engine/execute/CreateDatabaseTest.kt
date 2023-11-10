@@ -18,9 +18,9 @@ package org.gongxuanzhang.sql.insight.core.engine.execute
 
 import org.gongxuanzhang.sql.insight.assertFalse
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseExistsException
+import org.gongxuanzhang.sql.insight.databaseFile
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.io.File
 
 
 /**
@@ -30,7 +30,7 @@ class CreateDatabaseTest {
 
     @Test
     fun testCreateDatabase() {
-        val dbFolder = File("sql_insight_test_db")
+        val dbFolder = databaseFile("sql_insight_test_db")
         if (dbFolder.exists()) {
             dbFolder.deleteRecursively()
         }
@@ -44,7 +44,7 @@ class CreateDatabaseTest {
 
     @Test
     fun testCreateDatabaseExists() {
-        val dbFolder = File("sql_insight_test_db")
+        val dbFolder = databaseFile("sql_insight_test_db")
         if (!dbFolder.exists()) {
             dbFolder.mkdirs()
         }
@@ -56,7 +56,7 @@ class CreateDatabaseTest {
 
     @Test
     fun testCreateDatabaseExistsIfNotExists() {
-        val dbFolder = File("sql_insight_test_db")
+        val dbFolder = databaseFile("sql_insight_test_db")
         if (!dbFolder.exists()) {
             dbFolder.mkdirs()
         }

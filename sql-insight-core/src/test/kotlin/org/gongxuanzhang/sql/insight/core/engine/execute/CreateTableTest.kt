@@ -19,7 +19,6 @@ package org.gongxuanzhang.sql.insight.core.engine.execute
 import org.gongxuanzhang.sql.insight.core.command.ddl.CreateTable
 import org.gongxuanzhang.sql.insight.core.`object`.Column
 import org.gongxuanzhang.sql.insight.core.`object`.DataType
-import org.gongxuanzhang.sql.insight.doSql
 import org.gongxuanzhang.sql.insight.toCommand
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -31,63 +30,8 @@ import org.junit.jupiter.api.Test
 class CreateTableTest {
 
 
-    private val sql = """
-        CREATE TABLE custom_constraints (
-            id int PRIMARY KEY AUTO_INCREMENT,
-            name VARCHAR(50) AUTO_INCREMENT default 'sdf',
-            age INT default 1 unique comment '年龄',
-            email VARCHAR(100) not null,
-            alias char(10),
-            CHECK (age >= 18 AND age <= 100), -- 使用CHECK约束限制age的范围
-            CONSTRAINT check_email_format CHECK (email LIKE '%@'),
-            UNIQUE (name),
-            CONSTRAINT custom_unique_age_email UNIQUE (age, email),
-            FOREIGN KEY (id) REFERENCES another_table(id),
-            CONSTRAINT custom_fk_name FOREIGN KEY (name) REFERENCES another_table(name) ON DELETE CASCADE
-        ) comment = 'asdf'
 
-    """.trimIndent()
-
-    @Test
-    fun testAnalysis() {
-    }
-
-    @Test
-    fun testCreateTable() {
-        sql.doSql()
-    }
-
-
-//    @Test
-//    fun createSessionTable() {
-//        database = "create_database"
-//        CreateDatabaseTest().doCreateDatabase(database)
-//        val tableName = "aaa"
-//        UseDatabaseTest().doUseDatabase(database)
-//        doCreateSessionTable(tableName)
-//        val select = Context.getTableManager().select("$database.$tableName")
-//        checkTableInfo(select, database, tableName)
-//    }
-//
-//    @Test
-//    fun createExistTable() {
-//        database = "create_database"
-//        CreateDatabaseTest().doCreateDatabase(database)
-//        doCreateTable(database, "aaa")
-//        assertThrows<ExecuteException> {
-//            doCreateTable(database, "aaa")
-//        }
-//    }
-//
-//    @Test
-//    fun createNoExistDatabase() {
-//        assertThrows<ExecuteException> {
-//            doCreateTable("aaa", "aaaaa")
-//        }
-//    }
-
-
-    fun createTableSql(tableName: String, databaseName: String = "", ifNotExists: Boolean = true): String {
+    private fun createTableSql(tableName: String, databaseName: String = "", ifNotExists: Boolean = true): String {
         return """
                                     create table ${if (ifNotExists) "IF NOT EXISTS" else ""}
                                      ${if (databaseName.isEmpty()) databaseName else "$databaseName."}$tableName
@@ -96,21 +40,21 @@ class CreateTableTest {
                                     name varchar not null,
                                     gender varchar(20) default '男' not null comment '性别',
                                     id_card char UNIQUE
-                                    ) comment = '用户表'
+                                    ) comment = '用户表', engine = 'innodb'
                                 """.trimIndent()
     }
 
 
     @Test
-    fun doCreateTable() {
+    fun testCommand() {
         val tableName = "test_tableName"
         val databaseName = "test_database_name"
         val createTable = createTableSql(tableName, databaseName).toCommand()
         val table = (createTable as CreateTable).table
-        assertEquals(table.name,tableName)
-        assertEquals(table.database.name,databaseName)
-        assertEquals(table.comment,"用户表")
-        assertEquals(table.columnList[0],run {
+        assertEquals(table.name, tableName)
+        assertEquals(table.database.name, databaseName)
+        assertEquals(table.comment, "用户表")
+        assertEquals(table.columnList[0], run {
             val column = Column()
             column.isAutoIncrement = true
             column.isPrimaryKey = true
@@ -121,7 +65,7 @@ class CreateTableTest {
             column.dataType = dataType
             column
         })
-        assertEquals(table.columnList[1],run {
+        assertEquals(table.columnList[1], run {
             val column = Column()
             column.isNotNull = true
             column.name = "name"
@@ -131,7 +75,7 @@ class CreateTableTest {
             column.dataType = dataType
             column
         })
-        assertEquals(table.columnList[2],run {
+        assertEquals(table.columnList[2], run {
             val column = Column()
             column.isNotNull = true
             column.name = "gender"
@@ -143,7 +87,7 @@ class CreateTableTest {
             column.comment = "性别"
             column
         })
-        assertEquals(table.columnList[3],run {
+        assertEquals(table.columnList[3], run {
             val column = Column()
             column.name = "id_card"
             val dataType = DataType()
@@ -154,7 +98,6 @@ class CreateTableTest {
             column
         })
     }
-
 
 
 }

@@ -17,6 +17,11 @@
 package org.gongxuanzhang.sql.insight.core.object;
 
 
+import org.gongxuanzhang.sql.insight.core.environment.DefaultProperty;
+import org.gongxuanzhang.sql.insight.core.environment.GlobalContext;
+
+import java.io.File;
+
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
@@ -31,6 +36,11 @@ public class Database {
 
     public String getName() {
         return name;
+    }
+
+    public File getDbFolder() {
+        GlobalContext context = GlobalContext.getInstance();
+        return new File(context.get(DefaultProperty.DATA_DIR.getKey()), this.name);
     }
 
 }

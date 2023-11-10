@@ -18,9 +18,10 @@ package org.gongxuanzhang.sql.insight.core.engine.execute
 
 import org.gongxuanzhang.sql.insight.assertFalse
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseNotExistsException
+import org.gongxuanzhang.sql.insight.databaseFile
+import org.gongxuanzhang.sql.insight.doSql
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.io.File
 
 
 /**
@@ -28,8 +29,7 @@ import java.io.File
  **/
 class DropDatabaseTest {
     private val dbName = "sql_insight_test_db"
-    private val pipeline = InsightFactory.createSqlPipeline()
-    private val dbFolder = File(dbName)
+    private val dbFolder = databaseFile(dbName)
 
     @Test
     fun testDropDatabase() {
@@ -39,18 +39,17 @@ class DropDatabaseTest {
         }
         assertFalse(!dbFolder.exists(), "${dbFolder.absolutePath} can't created")
         val sql = "drop database $dbName"
-        pipeline.doSql(sql)
+        sql.doSql()
         assertFalse(dbFolder.exists())
-        assertThrows<DatabaseNotExistsException> { pipeline.doSql(sql) }
+        assertThrows<DatabaseNotExistsException> { sql.doSql() }
     }
 
     @Test
     fun testDropDatabaseNotExists() {
         testDropDatabase()
         val sql = "drop database if exists $dbName"
-        pipeline.doSql(sql)
+        sql.doSql()
         assertFalse(dbFolder.exists())
-
     }
 
 

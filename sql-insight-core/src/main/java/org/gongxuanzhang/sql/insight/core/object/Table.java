@@ -16,12 +16,14 @@
 
 package org.gongxuanzhang.sql.insight.core.object;
 
+import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
 import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
 import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement;
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
+import lombok.Getter;
 import org.gongxuanzhang.sql.insight.core.analysis.druid.CommentVisitor;
 
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ import java.util.List;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
+@Getter
 public class Table implements FillDataVisitor, CommentContainer {
 
     private Database database;
@@ -40,6 +43,7 @@ public class Table implements FillDataVisitor, CommentContainer {
 
     private String comment;
 
+    private String engine;
 
     @Override
     public void endVisit(SQLColumnDefinition x) {
@@ -54,6 +58,9 @@ public class Table implements FillDataVisitor, CommentContainer {
         if (x.getComment() != null) {
             x.getComment().accept(new CommentVisitor(this));
         }
+        if (x.getEngine() != null) {
+            x.getEngine().accept(new EngineVisitor());
+        }
         return true;
     }
 
@@ -61,6 +68,14 @@ public class Table implements FillDataVisitor, CommentContainer {
     public boolean visit(SQLExprTableSource x) {
         x.accept(new NameVisitor());
         return true;
+    }
+
+    private class EngineVisitor implements SQLASTVisitor {
+
+        @Override
+        public void endVisit(SQLCharExpr x) {
+            Table.this.engine = x.getText();
+        }
     }
 
 
@@ -80,25 +95,9 @@ public class Table implements FillDataVisitor, CommentContainer {
         }
     }
 
-    public Database getDatabase() {
-        return database;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<Column> getColumnList() {
-        return columnList;
-    }
-
     @Override
     public Table setComment(String comment) {
         this.comment = comment;
         return this;
-    }
-
-    public String getComment() {
-        return comment;
     }
 }

@@ -44,19 +44,24 @@ public class GlobalContext
         if (inputStream == null) {
             throw new RuntimeFileNotFoundException("check your default-file property " + configFileName);
         }
+        Properties config = new Properties();
         try {
-            Properties config = new Properties();
             config.load(inputStream);
-            Map<String, String> map = new HashMap<>(config.size() / 3 * 4 + 1);
-            config.forEach((k, v) -> map.put(k.toString(), v.toString()));
-            return new GlobalContext(map);
         } catch (IOException e) {
             throw new RuntimeIoException(e);
         }
+        DefaultProperty[] defaultValues = DefaultProperty.values();
+        Map<String, String> map = new HashMap<>((config.size() + defaultValues.length) / 3 * 4 + 1);
+        for (DefaultProperty defaultValue : defaultValues) {
+            map.put(defaultValue.getKey(), defaultValue.getValue());
+        }
+        config.forEach((k, v) -> map.put(k.toString(), v.toString()));
+        return new GlobalContext(map);
     }
 
     public static GlobalContext getInstance() {
         return INSTANCE;
     }
+
 
 }

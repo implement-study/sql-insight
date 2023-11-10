@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.command.ddl;
 
+import org.gongxuanzhang.sql.insight.core.environment.DefaultProperty;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseExistsException;
 import org.jetbrains.annotations.NotNull;
@@ -63,11 +64,10 @@ public class CreateDatabase implements CreateCommand {
             throw new DatabaseExistsException(this.dbName);
         }
         dbFold.mkdirs();
-
     }
 
     private File getDbFold(ExecuteContext context) {
-        //  todo get path in context
-        return new File(this.dbName);
+        String home = context.get(DefaultProperty.DATA_DIR.getKey());
+        return new File(home, this.dbName);
     }
 }

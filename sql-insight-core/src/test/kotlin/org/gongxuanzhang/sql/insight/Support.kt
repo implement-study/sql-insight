@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 sql-insight  and the original author or authors <gongxuanzhangmelt@gmail.com>.
+ * Copyright 2023 java-mysql  and the original author or authors <gongxuanzhangmelt@gmail.com>.
  *
  * Licensed under the GNU Affero General Public License v3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,13 @@
 
 package org.gongxuanzhang.sql.insight
 
-import org.gongxuanzhang.sql.insight.core.analysis.druid.DruidAnalyzer
-import org.gongxuanzhang.sql.insight.core.command.Command
-import org.gongxuanzhang.sql.insight.core.engine.execute.InsightFactory
+import org.gongxuanzhang.sql.insight.core.environment.DefaultProperty
+import org.gongxuanzhang.sql.insight.core.environment.GlobalContext
+import java.io.File
 
 
-/**
- * @author gxz gongxuanzhangmelt@gmail.com
- **/
+fun databaseFile(database: String): File {
+    val context = GlobalContext.getInstance()
 
-fun String.doSql() {
-    val pipeline = InsightFactory.createSqlPipeline()
-     pipeline.doSql(this)
+    return File(File(context[DefaultProperty.DATA_DIR.key].toString()), database)
 }
-
-
-fun String.toCommand(): Command {
-    return DruidAnalyzer().analysisSql(this)
-}
-
-

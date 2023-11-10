@@ -17,6 +17,7 @@
 package org.gongxuanzhang.sql.insight.core.environment;
 
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * context during execute
@@ -39,5 +40,35 @@ public class ExecuteContext extends AbstractMapContext {
         return null;
     }
 
+    public GlobalContext getGlobalContext() {
+        return GlobalContext.getInstance();
+    }
 
+    public SessionContext getSessionContext() {
+        //   todo
+        return new SessionContext();
+    }
+
+    @Nullable
+    @Override
+    public String get(String key) {
+        String s = getSessionContext().get(key);
+        if (s != null) {
+            return s;
+        }
+        return getGlobalContext().get(key);
+    }
+
+
+    @Override
+    public void put(String key, String value) {
+        throw new UnsupportedOperationException("execute context can't support put method");
+    }
+
+
+    @Nullable
+    @Override
+    public String remove(String key) {
+        throw new UnsupportedOperationException("execute context can't support remove method");
+    }
 }
