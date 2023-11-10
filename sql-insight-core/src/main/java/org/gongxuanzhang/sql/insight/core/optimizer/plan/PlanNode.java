@@ -47,6 +47,6 @@ public interface PlanNode {
      *                      else is engine what is plan node needed
      * @param context       execute context ,sharded in chain
      **/
-    void doPlan(StorageEngine storageEngine, ExecuteContext context);
+    void doPlan(StorageEngine storageEngine, ExecuteContext context) throws Exception;
 
 }

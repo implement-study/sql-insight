@@ -18,18 +18,24 @@ package org.gongxuanzhang.sql.insight.core.command.ddl;
 
 import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
+import org.gongxuanzhang.sql.insight.core.exception.TableExistsException;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.nio.file.Files;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
 public class CreateTable implements CreateCommand {
 
-
     private final String sql;
 
     private Table table;
+
+    private boolean ifNotExists;
+
 
     public CreateTable(String sql) {
         this.sql = sql;
@@ -37,8 +43,27 @@ public class CreateTable implements CreateCommand {
 
 
     @Override
-    public void run(ExecuteContext context) {
+    public void run(ExecuteContext context) throws Exception {
+        File dbFolder = table.getDatabase().getDbFolder();
+        File frmFile = new File(dbFolder, this.table.getName() + ".frm");
+        if (frmFile.createNewFile()) {
+            Files.write(frmFile.toPath(), tableFrmByteArray());
+            return;
+        }
+        if (!this.ifNotExists) {
+            throw new TableExistsException(table);
+        }
 
+    }
+
+    private byte[] tableFrmByteArray() {
+        //   todo
+        return new byte[0];
+    }
+
+
+    public boolean isIfNotExists() {
+        return ifNotExists;
     }
 
     public Table getTable() {
@@ -48,6 +73,7 @@ public class CreateTable implements CreateCommand {
     @Override
     public void endVisit(SQLCreateTableStatement x) {
         this.table = new Table();
+        this.ifNotExists = x.isIfNotExists();
         x.accept(this.table);
     }
 

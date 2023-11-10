@@ -58,7 +58,7 @@ public class CreateDatabase implements CreateCommand {
 
 
     @Override
-    public void run(ExecuteContext context) {
+    public void run(ExecuteContext context) throws Exception{
         File dbFold = getDbFold(context);
         if (dbFold.exists() && !ifNotExists) {
             throw new DatabaseExistsException(this.dbName);

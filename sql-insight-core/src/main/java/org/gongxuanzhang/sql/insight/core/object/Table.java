@@ -45,6 +45,7 @@ public class Table implements FillDataVisitor, CommentContainer {
 
     private String engine;
 
+
     @Override
     public void endVisit(SQLColumnDefinition x) {
         Column column = new Column();

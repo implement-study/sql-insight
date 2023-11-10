@@ -48,7 +48,12 @@ public class SqlInsightExecuteEngine implements ExecuteEngine {
             if (!node.withoutStorageEngine()) {
                 engine = storageEngineManager.selectEngine(node.neededStorageEngineName());
             }
-            node.doPlan(engine, context);
+            try {
+                node.doPlan(engine, context);
+            } catch (Exception e) {
+                //   todo
+                throw new RuntimeException(e);
+            }
         });
         return context.toResult();
     }

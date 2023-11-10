@@ -14,33 +14,18 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.command.ddl;
+package org.gongxuanzhang.sql.insight.core.exception;
 
-import org.gongxuanzhang.sql.insight.core.command.Command;
-import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
+import org.gongxuanzhang.sql.insight.core.object.Table;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface DdlCommand extends Command {
+public class TableExistsException extends SqlInsightException {
 
 
-    /**
-     * DDL commands are typically executed directly
-     *
-     * @return always true
-     **/
-    @Override
-    default boolean directly() {
-        return true;
+    public TableExistsException(Table table) {
+        super("databaseName " + table.getDatabase().getName() + " table " + table.getName() + " already exists");
     }
 
-
-    /**
-     * must override this method
-     *
-     * @param context {@link Command#run(ExecuteContext)}
-     **/
-    @Override
-    void run(ExecuteContext context) throws Exception;
 }

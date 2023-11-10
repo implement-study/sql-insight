@@ -109,11 +109,11 @@ public class DirectlyExecutionPlan implements ExecutionPlan {
         }
 
         @Override
-        default void doPlan(StorageEngine storageEngine, ExecuteContext context) {
+        default void doPlan(StorageEngine storageEngine, ExecuteContext context) throws Exception {
             this.doWithOutEngine(context);
         }
 
-        void doWithOutEngine(ExecuteContext context);
+        void doWithOutEngine(ExecuteContext context) throws Exception;
 
     }
 }
