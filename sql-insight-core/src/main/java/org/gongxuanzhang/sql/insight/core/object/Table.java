@@ -71,7 +71,7 @@ public class Table implements FillDataVisitor, CommentContainer {
         return true;
     }
 
-    private class EngineVisitor implements SQLASTVisitor {
+    public class EngineVisitor implements SQLASTVisitor {
 
         @Override
         public void endVisit(SQLCharExpr x) {
@@ -80,7 +80,7 @@ public class Table implements FillDataVisitor, CommentContainer {
     }
 
 
-    private class NameVisitor implements SQLASTVisitor {
+    public class NameVisitor implements SQLASTVisitor {
 
         @Override
         public boolean visit(SQLPropertyExpr x) {

@@ -19,6 +19,9 @@ package org.gongxuanzhang.sql.insight.core.engine.storage;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * template for storage engine
  *
@@ -28,14 +31,15 @@ public abstract class AbstractStorageEngine implements StorageEngine {
 
 
     @Override
+    public List<String> tableExtensions() {
+        return Collections.emptyList();
+    }
+
+    @Override
     public ResultInterface createTable(Table table) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public ResultInterface dropTable(Table table) {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public ResultInterface truncateTable(Table table) {

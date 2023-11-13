@@ -17,7 +17,10 @@
 package org.gongxuanzhang.sql.insight.core.command.ddl;
 
 import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement;
+import com.alibaba.fastjson2.JSONObject;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
+import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext;
+import org.gongxuanzhang.sql.insight.core.exception.DatabaseNotExistsException;
 import org.gongxuanzhang.sql.insight.core.exception.TableExistsException;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.jetbrains.annotations.NotNull;
@@ -45,9 +48,14 @@ public class CreateTable implements CreateCommand {
     @Override
     public void run(ExecuteContext context) throws Exception {
         File dbFolder = table.getDatabase().getDbFolder();
+        if (!dbFolder.exists() || !dbFolder.isDirectory()) {
+            throw new DatabaseNotExistsException(table.getDatabase().getName());
+        }
+        SqlInsightContext sqlInsightContext = SqlInsightContext.getInstance();
         File frmFile = new File(dbFolder, this.table.getName() + ".frm");
         if (frmFile.createNewFile()) {
             Files.write(frmFile.toPath(), tableFrmByteArray());
+            sqlInsightContext.selectEngine(table.getEngine()).createTable(table);
             return;
         }
         if (!this.ifNotExists) {
@@ -57,8 +65,8 @@ public class CreateTable implements CreateCommand {
     }
 
     private byte[] tableFrmByteArray() {
-        //   todo
-        return new byte[0];
+        //  todo
+        return JSONObject.toJSONString(this.table).getBytes();
     }
 
 

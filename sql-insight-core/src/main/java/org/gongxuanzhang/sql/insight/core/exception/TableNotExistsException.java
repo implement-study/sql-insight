@@ -16,14 +16,16 @@
 
 package org.gongxuanzhang.sql.insight.core.exception;
 
+import org.gongxuanzhang.sql.insight.core.object.Table;
+
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class EngineNotFoundException extends SqlInsightException {
+public class TableNotExistsException extends SqlInsightException {
 
 
-    public EngineNotFoundException(String engineName) {
-        super("dont have name:" + engineName + " engine ");
+    public TableNotExistsException(Table table) {
+        super("databaseName " + table.getDatabase().getName() + " table " + table.getName() + " not exists");
     }
 
 }

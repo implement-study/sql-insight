@@ -20,6 +20,8 @@ package org.gongxuanzhang.sql.insight.core.engine.storage;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 
+import java.util.List;
+
 /**
  * storage engine , executor select the engine
  *
@@ -37,14 +39,17 @@ public interface StorageEngine {
     String getName();
 
     /**
+     * the file extension that  storage engine create table
+     *
+     * @return may be a empty list
+     * @see <a href="https://www.mysqlzh.com/doc/147.html"/>
+     **/
+    List<String> tableExtensions();
+
+    /**
      * create table
      **/
     ResultInterface createTable(Table table);
-
-    /**
-     * drop table，delete all table information
-     **/
-    ResultInterface dropTable(Table table);
 
     /**
      * truncate table,reserved table construction

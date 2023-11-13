@@ -16,12 +16,15 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.execute
 
+import org.gongxuanzhang.sql.insight.*
 import org.gongxuanzhang.sql.insight.core.command.ddl.CreateTable
+import org.gongxuanzhang.sql.insight.core.exception.DatabaseNotExistsException
 import org.gongxuanzhang.sql.insight.core.`object`.Column
 import org.gongxuanzhang.sql.insight.core.`object`.DataType
-import org.gongxuanzhang.sql.insight.toCommand
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import java.io.File
 
 
 /**
@@ -30,18 +33,17 @@ import org.junit.jupiter.api.Test
 class CreateTableTest {
 
 
-
     private fun createTableSql(tableName: String, databaseName: String = "", ifNotExists: Boolean = true): String {
         return """
-                                    create table ${if (ifNotExists) "IF NOT EXISTS" else ""}
-                                     ${if (databaseName.isEmpty()) databaseName else "$databaseName."}$tableName
-                                    (
-                                    id int primary key auto_increment,
-                                    name varchar not null,
-                                    gender varchar(20) default '男' not null comment '性别',
-                                    id_card char UNIQUE
-                                    ) comment = '用户表', engine = 'innodb'
-                                """.trimIndent()
+                create table ${if (ifNotExists) "IF NOT EXISTS" else ""}
+                 ${if (databaseName.isEmpty()) databaseName else "$databaseName."}$tableName
+                (
+                id int primary key auto_increment,
+                name varchar not null,
+                gender varchar(20) default '男' not null comment '性别',
+                id_card char UNIQUE
+                ) comment = '用户表', engine = 'innodb'
+            """.trimIndent()
     }
 
 
@@ -97,6 +99,27 @@ class CreateTableTest {
             column.isUnique = true
             column
         })
+    }
+
+
+    @Test
+    fun testCreateTableDbNotExists() {
+        val tableName = "test_tableName"
+        val databaseName = "test_database_name"
+        clearDatabase(databaseName)
+        assertThrows<DatabaseNotExistsException> { createTableSql(tableName, databaseName, true).doSql() }
+    }
+
+
+    @Test
+    fun testCreateTable() {
+        val tableName = "test_tableName"
+        val databaseName = "test_database_name"
+        createDatabase(databaseName)
+        createTableSql(tableName, databaseName, true).doSql()
+        assert(File(databaseFile(databaseName), "$tableName.frm").exists())
+        clearDatabase(databaseName)
+
     }
 
 

@@ -6,6 +6,5 @@
         <artifactId>sql-insight</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <groupId>com.zhonghaiwenda</groupId>
     <artifactId>sql-insight-spring</artifactId>
 </project>

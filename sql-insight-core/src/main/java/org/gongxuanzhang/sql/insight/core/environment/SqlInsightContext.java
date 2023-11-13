@@ -17,14 +17,49 @@
 package org.gongxuanzhang.sql.insight.core.environment;
 
 
+import org.gongxuanzhang.sql.insight.core.engine.StorageEngineManager;
+import org.gongxuanzhang.sql.insight.core.engine.storage.SimpleStorageEngineManager;
+import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+
 /**
- * a static context
+ * a static context,contains all of necessary component
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
 public class SqlInsightContext {
 
-    private SqlInsightContext context;
+    private SqlInsightContext() {
+
+    }
+
+    private StorageEngineManager engineManager;
+
+    private GlobalContext globalContext;
 
 
+    private static final SqlInsightContext INSTANCE = createSqlInsightContext();
+
+    private static SqlInsightContext createSqlInsightContext() {
+        SqlInsightContext context = new SqlInsightContext();
+        context.engineManager = new SimpleStorageEngineManager();
+        context.globalContext = GlobalContext.getInstance();
+        return context;
+    }
+
+
+    public static SqlInsightContext getInstance() {
+        return INSTANCE;
+    }
+
+    public StorageEngineManager getEngineManager() {
+        return engineManager;
+    }
+
+    public GlobalContext getGlobalContext() {
+        return globalContext;
+    }
+
+    public StorageEngine selectEngine(String engineName) {
+        return engineManager.selectEngine(engineName);
+    }
 }

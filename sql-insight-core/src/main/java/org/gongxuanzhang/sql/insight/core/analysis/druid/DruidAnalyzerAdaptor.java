@@ -19,12 +19,14 @@ package org.gongxuanzhang.sql.insight.core.analysis.druid;
 import com.alibaba.druid.sql.ast.statement.SQLCreateDatabaseStatement;
 import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement;
 import com.alibaba.druid.sql.ast.statement.SQLDropDatabaseStatement;
+import com.alibaba.druid.sql.ast.statement.SQLDropTableStatement;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 import org.gongxuanzhang.sql.insight.core.command.Command;
 import org.gongxuanzhang.sql.insight.core.command.CommandContainer;
 import org.gongxuanzhang.sql.insight.core.command.ddl.CreateDatabase;
 import org.gongxuanzhang.sql.insight.core.command.ddl.CreateTable;
 import org.gongxuanzhang.sql.insight.core.command.ddl.DropDatabase;
+import org.gongxuanzhang.sql.insight.core.command.ddl.DropTable;
 
 /**
  * druid visitor, created a command fill field.
@@ -58,15 +60,18 @@ public class DruidAnalyzerAdaptor implements SQLASTVisitor, CommandContainer {
 
 
     @Override
+    public boolean visit(SQLDropTableStatement x) {
+        this.command = new DropTable(sql);
+        x.accept(this.command);
+        return false;
+    }
+
+    @Override
     public boolean visit(SQLCreateTableStatement x) {
         this.command = new CreateTable(sql);
         x.accept(this.command);
         return true;
     }
-
-
-
-
 
 
     @Override
