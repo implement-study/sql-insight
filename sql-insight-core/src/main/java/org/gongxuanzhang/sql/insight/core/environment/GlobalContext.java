@@ -28,8 +28,7 @@ import java.util.Properties;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class GlobalContext
-        extends AbstractMapContext {
+public class GlobalContext extends AbstractMapContext {
 
     private GlobalContext(Map<String, String> map) {
         super(map);

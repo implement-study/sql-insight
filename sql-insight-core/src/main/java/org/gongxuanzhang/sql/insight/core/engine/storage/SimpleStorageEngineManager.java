@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage;
 
+import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.StorageEngineManager;
 import org.gongxuanzhang.sql.insight.core.exception.DuplicationEngineNameException;
 import org.gongxuanzhang.sql.insight.core.exception.EngineNotFoundException;
@@ -28,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
+@Slf4j
 public class SimpleStorageEngineManager implements StorageEngineManager {
 
     private final Map<String, StorageEngine> storageEngineMap = new ConcurrentHashMap<>();
@@ -39,6 +41,7 @@ public class SimpleStorageEngineManager implements StorageEngineManager {
 
     @Override
     public void registerEngine(StorageEngine engine) {
+        log.info("register engine [{}], class {}", engine.getName(), engine.getClass().getName());
         if (storageEngineMap.putIfAbsent(engine.getName(), engine) != null) {
             throw new DuplicationEngineNameException("engine " + engine.getName() + "already register ");
         }

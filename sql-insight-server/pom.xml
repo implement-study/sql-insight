@@ -21,11 +21,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.gongxuanzhang</groupId>
-        <artifactId>sql-insight-engine</artifactId>
+        <artifactId>sql-insight</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>sql-insight-engine-innodb</artifactId>
+    <groupId>com.zhonghaiwenda</groupId>
+    <artifactId>sql-insight-server</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -33,10 +34,17 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+
     <dependencies>
         <dependency>
             <groupId>org.gongxuanzhang</groupId>
             <artifactId>sql-insight-core</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.gongxuanzhang</groupId>
+            <artifactId>sql-insight-engine-innodb</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

@@ -75,6 +75,7 @@
         <module>sql-insight-core</module>
         <module>sql-insight-spring</module>
         <module>sql-insight-engine</module>
+        <module>sql-insight-server</module>
     </modules>
 
 
