@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.StorageEngineManager;
+import org.gongxuanzhang.sql.insight.core.environment.GlobalContext;
 import org.gongxuanzhang.sql.insight.core.exception.DuplicationEngineNameException;
 import org.gongxuanzhang.sql.insight.core.exception.EngineNotFoundException;
 
@@ -25,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.gongxuanzhang.sql.insight.core.environment.DefaultProperty.DEFAULT_ENGINE;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -42,14 +45,17 @@ public class SimpleStorageEngineManager implements StorageEngineManager {
     @Override
     public void registerEngine(StorageEngine engine) {
         log.info("register engine [{}], class {}", engine.getName(), engine.getClass().getName());
-        if (storageEngineMap.putIfAbsent(engine.getName(), engine) != null) {
+        if (storageEngineMap.putIfAbsent(engine.getName().toUpperCase(), engine) != null) {
             throw new DuplicationEngineNameException("engine " + engine.getName() + "already register ");
         }
     }
 
     @Override
     public StorageEngine selectEngine(String engineName) {
-        StorageEngine engine = storageEngineMap.get(engineName);
+        if (engineName == null || engineName.isEmpty()) {
+            return selectEngine(GlobalContext.getInstance().get(DEFAULT_ENGINE.getKey()));
+        }
+        StorageEngine engine = storageEngineMap.get(engineName.toUpperCase());
         if (engine == null) {
             throw new EngineNotFoundException(engineName);
         }

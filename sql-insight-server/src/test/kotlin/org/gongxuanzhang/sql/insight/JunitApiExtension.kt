@@ -14,31 +14,15 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.environment;
+package org.gongxuanzhang.sql.insight
+
+import org.junit.jupiter.api.Assertions
+
 
 /**
- * @author gongxuanzhang
- */
-
-public enum DefaultProperty {
-    DATA_DIR("datadir", "./db"),
-    DEFAULT_ENGINE("default-storage-engine", "InnoDB");
-
-
-    private final String key;
-
-    private final String value;
-
-    DefaultProperty(String key, String value) {
-        this.key = key;
-        this.value = value;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public String getValue() {
-        return value;
-    }
+ * @author gxz gongxuanzhangmelt@gmail.com
+ **/
+fun assertFalse(condition: Boolean, message: String = "") {
+    Assertions.assertTrue(!condition, message)
 }
+

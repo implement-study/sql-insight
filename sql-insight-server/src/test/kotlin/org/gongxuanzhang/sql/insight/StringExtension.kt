@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 java-mysql  and the original author or authors <gongxuanzhangmelt@gmail.com>.
+ * Copyright 2023 sql-insight  and the original author or authors <gongxuanzhangmelt@gmail.com>.
  *
  * Licensed under the GNU Affero General Public License v3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,31 +14,25 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.environment;
+package org.gongxuanzhang.sql.insight
+
+import org.gongxuanzhang.sql.insight.core.analysis.druid.DruidAnalyzer
+import org.gongxuanzhang.sql.insight.core.command.Command
+import org.gongxuanzhang.sql.insight.core.engine.execute.InsightFactory
+
 
 /**
- * @author gongxuanzhang
- */
+ * @author gxz gongxuanzhangmelt@gmail.com
+ **/
 
-public enum DefaultProperty {
-    DATA_DIR("datadir", "./db"),
-    DEFAULT_ENGINE("default-storage-engine", "InnoDB");
-
-
-    private final String key;
-
-    private final String value;
-
-    DefaultProperty(String key, String value) {
-        this.key = key;
-        this.value = value;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public String getValue() {
-        return value;
-    }
+fun String.doSql() {
+    val pipeline = InsightFactory.createSqlPipeline()
+     pipeline.doSql(this)
 }
+
+
+fun String.toCommand(): Command {
+    return DruidAnalyzer().analysisSql(this)
+}
+
+

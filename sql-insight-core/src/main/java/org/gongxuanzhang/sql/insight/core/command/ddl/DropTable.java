@@ -61,7 +61,7 @@ public class DropTable implements DropCommand {
                 if (Files.deleteIfExists(frmFile.toPath())) {
                     StorageEngine engine = insightContext.selectEngine(table.getEngine());
                     for (String ext : engine.tableExtensions()) {
-                        Files.delete(new File(dbFolder, table.getName() + "." + ext).toPath());
+                        Files.deleteIfExists(new File(dbFolder, table.getName() + "." + ext).toPath());
                     }
                     return;
                 }

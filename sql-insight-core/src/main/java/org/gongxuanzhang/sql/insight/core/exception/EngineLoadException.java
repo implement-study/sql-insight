@@ -14,31 +14,27 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.environment;
+package org.gongxuanzhang.sql.insight.core.exception;
 
 /**
- * @author gongxuanzhang
- */
+ * in spi loading engine throws
+ *
+ * @author gongxuanzhangmelt@gmail.com
+ **/
+public class EngineLoadException extends SqlInsightException {
 
-public enum DefaultProperty {
-    DATA_DIR("datadir", "./db"),
-    DEFAULT_ENGINE("default-storage-engine", "InnoDB");
 
-
-    private final String key;
-
-    private final String value;
-
-    DefaultProperty(String key, String value) {
-        this.key = key;
-        this.value = value;
+    public EngineLoadException(ClassNotFoundException e, String className) {
+        super("can't found class " + className);
     }
 
-    public String getKey() {
-        return key;
+    public EngineLoadException(NoSuchMethodException e, String className) {
+        super(className + " must have a not param constructor method");
     }
 
-    public String getValue() {
-        return value;
+    public EngineLoadException(ReflectiveOperationException e) {
+        super(e);
     }
+
+
 }

@@ -14,31 +14,26 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.environment;
+package org.gongxuanzhang.sql.insight.core.environment
+
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Test
+
 
 /**
- * @author gongxuanzhang
- */
+ * @author gxz gongxuanzhangmelt@gmail.com
+ **/
+class GlobalContextTest {
 
-public enum DefaultProperty {
-    DATA_DIR("datadir", "./db"),
-    DEFAULT_ENGINE("default-storage-engine", "InnoDB");
-
-
-    private final String key;
-
-    private final String value;
-
-    DefaultProperty(String key, String value) {
-        this.key = key;
-        this.value = value;
+    @Test
+    fun testGlobalContext() {
+        System.setProperty("default-file", "/test-mysql.properties")
+        val instance = GlobalContext.getInstance()
+        assertEquals(instance["test"], "ok")
+        assertNull(instance["a"])
+        instance.put("a", "b")
+        assertEquals("b", instance["a"])
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public String getValue() {
-        return value;
-    }
 }
