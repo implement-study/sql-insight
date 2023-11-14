@@ -14,31 +14,23 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.environment;
+package org.gongxuanzhang.sql.insight.core.result;
 
 /**
- * @author gongxuanzhang
- */
+ * @author gongxuanzhangmelt@gmail.com
+ **/
+public class MessageResult implements ResultInterface {
 
-public enum DefaultProperty {
-    DATA_DIR("datadir", "./db"),
-    DEFAULT_ENGINE("default-storage-engine", "InnoDB");
+    private final String message;
 
 
-    private final String key;
-
-    private final String value;
-
-    DefaultProperty(String key, String value) {
-        this.key = key;
-        this.value = value;
+    public MessageResult(String message) {
+        this.message = message;
     }
 
-    public String getKey() {
-        return key;
+    public String getMessage() {
+        return message;
     }
 
-    String getValue() {
-        return value;
-    }
+
 }

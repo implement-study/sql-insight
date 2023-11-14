@@ -80,7 +80,7 @@ public class Table implements FillDataVisitor, CommentContainer {
     }
 
 
-    public class NameVisitor implements SQLASTVisitor {
+    private class NameVisitor implements SQLASTVisitor {
 
         @Override
         public boolean visit(SQLPropertyExpr x) {

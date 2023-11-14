@@ -20,6 +20,7 @@ import com.alibaba.druid.sql.ast.statement.SQLCreateDatabaseStatement;
 import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement;
 import com.alibaba.druid.sql.ast.statement.SQLDropDatabaseStatement;
 import com.alibaba.druid.sql.ast.statement.SQLDropTableStatement;
+import com.alibaba.druid.sql.ast.statement.SQLInsertStatement;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 import org.gongxuanzhang.sql.insight.core.command.Command;
 import org.gongxuanzhang.sql.insight.core.command.CommandContainer;
@@ -27,6 +28,7 @@ import org.gongxuanzhang.sql.insight.core.command.ddl.CreateDatabase;
 import org.gongxuanzhang.sql.insight.core.command.ddl.CreateTable;
 import org.gongxuanzhang.sql.insight.core.command.ddl.DropDatabase;
 import org.gongxuanzhang.sql.insight.core.command.ddl.DropTable;
+import org.gongxuanzhang.sql.insight.core.command.dml.Insert;
 
 /**
  * druid visitor, created a command fill field.
@@ -73,6 +75,12 @@ public class DruidAnalyzerAdaptor implements SQLASTVisitor, CommandContainer {
         return true;
     }
 
+    @Override
+    public boolean visit(SQLInsertStatement x) {
+        this.command = new Insert(sql);
+        x.accept(this.command);
+        return true;
+    }
 
     @Override
     public Command getCommand() {

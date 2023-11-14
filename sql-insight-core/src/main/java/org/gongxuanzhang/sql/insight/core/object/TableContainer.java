@@ -14,31 +14,27 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.environment;
+package org.gongxuanzhang.sql.insight.core.object;
 
 /**
- * @author gongxuanzhang
- */
+ * table container
+ *
+ * @author gongxuanzhangmelt@gmail.com
+ **/
+public interface TableContainer {
 
-public enum DefaultProperty {
-    DATA_DIR("datadir", "./db"),
-    DEFAULT_ENGINE("default-storage-engine", "InnoDB");
 
+    /**
+     * get a table
+     *
+     * @return table
+     **/
+    Table getTable();
 
-    private final String key;
-
-    private final String value;
-
-    DefaultProperty(String key, String value) {
-        this.key = key;
-        this.value = value;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    String getValue() {
-        return value;
-    }
+    /**
+     * set a table
+     *
+     * @param table table
+     **/
+    void setTable(Table table);
 }

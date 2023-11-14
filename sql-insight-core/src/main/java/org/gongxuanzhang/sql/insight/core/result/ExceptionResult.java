@@ -14,31 +14,20 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.environment;
+package org.gongxuanzhang.sql.insight.core.result;
 
 /**
- * @author gongxuanzhang
- */
+ * @author gongxuanzhangmelt@gmail.com
+ **/
+public class ExceptionResult implements ResultInterface {
 
-public enum DefaultProperty {
-    DATA_DIR("datadir", "./db"),
-    DEFAULT_ENGINE("default-storage-engine", "InnoDB");
+    private final Exception error;
 
-
-    private final String key;
-
-    private final String value;
-
-    DefaultProperty(String key, String value) {
-        this.key = key;
-        this.value = value;
+    public ExceptionResult(Exception error) {
+        this.error = error;
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    String getValue() {
-        return value;
+    public Exception getError() {
+        return error;
     }
 }

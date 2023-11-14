@@ -36,6 +36,7 @@ public class SqlInsightContext {
 
     private GlobalContext globalContext;
 
+    private TableDefinitionManager tableDefinitionManager;
 
     private static final SqlInsightContext INSTANCE = createSqlInsightContext();
 
@@ -43,7 +44,9 @@ public class SqlInsightContext {
         SqlInsightContext context = new SqlInsightContext();
         context.engineManager = new SimpleStorageEngineManager();
         context.globalContext = GlobalContext.getInstance();
+        context.tableDefinitionManager = new TableDefinitionManager();
         EngineLoader.loadEngine().forEach(context.engineManager::registerEngine);
+        TableLoader.loadTable().forEach(context.tableDefinitionManager::reload);
         return context;
     }
 
@@ -62,5 +65,9 @@ public class SqlInsightContext {
 
     public StorageEngine selectEngine(String engineName) {
         return engineManager.selectEngine(engineName);
+    }
+
+    public TableDefinitionManager getTableDefinitionManager() {
+        return tableDefinitionManager;
     }
 }

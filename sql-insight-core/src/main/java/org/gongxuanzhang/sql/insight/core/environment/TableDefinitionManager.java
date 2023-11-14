@@ -16,29 +16,29 @@
 
 package org.gongxuanzhang.sql.insight.core.environment;
 
+import org.gongxuanzhang.sql.insight.core.object.Table;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * @author gongxuanzhang
- */
+ * @author gongxuanzhangmelt@gmail.com
+ **/
+public class TableDefinitionManager {
 
-public enum DefaultProperty {
-    DATA_DIR("datadir", "./db"),
-    DEFAULT_ENGINE("default-storage-engine", "InnoDB");
+    private final Map<String, Table> tableMap = new HashMap<>();
 
-
-    private final String key;
-
-    private final String value;
-
-    DefaultProperty(String key, String value) {
-        this.key = key;
-        this.value = value;
+    public void reload(Table table) {
+        tableMap.put(tableKey(table), table);
     }
 
-    public String getKey() {
-        return key;
+    public Table select(String database, String tableName) {
+        return tableMap.get(database + "." + tableName);
     }
 
-    String getValue() {
-        return value;
+
+    private String tableKey(Table table) {
+        return table.getDatabase().getName() + "." + table.getName();
     }
+
 }
