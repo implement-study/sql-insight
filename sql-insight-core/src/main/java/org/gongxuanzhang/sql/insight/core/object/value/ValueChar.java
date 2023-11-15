@@ -17,11 +17,14 @@
 package org.gongxuanzhang.sql.insight.core.object.value;
 
 
+import lombok.EqualsAndHashCode;
+
 import java.nio.ByteBuffer;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
+@EqualsAndHashCode
 public class ValueChar implements Value {
 
 

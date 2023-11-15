@@ -115,4 +115,14 @@ public final class Table implements FillDataVisitor, CommentContainer {
         this.comment = comment;
         return this;
     }
+
+    public Table setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public Table setDatabase(Database database) {
+        this.database = database;
+        return this;
+    }
 }

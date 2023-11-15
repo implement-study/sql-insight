@@ -16,29 +16,48 @@
 
 package org.gongxuanzhang.sql.insight.core.environment;
 
+import com.google.common.collect.HashBasedTable;
+import org.gongxuanzhang.sql.insight.core.object.Database;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
+ * delegate to guava {@link  com.google.common.collect.Table}
+ * row key is table database name
+ * col key is table name
+ * value is table info object
+ *
  * @author gongxuanzhangmelt@gmail.com
  **/
 public class TableDefinitionManager {
 
-    private final Map<String, Table> tableMap = new HashMap<>();
 
-    public void reload(Table table) {
-        tableMap.put(tableKey(table), table);
+    private final HashBasedTable<String, String, Table> tableInfoCache = HashBasedTable.create();
+
+
+
+
+
+    public void load(Table table) {
+        tableInfoCache.put(table.getDatabase().getName(), table.getName(), table);
+    }
+
+    public void unload(Table table) {
+        tableInfoCache.remove(table.getDatabase().getName(),table.getName());
+    }
+
+    public void unload(Database database) {
+        tableInfoCache.row(database.getName()).clear();
     }
 
     public Table select(String database, String tableName) {
-        return tableMap.get(database + "." + tableName);
+        return tableInfoCache.get(database,tableName);
     }
 
-
-    private String tableKey(Table table) {
-        return table.getDatabase().getName() + "." + table.getName();
+    public List<Table> select(String database){
+        return new ArrayList<>(tableInfoCache.row(database).values());
     }
 
 }

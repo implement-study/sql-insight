@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.environment;
 
+import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,8 +45,8 @@ public class ExecuteContext extends AbstractMapContext {
         return GlobalContext.getInstance();
     }
 
+    @Temporary(detail = "temp new session")
     public SessionContext getSessionContext() {
-        //   todo
         return new SessionContext();
     }
 

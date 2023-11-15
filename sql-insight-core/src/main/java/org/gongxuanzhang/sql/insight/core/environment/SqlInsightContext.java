@@ -46,7 +46,7 @@ public class SqlInsightContext {
         context.globalContext = GlobalContext.getInstance();
         context.tableDefinitionManager = new TableDefinitionManager();
         EngineLoader.loadEngine().forEach(context.engineManager::registerEngine);
-        TableLoader.loadTable().forEach(context.tableDefinitionManager::reload);
+        TableLoader.loadTable().forEach(context.tableDefinitionManager::load);
         return context;
     }
 

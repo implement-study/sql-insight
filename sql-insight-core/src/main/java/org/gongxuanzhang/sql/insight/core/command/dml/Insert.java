@@ -51,11 +51,11 @@ public class Insert implements Command, TableContainer {
 
     private final List<Column> insertColumns;
 
-    private final List<Row> insertRow;
+    private final List<Row> insertRows;
 
     public Insert(String sql) {
         this.sql = sql;
-        this.insertRow = new ArrayList<>();
+        this.insertRows = new ArrayList<>();
         this.insertColumns = new ArrayList<>();
     }
 
@@ -83,7 +83,7 @@ public class Insert implements Command, TableContainer {
                 throw new InsertException(rowIndex, "Column count doesn't match value count");
             }
             InsertRow row = new InsertRow(insertColumns, rowIndex++);
-            insertRow.add(row);
+            insertRows.add(row);
             x.accept(row);
         }
     }
@@ -126,8 +126,8 @@ public class Insert implements Command, TableContainer {
         this.table = table;
     }
 
-    public List<Row> getInsertRow() {
-        return insertRow;
+    public List<Row> getInsertRows() {
+        return insertRows;
     }
 
     public List<Column> getInsertColumns() {

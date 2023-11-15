@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight
+package org.gongxuanzhang.sql.insight.core.annotation;
 
-import org.junit.jupiter.api.Assertions
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 
 /**
- * @author gxz gongxuanzhangmelt@gmail.com
+ * temporary  solution, will be replaced in the future
+ *
+ * @author gongxuanzhangmelt@gmail.com
  **/
-fun assertFalse(condition: Boolean, message: String = "") {
-    Assertions.assertTrue(!condition, message)
-}
+@Retention(RetentionPolicy.SOURCE)
+@Target({ElementType.CONSTRUCTOR, ElementType.TYPE, ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD})
+public @interface Temporary {
 
+    String detail() default "";
+}

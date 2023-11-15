@@ -16,12 +16,14 @@
 
 package org.gongxuanzhang.sql.insight.core.exception;
 
+import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
+
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
 public class InsertException extends SqlInsightException {
 
-    //  todo
+    @Temporary(detail = "how to deal exception?")
     public InsertException(long rowId, String message) {
         super(message + " at row" + rowId);
     }

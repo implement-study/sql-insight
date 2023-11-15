@@ -18,6 +18,8 @@ package org.gongxuanzhang.sql.insight.core.engine.execute
 
 import org.gongxuanzhang.sql.insight.core.command.dml.Insert
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseExistsException
+import org.gongxuanzhang.sql.insight.core.`object`.value.ValueInt
+import org.gongxuanzhang.sql.insight.core.`object`.value.ValueVarchar
 import org.gongxuanzhang.sql.insight.databaseFile
 import org.gongxuanzhang.sql.insight.doSql
 import org.gongxuanzhang.sql.insight.toCommand
@@ -40,7 +42,10 @@ class InsertTest {
     fun testCommand() {
         val toCommand = "insert into aa.user (id,name) values(1,'a') ,(2,'b')".toCommand()
         val insert = toCommand as Insert
-        insert.insertRow
+        assert(insert.insertRows[0].values[0]== ValueInt(1))
+        assert(insert.insertRows[0].values[1]==ValueVarchar("a"))
+        assert(insert.insertRows[1].values[0]== ValueInt(2))
+        assert(insert.insertRows[1].values[1]==ValueVarchar("b"))
         assert(insert.insertColumns == listOf("id","name"))
 
     }

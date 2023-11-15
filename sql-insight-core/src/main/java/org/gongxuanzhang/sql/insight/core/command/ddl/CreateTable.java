@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.command.ddl;
 
 import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement;
 import com.alibaba.fastjson2.JSONObject;
+import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
 import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext;
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseNotExistsException;
@@ -64,8 +65,9 @@ public class CreateTable implements CreateCommand {
 
     }
 
+
+    @Temporary(detail = "use json temp")
     private byte[] tableFrmByteArray() {
-        //  todo
         return JSONObject.toJSONString(this.table).getBytes();
     }
 

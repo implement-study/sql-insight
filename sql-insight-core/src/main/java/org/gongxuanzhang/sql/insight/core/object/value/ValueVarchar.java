@@ -17,9 +17,12 @@
 package org.gongxuanzhang.sql.insight.core.object.value;
 
 
+import lombok.EqualsAndHashCode;
+
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
+@EqualsAndHashCode
 public class ValueVarchar extends DynamicValue {
 
     private final String value;

@@ -14,42 +14,16 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.object.value;
+package org.gongxuanzhang.sql.insight
 
+import org.junit.jupiter.api.Assertions
 
-import lombok.EqualsAndHashCode;
-import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
-
-import java.nio.ByteBuffer;
 
 /**
- * @author gongxuanzhangmelt@gmail.com
+ * @author gxz gongxuanzhangmelt@gmail.com
  **/
-@EqualsAndHashCode
-public class ValueInt implements Value {
-
-    private final int value;
-
-    public ValueInt(int value) {
-        this.value = value;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    @Override
-    public int getLength() {
-        return Integer.BYTES;
-    }
-
-
-    @Temporary
-    @Override
-    public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(4);
-        buffer.putInt(this.value);
-        return buffer.array();
-    }
-
+fun assertFalse(condition: Boolean, message: String? = null) {
+    Assertions.assertTrue(!condition, message)
 }
+
+

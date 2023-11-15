@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.environment;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
@@ -58,8 +59,8 @@ public class TableLoader {
     }
 
 
+    @Temporary(detail = "temp use json parse")
     private static Table load(File frmFile) {
-        //   todo
         try (FileInputStream fileInputStream = new FileInputStream(frmFile)) {
             JSONObject jsonObject = JSON.parseObject(fileInputStream);
             return jsonObject.toJavaObject(Table.class);

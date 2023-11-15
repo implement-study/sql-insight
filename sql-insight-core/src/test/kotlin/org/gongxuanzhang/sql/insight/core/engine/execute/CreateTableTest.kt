@@ -18,10 +18,12 @@ package org.gongxuanzhang.sql.insight.core.engine.execute
 
 import org.gongxuanzhang.sql.insight.*
 import org.gongxuanzhang.sql.insight.core.command.ddl.CreateTable
+import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseNotExistsException
 import org.gongxuanzhang.sql.insight.core.`object`.Column
 import org.gongxuanzhang.sql.insight.core.`object`.DataType
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.io.File
@@ -118,6 +120,7 @@ class CreateTableTest {
         createDatabase(databaseName)
         createTableSql(tableName, databaseName, true).doSql()
         assert(File(databaseFile(databaseName), "$tableName.frm").exists())
+        assertNotNull(SqlInsightContext.getInstance().tableDefinitionManager.select(databaseName,tableName))
         clearDatabase(databaseName)
 
     }
