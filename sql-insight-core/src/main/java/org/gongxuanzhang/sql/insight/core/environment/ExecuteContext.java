@@ -41,6 +41,14 @@ public class ExecuteContext extends AbstractMapContext {
         return null;
     }
 
+    public TableDefinitionManager getTableDefinitionManager() {
+        return getSqlInsightContext().getTableDefinitionManager();
+    }
+
+    public SqlInsightContext getSqlInsightContext() {
+        return SqlInsightContext.getInstance();
+    }
+
     public GlobalContext getGlobalContext() {
         return GlobalContext.getInstance();
     }

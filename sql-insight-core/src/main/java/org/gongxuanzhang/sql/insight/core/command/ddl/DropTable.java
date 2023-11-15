@@ -68,6 +68,7 @@ public class DropTable implements DropCommand {
             } catch (IOException e) {
                 throw new RuntimeIoException(e);
             }
+            insightContext.getTableDefinitionManager().unload(table);
             if (!this.ifExists) {
                 throw new TableNotExistsException(table);
             }

@@ -21,6 +21,7 @@ import org.gongxuanzhang.sql.insight.core.environment.DefaultProperty;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseNotExistsException;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
+import org.gongxuanzhang.sql.insight.core.object.Database;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -72,6 +73,7 @@ public class DropDatabase implements DropCommand {
         File dbFold = getDbFold(context);
         if (dbFold.exists()) {
             deleteAllFiles(dbFold.toPath());
+            context.getTableDefinitionManager().unload(new Database(this.dbName));
             return;
         }
         if (!ifIsExists) {
