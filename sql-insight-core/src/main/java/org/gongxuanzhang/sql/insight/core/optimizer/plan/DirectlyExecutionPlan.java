@@ -17,6 +17,7 @@
 package org.gongxuanzhang.sql.insight.core.optimizer.plan;
 
 import org.gongxuanzhang.sql.insight.core.command.Command;
+import org.gongxuanzhang.sql.insight.core.command.CommandContainer;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +31,7 @@ import java.util.NoSuchElementException;
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class DirectlyExecutionPlan implements ExecutionPlan {
+public class DirectlyExecutionPlan implements ExecutionPlan, CommandContainer {
 
     private final Command command;
 
@@ -54,6 +55,11 @@ public class DirectlyExecutionPlan implements ExecutionPlan {
     @Override
     public String getOrginalSql() {
         return this.command.getSql();
+    }
+
+    @Override
+    public Command getCommand() {
+        return this.command;
     }
 
 

@@ -35,7 +35,7 @@ public class DataType implements FillDataVisitor {
     @Override
     public void endVisit(SQLDataType x) {
         type = Type.valueOf(x.getName().toUpperCase());
-        this.length = type.length;
+        this.length = type.defaultLength;
     }
 
 
@@ -44,7 +44,7 @@ public class DataType implements FillDataVisitor {
         type = Type.valueOf(x.getName().toUpperCase());
         this.length = x.getLength();
         if (this.length < 0) {
-            this.length = type.length;
+            this.length = type.defaultLength;
         }
     }
 
@@ -53,10 +53,10 @@ public class DataType implements FillDataVisitor {
         INT(8), VARCHAR(255), CHAR(255), TIME(-1);
 
 
-        final int length;
+        final int defaultLength;
 
-        Type(int length) {
-            this.length = length;
+        Type(int defaultLength) {
+            this.defaultLength = defaultLength;
         }
     }
 

@@ -25,15 +25,18 @@ import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 import lombok.Getter;
 import org.gongxuanzhang.sql.insight.core.analysis.druid.CommentVisitor;
+import org.gongxuanzhang.sql.insight.core.exception.UnknownColumnException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
 @Getter
-public class Table implements FillDataVisitor, CommentContainer {
+public final class Table implements FillDataVisitor, CommentContainer {
 
     private Database database;
 
@@ -45,12 +48,23 @@ public class Table implements FillDataVisitor, CommentContainer {
 
     private String engine;
 
+    private final Map<String, Column> columnMap = new HashMap<>();
+
+
+    public Column getColumnByName(String name) {
+        Column column = columnMap.get(name);
+        if (column == null) {
+            throw new UnknownColumnException(name);
+        }
+        return column;
+    }
 
     @Override
     public void endVisit(SQLColumnDefinition x) {
         Column column = new Column();
         x.accept(column);
         this.columnList.add(column);
+        this.columnMap.put(column.getName(), column);
     }
 
 

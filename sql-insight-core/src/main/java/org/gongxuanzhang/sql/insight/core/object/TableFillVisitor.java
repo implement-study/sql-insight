@@ -23,6 +23,9 @@ import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext;
 
 /**
+ * visit a exprTableSource in order get target table info.
+ * can't use for create table
+ *
  * @author gongxuanzhangmelt@gmail.com
  **/
 public class TableFillVisitor implements FillDataVisitor {

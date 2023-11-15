@@ -38,5 +38,8 @@ fun createDatabase(databaseName: String) {
 
 fun createTable(databaseName: String, tableName: String) {
     createDatabase(databaseName)
-    "create table $databaseName.$tableName(id int primary key)".doSql()
+    """create table $databaseName.$tableName(
+        id int primary key,
+        name varchar not null
+            )""".trimMargin().doSql()
 }
