@@ -16,11 +16,13 @@
 
 package org.gongxuanzhang.sql.insight.core.object;
 
+import com.alibaba.druid.sql.ast.SQLObject;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext;
+import org.gongxuanzhang.sql.insight.core.exception.TableNotExistsException;
 
 /**
  * visit a exprTableSource in order get target table info.
@@ -49,19 +51,36 @@ public class TableFillVisitor implements FillDataVisitor {
 
         Table table;
 
+        String databaseName;
+
+        String tableName;
+
         @Override
         public boolean visit(SQLPropertyExpr x) {
-            String databaseName = x.getOwnerName();
-            String tableName = x.getName();
+            databaseName = x.getOwnerName();
+            tableName = x.getName();
             table = SqlInsightContext.getInstance().getTableDefinitionManager().select(databaseName, tableName);
             return false;
         }
 
         @Override
         public boolean visit(SQLIdentifierExpr x) {
-            String tableName = x.getName();
-            table = SqlInsightContext.getInstance().getTableDefinitionManager().select(null, tableName);
+            tableName = x.getName();
+            table = SqlInsightContext.getInstance().getTableDefinitionManager().select(databaseName, tableName);
             return false;
+        }
+
+        @Override
+        public void postVisit(SQLObject x) {
+            if (this.table != null) {
+                return;
+            }
+            Table tempTable = new Table();
+            tempTable.setName(tableName);
+            if (databaseName != null) {
+                tempTable.setDatabase(new Database(databaseName));
+            }
+            throw new TableNotExistsException(tempTable);
         }
     }
 

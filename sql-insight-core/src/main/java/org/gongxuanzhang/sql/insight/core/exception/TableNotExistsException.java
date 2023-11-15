@@ -25,7 +25,8 @@ public class TableNotExistsException extends SqlInsightException {
 
 
     public TableNotExistsException(Table table) {
-        super("databaseName " + table.getDatabase().getName() + " table " + table.getName() + " not exists");
+        super(table.getDatabase() == null ? "" : table.getDatabase() + " table " + table.getName() + " not exists");
     }
+
 
 }

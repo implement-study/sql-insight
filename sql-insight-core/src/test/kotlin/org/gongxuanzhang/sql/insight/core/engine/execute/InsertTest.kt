@@ -16,13 +16,13 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.execute
 
+import org.gongxuanzhang.sql.insight.*
 import org.gongxuanzhang.sql.insight.core.command.dml.Insert
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseExistsException
+import org.gongxuanzhang.sql.insight.core.exception.TableNotExistsException
 import org.gongxuanzhang.sql.insight.core.`object`.value.ValueInt
 import org.gongxuanzhang.sql.insight.core.`object`.value.ValueVarchar
-import org.gongxuanzhang.sql.insight.databaseFile
-import org.gongxuanzhang.sql.insight.doSql
-import org.gongxuanzhang.sql.insight.toCommand
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -40,14 +40,20 @@ class InsertTest {
 
     @Test
     fun testCommand() {
+        createTable("aa", "user")
         val toCommand = "insert into aa.user (id,name) values(1,'a') ,(2,'b')".toCommand()
         val insert = toCommand as Insert
-        assert(insert.insertRows[0].values[0]== ValueInt(1))
-        assert(insert.insertRows[0].values[1]==ValueVarchar("a"))
-        assert(insert.insertRows[1].values[0]== ValueInt(2))
-        assert(insert.insertRows[1].values[1]==ValueVarchar("b"))
-        assert(insert.insertColumns == listOf("id","name"))
+        assertEquals(insert.insertRows[0].values[0], ValueInt(1))
+        assertEquals(insert.insertRows[0].values[1], ValueVarchar("a"))
+        assertEquals(insert.insertRows[1].values[0], ValueInt(2))
+        assertEquals(insert.insertRows[1].values[1], ValueVarchar("b"))
+        assertEquals(insert.insertColumns.map { it.name }, listOf("id", "name"))
+        clearDatabase("aa")
+    }
 
+    @Test
+    fun testNotFound() {
+        assertThrows<TableNotExistsException> { "insert into aa.user (id,name) values(1,'a') ,(2,'b')".toCommand() }
     }
 
     @Test

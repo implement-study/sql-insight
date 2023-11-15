@@ -43,4 +43,8 @@ public class Database {
         return new File(context.get(DefaultProperty.DATA_DIR.getKey()), this.name);
     }
 
+    @Override
+    public String toString() {
+        return "Database[" + name + "]";
+    }
 }

@@ -57,6 +57,7 @@ public class CreateTable implements CreateCommand {
         if (frmFile.createNewFile()) {
             Files.write(frmFile.toPath(), tableFrmByteArray());
             sqlInsightContext.selectEngine(table.getEngine()).createTable(table);
+            sqlInsightContext.getTableDefinitionManager().load(table);
             return;
         }
         if (!this.ifNotExists) {
