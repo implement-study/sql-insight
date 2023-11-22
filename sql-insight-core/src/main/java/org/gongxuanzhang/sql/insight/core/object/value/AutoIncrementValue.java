@@ -14,31 +14,37 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.event;
+package org.gongxuanzhang.sql.insight.core.object.value;
 
-import java.util.List;
+import org.gongxuanzhang.easybyte.core.tool.ByteArrays;
 
 /**
- * listen multiple event listener
- * if a listener implementation both {@link  MultipleEventListener} and {@link EventListener}
- * only {@link  MultipleEventListener} can take effect
- *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface MultipleEventListener {
+public class AutoIncrementValue implements Value {
 
+    private Integer value;
 
-    /**
-     * call back method for event
-     *
-     * @param event {@link this#listenEvent()} class event
-     **/
-    void onEvent(InsightEvent event);
+    public AutoIncrementValue(Integer value) {
+        this.value = value;
+    }
 
+    public AutoIncrementValue setValue(Integer value) {
+        this.value = value;
+        return this;
+    }
 
-    /**
-     * @return not null
-     **/
-    List<Class<? extends InsightEvent>> listenEvent();
+    public Integer getValue() {
+        return value;
+    }
 
+    @Override
+    public int getLength() {
+        return Integer.BYTES;
+    }
+
+    @Override
+    public byte[] toBytes() {
+       return ByteArrays.fromInt(this.value);
+    }
 }

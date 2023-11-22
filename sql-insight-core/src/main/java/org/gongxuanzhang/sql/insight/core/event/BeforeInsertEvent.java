@@ -28,4 +28,18 @@ public class BeforeInsertEvent extends InsightEvent {
         super(row);
     }
 
+
+    public InsertRow getRow() {
+        return (InsertRow) getSource();
+    }
+
+    public String databaseName() {
+        return getRow().getTable().getDatabase().getName();
+    }
+
+    public String tableName() {
+        return getRow().getTable().getName();
+    }
+
+
 }

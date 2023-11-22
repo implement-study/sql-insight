@@ -30,7 +30,9 @@ import java.util.List;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class InsertRow implements Row, FillDataVisitor {
+public class InsertRow implements Row, FillDataVisitor, TableContainer {
+
+    private Table table;
 
     private final List<Column> insertColumns;
 
@@ -109,4 +111,13 @@ public class InsertRow implements Row, FillDataVisitor {
     }
 
 
+    @Override
+    public Table getTable() {
+        return this.table;
+    }
+
+    @Override
+    public void setTable(Table table) {
+        this.table = table;
+    }
 }

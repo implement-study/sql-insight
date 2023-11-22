@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.engine.json;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+import org.gongxuanzhang.sql.insight.core.environment.AutoIncrementKeyCounter;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.result.ExceptionResult;
@@ -34,6 +35,8 @@ import java.util.List;
  **/
 @Slf4j
 public class JsonEngine implements StorageEngine {
+
+    private final AutoIncrementKeyCounter counter = new AutoIncrementKeyCounter();
 
     @Override
     public String getName() {
@@ -66,6 +69,8 @@ public class JsonEngine implements StorageEngine {
 
     @Override
     public ResultInterface insert(InsertRow row) {
+        //   todo lock
+        counter.dealAutoIncrement(row);
         return null;
     }
 

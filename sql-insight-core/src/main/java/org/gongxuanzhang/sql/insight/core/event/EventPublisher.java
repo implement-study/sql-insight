@@ -17,6 +17,8 @@
 package org.gongxuanzhang.sql.insight.core.event;
 
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ import java.util.Map;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
+@Slf4j
 public class EventPublisher {
 
     private EventPublisher() {
@@ -78,6 +81,7 @@ public class EventPublisher {
     }
 
     private void registerListener(Class<? extends InsightEvent> type, EventListener<InsightEvent> listener) {
+        log.info("register listener {} listen {}", listener.getClass().getName(), type.getName());
         this.listenerMap.computeIfAbsent(type, (k) -> new ArrayList<>()).add(listener);
     }
 

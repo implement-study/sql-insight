@@ -19,6 +19,9 @@ package org.gongxuanzhang.sql.insight.core.engine.storage;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.StorageEngineManager;
 import org.gongxuanzhang.sql.insight.core.environment.GlobalContext;
+import org.gongxuanzhang.sql.insight.core.event.EventListener;
+import org.gongxuanzhang.sql.insight.core.event.EventPublisher;
+import org.gongxuanzhang.sql.insight.core.event.MultipleEventListener;
 import org.gongxuanzhang.sql.insight.core.exception.DuplicationEngineNameException;
 import org.gongxuanzhang.sql.insight.core.exception.EngineNotFoundException;
 
@@ -47,6 +50,12 @@ public class SimpleStorageEngineManager implements StorageEngineManager {
         log.info("register engine [{}], class {}", engine.getName(), engine.getClass().getName());
         if (storageEngineMap.putIfAbsent(engine.getName().toUpperCase(), engine) != null) {
             throw new DuplicationEngineNameException("engine " + engine.getName() + "already register ");
+        }
+        EventPublisher publisher = EventPublisher.getInstance();
+        if (engine instanceof MultipleEventListener) {
+            publisher.registerListener((MultipleEventListener) engine);
+        } else if (engine instanceof EventListener) {
+            publisher.registerListener((EventListener<?>) engine);
         }
     }
 

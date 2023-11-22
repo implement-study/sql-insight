@@ -50,6 +50,8 @@ public final class Table implements FillDataVisitor, CommentContainer {
 
     private final Map<String, Column> columnMap = new HashMap<>();
 
+    private int autoColIndex = -1;
+
 
     public Column getColumnByName(String name) {
         Column column = columnMap.get(name);
@@ -64,6 +66,12 @@ public final class Table implements FillDataVisitor, CommentContainer {
         Column column = new Column();
         x.accept(column);
         this.columnList.add(column);
+        if (column.isAutoIncrement()) {
+            if (this.autoColIndex != -1) {
+                throw new UnsupportedOperationException("only support single column autoincrement");
+            }
+            this.autoColIndex = columnList.size() - 1;
+        }
         this.columnMap.put(column.getName(), column);
     }
 

@@ -89,6 +89,7 @@ public class Insert implements DmlCommand, TableContainer {
                 throw new InsertException(rowIndex, "Column count doesn't match value count");
             }
             InsertRow row = new InsertRow(insertColumns, rowIndex++);
+            row.setTable(table);
             insertRows.add(row);
             x.accept(row);
         }

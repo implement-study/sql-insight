@@ -8,6 +8,7 @@ Table相关语句根据 link:https://www.mysqlzh.com/doc/126.html[MySQL中文文
 image:../image/semi.svg[width=16] 部分完成
 
 - [ ] 仅支持单列主键
+- [ ] 仅支持主键自增
 - [ ] 暂不支持约束条件
 - [ ] 仅支持部分数据类型
 

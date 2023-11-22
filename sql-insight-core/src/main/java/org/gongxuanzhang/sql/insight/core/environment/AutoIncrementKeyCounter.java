@@ -19,43 +19,59 @@ package org.gongxuanzhang.sql.insight.core.environment;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
-import org.gongxuanzhang.sql.insight.core.event.BeforeInsertEvent;
-import org.gongxuanzhang.sql.insight.core.event.DropDatabaseEvent;
-import org.gongxuanzhang.sql.insight.core.event.DropTableEvent;
-import org.gongxuanzhang.sql.insight.core.event.InsightEvent;
-import org.gongxuanzhang.sql.insight.core.event.MultipleEventListener;
+import lombok.extern.slf4j.Slf4j;
+import org.gongxuanzhang.sql.insight.core.object.InsertRow;
+import org.gongxuanzhang.sql.insight.core.object.value.AutoIncrementValue;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class AutoIncrementKeyCounter implements MultipleEventListener {
+@Slf4j
+public class AutoIncrementKeyCounter {
 
 
     private final Table<String, String, AtomicLong> keyTable = Tables.synchronizedTable(HashBasedTable.create());
 
-
-    @Override
-    public void onEvent(InsightEvent event) {
-        if (event instanceof DropDatabaseEvent) {
-            keyTable.row(((DropDatabaseEvent) event).getDatabase().getName()).clear();
+    /**
+     * if auto increment column have value,fresh cache value.
+     * else set a value to row
+     *
+     * @param row insert row
+     **/
+    public void dealAutoIncrement(InsertRow row) {
+        int autoColIndex = row.getTable().getAutoColIndex();
+        if (autoColIndex < 0) {
             return;
         }
-        if (event instanceof DropTableEvent) {
-            DropTableEvent dropTableEvent = (DropTableEvent) event;
-            keyTable.row(dropTableEvent.getDatabaseName()).remove(dropTableEvent.getTableName());
+        String databaseName = row.getTable().getDatabase().getName();
+        AtomicLong atomicLong = loadMaxAutoIncrementKey(databaseName, row.getTable().getName());
+
+        AutoIncrementValue autoCol = (AutoIncrementValue) row.getValues().get(autoColIndex);
+        if (autoCol.getValue() == null) {
+            autoCol.setValue((int) atomicLong.incrementAndGet());
+            return;
         }
-        if(event instanceof BeforeInsertEvent){
-            //  todo  count update
+        if (autoCol.getValue() > atomicLong.get()) {
+            log.info("database[{}],table[{}],auto increment col value set {}",databaseName,row.getTable().getName(),autoCol.getValue());
+            atomicLong.set(autoCol.getValue());
         }
     }
 
-    @Override
-    public List<Class<? extends InsightEvent>> listenEvent() {
-        return Arrays.asList(DropDatabaseEvent.class, DropTableEvent.class, BeforeInsertEvent.class);
+
+    private AtomicLong loadMaxAutoIncrementKey(String database, String tableName) {
+        //  todo load from disk
+        AtomicLong atomicLong = keyTable.get(database, tableName);
+        if (atomicLong == null) {
+            synchronized (keyTable) {
+                if (keyTable.get(database, tableName) == null) {
+                    atomicLong = new AtomicLong();
+                    return keyTable.put(database, tableName, atomicLong);
+                }
+            }
+        }
+        return atomicLong;
     }
 
 
