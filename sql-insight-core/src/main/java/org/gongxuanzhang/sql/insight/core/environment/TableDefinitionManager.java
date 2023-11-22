@@ -67,11 +67,13 @@ public class TableDefinitionManager implements MultipleEventListener {
     public void onEvent(InsightEvent event) {
         if (event instanceof DropDatabaseEvent) {
             this.unload(((DropDatabaseEvent) event).getDatabase());
-
-        } else if (event instanceof CreateTableEvent) {
+            return;
+        }
+        if (event instanceof CreateTableEvent) {
             this.load(((CreateTableEvent) event).getTable());
-
-        } else if (event instanceof DropTableEvent) {
+            return;
+        }
+        if (event instanceof DropTableEvent) {
             this.unload(((DropTableEvent) event).getTable());
         }
     }

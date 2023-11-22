@@ -23,7 +23,6 @@ import org.gongxuanzhang.sql.insight.core.analysis.SqlType;
 import org.gongxuanzhang.sql.insight.core.exception.InsertException;
 import org.gongxuanzhang.sql.insight.core.object.Column;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
-import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.TableContainer;
 import org.gongxuanzhang.sql.insight.core.object.TableFillVisitor;
@@ -51,7 +50,7 @@ public class Insert implements DmlCommand, TableContainer {
 
     private final List<Column> insertColumns;
 
-    private final List<Row> insertRows;
+    private final List<InsertRow> insertRows;
 
     public Insert(String sql) {
         this.sql = sql;
@@ -133,7 +132,7 @@ public class Insert implements DmlCommand, TableContainer {
         this.table = table;
     }
 
-    public List<Row> getInsertRows() {
+    public List<InsertRow> getInsertRows() {
         return insertRows;
     }
 

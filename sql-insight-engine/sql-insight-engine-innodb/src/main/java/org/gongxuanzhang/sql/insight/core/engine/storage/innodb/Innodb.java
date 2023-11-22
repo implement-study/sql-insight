@@ -17,6 +17,7 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb;
 
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 
@@ -49,7 +50,7 @@ public class Innodb implements StorageEngine {
     }
 
     @Override
-    public ResultInterface insert() {
+    public ResultInterface insert(InsertRow row) {
         return null;
     }
 

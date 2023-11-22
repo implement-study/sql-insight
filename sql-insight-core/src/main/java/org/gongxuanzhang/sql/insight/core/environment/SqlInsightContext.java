@@ -39,6 +39,8 @@ public class SqlInsightContext {
 
     private TableDefinitionManager tableDefinitionManager;
 
+    private AutoIncrementKeyCounter autoIncrementKeycounter;
+
     private static final SqlInsightContext INSTANCE = createSqlInsightContext();
 
     private static SqlInsightContext createSqlInsightContext() {
@@ -71,5 +73,9 @@ public class SqlInsightContext {
 
     public TableDefinitionManager getTableDefinitionManager() {
         return tableDefinitionManager;
+    }
+
+    public AutoIncrementKeyCounter getAutoIncrementKeyCounter(){
+        return autoIncrementKeycounter;
     }
 }

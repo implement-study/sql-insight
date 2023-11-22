@@ -33,4 +33,12 @@ public class DropTableEvent extends InsightEvent {
     public Table getTable() {
         return (Table) this.source;
     }
+
+    public String getDatabaseName() {
+        return getTable().getDatabase().getName();
+    }
+
+    public String getTableName() {
+        return getTable().getName();
+    }
 }

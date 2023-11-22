@@ -65,11 +65,6 @@ public class DirectlyExecutionPlan implements ExecutionPlan, CommandContainer {
 
     private class SinglePlanChain implements PlanChain {
 
-        @Override
-        public void addNode(PlanNode node) {
-            throw new UnsupportedOperationException();
-        }
-
         @NotNull
         @Override
         public Iterator<PlanNode> iterator() {

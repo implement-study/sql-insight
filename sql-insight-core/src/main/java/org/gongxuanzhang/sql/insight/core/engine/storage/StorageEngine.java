@@ -17,6 +17,7 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage;
 
 
+import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 
@@ -59,7 +60,7 @@ public interface StorageEngine {
     /**
      * insert data
      **/
-    ResultInterface insert();
+    ResultInterface insert(InsertRow row);
 
     /**
      * update

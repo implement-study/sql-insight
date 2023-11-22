@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.optimizer.plan;
+package org.gongxuanzhang.sql.insight.core.event;
+
+
+import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface PlanChain extends Iterable<PlanNode> {
-}
+public class BeforeInsertEvent extends InsightEvent {
 
+    public BeforeInsertEvent(InsertRow row) {
+        super(row);
+    }
+
+}

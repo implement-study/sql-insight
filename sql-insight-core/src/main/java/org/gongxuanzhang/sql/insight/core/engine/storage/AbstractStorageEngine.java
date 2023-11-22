@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage;
 
+import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 
@@ -47,7 +48,7 @@ public abstract class AbstractStorageEngine implements StorageEngine {
     }
 
     @Override
-    public ResultInterface insert() {
+    public ResultInterface insert(InsertRow row) {
         throw new UnsupportedOperationException();
     }
 

@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.engine.json;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.result.ExceptionResult;
 import org.gongxuanzhang.sql.insight.core.result.MessageResult;
@@ -64,7 +65,7 @@ public class JsonEngine implements StorageEngine {
     }
 
     @Override
-    public ResultInterface insert() {
+    public ResultInterface insert(InsertRow row) {
         return null;
     }
 

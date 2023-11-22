@@ -16,9 +16,31 @@
 
 package org.gongxuanzhang.sql.insight.core.optimizer.plan;
 
+import org.gongxuanzhang.sql.insight.core.command.dml.Insert;
+
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface PlanChain extends Iterable<PlanNode> {
-}
+public class InsertExecutionPlan implements ExecutionPlan {
 
+    private final Insert insert;
+
+    public InsertExecutionPlan(Insert insert) {
+        this.insert = insert;
+    }
+
+    @Override
+    public String showExplain() {
+        return "insert ";
+    }
+
+    @Override
+    public PlanChain getPlanChain() {
+        return new InsertPlanChain(insert);
+    }
+
+    @Override
+    public String getOrginalSql() {
+        return insert.getSql();
+    }
+}
