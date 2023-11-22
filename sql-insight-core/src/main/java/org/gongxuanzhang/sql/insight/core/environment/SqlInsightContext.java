@@ -20,6 +20,7 @@ package org.gongxuanzhang.sql.insight.core.environment;
 import org.gongxuanzhang.sql.insight.core.engine.StorageEngineManager;
 import org.gongxuanzhang.sql.insight.core.engine.storage.SimpleStorageEngineManager;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+import org.gongxuanzhang.sql.insight.core.event.EventPublisher;
 
 /**
  * a static context,contains all of necessary component
@@ -47,6 +48,7 @@ public class SqlInsightContext {
         context.tableDefinitionManager = new TableDefinitionManager();
         EngineLoader.loadEngine().forEach(context.engineManager::registerEngine);
         TableLoader.loadTable().forEach(context.tableDefinitionManager::load);
+        EventPublisher.getInstance().registerListener(context.tableDefinitionManager);
         return context;
     }
 

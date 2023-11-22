@@ -33,7 +33,8 @@ import org.junit.jupiter.api.assertThrows
 class InsertTest {
 
     @Test
-    fun testCreateDatabase() {
+    fun testInsert() {
+        createTable("aa","user")
         "insert into aa.user (id,name) values(1,'a') ,(2,'b')".doSql()
     }
 

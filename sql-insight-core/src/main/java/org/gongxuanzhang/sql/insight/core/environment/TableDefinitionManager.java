@@ -17,10 +17,16 @@
 package org.gongxuanzhang.sql.insight.core.environment;
 
 import com.google.common.collect.HashBasedTable;
+import org.gongxuanzhang.sql.insight.core.event.CreateTableEvent;
+import org.gongxuanzhang.sql.insight.core.event.DropDatabaseEvent;
+import org.gongxuanzhang.sql.insight.core.event.DropTableEvent;
+import org.gongxuanzhang.sql.insight.core.event.InsightEvent;
+import org.gongxuanzhang.sql.insight.core.event.MultipleEventListener;
 import org.gongxuanzhang.sql.insight.core.object.Database;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,13 +37,10 @@ import java.util.List;
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class TableDefinitionManager {
+public class TableDefinitionManager implements MultipleEventListener {
 
 
     private final HashBasedTable<String, String, Table> tableInfoCache = HashBasedTable.create();
-
-
-
 
 
     public void load(Table table) {
@@ -45,7 +48,7 @@ public class TableDefinitionManager {
     }
 
     public void unload(Table table) {
-        tableInfoCache.remove(table.getDatabase().getName(),table.getName());
+        tableInfoCache.remove(table.getDatabase().getName(), table.getName());
     }
 
     public void unload(Database database) {
@@ -53,11 +56,29 @@ public class TableDefinitionManager {
     }
 
     public Table select(String database, String tableName) {
-        return tableInfoCache.get(database,tableName);
+        return tableInfoCache.get(database, tableName);
     }
 
-    public List<Table> select(String database){
+    public List<Table> select(String database) {
         return new ArrayList<>(tableInfoCache.row(database).values());
     }
 
+    @Override
+    public void onEvent(InsightEvent event) {
+        if (event instanceof DropDatabaseEvent) {
+            this.unload(((DropDatabaseEvent) event).getDatabase());
+
+        } else if (event instanceof CreateTableEvent) {
+            this.load(((CreateTableEvent) event).getTable());
+
+        } else if (event instanceof DropTableEvent) {
+            this.unload(((DropTableEvent) event).getTable());
+        }
+    }
+
+
+    @Override
+    public List<Class<? extends InsightEvent>> listenEvent() {
+        return Arrays.asList(DropDatabaseEvent.class, CreateTableEvent.class, DropTableEvent.class);
+    }
 }

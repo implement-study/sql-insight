@@ -14,19 +14,31 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.exception;
+package org.gongxuanzhang.sql.insight.core.command.dml;
 
-import org.gongxuanzhang.sql.insight.core.object.Table;
+import org.gongxuanzhang.sql.insight.core.command.Command;
+import org.gongxuanzhang.sql.insight.core.optimizer.plan.ExecutionPlan;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class TableNotExistsException extends SqlInsightException {
+public interface DmlCommand extends Command {
 
 
-    public TableNotExistsException(Table table) {
-        super(table.getDatabase() == null ? "" : table.getDatabase() + " table[" + table.getName() + "] not exists");
+    /**
+     * DML commands depend on storage engine
+     *
+     * @return always false
+     **/
+    @Override
+    default boolean directly() {
+        return false;
     }
 
+    /**
+     * package to execution plan
+     * @return 返回个啥
+     **/
+    ExecutionPlan plan();
 
 }

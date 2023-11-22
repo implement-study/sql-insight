@@ -18,7 +18,10 @@ package org.gongxuanzhang.sql.insight.core.command.ddl;
 
 import org.gongxuanzhang.sql.insight.core.environment.DefaultProperty;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
+import org.gongxuanzhang.sql.insight.core.event.CreateDatabaseEvent;
+import org.gongxuanzhang.sql.insight.core.event.EventPublisher;
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseExistsException;
+import org.gongxuanzhang.sql.insight.core.object.Database;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -58,12 +61,15 @@ public class CreateDatabase implements CreateCommand {
 
 
     @Override
-    public void run(ExecuteContext context) throws Exception{
+    public void run(ExecuteContext context) throws Exception {
         File dbFold = getDbFold(context);
         if (dbFold.exists() && !ifNotExists) {
             throw new DatabaseExistsException(this.dbName);
         }
-        dbFold.mkdirs();
+        if (dbFold.mkdirs()) {
+            EventPublisher.getInstance().publishEvent(new CreateDatabaseEvent(new Database(this.dbName)));
+        }
+
     }
 
     private File getDbFold(ExecuteContext context) {

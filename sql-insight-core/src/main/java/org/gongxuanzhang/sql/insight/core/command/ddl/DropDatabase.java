@@ -19,6 +19,8 @@ package org.gongxuanzhang.sql.insight.core.command.ddl;
 import com.alibaba.druid.sql.ast.statement.SQLDropDatabaseStatement;
 import org.gongxuanzhang.sql.insight.core.environment.DefaultProperty;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
+import org.gongxuanzhang.sql.insight.core.event.DropDatabaseEvent;
+import org.gongxuanzhang.sql.insight.core.event.EventPublisher;
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseNotExistsException;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.object.Database;
@@ -73,7 +75,7 @@ public class DropDatabase implements DropCommand {
         File dbFold = getDbFold(context);
         if (dbFold.exists()) {
             deleteAllFiles(dbFold.toPath());
-            context.getTableDefinitionManager().unload(new Database(this.dbName));
+            EventPublisher.getInstance().publishEvent(new DropDatabaseEvent(new Database(this.dbName)));
             return;
         }
         if (!ifIsExists) {

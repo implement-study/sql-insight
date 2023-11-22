@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.exception;
+package org.gongxuanzhang.sql.insight.core.event;
 
-import org.gongxuanzhang.sql.insight.core.object.Table;
+import org.gongxuanzhang.sql.insight.core.object.Database;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class TableNotExistsException extends SqlInsightException {
+public class CreateDatabaseEvent extends InsightEvent {
 
-
-    public TableNotExistsException(Table table) {
-        super(table.getDatabase() == null ? "" : table.getDatabase() + " table[" + table.getName() + "] not exists");
+    /**
+     * @param database the new database
+     **/
+    public CreateDatabaseEvent(Database database) {
+        super(database);
     }
 
-
+    public Database getDatabase() {
+        return (Database) this.source;
+    }
 }

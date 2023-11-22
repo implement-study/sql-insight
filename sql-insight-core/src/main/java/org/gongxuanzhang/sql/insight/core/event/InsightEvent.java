@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.exception;
+package org.gongxuanzhang.sql.insight.core.event;
 
-import org.gongxuanzhang.sql.insight.core.object.Table;
+import java.util.EventObject;
 
 /**
+ * sql-insight event super class
+ *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class TableNotExistsException extends SqlInsightException {
+public abstract class InsightEvent extends EventObject {
 
-
-    public TableNotExistsException(Table table) {
-        super(table.getDatabase() == null ? "" : table.getDatabase() + " table[" + table.getName() + "] not exists");
+    /**
+     * Constructs a prototypical Event.
+     *
+     * @param source The object on which the Event initially occurred.
+     * @throws IllegalArgumentException if source is null.
+     */
+    protected InsightEvent(Object source) {
+        super(source);
     }
-
-
 }

@@ -20,7 +20,6 @@ import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.statement.SQLInsertStatement;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 import org.gongxuanzhang.sql.insight.core.analysis.SqlType;
-import org.gongxuanzhang.sql.insight.core.command.Command;
 import org.gongxuanzhang.sql.insight.core.exception.InsertException;
 import org.gongxuanzhang.sql.insight.core.object.Column;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
@@ -28,6 +27,7 @@ import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.TableContainer;
 import org.gongxuanzhang.sql.insight.core.object.TableFillVisitor;
+import org.gongxuanzhang.sql.insight.core.optimizer.plan.ExecutionPlan;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ import java.util.Set;
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class Insert implements Command, TableContainer {
+public class Insert implements DmlCommand, TableContainer {
 
 
     private final String sql;
@@ -61,6 +61,12 @@ public class Insert implements Command, TableContainer {
 
 
     @Override
+    public ExecutionPlan plan() {
+
+        return null;
+    }
+
+    @Override
     public boolean visit(SQLInsertStatement x) {
         x.getTableSource().accept(new TableFillVisitor(this));
         ColumnVisitor columnVisitor = new ColumnVisitor();
@@ -69,6 +75,7 @@ public class Insert implements Command, TableContainer {
         x.getValuesList().forEach(vc -> vc.accept(valueVisitor));
         return true;
     }
+
 
     /**
      * visit values clause must after visit table because insert row should have complete table info before visit

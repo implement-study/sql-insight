@@ -21,6 +21,8 @@ import com.alibaba.fastjson2.JSONObject;
 import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
 import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext;
+import org.gongxuanzhang.sql.insight.core.event.CreateTableEvent;
+import org.gongxuanzhang.sql.insight.core.event.EventPublisher;
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseNotExistsException;
 import org.gongxuanzhang.sql.insight.core.exception.TableExistsException;
 import org.gongxuanzhang.sql.insight.core.object.Table;
@@ -57,7 +59,7 @@ public class CreateTable implements CreateCommand {
         if (frmFile.createNewFile()) {
             Files.write(frmFile.toPath(), tableFrmByteArray());
             sqlInsightContext.selectEngine(table.getEngine()).createTable(table);
-            sqlInsightContext.getTableDefinitionManager().load(table);
+            EventPublisher.getInstance().publishEvent(new CreateTableEvent(table));
             return;
         }
         if (!this.ifNotExists) {

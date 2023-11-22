@@ -21,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
 import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext;
+import org.gongxuanzhang.sql.insight.core.event.DropTableEvent;
+import org.gongxuanzhang.sql.insight.core.event.EventPublisher;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.exception.TableNotExistsException;
 import org.gongxuanzhang.sql.insight.core.object.Table;
@@ -63,12 +65,12 @@ public class DropTable implements DropCommand {
                     for (String ext : engine.tableExtensions()) {
                         Files.deleteIfExists(new File(dbFolder, table.getName() + "." + ext).toPath());
                     }
+                    EventPublisher.getInstance().publishEvent(new DropTableEvent(table));
                     return;
                 }
             } catch (IOException e) {
                 throw new RuntimeIoException(e);
             }
-            insightContext.getTableDefinitionManager().unload(table);
             if (!this.ifExists) {
                 throw new TableNotExistsException(table);
             }

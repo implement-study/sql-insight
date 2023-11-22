@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.optimizer;
 
 import org.gongxuanzhang.sql.insight.core.analysis.Analyzer;
 import org.gongxuanzhang.sql.insight.core.command.Command;
+import org.gongxuanzhang.sql.insight.core.command.dml.DmlCommand;
 import org.gongxuanzhang.sql.insight.core.exception.SqlAnalysisException;
 import org.gongxuanzhang.sql.insight.core.optimizer.plan.DirectlyExecutionPlan;
 import org.gongxuanzhang.sql.insight.core.optimizer.plan.ExecutionPlan;
@@ -39,7 +40,10 @@ public class OptimizerImpl implements Optimizer {
         if (command.directly()) {
             return new DirectlyExecutionPlan(command);
         }
-        //  todo indirectly
+        if (command instanceof DmlCommand) {
+            return ((DmlCommand) command).plan();
+        }
+        //  todo dcl
         return null;
     }
 

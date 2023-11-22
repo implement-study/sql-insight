@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.exception;
-
-import org.gongxuanzhang.sql.insight.core.object.Table;
+package org.gongxuanzhang.sql.insight.core.event;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class TableNotExistsException extends SqlInsightException {
+@FunctionalInterface
+public interface EventListener<E extends InsightEvent> {
 
 
-    public TableNotExistsException(Table table) {
-        super(table.getDatabase() == null ? "" : table.getDatabase() + " table[" + table.getName() + "] not exists");
-    }
-
+    /**
+     * call back method for event
+     *
+     * @param event listening event
+     **/
+    void onEvent(E event);
 
 }

@@ -44,7 +44,7 @@ class CreateTableTest {
                 name varchar not null,
                 gender varchar(20) default '男' not null comment '性别',
                 id_card char UNIQUE
-                ) comment = '用户表', engine = 'innodb'
+                ) comment = '用户表', engine = 'json'
             """.trimIndent()
     }
 
@@ -120,7 +120,8 @@ class CreateTableTest {
         createDatabase(databaseName)
         createTableSql(tableName, databaseName, true).doSql()
         assert(File(databaseFile(databaseName), "$tableName.frm").exists())
-        assertNotNull(SqlInsightContext.getInstance().tableDefinitionManager.select(databaseName,tableName))
+        val table = SqlInsightContext.getInstance().tableDefinitionManager.select(databaseName, tableName)
+        assertNotNull(table)
         clearDatabase(databaseName)
 
     }
