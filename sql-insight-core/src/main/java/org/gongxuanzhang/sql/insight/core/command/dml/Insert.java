@@ -27,6 +27,7 @@ import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.TableContainer;
 import org.gongxuanzhang.sql.insight.core.object.TableFillVisitor;
 import org.gongxuanzhang.sql.insight.core.optimizer.plan.ExecutionPlan;
+import org.gongxuanzhang.sql.insight.core.optimizer.plan.InsertExecutionPlan;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -61,8 +62,7 @@ public class Insert implements DmlCommand, TableContainer {
 
     @Override
     public ExecutionPlan plan() {
-
-        return null;
+        return new InsertExecutionPlan(this);
     }
 
     @Override

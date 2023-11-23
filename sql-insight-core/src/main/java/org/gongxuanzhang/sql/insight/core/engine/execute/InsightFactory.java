@@ -18,8 +18,7 @@ package org.gongxuanzhang.sql.insight.core.engine.execute;
 
 import org.gongxuanzhang.sql.insight.core.analysis.druid.DruidAnalyzer;
 import org.gongxuanzhang.sql.insight.core.engine.SqlPipeline;
-import org.gongxuanzhang.sql.insight.core.engine.StorageEngineManager;
-import org.gongxuanzhang.sql.insight.core.engine.storage.SimpleStorageEngineManager;
+import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext;
 import org.gongxuanzhang.sql.insight.core.optimizer.OptimizerImpl;
 
 /**
@@ -33,8 +32,6 @@ public class InsightFactory {
 
     }
 
-    private static volatile StorageEngineManager storageEngineManager;
-
     public static SqlPipeline createSqlPipeline() {
         SqlPipeline sqlPipeline = new SqlPipeline();
         OptimizerImpl optimizer = new OptimizerImpl();
@@ -46,19 +43,9 @@ public class InsightFactory {
 
     public static SqlInsightExecuteEngine createSingleEngine() {
         SqlInsightExecuteEngine engine = new SqlInsightExecuteEngine();
-        engine.setStorageEngineManager(shareStorageEngineManager());
+        engine.setStorageEngineManager(SqlInsightContext.getInstance().getEngineManager());
         return engine;
     }
 
 
-    private static StorageEngineManager shareStorageEngineManager() {
-        if (storageEngineManager == null) {
-            synchronized (InsightFactory.class) {
-                if (storageEngineManager == null) {
-                    storageEngineManager = new SimpleStorageEngineManager();
-                }
-            }
-        }
-        return storageEngineManager;
-    }
 }

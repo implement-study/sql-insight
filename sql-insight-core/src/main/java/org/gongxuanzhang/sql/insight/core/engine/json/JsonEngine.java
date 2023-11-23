@@ -48,9 +48,9 @@ public class JsonEngine implements StorageEngine {
 
     private final AutoIncrementKeyCounter counter = new AutoIncrementKeyCounter();
 
-    private final int maxPrimaryKey = 10000;
+    private static final int MAX_PRIMARY_KEY = 10000;
 
-    private final int minPrimaryKey = 1;
+    private static final int MIN_PRIMARY_KEY = 1;
 
     @Override
     public String getName() {
@@ -74,13 +74,14 @@ public class JsonEngine implements StorageEngine {
         File jsonFile = new File(dbFolder, table.getName() + ".json");
         try {
             if (!jsonFile.createNewFile()) {
-                List<String> initContent = new ArrayList<>();
-                for (int i = 0; i < maxPrimaryKey; i++) {
-                    initContent.add("");
-                }
-                Files.write(jsonFile.toPath(), initContent);
                 log.warn("create file {} fail", jsonFile.getName());
             }
+            List<String> initContent = new ArrayList<>();
+            for (int i = 0; i < MAX_PRIMARY_KEY; i++) {
+                initContent.add("");
+            }
+            Files.write(jsonFile.toPath(), initContent);
+            log.info("write {} json to {}", initContent.size(), jsonFile.toPath().toAbsolutePath());
             return new MessageResult(String.format("成功创建%s", table.getName()));
         } catch (IOException e) {
             return new ExceptionResult(e);
@@ -94,21 +95,21 @@ public class JsonEngine implements StorageEngine {
 
     @Override
     public ResultInterface insert(InsertRow row) {
-        //   todo lock
         counter.dealAutoIncrement(row);
         JSONObject jsonObject = fullAllColumnRow(row);
         File jsonFile = getJsonFile(row.getTable());
         int insertPrimaryKey = getJsonInsertRowPrimaryKey(row, jsonObject);
-        if (maxPrimaryKey < insertPrimaryKey || insertPrimaryKey < minPrimaryKey) {
-            throw new InsertException("engine json primary key must between " + minPrimaryKey + " and " + maxPrimaryKey);
+        if (MAX_PRIMARY_KEY < insertPrimaryKey || insertPrimaryKey < MIN_PRIMARY_KEY) {
+            throw new InsertException("engine json primary key must between " + MIN_PRIMARY_KEY + " and " + MAX_PRIMARY_KEY);
         }
         try {
             List<String> lines = Files.readAllLines(jsonFile.toPath());
             String currentLine = lines.get(insertPrimaryKey);
-            if (currentLine.isEmpty()) {
+            if (!currentLine.isEmpty()) {
                 throw new InsertException(String.format("Duplicate entry '%s' for key 'PRIMARY'", insertPrimaryKey));
             }
             lines.set(insertPrimaryKey, jsonObject.toString());
+            log.info("insert {} to table [{}] ", jsonObject, row.getTable().getName());
             Files.write(jsonFile.toPath(), lines);
         } catch (IOException e) {
             throw new RuntimeIoException(e);
