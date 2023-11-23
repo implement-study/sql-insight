@@ -14,39 +14,25 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.object.value;
+package org.gongxuanzhang.sql.insight.core.engine;
 
-import org.gongxuanzhang.easybyte.core.tool.ByteArrays;
+import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 
 /**
+ * every engine that support auto increment should have a counter.
+ * engine allow not support auto increment col.
+ *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class AutoIncrementValue implements Value {
-
-    private Integer value;
-
-    public AutoIncrementValue(Integer value) {
-        this.value = value;
-    }
-
-    public AutoIncrementValue setValue(Integer value) {
-        this.value = value;
-        return this;
-    }
+public interface AutoIncrementKeyCounter {
 
 
-    @Override
-    public int getLength() {
-        return Integer.BYTES;
-    }
-
-    @Override
-    public Integer getSource() {
-        return value;
-    }
-
-    @Override
-    public byte[] toBytes() {
-        return ByteArrays.fromInt(this.value);
-    }
+    /**
+     * before insert row. check data auto increment column value is empty.
+     * if not empty the counter should refresh perhaps.
+     * if value is empty the counter should set a increment value
+     *
+     * @param row insert row
+     **/
+    void dealAutoIncrement(InsertRow row);
 }

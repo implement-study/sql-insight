@@ -39,7 +39,7 @@ fun createDatabase(databaseName: String) {
 fun createTable(databaseName: String, tableName: String) {
     createDatabase(databaseName)
     """create table if not exists $databaseName.$tableName(
-        id int primary key,
+        id int primary key auto_increment,
         name varchar not null
             )""".trimMargin().doSql()
 }

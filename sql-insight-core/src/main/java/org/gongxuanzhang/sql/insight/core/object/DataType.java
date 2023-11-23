@@ -50,7 +50,7 @@ public class DataType implements FillDataVisitor {
 
 
     public enum Type {
-        INT(8), VARCHAR(255), CHAR(255), TIME(-1);
+        INT(4), VARCHAR(255), CHAR(255), TIME(-1);
 
 
         final int defaultLength;

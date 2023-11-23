@@ -16,6 +16,8 @@
 
 package org.gongxuanzhang.sql.insight.core.engine;
 
+import lombok.extern.slf4j.Slf4j;
+import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
 import org.gongxuanzhang.sql.insight.core.command.Command;
 import org.gongxuanzhang.sql.insight.core.engine.execute.ExecuteEngine;
 import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext;
@@ -30,19 +32,26 @@ import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
+@Slf4j
 public class SqlPipeline {
 
     private Optimizer optimizer = new OptimizerImpl();
 
     private ExecuteEngine executeEngine;
 
+    @Temporary(detail = "how to deal exception?")
     public ResultInterface doSql(String sql) throws SqlInsightException {
+        log.info("start execute sql {} ...", sql);
+        long startTime = System.currentTimeMillis();
 
         Command command = optimizer.analysisSql(sql);
 
         ExecutionPlan plan = optimizer.assign(command);
 
-        return executeEngine.executePlan(plan);
+        ResultInterface resultInterface = executeEngine.executePlan(plan);
+
+        log.info("end sql {} ...take time {}ms", sql.split("\n")[0], (System.currentTimeMillis() - startTime));
+        return resultInterface;
     }
 
     public Optimizer getOptimizer() {

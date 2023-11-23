@@ -18,10 +18,13 @@ package org.gongxuanzhang.sql.insight.core.object;
 
 import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
 import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
+import com.alibaba.druid.sql.ast.expr.SQLNullExpr;
+import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
 import org.gongxuanzhang.sql.insight.core.exception.InsertException;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
 import org.gongxuanzhang.sql.insight.core.object.value.ValueChar;
 import org.gongxuanzhang.sql.insight.core.object.value.ValueInt;
+import org.gongxuanzhang.sql.insight.core.object.value.ValueNull;
 import org.gongxuanzhang.sql.insight.core.object.value.ValueVarchar;
 
 import java.util.ArrayList;
@@ -68,6 +71,7 @@ public class InsertRow implements Row, FillDataVisitor, TableContainer {
     }
 
     @Override
+    @Temporary(detail = "instead to negotiate")
     public void endVisit(SQLCharExpr x) {
         String text = x.getText();
         Column column = currentColumn();
@@ -83,6 +87,15 @@ public class InsertRow implements Row, FillDataVisitor, TableContainer {
                 throw new InsertException(this.insertRowId, text + " can't cast to " + dataType.getType());
 
         }
+    }
+
+    @Override
+    public void endVisit(SQLNullExpr x) {
+        Column column = currentColumn();
+        if (column.isNotNull()) {
+            throw new InsertException(this.insertRowId, "column " + column.getName() + " not null");
+        }
+        valueList.add(ValueNull.getInstance());
     }
 
     private ValueVarchar wrapVarchar(String text) {

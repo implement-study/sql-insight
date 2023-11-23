@@ -24,6 +24,7 @@ import lombok.EqualsAndHashCode;
  **/
 @EqualsAndHashCode
 public class ValueNull implements Value {
+
     public static final ValueNull INSTANCE = new ValueNull();
 
     private ValueNull() {

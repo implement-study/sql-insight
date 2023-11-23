@@ -19,7 +19,6 @@ package org.gongxuanzhang.sql.insight.core.engine.json;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
-import org.gongxuanzhang.sql.insight.core.environment.AutoIncrementKeyCounter;
 import org.gongxuanzhang.sql.insight.core.exception.CreateTableException;
 import org.gongxuanzhang.sql.insight.core.exception.InsertException;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
@@ -46,7 +45,7 @@ import java.util.List;
 @Slf4j
 public class JsonEngine implements StorageEngine {
 
-    private final AutoIncrementKeyCounter counter = new AutoIncrementKeyCounter();
+    private final JsonIncrementKeyCounter counter = new JsonIncrementKeyCounter();
 
     private static final int MAX_PRIMARY_KEY = 10000;
 
@@ -97,8 +96,8 @@ public class JsonEngine implements StorageEngine {
     public ResultInterface insert(InsertRow row) {
         counter.dealAutoIncrement(row);
         JSONObject jsonObject = fullAllColumnRow(row);
-        File jsonFile = getJsonFile(row.getTable());
-        int insertPrimaryKey = getJsonInsertRowPrimaryKey(row, jsonObject);
+        File jsonFile = JsonEngineSupport.getJsonFile(row.getTable());
+        int insertPrimaryKey = JsonEngineSupport.getJsonInsertRowPrimaryKey(row.getTable(), jsonObject);
         if (MAX_PRIMARY_KEY < insertPrimaryKey || insertPrimaryKey < MIN_PRIMARY_KEY) {
             throw new InsertException("engine json primary key must between " + MIN_PRIMARY_KEY + " and " + MAX_PRIMARY_KEY);
         }
@@ -114,7 +113,6 @@ public class JsonEngine implements StorageEngine {
         } catch (IOException e) {
             throw new RuntimeIoException(e);
         }
-        getJsonInsertRowPrimaryKey(row, jsonObject);
         //  拿到对应行的id 插入位置
         return new InsertResult(1);
     }
@@ -135,9 +133,7 @@ public class JsonEngine implements StorageEngine {
         return null;
     }
 
-    private File getJsonFile(Table table) {
-        return new File(table.getDatabase().getDbFolder(), table.getName() + ".json");
-    }
+
 
     private JSONObject fullAllColumnRow(InsertRow row) {
         Table table = row.getTable();
@@ -149,13 +145,6 @@ public class JsonEngine implements StorageEngine {
             jsonObject.put(insertColumns.get(i).getName(), values.get(i).getSource());
         }
         return jsonObject;
-    }
-
-    private int getJsonInsertRowPrimaryKey(InsertRow row, JSONObject json) {
-        Table table = row.getTable();
-        List<Column> columnList = table.getColumnList();
-        Column column = columnList.get(table.getPrimaryKeyIndex());
-        return json.getInteger(column.getName());
     }
 
 

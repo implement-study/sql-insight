@@ -25,7 +25,7 @@ public class InsertException extends SqlInsightException {
 
     @Temporary(detail = "how to deal exception?")
     public InsertException(long rowId, String message) {
-        super(message + " at row" + rowId);
+        super(message + " at row " + rowId);
     }
 
     public InsertException(String message) {

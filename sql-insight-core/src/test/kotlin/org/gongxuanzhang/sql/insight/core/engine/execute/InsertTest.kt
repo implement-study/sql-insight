@@ -34,8 +34,11 @@ class InsertTest {
 
     @Test
     fun testInsert() {
-        createTable("aa","user")
-        "insert into aa.user (id,name) values(1,'a') ,(2,'b')".doSql()
+        createTable("aa", "user")
+        """insert into aa.user (id,name) values
+            (1,'a') ,(2,'b') ,(null,'c')
+            ,(null,'b') ,(null,'c')
+        """.trimMargin().doSql()
     }
 
 
