@@ -111,6 +111,9 @@ public class InsertRow implements Row, FillDataVisitor, TableContainer {
         return insertColumns.get(valueList.size());
     }
 
+    public List<Column> getInsertColumns() {
+        return insertColumns;
+    }
 
     @Override
     public Table getTable() {

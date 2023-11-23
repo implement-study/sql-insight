@@ -59,6 +59,8 @@ public final class Table implements FillDataVisitor, CommentContainer {
      **/
     private List<Integer> notNullIndex = new ArrayList<>();
 
+    private int primaryKeyIndex = -1;
+
 
     public Column getColumnByName(String name) {
         Column column = columnMap.get(name);
@@ -78,6 +80,12 @@ public final class Table implements FillDataVisitor, CommentContainer {
                 throw new UnsupportedOperationException("only support single column autoincrement");
             }
             this.autoColIndex = columnList.size() - 1;
+        }
+        if (column.isPrimaryKey()) {
+            if (this.primaryKeyIndex != -1) {
+                throw new UnsupportedOperationException("only support single column primary key");
+            }
+            this.primaryKeyIndex = columnList.size() - 1;
         }
         this.columnMap.put(column.getName(), column);
     }
