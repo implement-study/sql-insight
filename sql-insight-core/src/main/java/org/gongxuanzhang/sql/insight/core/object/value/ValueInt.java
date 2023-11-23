@@ -19,6 +19,7 @@ package org.gongxuanzhang.sql.insight.core.object.value;
 
 import lombok.EqualsAndHashCode;
 import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
+import org.gongxuanzhang.sql.insight.core.exception.DateTypeCastException;
 
 import java.nio.ByteBuffer;
 
@@ -26,7 +27,7 @@ import java.nio.ByteBuffer;
  * @author gongxuanzhangmelt@gmail.com
  **/
 @EqualsAndHashCode
-public class ValueInt implements Value {
+public class ValueInt extends BaseValue {
 
     private final int value;
 
@@ -34,7 +35,16 @@ public class ValueInt implements Value {
         this.value = value;
     }
 
-    public int getValue() {
+    public ValueInt(Value value) {
+        try {
+            this.value = Integer.parseInt(value.getSource().toString());
+        } catch (Exception e) {
+            throw new DateTypeCastException("int", value.getClass().getName());
+        }
+    }
+
+    @Override
+    public Integer getSource() {
         return value;
     }
 

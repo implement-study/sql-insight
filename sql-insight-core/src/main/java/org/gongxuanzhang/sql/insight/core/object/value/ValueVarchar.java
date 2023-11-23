@@ -27,12 +27,22 @@ public class ValueVarchar extends DynamicValue {
 
     private final String value;
 
+    public ValueVarchar(Value value) {
+        this.value = value.getSource().toString();
+    }
+
     public ValueVarchar(String value) {
         this.value = value;
     }
 
 
-    public String getValue() {
+    @Override
+    public int getLength() {
+        return toBytes().length;
+    }
+
+    @Override
+    public String getSource() {
         return value;
     }
 

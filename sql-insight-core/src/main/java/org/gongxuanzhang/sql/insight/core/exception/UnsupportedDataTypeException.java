@@ -14,45 +14,23 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.object.value;
+package org.gongxuanzhang.sql.insight.core.exception;
 
-
-import lombok.EqualsAndHashCode;
-
-import java.nio.ByteBuffer;
+import org.gongxuanzhang.sql.insight.core.object.DataType;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-@EqualsAndHashCode
-public class ValueChar implements Value {
+public class UnsupportedDataTypeException extends SqlInsightException {
 
 
-    private final String value;
-
-    private final int length;
-
-    public ValueChar(String value, int length) {
-        this.value = value;
-        this.length = length;
+    public UnsupportedDataTypeException(String type) {
+        super("sql-insight unsupported data type " + type);
     }
 
 
-    @Override
-    public int getLength() {
-        return this.length;
-    }
-
-    @Override
-    public String getSource() {
-        return value;
-    }
-
-    @Override
-    public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(this.length);
-        buffer.put(this.value.getBytes());
-        return buffer.array();
+    public UnsupportedDataTypeException(DataType type) {
+        this(type.toString());
     }
 
 }

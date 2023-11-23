@@ -50,7 +50,14 @@ public final class Table implements FillDataVisitor, CommentContainer {
 
     private final Map<String, Column> columnMap = new HashMap<>();
 
+    //  support operator
+
     private int autoColIndex = -1;
+
+    /**
+     * not null column index list
+     **/
+    private List<Integer> notNullIndex = new ArrayList<>();
 
 
     public Column getColumnByName(String name) {

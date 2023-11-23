@@ -34,9 +34,6 @@ public class AutoIncrementValue implements Value {
         return this;
     }
 
-    public Integer getValue() {
-        return value;
-    }
 
     @Override
     public int getLength() {
@@ -44,7 +41,12 @@ public class AutoIncrementValue implements Value {
     }
 
     @Override
+    public Integer getSource() {
+        return value;
+    }
+
+    @Override
     public byte[] toBytes() {
-       return ByteArrays.fromInt(this.value);
+        return ByteArrays.fromInt(this.value);
     }
 }

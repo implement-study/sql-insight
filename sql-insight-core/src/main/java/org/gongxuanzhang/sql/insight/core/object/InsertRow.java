@@ -27,6 +27,7 @@ import org.gongxuanzhang.sql.insight.core.object.value.ValueVarchar;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/

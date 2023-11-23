@@ -16,43 +16,34 @@
 
 package org.gongxuanzhang.sql.insight.core.object.value;
 
+import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
+import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
+import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 
-import lombok.EqualsAndHashCode;
-
-import java.nio.ByteBuffer;
+import java.util.function.Consumer;
 
 /**
+ * visitor a value expr ,work up a {@link Value},
+ * the value can operated after visitor
+ *
  * @author gongxuanzhangmelt@gmail.com
  **/
-@EqualsAndHashCode
-public class ValueChar implements Value {
+public class ValueVisitor implements SQLASTVisitor {
 
+    private final Consumer<Value> afterVisit;
 
-    private final String value;
-
-    private final int length;
-
-    public ValueChar(String value, int length) {
-        this.value = value;
-        this.length = length;
-    }
-
-
-    @Override
-    public int getLength() {
-        return this.length;
+    public ValueVisitor(Consumer<Value> afterVisit) {
+        this.afterVisit = afterVisit;
     }
 
     @Override
-    public String getSource() {
-        return value;
+    public void endVisit(SQLCharExpr x) {
+        String text = x.getText();
+        afterVisit.accept(new ValueVarchar(text));
     }
 
     @Override
-    public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(this.length);
-        buffer.put(this.value.getBytes());
-        return buffer.array();
+    public void endVisit(SQLIntegerExpr x) {
+        afterVisit.accept(new ValueInt(x.getNumber().intValue()));
     }
-
 }

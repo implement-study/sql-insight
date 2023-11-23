@@ -17,8 +17,6 @@
 package org.gongxuanzhang.sql.insight.core.object;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
-import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
-import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
 import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
 import com.alibaba.druid.sql.ast.statement.SQLColumnPrimaryKey;
 import com.alibaba.druid.sql.ast.statement.SQLColumnUniqueKey;
@@ -26,6 +24,9 @@ import com.alibaba.druid.sql.ast.statement.SQLNotNullConstraint;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 import lombok.Data;
 import org.gongxuanzhang.sql.insight.core.analysis.druid.CommentVisitor;
+import org.gongxuanzhang.sql.insight.core.object.value.Value;
+import org.gongxuanzhang.sql.insight.core.object.value.ValueNegotiator;
+import org.gongxuanzhang.sql.insight.core.object.value.ValueVisitor;
 
 
 /**
@@ -46,7 +47,7 @@ public class Column implements FillDataVisitor, CommentContainer {
 
     private boolean unique;
 
-    private String defaultValue;
+    private Value defaultValue;
 
     private String comment;
 
@@ -70,7 +71,7 @@ public class Column implements FillDataVisitor, CommentContainer {
         }
         SQLExpr defaultExpr = x.getDefaultExpr();
         if (defaultExpr != null) {
-            defaultExpr.accept(new ValueVisitor());
+            defaultExpr.accept(new ValueVisitor(ValueNegotiator.columnDefaultValue(this)));
         }
     }
 
@@ -92,19 +93,5 @@ public class Column implements FillDataVisitor, CommentContainer {
         }
     }
 
-
-    private class ValueVisitor implements SQLASTVisitor {
-
-
-        @Override
-        public void endVisit(SQLCharExpr x) {
-            Column.this.defaultValue = x.getText();
-        }
-
-        @Override
-        public void endVisit(SQLIntegerExpr x) {
-            Column.this.defaultValue = x.toString();
-        }
-    }
 
 }

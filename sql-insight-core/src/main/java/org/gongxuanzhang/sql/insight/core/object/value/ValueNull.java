@@ -19,40 +19,34 @@ package org.gongxuanzhang.sql.insight.core.object.value;
 
 import lombok.EqualsAndHashCode;
 
-import java.nio.ByteBuffer;
-
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
 @EqualsAndHashCode
-public class ValueChar implements Value {
+public class ValueNull implements Value {
+    public static final ValueNull INSTANCE = new ValueNull();
 
+    private ValueNull() {
+    }
 
-    private final String value;
-
-    private final int length;
-
-    public ValueChar(String value, int length) {
-        this.value = value;
-        this.length = length;
+    public static ValueNull getInstance() {
+        return INSTANCE;
     }
 
 
     @Override
     public int getLength() {
-        return this.length;
+        return 0;
     }
 
     @Override
     public String getSource() {
-        return value;
+        return null;
     }
 
     @Override
     public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(this.length);
-        buffer.put(this.value.getBytes());
-        return buffer.array();
+        return new byte[0];
     }
 
 }

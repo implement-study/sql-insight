@@ -49,13 +49,14 @@ public class AutoIncrementKeyCounter {
         AtomicLong atomicLong = loadMaxAutoIncrementKey(databaseName, row.getTable().getName());
 
         AutoIncrementValue autoCol = (AutoIncrementValue) row.getValues().get(autoColIndex);
-        if (autoCol.getValue() == null) {
+        if (autoCol.getSource() == null) {
             autoCol.setValue((int) atomicLong.incrementAndGet());
             return;
         }
-        if (autoCol.getValue() > atomicLong.get()) {
-            log.info("database[{}],table[{}],auto increment col value set {}",databaseName,row.getTable().getName(),autoCol.getValue());
-            atomicLong.set(autoCol.getValue());
+        if (autoCol.getSource() > atomicLong.get()) {
+            log.info("database[{}],table[{}],auto increment col value set {}", databaseName, row.getTable().getName()
+                    , autoCol.getSource());
+            atomicLong.set(autoCol.getSource());
         }
     }
 

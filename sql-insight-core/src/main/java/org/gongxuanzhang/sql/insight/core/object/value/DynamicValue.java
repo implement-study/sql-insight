@@ -19,12 +19,15 @@ package org.gongxuanzhang.sql.insight.core.object.value;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public abstract class DynamicValue implements Value {
+public abstract class DynamicValue extends BaseValue {
 
-    @Override
-    public int getLength() {
-        return -1;
+    protected DynamicValue() {
     }
+
+    protected DynamicValue(Value value) {
+        super(value);
+    }
+
 
     @Override
     public boolean isDynamic() {

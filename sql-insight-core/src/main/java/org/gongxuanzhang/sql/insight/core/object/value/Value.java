@@ -26,7 +26,7 @@ public interface Value {
     /**
      * length for value
      *
-     * @return -1 is dynamic
+     * @return byte array length
      **/
     int getLength();
 
@@ -38,6 +38,11 @@ public interface Value {
     default boolean isDynamic() {
         return false;
     }
+
+    /**
+     * @return content
+     **/
+    Object getSource();
 
     /**
      * to byte array

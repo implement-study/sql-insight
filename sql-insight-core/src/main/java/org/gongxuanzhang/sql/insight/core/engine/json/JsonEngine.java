@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.json;
 
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
 import org.gongxuanzhang.sql.insight.core.environment.AutoIncrementKeyCounter;
@@ -71,8 +72,12 @@ public class JsonEngine implements StorageEngine {
     public ResultInterface insert(InsertRow row) {
         //   todo lock
         counter.dealAutoIncrement(row);
+        JSONObject jsonObject = fullAllColumnRow(row);
+        byte[] bytes = jsonObject.toJSONBBytes();
+        //  拿到对应行的id 插入位置
         return null;
     }
+
 
     @Override
     public ResultInterface update() {
@@ -86,6 +91,11 @@ public class JsonEngine implements StorageEngine {
 
     @Override
     public ResultInterface query() {
+        return null;
+    }
+
+    private JSONObject fullAllColumnRow(InsertRow row) {
+
         return null;
     }
 }

@@ -16,43 +16,32 @@
 
 package org.gongxuanzhang.sql.insight.core.object.value;
 
+import org.gongxuanzhang.sql.insight.core.exception.DataTooLongException;
+import org.gongxuanzhang.sql.insight.core.object.Column;
 
-import lombok.EqualsAndHashCode;
-
-import java.nio.ByteBuffer;
+import java.util.function.Consumer;
 
 /**
+ * support {@link ValueVisitor} any way
+ *
  * @author gongxuanzhangmelt@gmail.com
  **/
-@EqualsAndHashCode
-public class ValueChar implements Value {
+public class ValueNegotiator {
 
+    private ValueNegotiator() {
 
-    private final String value;
-
-    private final int length;
-
-    public ValueChar(String value, int length) {
-        this.value = value;
-        this.length = length;
     }
 
-
-    @Override
-    public int getLength() {
-        return this.length;
-    }
-
-    @Override
-    public String getSource() {
-        return value;
-    }
-
-    @Override
-    public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(this.length);
-        buffer.put(this.value.getBytes());
-        return buffer.array();
+    /**
+     * column default value
+     **/
+    public static Consumer<Value> columnDefaultValue(Column column) {
+        return (value) -> {
+            if (value.getLength() > column.getDataType().getLength()) {
+                throw new DataTooLongException(column);
+            }
+            column.setDefaultValue(value);
+        };
     }
 
 }
