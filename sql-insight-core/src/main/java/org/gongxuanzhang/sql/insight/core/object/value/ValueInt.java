@@ -18,10 +18,9 @@ package org.gongxuanzhang.sql.insight.core.object.value;
 
 
 import lombok.EqualsAndHashCode;
-import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
+import org.gongxuanzhang.easybyte.core.tool.ByteArrays;
 import org.gongxuanzhang.sql.insight.core.exception.DateTypeCastException;
-
-import java.nio.ByteBuffer;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -54,12 +53,16 @@ public class ValueInt extends BaseValue {
     }
 
 
-    @Temporary
     @Override
     public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(4);
-        buffer.putInt(this.value);
-        return buffer.array();
+        return ByteArrays.fromInt(this.value);
     }
 
+    @Override
+    public int compareTo(@NotNull Value o) {
+        if (o instanceof ValueInt) {
+            return Integer.compare(this.value, ((ValueInt) o).value);
+        }
+        throw new IllegalArgumentException("ValueInt can't compare to " + o.getClass().getName());
+    }
 }

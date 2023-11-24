@@ -16,12 +16,13 @@
 
 package org.gongxuanzhang.sql.insight.core.object.value;
 
+
 /**
  * base value
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface Value {
+public interface Value extends Comparable<Value> {
 
     /**
      * length for value

@@ -16,49 +16,20 @@
 
 package org.gongxuanzhang.sql.insight.core.object;
 
-
-import com.alibaba.druid.sql.ast.SQLDataType;
-import com.alibaba.druid.sql.ast.statement.SQLCharacterDataType;
-import lombok.Data;
-
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-@Data
-public class DataType implements FillDataVisitor {
+public class Where implements TableContainer {
 
-    private Type type;
-
-    private int length;
-
+    private Table table;
 
     @Override
-    public void endVisit(SQLDataType x) {
-        type = Type.valueOf(x.getName().toUpperCase());
-        this.length = type.defaultLength;
+    public Table getTable() {
+        return table;
     }
-
 
     @Override
-    public void endVisit(SQLCharacterDataType x) {
-        type = Type.valueOf(x.getName().toUpperCase());
-        this.length = x.getLength();
-        if (this.length < 0) {
-            this.length = type.defaultLength;
-        }
+    public void setTable(Table table) {
+        this.table = table;
     }
-
-
-    public enum Type {
-        INT(4), VARCHAR(255), CHAR(255);
-
-
-        final int defaultLength;
-
-        Type(int defaultLength) {
-            this.defaultLength = defaultLength;
-        }
-    }
-
-
 }

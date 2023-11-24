@@ -43,3 +43,11 @@ fun createTable(databaseName: String, tableName: String) {
         name varchar not null
             )""".trimMargin().doSql()
 }
+
+fun insert(databaseName: String, tableName: String){
+    createTable(databaseName,tableName)
+    """insert into aa.user (id,name) values
+            (1,'a') ,(2,'b') ,(null,'c')
+            ,(null,'b') ,(null,'c')
+        """.trimMargin().doSql()
+}

@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.object.value;
 
 
 import lombok.EqualsAndHashCode;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -50,5 +51,10 @@ public class ValueVarchar extends DynamicValue {
     @Override
     public byte[] toBytes() {
         return value.getBytes();
+    }
+
+    @Override
+    public int compareTo(@NotNull Value o) {
+        return this.value.compareTo(o.getSource().toString());
     }
 }

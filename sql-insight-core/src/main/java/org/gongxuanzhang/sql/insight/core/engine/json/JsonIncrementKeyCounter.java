@@ -20,6 +20,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Tables;
 import lombok.extern.slf4j.Slf4j;
+import org.gongxuanzhang.sql.insight.core.engine.AutoIncrementKeyCounter;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
@@ -30,13 +31,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
 @Slf4j
-public class JsonIncrementKeyCounter {
+public class JsonIncrementKeyCounter implements AutoIncrementKeyCounter {
 
 
     private final com.google.common.collect.Table<String, String, AtomicLong> keyTable =
@@ -48,6 +50,7 @@ public class JsonIncrementKeyCounter {
      *
      * @param row insert row
      **/
+    @Override
     public void dealAutoIncrement(InsertRow row) {
         int autoColIndex = row.getTable().getAutoColIndex();
         if (autoColIndex < 0) {
@@ -70,6 +73,11 @@ public class JsonIncrementKeyCounter {
         }
     }
 
+    @Override
+    public void reset(Table table) {
+        AtomicLong atomicLong = loadMaxAutoIncrementKey(table);
+        atomicLong.set(0);
+    }
 
     private AtomicLong loadMaxAutoIncrementKey(Table table) {
         String database = table.getDatabase().getName();
@@ -80,11 +88,10 @@ public class JsonIncrementKeyCounter {
                 if (keyTable.get(database, tableName) == null) {
                     atomicLong = loadFromDisk(table);
                     keyTable.put(database, tableName, atomicLong);
-                    return atomicLong;
                 }
             }
         }
-        return atomicLong;
+        return Objects.requireNonNull(atomicLong);
     }
 
     private AtomicLong loadFromDisk(Table table) {

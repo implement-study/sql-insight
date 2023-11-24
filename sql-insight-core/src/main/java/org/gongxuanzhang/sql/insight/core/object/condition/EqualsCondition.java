@@ -14,31 +14,30 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine;
+package org.gongxuanzhang.sql.insight.core.object.condition;
 
-import org.gongxuanzhang.sql.insight.core.object.InsertRow;
-import org.gongxuanzhang.sql.insight.core.object.Table;
+import org.gongxuanzhang.sql.insight.core.object.Row;
+import org.gongxuanzhang.sql.insight.core.object.value.Value;
+
 
 /**
- * every engine that support auto increment should have a counter.
- * engine allow not support auto increment col.
- *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface AutoIncrementKeyCounter {
+public class EqualsCondition implements Condition {
+
+    private final Expression left;
+    private final Expression right;
+
+    public EqualsCondition(Expression left, Expression right) {
+        this.left = left;
+        this.right = right;
+    }
 
 
-    /**
-     * before insert row. check data auto increment column value is empty.
-     * if not empty the counter should refresh perhaps.
-     * if value is empty the counter should set a increment value
-     *
-     * @param row insert row
-     **/
-    void dealAutoIncrement(InsertRow row);
-
-    /**
-     * reset the counter
-     **/
-    void reset(Table table);
+    @Override
+    public boolean hit(Row row) {
+        Value leftValue = left.getExpressionValue(row);
+        Value rightValue = right.getExpressionValue(row);
+        return leftValue.compareTo(rightValue) == 0;
+    }
 }

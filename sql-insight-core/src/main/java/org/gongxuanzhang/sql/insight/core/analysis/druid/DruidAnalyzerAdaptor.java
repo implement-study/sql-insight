@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.analysis.druid;
 
 import com.alibaba.druid.sql.ast.statement.SQLCreateDatabaseStatement;
 import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement;
+import com.alibaba.druid.sql.ast.statement.SQLDeleteStatement;
 import com.alibaba.druid.sql.ast.statement.SQLDropDatabaseStatement;
 import com.alibaba.druid.sql.ast.statement.SQLDropTableStatement;
 import com.alibaba.druid.sql.ast.statement.SQLInsertStatement;
@@ -28,6 +29,7 @@ import org.gongxuanzhang.sql.insight.core.command.ddl.CreateDatabase;
 import org.gongxuanzhang.sql.insight.core.command.ddl.CreateTable;
 import org.gongxuanzhang.sql.insight.core.command.ddl.DropDatabase;
 import org.gongxuanzhang.sql.insight.core.command.ddl.DropTable;
+import org.gongxuanzhang.sql.insight.core.command.dml.Delete;
 import org.gongxuanzhang.sql.insight.core.command.dml.Insert;
 
 /**
@@ -60,6 +62,12 @@ public class DruidAnalyzerAdaptor implements SQLASTVisitor, CommandContainer {
         return false;
     }
 
+    @Override
+    public boolean visit(SQLDeleteStatement x) {
+        this.command = new Delete(sql);
+        x.accept(this.command);
+        return false;
+    }
 
     @Override
     public boolean visit(SQLDropTableStatement x) {
@@ -72,14 +80,14 @@ public class DruidAnalyzerAdaptor implements SQLASTVisitor, CommandContainer {
     public boolean visit(SQLCreateTableStatement x) {
         this.command = new CreateTable(sql);
         x.accept(this.command);
-        return true;
+        return false;
     }
 
     @Override
     public boolean visit(SQLInsertStatement x) {
         this.command = new Insert(sql);
         x.accept(this.command);
-        return true;
+        return false;
     }
 
     @Override

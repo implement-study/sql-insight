@@ -36,11 +36,7 @@ class InsertTest {
 
     @Test
     fun testInsert() {
-        createTable("aa", "user")
-        """insert into aa.user (id,name) values
-            (1,'a') ,(2,'b') ,(null,'c')
-            ,(null,'b') ,(null,'c')
-        """.trimMargin().doSql()
+        insert("aa","user")
         val context = SqlInsightContext.getInstance()
         val table = context.tableDefinitionManager.select("aa", "user")
         val tableJson = JsonEngineSupport.getJsonFile(table)
@@ -60,7 +56,7 @@ class InsertTest {
                 JSONObject.of("id", 5, "name", "c"),
             )
         )
-
+        clearDatabase("aa")
     }
 
 

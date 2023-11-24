@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.object.value;
 
 
 import lombok.EqualsAndHashCode;
+import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
 
@@ -55,4 +56,8 @@ public class ValueChar implements Value {
         return buffer.array();
     }
 
+    @Override
+    public int compareTo(@NotNull Value o) {
+        return 0;
+    }
 }

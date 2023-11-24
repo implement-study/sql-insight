@@ -14,31 +14,22 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine;
+package org.gongxuanzhang.sql.insight.core.object.condition;
 
-import org.gongxuanzhang.sql.insight.core.object.InsertRow;
-import org.gongxuanzhang.sql.insight.core.object.Table;
+import org.gongxuanzhang.sql.insight.core.object.Row;
+import org.gongxuanzhang.sql.insight.core.object.value.Value;
 
 /**
- * every engine that support auto increment should have a counter.
- * engine allow not support auto increment col.
+ * where.
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface AutoIncrementKeyCounter {
-
+public interface Expression {
 
     /**
-     * before insert row. check data auto increment column value is empty.
-     * if not empty the counter should refresh perhaps.
-     * if value is empty the counter should set a increment value
+     * expression and row  calculate
      *
-     * @param row insert row
+     * @return value
      **/
-    void dealAutoIncrement(InsertRow row);
-
-    /**
-     * reset the counter
-     **/
-    void reset(Table table);
+    Value getExpressionValue(Row row);
 }

@@ -14,31 +14,30 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine;
+package org.gongxuanzhang.sql.insight.core.object.condition;
 
-import org.gongxuanzhang.sql.insight.core.object.InsertRow;
-import org.gongxuanzhang.sql.insight.core.object.Table;
+import org.gongxuanzhang.sql.insight.core.object.Row;
 
 /**
- * every engine that support auto increment should have a counter.
- * engine allow not support auto increment col.
- *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface AutoIncrementKeyCounter {
+public class BooleanCondition implements Condition {
 
+    private final boolean and;
+    private final Condition left;
+    private final Condition right;
 
-    /**
-     * before insert row. check data auto increment column value is empty.
-     * if not empty the counter should refresh perhaps.
-     * if value is empty the counter should set a increment value
-     *
-     * @param row insert row
-     **/
-    void dealAutoIncrement(InsertRow row);
+    public BooleanCondition(boolean and, Condition left, Condition right) {
+        this.and = and;
+        this.left = left;
+        this.right = right;
+    }
 
-    /**
-     * reset the counter
-     **/
-    void reset(Table table);
+    @Override
+    public boolean hit(Row row) {
+        if (and) {
+            return left.hit(row) && right.hit(row);
+        }
+        return left.hit(row) || right.hit(row);
+    }
 }

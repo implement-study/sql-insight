@@ -33,6 +33,7 @@ public enum SqlType {
     RENAME(DDL),
     INSERT(DML),
     UPDATE(DML),
+    DELETE(DML),
     SELECT(DML),
     TRUNCATE(DML),
     SHOW(DCL),

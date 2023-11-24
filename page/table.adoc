@@ -3,11 +3,18 @@
 
 Table相关语句根据 link:https://www.mysqlzh.com/doc/126.html[MySQL中文文档]实现，实现可能有所区别。
 
+=== 数据结构支持三种类型
+- [ ] varchar
+- [ ] char
+- [ ] int
+
+=== 一些不同点
+* 自动类型检测只支持字符串列
 
 === https://www.mysqlzh.com/doc/125/250.html[CREATE]
 image:../image/semi.svg[width=16] 部分完成
 
-- [ ] 仅支持单列主键
+- [ ] 仅支持单列主键(json引擎) innodb可支持多主键
 - [ ] 仅支持主键自增
 - [ ] 暂不支持约束条件
 - [ ] 仅支持部分数据类型
@@ -31,7 +38,9 @@ image:../image/game.svg[width=16] 还没做(作者去打游戏了)
 image:../image/game.svg[width=16] 还没做(作者去打游戏了)
 
 === link:https://www.mysqlzh.com/doc/126/254.html[INSERT]
-image:../image/game.svg[width=16] 还没做(作者去打游戏了)
+image:../image/complete.svg[width=16] 完成
+
+
 
 === https://www.mysqlzh.com/doc/126/646.html[SELECT]
 image:../image/game.svg[width=16] 还没做(作者去打游戏了)

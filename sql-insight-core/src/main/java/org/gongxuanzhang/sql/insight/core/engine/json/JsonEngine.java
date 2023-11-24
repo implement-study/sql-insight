@@ -96,6 +96,7 @@ public class JsonEngine implements StorageEngine {
         }
         try {
             Files.write(jsonFile.toPath(), initContent);
+            counter.reset(table);
             return new MessageResult();
         } catch (IOException e) {
             return new ExceptionResult(e);

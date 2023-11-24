@@ -21,6 +21,7 @@ import org.gongxuanzhang.sql.insight.core.command.ddl.CreateTable
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseNotExistsException
 import org.gongxuanzhang.sql.insight.core.`object`.Column
 import org.gongxuanzhang.sql.insight.core.`object`.DataType
+import org.gongxuanzhang.sql.insight.core.`object`.value.ValueVarchar
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -84,7 +85,7 @@ class CreateTableTest {
             val dataType = DataType()
             dataType.type = DataType.Type.VARCHAR
             dataType.length = 20
-            column.defaultValue = "男"
+            column.defaultValue = ValueVarchar("男")
             column.dataType = dataType
             column.comment = "性别"
             column
