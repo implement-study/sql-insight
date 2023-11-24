@@ -19,7 +19,7 @@ package org.gongxuanzhang.sql.insight.core.engine;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
 import org.gongxuanzhang.sql.insight.core.command.Command;
-import org.gongxuanzhang.sql.insight.core.engine.execute.ExecuteEngine;
+import org.gongxuanzhang.sql.insight.core.engine.json.ExecuteEngine;
 import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext;
 import org.gongxuanzhang.sql.insight.core.exception.SqlInsightException;
 import org.gongxuanzhang.sql.insight.core.optimizer.Optimizer;

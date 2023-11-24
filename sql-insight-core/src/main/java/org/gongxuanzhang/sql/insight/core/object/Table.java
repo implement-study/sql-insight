@@ -24,6 +24,7 @@ import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement;
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 import lombok.Getter;
+import lombok.Setter;
 import org.gongxuanzhang.sql.insight.core.analysis.druid.CommentVisitor;
 import org.gongxuanzhang.sql.insight.core.exception.UnknownColumnException;
 
@@ -36,6 +37,7 @@ import java.util.Map;
  * @author gongxuanzhangmelt@gmail.com
  **/
 @Getter
+@Setter
 public final class Table implements FillDataVisitor, CommentContainer {
 
     private Database database;
@@ -57,7 +59,7 @@ public final class Table implements FillDataVisitor, CommentContainer {
     /**
      * not null column index list
      **/
-    private List<Integer> notNullIndex = new ArrayList<>();
+    private final List<Integer> notNullIndex = new ArrayList<>();
 
     private int primaryKeyIndex = -1;
 
@@ -139,13 +141,4 @@ public final class Table implements FillDataVisitor, CommentContainer {
         return this;
     }
 
-    public Table setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public Table setDatabase(Database database) {
-        this.database = database;
-        return this;
-    }
 }

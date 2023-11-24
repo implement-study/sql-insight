@@ -23,6 +23,9 @@ public class MessageResult implements ResultInterface {
 
     private final String message;
 
+    public MessageResult() {
+        this("");
+    }
 
     public MessageResult(String message) {
         this.message = message;

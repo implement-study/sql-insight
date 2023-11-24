@@ -18,7 +18,7 @@ package org.gongxuanzhang.sql.insight
 
 import org.gongxuanzhang.sql.insight.core.analysis.druid.DruidAnalyzer
 import org.gongxuanzhang.sql.insight.core.command.Command
-import org.gongxuanzhang.sql.insight.core.engine.execute.InsightFactory
+import org.gongxuanzhang.sql.insight.core.engine.json.InsightFactory
 
 
 /**

@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine.execute
+package org.gongxuanzhang.sql.insight.core.engine.json
 
-import org.gongxuanzhang.sql.insight.*
-import org.gongxuanzhang.sql.insight.core.command.dml.Insert
+import org.gongxuanzhang.sql.insight.assertFalse
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseExistsException
-import org.gongxuanzhang.sql.insight.core.exception.TableNotExistsException
-import org.gongxuanzhang.sql.insight.core.`object`.value.ValueInt
-import org.gongxuanzhang.sql.insight.core.`object`.value.ValueVarchar
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.gongxuanzhang.sql.insight.databaseFile
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -30,34 +26,20 @@ import org.junit.jupiter.api.assertThrows
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-class InsertTest {
+class CreateDatabaseTest {
 
     @Test
-    fun testInsert() {
-        createTable("aa", "user")
-        """insert into aa.user (id,name) values
-            (1,'a') ,(2,'b') ,(null,'c')
-            ,(null,'b') ,(null,'c')
-        """.trimMargin().doSql()
-    }
-
-
-    @Test
-    fun testCommand() {
-        createTable("aa", "user")
-        val toCommand = "insert into aa.user (id,name) values(1,'a') ,(2,'b')".toCommand()
-        val insert = toCommand as Insert
-        assertEquals(insert.insertRows[0].values[0], ValueInt(1))
-        assertEquals(insert.insertRows[0].values[1], ValueVarchar("a"))
-        assertEquals(insert.insertRows[1].values[0], ValueInt(2))
-        assertEquals(insert.insertRows[1].values[1], ValueVarchar("b"))
-        assertEquals(insert.insertColumns.map { it.name }, listOf("id", "name"))
-        clearDatabase("aa")
-    }
-
-    @Test
-    fun testNotFound() {
-        assertThrows<TableNotExistsException> { "insert into aa.user (id,name) values(1,'a') ,(2,'b')".toCommand() }
+    fun testCreateDatabase() {
+        val dbFolder = databaseFile("sql_insight_test_db")
+        if (dbFolder.exists()) {
+            dbFolder.deleteRecursively()
+        }
+        assertFalse(dbFolder.exists(), "${dbFolder.absolutePath} exists and that can't deleted")
+        val sql = "create database sql_insight_test_db"
+        val createSqlPipeline = InsightFactory.createSqlPipeline()
+        createSqlPipeline.doSql(sql)
+        assert(dbFolder.exists())
+        dbFolder.deleteRecursively()
     }
 
     @Test

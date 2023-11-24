@@ -89,7 +89,17 @@ public class JsonEngine implements StorageEngine {
 
     @Override
     public ResultInterface truncateTable(Table table) {
-        return null;
+        File jsonFile = JsonEngineSupport.getJsonFile(table);
+        List<String> initContent = new ArrayList<>();
+        for (int i = 0; i < MAX_PRIMARY_KEY; i++) {
+            initContent.add("");
+        }
+        try {
+            Files.write(jsonFile.toPath(), initContent);
+            return new MessageResult();
+        } catch (IOException e) {
+            return new ExceptionResult(e);
+        }
     }
 
     @Override
@@ -132,7 +142,6 @@ public class JsonEngine implements StorageEngine {
     public ResultInterface query() {
         return null;
     }
-
 
 
     private JSONObject fullAllColumnRow(InsertRow row) {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine.execute
+package org.gongxuanzhang.sql.insight.core.engine.json
 
 import org.gongxuanzhang.sql.insight.clearDatabase
 import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext

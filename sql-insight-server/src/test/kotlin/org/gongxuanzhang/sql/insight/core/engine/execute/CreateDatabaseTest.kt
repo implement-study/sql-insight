@@ -17,6 +17,7 @@
 package org.gongxuanzhang.sql.insight.core.engine.execute
 
 import org.gongxuanzhang.sql.insight.assertFalse
+import org.gongxuanzhang.sql.insight.core.engine.json.InsightFactory
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseExistsException
 import org.gongxuanzhang.sql.insight.databaseFile
 import org.junit.jupiter.api.Test
