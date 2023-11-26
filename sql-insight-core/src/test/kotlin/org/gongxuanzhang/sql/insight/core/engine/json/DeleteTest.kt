@@ -65,7 +65,7 @@ class DeleteTest {
     @Test
     fun testCommand() {
         createTable("aa", "user")
-        val toCommand = "delete from aa.user  where 'id' >1 ".toCommand()
+        val toCommand = "delete from aa.user  where 'id' >1 and id <1 and id = 1".toCommand()
         val delete = toCommand as Delete
     }
 

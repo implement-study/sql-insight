@@ -17,10 +17,9 @@
 package org.gongxuanzhang.sql.insight.core.object.value;
 
 
+import com.google.common.base.Strings;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
-
-import java.nio.ByteBuffer;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -28,12 +27,14 @@ import java.nio.ByteBuffer;
 @EqualsAndHashCode
 public class ValueChar implements Value {
 
-
     private final String value;
 
     private final int length;
 
     public ValueChar(String value, int length) {
+        if (value.length() < length) {
+            value += Strings.repeat(" ", length - value.length());
+        }
         this.value = value;
         this.length = length;
     }
@@ -51,13 +52,11 @@ public class ValueChar implements Value {
 
     @Override
     public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(this.length);
-        buffer.put(this.value.getBytes());
-        return buffer.array();
+        return this.value.getBytes();
     }
 
     @Override
     public int compareTo(@NotNull Value o) {
-        return 0;
+        return this.value.compareTo(o.getSource().toString());
     }
 }

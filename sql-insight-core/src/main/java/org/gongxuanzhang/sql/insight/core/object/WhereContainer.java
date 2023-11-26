@@ -14,45 +14,27 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.object.value;
-
-
-import lombok.EqualsAndHashCode;
-import org.jetbrains.annotations.NotNull;
+package org.gongxuanzhang.sql.insight.core.object;
 
 /**
+ * where container
+ *
  * @author gongxuanzhangmelt@gmail.com
  **/
-@EqualsAndHashCode
-public class ValueNull implements Value {
-
-    public static final ValueNull INSTANCE = new ValueNull();
-
-    private ValueNull() {
-    }
-
-    public static ValueNull getInstance() {
-        return INSTANCE;
-    }
+public interface WhereContainer {
 
 
-    @Override
-    public int getLength() {
-        return 0;
-    }
+    /**
+     * get a where
+     *
+     * @return where
+     **/
+    Where getWhere();
 
-    @Override
-    public String getSource() {
-        return null;
-    }
-
-    @Override
-    public byte[] toBytes() {
-        return new byte[0];
-    }
-
-    @Override
-    public int compareTo(@NotNull Value o) {
-        throw new IllegalArgumentException("value null not support compare");
-    }
+    /**
+     * set a where
+     *
+     * @param where where
+     **/
+    void setWhere(Where where);
 }

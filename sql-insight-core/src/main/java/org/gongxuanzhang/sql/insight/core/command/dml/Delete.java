@@ -24,6 +24,7 @@ import org.gongxuanzhang.sql.insight.core.analysis.SqlType;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.TableContainer;
 import org.gongxuanzhang.sql.insight.core.object.TableFillVisitor;
+import org.gongxuanzhang.sql.insight.core.object.Where;
 import org.gongxuanzhang.sql.insight.core.optimizer.plan.ExecutionPlan;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,6 +37,8 @@ public class Delete implements DmlCommand, TableContainer {
     private final String sql;
 
     private Table table;
+
+    private Where where;
 
     public Delete(String sql) {
         this.sql = sql;
