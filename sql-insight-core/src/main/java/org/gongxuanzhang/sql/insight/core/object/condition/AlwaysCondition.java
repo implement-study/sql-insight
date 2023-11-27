@@ -14,42 +14,43 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.object;
+package org.gongxuanzhang.sql.insight.core.object.condition;
 
-import org.gongxuanzhang.sql.insight.core.object.condition.AlwaysCondition;
-import org.gongxuanzhang.sql.insight.core.object.condition.BooleanExpression;
+import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.value.ValueBoolean;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class Where implements TableContainer, BooleanExpression {
+public class AlwaysCondition implements BooleanExpression {
 
-    private Table table;
+    private static final AlwaysCondition TURE_INSTANCE = new AlwaysCondition(true);
 
-    private final BooleanExpression condition;
+    private static final AlwaysCondition FALSE_INSTANCE = new AlwaysCondition(false);
 
-    public Where(boolean always) {
-        condition = AlwaysCondition.getInstance(always);
+    private static final ValueBoolean TRUE_VALUE = new ValueBoolean(true);
+
+    private static final ValueBoolean FALSE_VALUE = new ValueBoolean(false);
+
+    private final boolean bool;
+
+    public static AlwaysCondition getInstance(boolean bool) {
+        if (bool) {
+            return TURE_INSTANCE;
+        }
+        return FALSE_INSTANCE;
     }
 
-    public Where(BooleanExpression condition) {
-        this.condition = condition;
-    }
-
-    @Override
-    public Table getTable() {
-        return table;
-    }
-
-    @Override
-    public void setTable(Table table) {
-        this.table = table;
+    private AlwaysCondition(boolean bool) {
+        this.bool = bool;
     }
 
 
     @Override
     public ValueBoolean getExpressionValue(Row row) {
-        return null;
+        if (bool) {
+            return TRUE_VALUE;
+        }
+        return FALSE_VALUE;
     }
 }

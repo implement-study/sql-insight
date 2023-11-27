@@ -17,27 +17,28 @@
 package org.gongxuanzhang.sql.insight.core.object.condition;
 
 import org.gongxuanzhang.sql.insight.core.object.Row;
+import org.gongxuanzhang.sql.insight.core.object.value.ValueBoolean;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class BooleanCondition implements Condition {
+public class BooleanCondition implements BooleanExpression {
 
     private final boolean and;
-    private final Condition left;
-    private final Condition right;
+    private final BooleanExpression left;
+    private final BooleanExpression right;
 
-    public BooleanCondition(boolean and, Condition left, Condition right) {
+    public BooleanCondition(boolean and, BooleanExpression left, BooleanExpression right) {
         this.and = and;
         this.left = left;
         this.right = right;
     }
 
     @Override
-    public boolean hit(Row row) {
+    public ValueBoolean getExpressionValue(Row row) {
         if (and) {
-            return left.hit(row) && right.hit(row);
+            return new ValueBoolean(left.getExpressionValue(row).getSource() && right.getExpressionValue(row).getSource());
         }
-        return left.hit(row) || right.hit(row);
+        return new ValueBoolean(left.getExpressionValue(row).getSource() || right.getExpressionValue(row).getSource());
     }
 }

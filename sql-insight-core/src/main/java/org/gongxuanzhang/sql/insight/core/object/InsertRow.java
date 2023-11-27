@@ -21,6 +21,7 @@ import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
 import com.alibaba.druid.sql.ast.expr.SQLNullExpr;
 import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
 import org.gongxuanzhang.sql.insight.core.exception.InsertException;
+import org.gongxuanzhang.sql.insight.core.exception.UnknownColumnException;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
 import org.gongxuanzhang.sql.insight.core.object.value.ValueChar;
 import org.gongxuanzhang.sql.insight.core.object.value.ValueInt;
@@ -29,6 +30,7 @@ import org.gongxuanzhang.sql.insight.core.object.value.ValueVarchar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -58,6 +60,18 @@ public class InsertRow implements Row, FillDataVisitor, TableContainer {
     @Override
     public long getRowId() {
         return this.insertRowId;
+    }
+
+
+    @Override
+    public Value getValueByColumnName(String colName) {
+        //   no need to use hash index because insert row invoke this method rarely used
+        for (int i = 0; i < insertColumns.size(); i++) {
+            if (Objects.equals(insertColumns.get(i).getName(), colName)) {
+                return valueList.get(i);
+            }
+        }
+        throw new UnknownColumnException(colName);
     }
 
     @Override

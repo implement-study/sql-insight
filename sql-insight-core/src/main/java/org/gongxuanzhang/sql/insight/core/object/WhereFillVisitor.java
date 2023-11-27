@@ -17,8 +17,10 @@
 package org.gongxuanzhang.sql.insight.core.object;
 
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
+import com.alibaba.druid.sql.ast.expr.SQLBooleanExpr;
+import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
-import org.gongxuanzhang.sql.insight.core.object.condition.Condition;
+import org.gongxuanzhang.sql.insight.core.object.condition.BooleanCondition;
 import org.gongxuanzhang.sql.insight.core.object.condition.Expression;
 
 /**
@@ -36,30 +38,47 @@ public class WhereFillVisitor implements FillDataVisitor {
 
 
     @Override
-    public void endVisit(SQLBinaryOpExpr x) {
-        Condition condition = null;
-        ExpressionVisitor leftVisitor = new ExpressionVisitor();
-        ExpressionVisitor rightVisitor = new ExpressionVisitor();
-        x.getLeft().accept(leftVisitor);
-        x.getRight().accept(rightVisitor);
-
-        switch (x.getOperator()) {
-            case BooleanAnd:
-//                new BooleanCondition(true,leftVisitor.result,rightVisitor.result);
-                break;
-            case BooleanOr:
-
-                break;
-            default:
-                throw new UnsupportedOperationException(x.getOperator() + "not support");
-
-        }
+    public boolean visit(SQLBinaryOpExpr x) {
+        OperatorVisitor visitor = new OperatorVisitor();
+        x.accept(visitor);
+        return false;
     }
 
+    @Override
+    public boolean visit(SQLBooleanExpr x) {
+        Where where = new Where(x.getBooleanValue());
+        this.whereContainer.setWhere(where);
+        return false;
+    }
 
-    private class ExpressionVisitor implements SQLASTVisitor {
+    @Override
+    public boolean visit(SQLIntegerExpr x) {
+        Where where = new Where(x.getNumber().intValue() != 0);
+        this.whereContainer.setWhere(where);
+        return false;
+    }
+
+    private class OperatorVisitor implements SQLASTVisitor {
         Expression result = null;
-        //  todo
+
+        @Override
+        public boolean visit(SQLBinaryOpExpr x) {
+            OperatorVisitor leftVisitor = new OperatorVisitor();
+            OperatorVisitor rightVisitor = new OperatorVisitor();
+            x.getLeft().accept(leftVisitor);
+            x.getRight().accept(rightVisitor);
+            switch (x.getOperator()) {
+                case BooleanAnd:
+                    new BooleanCondition(true, leftVisitor.result, rightVisitor.result);
+                    break;
+                case BooleanOr:
+
+                    break;
+                default:
+                    throw new UnsupportedOperationException(x.getOperator() + "not support");
+
+            }
+        }
     }
 }
 

@@ -14,42 +14,31 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.object;
+package org.gongxuanzhang.sql.insight.core.object.condition;
 
-import org.gongxuanzhang.sql.insight.core.object.condition.AlwaysCondition;
-import org.gongxuanzhang.sql.insight.core.object.condition.BooleanExpression;
+import org.gongxuanzhang.sql.insight.core.object.Row;
+import org.gongxuanzhang.sql.insight.core.object.value.Value;
 import org.gongxuanzhang.sql.insight.core.object.value.ValueBoolean;
+
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class Where implements TableContainer, BooleanExpression {
+public class GreatEqualsCondition implements BooleanExpression {
 
-    private Table table;
+    private final Expression left;
+    private final Expression right;
 
-    private final BooleanExpression condition;
-
-    public Where(boolean always) {
-        condition = AlwaysCondition.getInstance(always);
-    }
-
-    public Where(BooleanExpression condition) {
-        this.condition = condition;
-    }
-
-    @Override
-    public Table getTable() {
-        return table;
-    }
-
-    @Override
-    public void setTable(Table table) {
-        this.table = table;
+    public GreatEqualsCondition(Expression left, Expression right) {
+        this.left = left;
+        this.right = right;
     }
 
 
     @Override
     public ValueBoolean getExpressionValue(Row row) {
-        return null;
+        Value leftValue = left.getExpressionValue(row);
+        Value rightValue = right.getExpressionValue(row);
+        return new ValueBoolean(leftValue.compareTo(rightValue) >= 0);
     }
 }

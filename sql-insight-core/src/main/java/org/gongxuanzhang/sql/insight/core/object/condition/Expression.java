@@ -20,7 +20,7 @@ import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
 
 /**
- * where.
+ * you can calculate the result with row
  *
  * @author gongxuanzhangmelt@gmail.com
  **/

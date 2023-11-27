@@ -14,42 +14,43 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.object;
+package org.gongxuanzhang.sql.insight.core.object.value;
 
-import org.gongxuanzhang.sql.insight.core.object.condition.AlwaysCondition;
-import org.gongxuanzhang.sql.insight.core.object.condition.BooleanExpression;
-import org.gongxuanzhang.sql.insight.core.object.value.ValueBoolean;
+
+import lombok.EqualsAndHashCode;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class Where implements TableContainer, BooleanExpression {
+@EqualsAndHashCode
+public class ValueBoolean extends BaseValue {
 
-    private Table table;
+    private final boolean value;
 
-    private final BooleanExpression condition;
-
-    public Where(boolean always) {
-        condition = AlwaysCondition.getInstance(always);
-    }
-
-    public Where(BooleanExpression condition) {
-        this.condition = condition;
-    }
-
-    @Override
-    public Table getTable() {
-        return table;
-    }
-
-    @Override
-    public void setTable(Table table) {
-        this.table = table;
+    public ValueBoolean(boolean value) {
+        this.value = value;
     }
 
 
     @Override
-    public ValueBoolean getExpressionValue(Row row) {
-        return null;
+    public Boolean getSource() {
+        return this.value;
+    }
+
+    @Override
+    public int getLength() {
+        return Integer.BYTES;
+    }
+
+
+    @Override
+    public byte[] toBytes() {
+        return new byte[]{(byte) (this.value ? 1 : 0)};
+    }
+
+    @Override
+    public int compareTo(@NotNull Value o) {
+        throw new IllegalArgumentException("ValueBoolean can't compare to " + o.getClass().getName());
     }
 }

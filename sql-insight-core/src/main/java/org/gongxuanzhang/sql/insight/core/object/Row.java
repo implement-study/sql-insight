@@ -40,4 +40,12 @@ public interface Row {
      **/
     long getRowId();
 
+    /**
+     * get value by col name,if row don't have the column,throw exception
+     *
+     * @param colName column name
+     * @return value or error
+     **/
+    Value getValueByColumnName(String colName);
+
 }

@@ -16,29 +16,39 @@
 
 package org.gongxuanzhang.sql.insight.core.object.condition;
 
+import org.gongxuanzhang.sql.insight.core.exception.DateTypeCastException;
 import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
-import org.gongxuanzhang.sql.insight.core.object.value.ValueBoolean;
-
+import org.gongxuanzhang.sql.insight.core.object.value.ValueVarchar;
 
 /**
+ * there are two ways to result values.
+ * fixed value or get column value
+ *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class EqualsCondition implements BooleanExpression {
+public class StringExpression implements Expression {
 
-    private final Expression left;
-    private final Expression right;
+    private final String value;
 
-    public EqualsCondition(Expression left, Expression right) {
-        this.left = left;
-        this.right = right;
+    private final String columnName;
+
+    public StringExpression(String value, String columnName) {
+        this.value = value;
+        this.columnName = columnName;
     }
 
 
     @Override
-    public ValueBoolean getExpressionValue(Row row) {
-        Value leftValue = left.getExpressionValue(row);
-        Value rightValue = right.getExpressionValue(row);
-        return new ValueBoolean(leftValue.compareTo(rightValue) == 0);
+    public ValueVarchar getExpressionValue(Row row) {
+        if (columnName != null) {
+            Value result = row.getValueByColumnName(columnName);
+            if (result instanceof ValueVarchar) {
+                return (ValueVarchar) result;
+            }
+            throw new DateTypeCastException(result.getSource().toString(), "varchar");
+
+        }
+        return new ValueVarchar(value);
     }
 }

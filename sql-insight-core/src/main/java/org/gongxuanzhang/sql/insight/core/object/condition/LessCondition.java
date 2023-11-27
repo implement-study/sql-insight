@@ -17,14 +17,28 @@
 package org.gongxuanzhang.sql.insight.core.object.condition;
 
 import org.gongxuanzhang.sql.insight.core.object.Row;
+import org.gongxuanzhang.sql.insight.core.object.value.Value;
+import org.gongxuanzhang.sql.insight.core.object.value.ValueBoolean;
+
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface Condition {
+public class LessCondition implements BooleanExpression {
 
-    /**
-     * whether the line matches the condition
-     **/
-    boolean hit(Row row);
+    private final Expression left;
+    private final Expression right;
+
+    public LessCondition(Expression left, Expression right) {
+        this.left = left;
+        this.right = right;
+    }
+
+
+    @Override
+    public ValueBoolean getExpressionValue(Row row) {
+        Value leftValue = left.getExpressionValue(row);
+        Value rightValue = right.getExpressionValue(row);
+        return new ValueBoolean(leftValue.compareTo(rightValue) < 0);
+    }
 }
