@@ -17,13 +17,24 @@
 package org.gongxuanzhang.sql.insight.core.object.condition;
 
 import org.gongxuanzhang.sql.insight.core.object.Row;
-import org.gongxuanzhang.sql.insight.core.object.value.Value;
 
 /**
+ * operator expression function
+ *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface BooleanExpression extends Expression {
+@FunctionalInterface
+public interface OperatorFunction {
 
-    @Override
-    Value getExpressionValue(Row row);
+    //  todo
+
+    /**
+     * a operator
+     *
+     * @param left  left expression
+     * @param right right expression
+     * @param row   a row
+     * @return result value
+     **/
+    Boolean apply(Expression left, Expression right, Row row);
 }

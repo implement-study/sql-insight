@@ -16,14 +16,23 @@
 
 package org.gongxuanzhang.sql.insight.core.object.condition;
 
-import org.gongxuanzhang.sql.insight.core.object.Row;
-import org.gongxuanzhang.sql.insight.core.object.value.Value;
+import java.util.Objects;
+
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface BooleanExpression extends Expression {
+public class NotEqualsExpression extends BinaryOperatorExpression {
+
+
+    public NotEqualsExpression(Expression left, Expression right) {
+        super(left, right);
+    }
 
     @Override
-    Value getExpressionValue(Row row);
+    protected OperatorFunction operator() {
+        return (left, right, row) -> !Objects.equals(left.getExpressionValue(row), right.getExpressionValue(row));
+    }
+
+
 }

@@ -18,12 +18,36 @@ package org.gongxuanzhang.sql.insight.core.object.condition;
 
 import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
+import org.gongxuanzhang.sql.insight.core.object.value.ValueBoolean;
 
 /**
+ * binary operator expression
+ * compose left and right
+ *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface BooleanExpression extends Expression {
+public abstract class BinaryOperatorExpression implements BooleanExpression {
+
+
+    protected final Expression left;
+    protected final Expression right;
+
+    protected BinaryOperatorExpression(Expression left, Expression right) {
+        this.left = left;
+        this.right = right;
+    }
+
+    /**
+     * compare between two expression
+     * function params is expression not result.
+     * because the boolean can lazy invoke.(circuit logic)
+     *
+     * @return the function
+     **/
+    protected abstract OperatorFunction operator();
 
     @Override
-    Value getExpressionValue(Row row);
+    public Value getExpressionValue(Row row) {
+        return new ValueBoolean(operator().apply(left, right, row));
+    }
 }

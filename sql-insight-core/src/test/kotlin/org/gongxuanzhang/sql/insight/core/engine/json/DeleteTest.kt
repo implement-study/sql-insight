@@ -16,14 +16,9 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.json
 
-import com.alibaba.fastjson2.JSONObject
-import org.gongxuanzhang.sql.insight.clearDatabase
 import org.gongxuanzhang.sql.insight.core.command.dml.Delete
-import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext
 import org.gongxuanzhang.sql.insight.createTable
-import org.gongxuanzhang.sql.insight.doSql
 import org.gongxuanzhang.sql.insight.toCommand
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 
@@ -32,35 +27,6 @@ import org.junit.jupiter.api.Test
  **/
 class DeleteTest {
 
-    @Test
-    fun testInsert() {
-        createTable("aa", "user")
-        """insert into aa.user (id,name) values
-            (1,'a') ,(2,'b') ,(null,'c')
-            ,(null,'b') ,(null,'c')
-        """.trimMargin().doSql()
-        val context = SqlInsightContext.getInstance()
-        val table = context.tableDefinitionManager.select("aa", "user")
-        val tableJson = JsonEngineSupport.getJsonFile(table)
-        val jsonList = mutableListOf<JSONObject>()
-        tableJson.forEachLine {
-            if (it.isNotEmpty()) {
-                val jsonObject = JSONObject.parse(it)
-                jsonList.add(jsonObject)
-            }
-        }
-        assertEquals(
-            jsonList, listOf(
-                JSONObject.of("id", 1, "name", "a"),
-                JSONObject.of("id", 2, "name", "b"),
-                JSONObject.of("id", 3, "name", "c"),
-                JSONObject.of("id", 4, "name", "b"),
-                JSONObject.of("id", 5, "name", "c"),
-            )
-        )
-        clearDatabase("aa")
-    }
-
 
     @Test
     fun testCommand() {
@@ -68,7 +34,6 @@ class DeleteTest {
         val toCommand = "delete from aa.user  where 'id' >1 and id <1 and id = 1".toCommand()
         val delete = toCommand as Delete
     }
-
 
 
 }

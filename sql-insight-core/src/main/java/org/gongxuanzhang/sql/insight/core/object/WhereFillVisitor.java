@@ -19,9 +19,7 @@ package org.gongxuanzhang.sql.insight.core.object;
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
 import com.alibaba.druid.sql.ast.expr.SQLBooleanExpr;
 import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
-import com.alibaba.druid.sql.visitor.SQLASTVisitor;
-import org.gongxuanzhang.sql.insight.core.object.condition.BooleanCondition;
-import org.gongxuanzhang.sql.insight.core.object.condition.Expression;
+import org.gongxuanzhang.sql.insight.core.object.condition.BooleanExpression;
 
 /**
  * visit a SQLBinaryOpExpr in order get target table info.
@@ -39,8 +37,10 @@ public class WhereFillVisitor implements FillDataVisitor {
 
     @Override
     public boolean visit(SQLBinaryOpExpr x) {
-        OperatorVisitor visitor = new OperatorVisitor();
+        ExpressionVisitor visitor = new ExpressionVisitor();
         x.accept(visitor);
+        Where where = new Where((BooleanExpression) visitor.getExpression());
+        this.whereContainer.setWhere(where);
         return false;
     }
 
@@ -58,27 +58,6 @@ public class WhereFillVisitor implements FillDataVisitor {
         return false;
     }
 
-    private class OperatorVisitor implements SQLASTVisitor {
-        Expression result = null;
 
-        @Override
-        public boolean visit(SQLBinaryOpExpr x) {
-            OperatorVisitor leftVisitor = new OperatorVisitor();
-            OperatorVisitor rightVisitor = new OperatorVisitor();
-            x.getLeft().accept(leftVisitor);
-            x.getRight().accept(rightVisitor);
-            switch (x.getOperator()) {
-                case BooleanAnd:
-                    new BooleanCondition(true, leftVisitor.result, rightVisitor.result);
-                    break;
-                case BooleanOr:
-
-                    break;
-                default:
-                    throw new UnsupportedOperationException(x.getOperator() + "not support");
-
-            }
-        }
-    }
 }
 

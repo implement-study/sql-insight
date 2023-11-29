@@ -16,22 +16,21 @@
 
 package org.gongxuanzhang.sql.insight.core.command.dml;
 
-import com.alibaba.druid.sql.ast.SQLObject;
-import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
 import com.alibaba.druid.sql.ast.statement.SQLDeleteStatement;
-import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 import org.gongxuanzhang.sql.insight.core.analysis.SqlType;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.TableContainer;
 import org.gongxuanzhang.sql.insight.core.object.TableFillVisitor;
 import org.gongxuanzhang.sql.insight.core.object.Where;
+import org.gongxuanzhang.sql.insight.core.object.WhereContainer;
+import org.gongxuanzhang.sql.insight.core.object.WhereFillVisitor;
 import org.gongxuanzhang.sql.insight.core.optimizer.plan.ExecutionPlan;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class Delete implements DmlCommand, TableContainer {
+public class Delete implements DmlCommand, TableContainer, WhereContainer {
 
 
     private final String sql;
@@ -52,22 +51,9 @@ public class Delete implements DmlCommand, TableContainer {
     @Override
     public boolean visit(SQLDeleteStatement x) {
         x.getTableSource().accept(new TableFillVisitor(this));
-        x.getWhere().accept(new SQLASTVisitor(){
-            @Override
-            public boolean visit(SQLBinaryOpExpr x) {
-                System.out.println(x);
-                return false;
-            }
-
-            @Override
-            public void postVisit(SQLObject x) {
-                System.out.println(x.getClass());
-            }
-        });
+        x.getWhere().accept(new WhereFillVisitor(this));
         return false;
     }
-
-
 
 
     @NotNull
@@ -92,4 +78,13 @@ public class Delete implements DmlCommand, TableContainer {
         this.table = table;
     }
 
+    @Override
+    public Where getWhere() {
+        return this.where;
+    }
+
+    @Override
+    public void setWhere(Where where) {
+        this.where = where;
+    }
 }

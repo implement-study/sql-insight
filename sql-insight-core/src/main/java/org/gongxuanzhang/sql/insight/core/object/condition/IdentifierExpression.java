@@ -17,28 +17,22 @@
 package org.gongxuanzhang.sql.insight.core.object.condition;
 
 import org.gongxuanzhang.sql.insight.core.object.Row;
-import org.gongxuanzhang.sql.insight.core.object.value.ValueBoolean;
+import org.gongxuanzhang.sql.insight.core.object.value.Value;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class BooleanCondition implements BooleanExpression {
+public class IdentifierExpression implements Expression {
 
-    private final boolean and;
-    private final BooleanExpression left;
-    private final BooleanExpression right;
+    private final String name;
 
-    public BooleanCondition(boolean and, BooleanExpression left, BooleanExpression right) {
-        this.and = and;
-        this.left = left;
-        this.right = right;
+    public IdentifierExpression(String name) {
+        this.name = name;
     }
 
     @Override
-    public ValueBoolean getExpressionValue(Row row) {
-        if (and) {
-            return new ValueBoolean(left.getExpressionValue(row).getSource() && right.getExpressionValue(row).getSource());
-        }
-        return new ValueBoolean(left.getExpressionValue(row).getSource() || right.getExpressionValue(row).getSource());
+    public Value getExpressionValue(Row row) {
+        //   todo
+        return null;
     }
 }

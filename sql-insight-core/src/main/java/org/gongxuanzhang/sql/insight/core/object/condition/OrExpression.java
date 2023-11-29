@@ -16,14 +16,20 @@
 
 package org.gongxuanzhang.sql.insight.core.object.condition;
 
-import org.gongxuanzhang.sql.insight.core.object.Row;
-import org.gongxuanzhang.sql.insight.core.object.value.Value;
-
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface BooleanExpression extends Expression {
+public class OrExpression extends BinaryOperatorExpression {
+
+
+    public OrExpression(Expression left, Expression right) {
+        super(left, right);
+    }
 
     @Override
-    Value getExpressionValue(Row row);
+    protected OperatorFunction operator() {
+        return (left, right, row) -> left.getBooleanValue(row) || right.getBooleanValue(row);
+    }
+
+
 }

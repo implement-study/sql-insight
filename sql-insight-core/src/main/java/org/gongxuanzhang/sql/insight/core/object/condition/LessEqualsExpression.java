@@ -16,29 +16,20 @@
 
 package org.gongxuanzhang.sql.insight.core.object.condition;
 
-import org.gongxuanzhang.sql.insight.core.object.Row;
-import org.gongxuanzhang.sql.insight.core.object.value.Value;
-import org.gongxuanzhang.sql.insight.core.object.value.ValueBoolean;
-
-
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class EqualsCondition implements BooleanExpression {
+public class LessEqualsExpression extends BinaryOperatorExpression {
 
-    private final Expression left;
-    private final Expression right;
 
-    public EqualsCondition(Expression left, Expression right) {
-        this.left = left;
-        this.right = right;
+    public LessEqualsExpression(Expression left, Expression right) {
+        super(left, right);
     }
-
 
     @Override
-    public ValueBoolean getExpressionValue(Row row) {
-        Value leftValue = left.getExpressionValue(row);
-        Value rightValue = right.getExpressionValue(row);
-        return new ValueBoolean(leftValue.compareTo(rightValue) == 0);
+    protected OperatorFunction operator() {
+        return (left, right, row) -> left.getExpressionValue(row).compareTo(right.getExpressionValue(row)) < 0;
     }
+
+
 }

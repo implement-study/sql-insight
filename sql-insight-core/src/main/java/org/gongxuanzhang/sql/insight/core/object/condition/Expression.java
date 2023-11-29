@@ -16,8 +16,14 @@
 
 package org.gongxuanzhang.sql.insight.core.object.condition;
 
+import org.gongxuanzhang.sql.insight.core.exception.DateTypeCastException;
 import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
+import org.gongxuanzhang.sql.insight.core.object.value.ValueBoolean;
+import org.gongxuanzhang.sql.insight.core.object.value.ValueInt;
+import org.gongxuanzhang.sql.insight.core.object.value.ValueVarchar;
+
+import java.util.Objects;
 
 /**
  * you can calculate the result with row
@@ -32,4 +38,24 @@ public interface Expression {
      * @return value
      **/
     Value getExpressionValue(Row row);
+
+
+    /**
+     * value to boolean support expression
+     **/
+    default Boolean getBooleanValue(Row row) {
+        Value expressionValue = getExpressionValue(row);
+        if (expressionValue instanceof ValueBoolean) {
+            return ((ValueBoolean) expressionValue).getSource();
+        }
+        if (expressionValue instanceof ValueInt) {
+            int value = ((ValueInt) expressionValue).getSource();
+            return !Objects.equals(value, 0);
+        }
+        if (expressionValue instanceof ValueVarchar) {
+            String string = expressionValue.getSource().toString();
+            return (!string.isEmpty());
+        }
+        throw new DateTypeCastException("boolean", expressionValue.getSource().getClass().getName());
+    }
 }
