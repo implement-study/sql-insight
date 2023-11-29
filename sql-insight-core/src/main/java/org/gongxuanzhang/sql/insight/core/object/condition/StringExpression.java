@@ -16,9 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.object.condition;
 
-import org.gongxuanzhang.sql.insight.core.exception.DateTypeCastException;
 import org.gongxuanzhang.sql.insight.core.object.Row;
-import org.gongxuanzhang.sql.insight.core.object.value.Value;
 import org.gongxuanzhang.sql.insight.core.object.value.ValueVarchar;
 
 /**
@@ -31,24 +29,13 @@ public class StringExpression implements Expression {
 
     private final String value;
 
-    private final String columnName;
-
-    public StringExpression(String value, String columnName) {
+    public StringExpression(String value) {
         this.value = value;
-        this.columnName = columnName;
     }
 
 
     @Override
     public ValueVarchar getExpressionValue(Row row) {
-        if (columnName != null) {
-            Value result = row.getValueByColumnName(columnName);
-            if (result instanceof ValueVarchar) {
-                return (ValueVarchar) result;
-            }
-            throw new DateTypeCastException(result.getSource().toString(), "varchar");
-
-        }
         return new ValueVarchar(value);
     }
 }

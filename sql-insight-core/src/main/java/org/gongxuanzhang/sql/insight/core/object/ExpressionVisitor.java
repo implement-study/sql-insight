@@ -17,6 +17,7 @@
 package org.gongxuanzhang.sql.insight.core.object;
 
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
+import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
@@ -32,6 +33,7 @@ public class ExpressionVisitor implements SQLASTVisitor {
 
 
     private Expression expression = null;
+
 
     @Override
     public boolean visit(SQLBinaryOpExpr x) {
@@ -61,10 +63,11 @@ public class ExpressionVisitor implements SQLASTVisitor {
                 this.expression = new GreatEqualsExpression(left, right);
                 break;
             case Equality:
-                this.expression = new EqualsExpression(left,right);
+                this.expression = new EqualsExpression(left, right);
                 break;
             case NotEqual:
-                this.expression = new NotEqualsExpression(left,right);
+            case LessThanOrGreater:
+                this.expression = new NotEqualsExpression(left, right);
                 break;
             default:
                 throw new UnsupportedOperationException("operator [" + x.getOperator() + "] not support");
@@ -82,6 +85,12 @@ public class ExpressionVisitor implements SQLASTVisitor {
     @Override
     public boolean visit(SQLIdentifierExpr x) {
         this.expression = new IdentifierExpression(x.getName());
+        return false;
+    }
+
+    @Override
+    public boolean visit(SQLCharExpr x) {
+        this.expression = new StringExpression(x.getText());
         return false;
     }
 
