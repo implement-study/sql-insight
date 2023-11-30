@@ -16,40 +16,53 @@
 
 package org.gongxuanzhang.sql.insight.core.object;
 
-import org.gongxuanzhang.sql.insight.core.object.condition.AlwaysCondition;
-import org.gongxuanzhang.sql.insight.core.object.condition.BooleanExpression;
-import org.gongxuanzhang.sql.insight.core.object.value.ValueBoolean;
+import org.gongxuanzhang.sql.insight.core.object.value.Value;
+
+import java.util.List;
+
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class Where implements TableContainer, BooleanExpression {
+public class DeleteRow implements Row, TableContainer {
 
     private Table table;
 
-    private final BooleanExpression condition;
+    private final List<Value> valueList;
 
-    public Where(boolean always) {
-        condition = AlwaysCondition.getInstance(always);
+    private final long rowId;
+
+    public DeleteRow(List<Value> valueList, long rowId) {
+        this.rowId = rowId;
+        this.valueList = valueList;
     }
 
-    public Where(BooleanExpression condition) {
-        this.condition = condition;
+
+    @Override
+    public List<Value> getValues() {
+        return valueList;
     }
 
     @Override
+    public long getRowId() {
+        return this.rowId;
+    }
+
+
+    @Override
+    public Value getValueByColumnName(String colName) {
+        Integer columnIndexByName = table.getColumnIndexByName(colName);
+        return this.valueList.get(columnIndexByName);
+    }
+
+
+    @Override
     public Table getTable() {
-        return table;
+        return this.table;
     }
 
     @Override
     public void setTable(Table table) {
         this.table = table;
-    }
-
-
-    @Override
-    public ValueBoolean getExpressionValue(Row row) {
-        return new ValueBoolean(condition.getBooleanValue(row));
     }
 }

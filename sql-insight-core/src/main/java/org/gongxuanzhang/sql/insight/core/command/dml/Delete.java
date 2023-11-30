@@ -24,6 +24,7 @@ import org.gongxuanzhang.sql.insight.core.object.TableFillVisitor;
 import org.gongxuanzhang.sql.insight.core.object.Where;
 import org.gongxuanzhang.sql.insight.core.object.WhereContainer;
 import org.gongxuanzhang.sql.insight.core.object.WhereFillVisitor;
+import org.gongxuanzhang.sql.insight.core.optimizer.plan.DeleteExecutionPlan;
 import org.gongxuanzhang.sql.insight.core.optimizer.plan.ExecutionPlan;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +32,6 @@ import org.jetbrains.annotations.NotNull;
  * @author gongxuanzhangmelt@gmail.com
  **/
 public class Delete implements DmlCommand, TableContainer, WhereContainer {
-
 
     private final String sql;
 
@@ -45,7 +45,7 @@ public class Delete implements DmlCommand, TableContainer, WhereContainer {
 
     @Override
     public ExecutionPlan plan() {
-        return null;
+        return new DeleteExecutionPlan(this);
     }
 
     @Override

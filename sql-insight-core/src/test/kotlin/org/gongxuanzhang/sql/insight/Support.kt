@@ -45,6 +45,7 @@ fun createTable(databaseName: String, tableName: String) {
 }
 
 fun insert(databaseName: String, tableName: String){
+    clearDatabase(databaseName)
     createTable(databaseName,tableName)
     """insert into aa.user (id,name) values
             (1,'a') ,(2,'b') ,(null,'c')

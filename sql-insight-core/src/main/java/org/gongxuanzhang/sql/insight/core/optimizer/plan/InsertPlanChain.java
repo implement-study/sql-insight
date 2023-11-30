@@ -81,5 +81,6 @@ public class InsertPlanChain implements PlanChain {
             EventPublisher.getInstance().publishEvent(new BeforeInsertEvent(row));
             storageEngine.insert(row);
         }
+
     }
 }

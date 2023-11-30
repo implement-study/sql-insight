@@ -18,15 +18,18 @@ package org.gongxuanzhang.sql.insight.core.engine.json;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.gongxuanzhang.sql.insight.core.command.dml.Delete;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
 import org.gongxuanzhang.sql.insight.core.exception.CreateTableException;
 import org.gongxuanzhang.sql.insight.core.exception.InsertException;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.object.Column;
 import org.gongxuanzhang.sql.insight.core.object.DataType;
+import org.gongxuanzhang.sql.insight.core.object.DeleteRow;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
+import org.gongxuanzhang.sql.insight.core.result.DeleteResult;
 import org.gongxuanzhang.sql.insight.core.result.ExceptionResult;
 import org.gongxuanzhang.sql.insight.core.result.InsertResult;
 import org.gongxuanzhang.sql.insight.core.result.MessageResult;
@@ -135,8 +138,29 @@ public class JsonEngine implements StorageEngine {
     }
 
     @Override
-    public ResultInterface delete() {
-        return null;
+    public ResultInterface delete(Delete delete) {
+        File jsonFile = JsonEngineSupport.getJsonFile(delete.getTable());
+        int deleteCount = 0;
+        try {
+            List<String> lines = Files.readAllLines(jsonFile.toPath());
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                if (line.isEmpty()) {
+                    continue;
+                }
+                DeleteRow row = JsonEngineSupport.getDeleteRowFromJsonLine(line, delete.getTable());
+                if (Boolean.TRUE.equals(delete.getWhere().getBooleanValue(row))) {
+                    lines.set(i, "");
+                    deleteCount++;
+                }
+            }
+            if (deleteCount > 0) {
+                Files.write(jsonFile.toPath(), lines);
+            }
+        } catch (IOException e) {
+            throw new RuntimeIoException(e);
+        }
+        return new DeleteResult(deleteCount);
     }
 
     @Override

@@ -17,6 +17,7 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage;
 
 
+import org.gongxuanzhang.sql.insight.core.command.dml.Delete;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
@@ -70,7 +71,7 @@ public interface StorageEngine {
     /**
      * delete
      **/
-    ResultInterface delete();
+    ResultInterface delete(Delete delete);
 
     /**
      * select

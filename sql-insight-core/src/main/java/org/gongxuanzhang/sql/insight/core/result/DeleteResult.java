@@ -14,24 +14,20 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.object.condition;
-
-import org.gongxuanzhang.sql.insight.core.object.Row;
-import org.gongxuanzhang.sql.insight.core.object.value.Value;
+package org.gongxuanzhang.sql.insight.core.result;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class IdentifierExpression implements Expression {
+public class DeleteResult implements ResultInterface {
 
-    private final String name;
+    private final int deleteRow;
 
-    public IdentifierExpression(String name) {
-        this.name = name;
+    public DeleteResult(int deleteRow) {
+        this.deleteRow = deleteRow;
     }
 
-    @Override
-    public Value getExpressionValue(Row row) {
-        return row.getValueByColumnName(name);
+    public int getDeleteRow() {
+        return deleteRow;
     }
 }

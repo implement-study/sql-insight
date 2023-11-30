@@ -50,9 +50,11 @@ public final class Table implements FillDataVisitor, CommentContainer {
 
     private String engine;
 
+    //  support operator
+
     private final Map<String, Column> columnMap = new HashMap<>();
 
-    //  support operator
+    private final Map<String, Integer> columnIndex = new HashMap<>();
 
     private int autoColIndex = -1;
 
@@ -63,6 +65,14 @@ public final class Table implements FillDataVisitor, CommentContainer {
 
     private int primaryKeyIndex = -1;
 
+
+    public Integer getColumnIndexByName(String colName) {
+        Integer index = this.columnIndex.get(colName);
+        if (index == null) {
+            throw new UnknownColumnException(name);
+        }
+        return index;
+    }
 
     public Column getColumnByName(String name) {
         Column column = columnMap.get(name);
@@ -89,6 +99,10 @@ public final class Table implements FillDataVisitor, CommentContainer {
             }
             this.primaryKeyIndex = columnList.size() - 1;
         }
+        if (column.isNotNull()) {
+            this.notNullIndex.add(columnList.size() - 1);
+        }
+        this.columnIndex.put(column.getName(), this.columnList.size() - 1);
         this.columnMap.put(column.getName(), column);
     }
 
@@ -101,6 +115,7 @@ public final class Table implements FillDataVisitor, CommentContainer {
         if (x.getEngine() != null) {
             x.getEngine().accept(new EngineVisitor());
         }
+
         return true;
     }
 

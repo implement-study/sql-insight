@@ -17,7 +17,10 @@
 package org.gongxuanzhang.sql.insight.core.engine.json
 
 import org.gongxuanzhang.sql.insight.core.command.dml.Delete
-import org.gongxuanzhang.sql.insight.createTable
+import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext
+import org.gongxuanzhang.sql.insight.doSql
+import org.gongxuanzhang.sql.insight.forEachLineIndex
+import org.gongxuanzhang.sql.insight.insert
 import org.gongxuanzhang.sql.insight.toCommand
 import org.junit.jupiter.api.Test
 
@@ -30,9 +33,21 @@ class DeleteTest {
 
     @Test
     fun testCommand() {
-        createTable("aa", "user")
         val toCommand = "delete from aa.user  where 'id' >1 and id <1 and id = 1".toCommand()
-        val delete = toCommand as Delete
+        assert(toCommand is Delete)
+    }
+
+    @Test
+    fun testDelete() {
+        insert("aa", "user")
+        "delete from aa.user  where id>2 ".doSql()
+        val table = SqlInsightContext.getInstance().tableDefinitionManager.select("aa", "user")
+        val tableJson = JsonEngineSupport.getJsonFile(table)
+        tableJson.forEachLineIndex { index, line ->
+            if (index > 3) {
+                assert(line.isEmpty())
+            }
+        }
     }
 
 

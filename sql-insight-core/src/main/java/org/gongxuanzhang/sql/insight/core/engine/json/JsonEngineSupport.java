@@ -17,10 +17,18 @@
 package org.gongxuanzhang.sql.insight.core.engine.json;
 
 import com.alibaba.fastjson2.JSONObject;
+import org.gongxuanzhang.sql.insight.core.exception.DateTypeCastException;
 import org.gongxuanzhang.sql.insight.core.object.Column;
+import org.gongxuanzhang.sql.insight.core.object.DataType;
+import org.gongxuanzhang.sql.insight.core.object.DeleteRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
+import org.gongxuanzhang.sql.insight.core.object.value.Value;
+import org.gongxuanzhang.sql.insight.core.object.value.ValueInt;
+import org.gongxuanzhang.sql.insight.core.object.value.ValueNull;
+import org.gongxuanzhang.sql.insight.core.object.value.ValueVarchar;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,6 +64,33 @@ public class JsonEngineSupport {
      **/
     static File getJsonFile(Table table) {
         return new File(table.getDatabase().getDbFolder(), table.getName() + ".json");
+    }
+
+    static DeleteRow getDeleteRowFromJsonLine(String jsonLine, Table table) {
+        JSONObject jsonObject = JSONObject.parseObject(jsonLine);
+        Column primaryKey = table.getColumnList().get(table.getPrimaryKeyIndex());
+        long id = jsonObject.getLongValue(primaryKey.getName());
+        List<Value> valueList = new ArrayList<>(table.getColumnList().size());
+        for (Column column : table.getColumnList()) {
+            valueList.add(wrapValue(column, jsonObject.get(column.getName())));
+        }
+        DeleteRow deleteRow = new DeleteRow(valueList, id);
+        deleteRow.setTable(table);
+        return deleteRow;
+    }
+
+    private static Value wrapValue(Column column, Object o) {
+        DataType.Type type = column.getDataType().getType();
+        if (type == DataType.Type.INT) {
+            return new ValueInt((int) o);
+        }
+        if (type == DataType.Type.VARCHAR || type == DataType.Type.CHAR) {
+            return new ValueVarchar(o.toString());
+        }
+        if (o == null) {
+            return column.getDefaultValue() == null ? ValueNull.getInstance() : column.getDefaultValue();
+        }
+        throw new DateTypeCastException(column.getDataType().toString(), o.toString());
     }
 
 

@@ -14,24 +14,33 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.object.condition;
+package org.gongxuanzhang.sql.insight.core.optimizer.plan;
 
-import org.gongxuanzhang.sql.insight.core.object.Row;
-import org.gongxuanzhang.sql.insight.core.object.value.Value;
+import org.gongxuanzhang.sql.insight.core.command.dml.Delete;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class IdentifierExpression implements Expression {
+public class DeleteExecutionPlan implements ExecutionPlan {
 
-    private final String name;
+    private final Delete delete;
 
-    public IdentifierExpression(String name) {
-        this.name = name;
+    public DeleteExecutionPlan(Delete delete) {
+        this.delete = delete;
     }
 
     @Override
-    public Value getExpressionValue(Row row) {
-        return row.getValueByColumnName(name);
+    public String showExplain() {
+        return "delete ";
+    }
+
+    @Override
+    public PlanChain getPlanChain() {
+        return new DeletePlanChain(delete);
+    }
+
+    @Override
+    public String getOrginalSql() {
+        return delete.getSql();
     }
 }
