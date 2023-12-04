@@ -16,17 +16,17 @@
 
 package org.gongxuanzhang.sql.insight.core.command.dml;
 
-import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.statement.SQLUpdateSetItem;
 import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement;
 import org.gongxuanzhang.sql.insight.core.analysis.SqlType;
+import org.gongxuanzhang.sql.insight.core.object.ExpressionVisitor;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.TableContainer;
 import org.gongxuanzhang.sql.insight.core.object.TableFillVisitor;
 import org.gongxuanzhang.sql.insight.core.object.Where;
 import org.gongxuanzhang.sql.insight.core.object.WhereContainer;
 import org.gongxuanzhang.sql.insight.core.object.WhereFillVisitor;
-import org.gongxuanzhang.sql.insight.core.object.value.Value;
+import org.gongxuanzhang.sql.insight.core.object.condition.Expression;
 import org.gongxuanzhang.sql.insight.core.optimizer.plan.ExecutionPlan;
 import org.gongxuanzhang.sql.insight.core.optimizer.plan.UpdateExecutionPlan;
 import org.jetbrains.annotations.NotNull;
@@ -43,8 +43,7 @@ public class Update implements DmlCommand, TableContainer, WhereContainer {
 
     private Table table;
 
-    private final Map<String, Value> updateField = new HashMap<>();
-
+    private final Map<String, Expression> updateField = new HashMap<>();
     private Where where;
 
     public Update(String sql) {
@@ -66,13 +65,15 @@ public class Update implements DmlCommand, TableContainer, WhereContainer {
 
 
     @Override
-    public boolean visit(SQLUpdateSetItem x){
-        SQLExpr column = x.getColumn();
-        System.out.println(column);
-        SQLExpr value = x.getValue();
-        System.out.println(value);
+    public boolean visit(SQLUpdateSetItem x) {
+        String column = x.getColumn().toString();
+        //  don't support  table.column
+        ExpressionVisitor expressionVisitor = new ExpressionVisitor();
+        x.getValue().accept(expressionVisitor);
+        this.updateField.put(column, expressionVisitor.getExpression());
         return false;
     }
+
 
     @NotNull
     @Override

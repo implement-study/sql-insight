@@ -16,19 +16,28 @@
 
 package org.gongxuanzhang.sql.insight.core.object.condition;
 
+import org.gongxuanzhang.sql.insight.core.object.value.ValueInt;
+
+
+
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class AndExpression extends BooleanBinaryOperatorExpression {
+public class PlusExpression extends NumberOperatorExpression {
 
 
-    public AndExpression(Expression left, Expression right) {
+    public PlusExpression(Expression left, Expression right) {
         super(left, right);
     }
 
     @Override
-    protected BooleanOperatorFunction operator() {
-        return (left, right, row) -> left.getBooleanValue(row) && right.getBooleanValue(row);
+    protected NumberValueOperatorFunction operator() {
+        return (left, right) -> new ValueInt(left.getSource() * right.getSource());
+    }
+
+    @Override
+    protected char operatorDesc() {
+        return '*';
     }
 
 

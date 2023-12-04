@@ -19,7 +19,7 @@ package org.gongxuanzhang.sql.insight.core.object.condition;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class LessExpression extends BinaryOperatorExpression {
+public class LessExpression extends BooleanBinaryOperatorExpression {
 
 
     public LessExpression(Expression left, Expression right) {
@@ -27,7 +27,7 @@ public class LessExpression extends BinaryOperatorExpression {
     }
 
     @Override
-    protected OperatorFunction operator() {
+    protected BooleanOperatorFunction operator() {
         return (left, right, row) -> left.getExpressionValue(row).compareTo(right.getExpressionValue(row)) < 0;
     }
 

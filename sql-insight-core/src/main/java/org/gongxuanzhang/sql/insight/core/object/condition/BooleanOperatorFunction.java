@@ -16,20 +16,24 @@
 
 package org.gongxuanzhang.sql.insight.core.object.condition;
 
+import org.gongxuanzhang.sql.insight.core.object.Row;
+
 /**
+ * operator expression function
+ *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class AndExpression extends BooleanBinaryOperatorExpression {
+@FunctionalInterface
+public interface BooleanOperatorFunction {
 
 
-    public AndExpression(Expression left, Expression right) {
-        super(left, right);
-    }
-
-    @Override
-    protected BooleanOperatorFunction operator() {
-        return (left, right, row) -> left.getBooleanValue(row) && right.getBooleanValue(row);
-    }
-
-
+    /**
+     * a operator
+     *
+     * @param left  left expression
+     * @param right right expression
+     * @param row   a row
+     * @return result value
+     **/
+    Boolean apply(Expression left, Expression right, Row row);
 }

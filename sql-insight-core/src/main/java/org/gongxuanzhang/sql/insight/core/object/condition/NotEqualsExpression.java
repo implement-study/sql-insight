@@ -22,7 +22,7 @@ import java.util.Objects;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class NotEqualsExpression extends BinaryOperatorExpression {
+public class NotEqualsExpression extends BooleanBinaryOperatorExpression {
 
 
     public NotEqualsExpression(Expression left, Expression right) {
@@ -30,7 +30,7 @@ public class NotEqualsExpression extends BinaryOperatorExpression {
     }
 
     @Override
-    protected OperatorFunction operator() {
+    protected BooleanOperatorFunction operator() {
         return (left, right, row) -> !Objects.equals(left.getExpressionValue(row), right.getExpressionValue(row));
     }
 

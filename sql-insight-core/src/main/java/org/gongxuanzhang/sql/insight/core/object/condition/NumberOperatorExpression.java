@@ -18,36 +18,41 @@ package org.gongxuanzhang.sql.insight.core.object.condition;
 
 import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
-import org.gongxuanzhang.sql.insight.core.object.value.ValueBoolean;
+import org.gongxuanzhang.sql.insight.core.object.value.ValueInt;
 
 /**
- * binary operator expression
- * compose left and right
+ * calc two value to one value.
+ * must be number
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public abstract class BinaryOperatorExpression implements BooleanExpression {
+public abstract class NumberOperatorExpression implements Expression {
 
 
     protected final Expression left;
     protected final Expression right;
 
-    protected BinaryOperatorExpression(Expression left, Expression right) {
+    protected NumberOperatorExpression(Expression left, Expression right) {
         this.left = left;
         this.right = right;
     }
 
     /**
-     * compare between two expression
-     * function params is expression not result.
-     * because the boolean can lazy invoke.(circuit logic)
+     * calculate a result from left and right value
      *
      * @return the function
      **/
-    protected abstract OperatorFunction operator();
+    protected abstract NumberValueOperatorFunction operator();
+
+    protected abstract char operatorDesc();
 
     @Override
     public Value getExpressionValue(Row row) {
-        return new ValueBoolean(operator().apply(left, right, row));
+        Value leftValue = left.getExpressionValue(row);
+        Value rightValue = right.getExpressionValue(row);
+        if (!(leftValue instanceof ValueInt) || !(rightValue instanceof ValueInt)) {
+            throw new UnsupportedOperationException(operatorDesc() + " must be pair of number ");
+        }
+        return operator().apply((ValueInt) leftValue, (ValueInt) rightValue);
     }
 }

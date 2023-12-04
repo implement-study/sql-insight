@@ -19,7 +19,7 @@ package org.gongxuanzhang.sql.insight.core.object.condition;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class OrExpression extends BinaryOperatorExpression {
+public class OrExpression extends BooleanBinaryOperatorExpression {
 
 
     public OrExpression(Expression left, Expression right) {
@@ -27,7 +27,7 @@ public class OrExpression extends BinaryOperatorExpression {
     }
 
     @Override
-    protected OperatorFunction operator() {
+    protected BooleanOperatorFunction operator() {
         return (left, right, row) -> left.getBooleanValue(row) || right.getBooleanValue(row);
     }
 

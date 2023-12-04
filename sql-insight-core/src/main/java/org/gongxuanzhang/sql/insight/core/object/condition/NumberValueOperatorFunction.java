@@ -16,7 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.object.condition;
 
-import org.gongxuanzhang.sql.insight.core.object.Row;
+import org.gongxuanzhang.sql.insight.core.object.value.ValueInt;
 
 /**
  * operator expression function
@@ -24,17 +24,15 @@ import org.gongxuanzhang.sql.insight.core.object.Row;
  * @author gongxuanzhangmelt@gmail.com
  **/
 @FunctionalInterface
-public interface OperatorFunction {
+public interface NumberValueOperatorFunction {
 
-    //  todo
 
     /**
      * a operator
      *
-     * @param left  left expression
-     * @param right right expression
-     * @param row   a row
+     * @param leftValue  left expression
+     * @param rightValue right expression
      * @return result value
      **/
-    Boolean apply(Expression left, Expression right, Row row);
+    ValueInt apply(ValueInt leftValue, ValueInt rightValue);
 }

@@ -17,6 +17,7 @@
 package org.gongxuanzhang.sql.insight.core.engine.json
 
 import org.gongxuanzhang.sql.insight.core.command.dml.Update
+import org.gongxuanzhang.sql.insight.insert
 import org.gongxuanzhang.sql.insight.toCommand
 import org.junit.jupiter.api.Test
 
@@ -29,7 +30,7 @@ class UpdateTest {
 
     @Test
     fun updateCommand() {
-
+        insert("aa","user")
         val toCommand = "update aa.user set name = name + 'a' where id > 1".toCommand()
         assert(toCommand is Update)
     }

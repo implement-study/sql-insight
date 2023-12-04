@@ -19,7 +19,7 @@ package org.gongxuanzhang.sql.insight.core.object.condition;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class GreatExpression extends BinaryOperatorExpression {
+public class GreatExpression extends BooleanBinaryOperatorExpression {
 
 
     public GreatExpression(Expression left, Expression right) {
@@ -27,7 +27,7 @@ public class GreatExpression extends BinaryOperatorExpression {
     }
 
     @Override
-    protected OperatorFunction operator() {
+    protected BooleanOperatorFunction operator() {
         return (left, right, row) -> left.getExpressionValue(row).compareTo(right.getExpressionValue(row)) > 0;
     }
 

@@ -69,6 +69,18 @@ public class ExpressionVisitor implements SQLASTVisitor {
             case LessThanOrGreater:
                 this.expression = new NotEqualsExpression(left, right);
                 break;
+            case Add:
+                this.expression = new AddExpression(left, right);
+                break;
+            case Subtract:
+                this.expression = new SubtractExpression(left, right);
+                break;
+            case Multiply:
+                this.expression = new PlusExpression(left, right);
+                break;
+            case Divide:
+                this.expression = new DivideExpression(left, right);
+                break;
             default:
                 throw new UnsupportedOperationException("operator [" + x.getOperator() + "] not support");
 
