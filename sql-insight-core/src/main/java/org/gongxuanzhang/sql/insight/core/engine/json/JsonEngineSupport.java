@@ -21,6 +21,7 @@ import org.gongxuanzhang.sql.insight.core.exception.DateTypeCastException;
 import org.gongxuanzhang.sql.insight.core.object.Column;
 import org.gongxuanzhang.sql.insight.core.object.DataType;
 import org.gongxuanzhang.sql.insight.core.object.DeleteRow;
+import org.gongxuanzhang.sql.insight.core.object.PhysicRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
 import org.gongxuanzhang.sql.insight.core.object.value.ValueInt;
@@ -66,18 +67,19 @@ public class JsonEngineSupport {
         return new File(table.getDatabase().getDbFolder(), table.getName() + ".json");
     }
 
-    static DeleteRow getDeleteRowFromJsonLine(String jsonLine, Table table) {
-        JSONObject jsonObject = JSONObject.parseObject(jsonLine);
+
+    static PhysicRow getPhysicRowFromJson(JSONObject jsonObject , Table table) {
         Column primaryKey = table.getColumnList().get(table.getPrimaryKeyIndex());
         long id = jsonObject.getLongValue(primaryKey.getName());
         List<Value> valueList = new ArrayList<>(table.getColumnList().size());
         for (Column column : table.getColumnList()) {
             valueList.add(wrapValue(column, jsonObject.get(column.getName())));
         }
-        DeleteRow deleteRow = new DeleteRow(valueList, id);
-        deleteRow.setTable(table);
-        return deleteRow;
+        PhysicRow physicRow = new PhysicRow(valueList, id);
+        physicRow.setTable(table);
+        return physicRow;
     }
+
 
     private static Value wrapValue(Column column, Object o) {
         DataType.Type type = column.getDataType().getType();

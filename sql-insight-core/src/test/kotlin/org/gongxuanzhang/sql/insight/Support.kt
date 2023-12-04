@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight
 
 import org.gongxuanzhang.sql.insight.core.environment.DefaultProperty
 import org.gongxuanzhang.sql.insight.core.environment.GlobalContext
+import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext
 import java.io.File
 
 
@@ -27,6 +28,10 @@ fun databaseFile(database: String): File {
     return File(File(context[DefaultProperty.DATA_DIR.key].toString()), database)
 }
 
+
+fun context(): SqlInsightContext {
+    return SqlInsightContext.getInstance()
+}
 
 fun clearDatabase(databaseName: String) {
     "drop database if exists $databaseName".doSql()
@@ -44,9 +49,9 @@ fun createTable(databaseName: String, tableName: String) {
             )""".trimMargin().doSql()
 }
 
-fun insert(databaseName: String, tableName: String){
+fun insert(databaseName: String, tableName: String) {
     clearDatabase(databaseName)
-    createTable(databaseName,tableName)
+    createTable(databaseName, tableName)
     """insert into aa.user (id,name) values
             (1,'a') ,(2,'b') ,(null,'c')
             ,(null,'b') ,(null,'c')

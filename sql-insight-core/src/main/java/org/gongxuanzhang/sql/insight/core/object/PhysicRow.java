@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class UpdateRow implements Row, TableContainer {
+public class PhysicRow implements Row, TableContainer {
 
     private Table table;
 
@@ -32,7 +32,7 @@ public class UpdateRow implements Row, TableContainer {
 
     private final long rowId;
 
-    public UpdateRow(List<Value> valueList, long rowId) {
+    public PhysicRow(List<Value> valueList, long rowId) {
         this.rowId = rowId;
         this.valueList = valueList;
     }

@@ -37,8 +37,7 @@ class InsertTest {
     @Test
     fun testInsert() {
         insert("aa", "user")
-        val context = SqlInsightContext.getInstance()
-        val table = context.tableDefinitionManager.select("aa", "user")
+        val table = context().tableDefinitionManager.select("aa", "user")
         val tableJson = JsonEngineSupport.getJsonFile(table)
         val jsonList = mutableListOf<JSONObject>()
         tableJson.forEachLine {

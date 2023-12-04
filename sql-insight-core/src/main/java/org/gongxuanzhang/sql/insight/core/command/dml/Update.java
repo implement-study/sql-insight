@@ -106,4 +106,8 @@ public class Update implements DmlCommand, TableContainer, WhereContainer {
     public void setWhere(Where where) {
         this.where = where;
     }
+
+    public Map<String, Expression> getUpdateField() {
+        return updateField;
+    }
 }

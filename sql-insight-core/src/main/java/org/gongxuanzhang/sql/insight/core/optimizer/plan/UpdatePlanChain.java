@@ -17,6 +17,8 @@
 package org.gongxuanzhang.sql.insight.core.optimizer.plan;
 
 import org.gongxuanzhang.sql.insight.core.command.dml.Update;
+import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -24,21 +26,20 @@ import java.util.Iterator;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class UpdatePlanChain implements PlanChain {
+public class UpdatePlanChain extends SingleStoragePlanChain {
 
     private final Update update;
 
 
     public UpdatePlanChain(Update update) {
+        super(update.getTable().getEngine());
         this.update = update;
     }
 
 
-
-    @NotNull
     @Override
-    public Iterator<PlanNode> iterator() {
-        return null;
+    protected void doPlan(StorageEngine storageEngine, ExecuteContext context) {
+        storageEngine.update(update);
     }
 
 

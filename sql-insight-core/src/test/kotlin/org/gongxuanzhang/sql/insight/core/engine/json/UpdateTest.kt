@@ -16,9 +16,13 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.json
 
+import com.alibaba.fastjson2.JSONObject
+import org.gongxuanzhang.sql.insight.context
 import org.gongxuanzhang.sql.insight.core.command.dml.Update
+import org.gongxuanzhang.sql.insight.doSql
 import org.gongxuanzhang.sql.insight.insert
 import org.gongxuanzhang.sql.insight.toCommand
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 
@@ -30,9 +34,33 @@ class UpdateTest {
 
     @Test
     fun updateCommand() {
-        insert("aa","user")
+        insert("aa", "user")
         val toCommand = "update aa.user set name = name + 'a' where id > 1".toCommand()
         assert(toCommand is Update)
+    }
+
+    @Test
+    fun updateTest() {
+        insert("aa", "user")
+        "update aa.user set name = name + 'a' where id > 1".doSql()
+        val table = context().tableDefinitionManager.select("aa", "user")
+        val tableJson = JsonEngineSupport.getJsonFile(table)
+        val jsonList = mutableListOf<JSONObject>()
+        tableJson.forEachLine {
+            if (it.isNotEmpty()) {
+                val jsonObject = JSONObject.parse(it)
+                jsonList.add(jsonObject)
+            }
+        }
+        Assertions.assertEquals(
+            jsonList, listOf(
+                JSONObject.of("id", 1, "name", "a"),
+                JSONObject.of("id", 2, "name", "ba"),
+                JSONObject.of("id", 3, "name", "ca"),
+                JSONObject.of("id", 4, "name", "ba"),
+                JSONObject.of("id", 5, "name", "ca"),
+            )
+        )
     }
 
 

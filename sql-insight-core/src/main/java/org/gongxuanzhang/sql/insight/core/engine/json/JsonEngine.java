@@ -28,7 +28,9 @@ import org.gongxuanzhang.sql.insight.core.object.Column;
 import org.gongxuanzhang.sql.insight.core.object.DataType;
 import org.gongxuanzhang.sql.insight.core.object.DeleteRow;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
+import org.gongxuanzhang.sql.insight.core.object.PhysicRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
+import org.gongxuanzhang.sql.insight.core.object.Where;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
 import org.gongxuanzhang.sql.insight.core.result.DeleteResult;
 import org.gongxuanzhang.sql.insight.core.result.ExceptionResult;
@@ -135,7 +137,37 @@ public class JsonEngine implements StorageEngine {
 
     @Override
     public ResultInterface update(Update update) {
-        return null;
+        File jsonFile = JsonEngineSupport.getJsonFile(update.getTable());
+        int updateCount = 0;
+        try {
+            List<String> lines = Files.readAllLines(jsonFile.toPath());
+            Where where = update.getWhere();
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                if (line.isEmpty()) {
+                    continue;
+                }
+                final int lineNumber = i;
+                JSONObject jsonObject = JSONObject.parseObject(line);
+                PhysicRow row = JsonEngineSupport.getPhysicRowFromJson(jsonObject, update.getTable());
+                if (Boolean.TRUE.equals(where.getBooleanValue(row))) {
+                    update.getUpdateField().forEach((colName, expression) -> {
+                        Value expressionValue = expression.getExpressionValue(row);
+                        jsonObject.put(colName, expressionValue.getSource());
+                        String newLine = jsonObject.toString();
+                        lines.set(lineNumber, newLine);
+                        log.info("update {} to {} ", line, newLine);
+                    });
+                    updateCount++;
+                }
+            }
+            if (updateCount > 0) {
+                Files.write(jsonFile.toPath(), lines);
+            }
+        } catch (IOException e) {
+            throw new RuntimeIoException(e);
+        }
+        return new DeleteResult(updateCount);
     }
 
     @Override
@@ -149,8 +181,9 @@ public class JsonEngine implements StorageEngine {
                 if (line.isEmpty()) {
                     continue;
                 }
-                DeleteRow row = JsonEngineSupport.getDeleteRowFromJsonLine(line, delete.getTable());
+                PhysicRow row = JsonEngineSupport.getPhysicRowFromJson(JSONObject.parseObject(line), delete.getTable());
                 if (Boolean.TRUE.equals(delete.getWhere().getBooleanValue(row))) {
+                    log.info("delete row {} ", line);
                     lines.set(i, "");
                     deleteCount++;
                 }
