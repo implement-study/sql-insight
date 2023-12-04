@@ -19,6 +19,7 @@ package org.gongxuanzhang.sql.insight.core.engine.json;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.command.dml.Delete;
+import org.gongxuanzhang.sql.insight.core.command.dml.Update;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
 import org.gongxuanzhang.sql.insight.core.exception.CreateTableException;
 import org.gongxuanzhang.sql.insight.core.exception.InsertException;
@@ -133,7 +134,7 @@ public class JsonEngine implements StorageEngine {
 
 
     @Override
-    public ResultInterface update() {
+    public ResultInterface update(Update update) {
         return null;
     }
 

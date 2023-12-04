@@ -17,6 +17,7 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage;
 
 import org.gongxuanzhang.sql.insight.core.command.dml.Delete;
+import org.gongxuanzhang.sql.insight.core.command.dml.Update;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
@@ -54,7 +55,7 @@ public abstract class AbstractStorageEngine implements StorageEngine {
     }
 
     @Override
-    public ResultInterface update() {
+    public ResultInterface update(Update update) {
         throw new UnsupportedOperationException();
     }
 
