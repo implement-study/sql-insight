@@ -20,7 +20,6 @@ import com.alibaba.fastjson2.JSONObject;
 import org.gongxuanzhang.sql.insight.core.exception.DateTypeCastException;
 import org.gongxuanzhang.sql.insight.core.object.Column;
 import org.gongxuanzhang.sql.insight.core.object.DataType;
-import org.gongxuanzhang.sql.insight.core.object.DeleteRow;
 import org.gongxuanzhang.sql.insight.core.object.PhysicRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;

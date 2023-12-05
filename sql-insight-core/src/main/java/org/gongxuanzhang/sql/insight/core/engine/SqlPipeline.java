@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
 import org.gongxuanzhang.sql.insight.core.command.Command;
 import org.gongxuanzhang.sql.insight.core.engine.json.ExecuteEngine;
+import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
 import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext;
 import org.gongxuanzhang.sql.insight.core.exception.SqlInsightException;
 import org.gongxuanzhang.sql.insight.core.optimizer.Optimizer;
@@ -41,17 +42,25 @@ public class SqlPipeline {
 
     @Temporary(detail = "how to deal exception?")
     public ResultInterface doSql(String sql) throws SqlInsightException {
-        log.info("start execute sql {} ...", sql);
-        long startTime = System.currentTimeMillis();
 
-        Command command = optimizer.analysisSql(sql);
+        SessionContext.getCurrentSession();
+        try {
+            log.info("start execute sql {} ...", sql);
+            long startTime = System.currentTimeMillis();
 
-        ExecutionPlan plan = optimizer.assign(command);
+            Command command = optimizer.analysisSql(sql);
 
-        ResultInterface resultInterface = executeEngine.executePlan(plan);
+            ExecutionPlan plan = optimizer.assign(command);
 
-        log.info("end sql {} ...take time {}ms", sql.split("\n")[0], (System.currentTimeMillis() - startTime));
-        return resultInterface;
+            ResultInterface resultInterface = executeEngine.executePlan(plan);
+
+            log.info("end sql {} ...take time {}ms", sql.split("\n")[0], (System.currentTimeMillis() - startTime));
+
+            return resultInterface;
+        } finally {
+            SessionContext.clearSession();
+        }
+
     }
 
     public Optimizer getOptimizer() {

@@ -69,7 +69,7 @@ public final class Table implements FillDataVisitor, CommentContainer {
     public Integer getColumnIndexByName(String colName) {
         Integer index = this.columnIndex.get(colName);
         if (index == null) {
-            throw new UnknownColumnException(name);
+            throw new UnknownColumnException(colName);
         }
         return index;
     }

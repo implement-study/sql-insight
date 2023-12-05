@@ -16,16 +16,59 @@
 
 package org.gongxuanzhang.sql.insight.core.environment;
 
+import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
 import org.gongxuanzhang.sql.insight.core.auth.User;
+import org.gongxuanzhang.sql.insight.core.object.Database;
+import org.gongxuanzhang.sql.insight.core.object.Table;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
 public class SessionContext extends AbstractMapContext {
 
+    private static final ThreadLocal<SessionContext> HOLDER = ThreadLocal.withInitial(SessionContext::new);
+
+
+    @Temporary(detail = "temp for thread")
+    public static SessionContext getCurrentSession() {
+        return HOLDER.get();
+    }
+
+    @Temporary
+    public static void clearSession() {
+        HOLDER.remove();
+    }
+
+    private Database database;
+
+    private final Map<String, String> tableAlias = new HashMap<>();
+
+    public void tableAlias(String name, String alias) {
+        this.tableAlias.put(name, alias);
+    }
+
+    public Table getTableByNameOrAlias(String nameOrAlias) {
+        String convertName = this.tableAlias.get(nameOrAlias);
+        if (convertName == null) {
+            convertName = nameOrAlias;
+        }
+        TableDefinitionManager tableDefinitionManager = SqlInsightContext.getInstance().getTableDefinitionManager();
+        return tableDefinitionManager.select(this.database.getName(), convertName);
+    }
 
     public User getCurrentUser() {
         return null;
+    }
+
+    public Database currentDatabase() {
+        return this.database;
+    }
+
+    public void useDatabase(Database database) {
+        this.database = database;
     }
 
 }

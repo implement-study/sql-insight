@@ -67,6 +67,8 @@ public class Update implements DmlCommand, TableContainer, WhereContainer {
     @Override
     public boolean visit(SQLUpdateSetItem x) {
         String column = x.getColumn().toString();
+        //  check column name
+        this.table.getColumnByName(column);
         //  don't support  table.column
         ExpressionVisitor expressionVisitor = new ExpressionVisitor();
         x.getValue().accept(expressionVisitor);

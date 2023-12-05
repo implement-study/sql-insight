@@ -20,6 +20,7 @@ import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
 import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
+import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 import org.gongxuanzhang.sql.insight.core.object.condition.*;
 
@@ -103,6 +104,12 @@ public class ExpressionVisitor implements SQLASTVisitor {
     @Override
     public boolean visit(SQLCharExpr x) {
         this.expression = new StringExpression(x.getText());
+        return false;
+    }
+
+    @Override
+    public boolean visit(SQLPropertyExpr x) {
+        this.expression = new IdentifierExpression(x.toString());
         return false;
     }
 

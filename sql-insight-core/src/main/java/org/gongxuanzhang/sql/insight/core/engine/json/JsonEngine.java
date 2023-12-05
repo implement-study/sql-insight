@@ -26,7 +26,6 @@ import org.gongxuanzhang.sql.insight.core.exception.InsertException;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.object.Column;
 import org.gongxuanzhang.sql.insight.core.object.DataType;
-import org.gongxuanzhang.sql.insight.core.object.DeleteRow;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.PhysicRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
