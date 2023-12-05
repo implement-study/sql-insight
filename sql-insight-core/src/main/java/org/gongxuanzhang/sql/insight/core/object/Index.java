@@ -20,4 +20,10 @@ package org.gongxuanzhang.sql.insight.core.object;
  * @author gongxuanzhangmelt@gmail.com
  **/
 public interface Index {
+
+    /**
+     * index next row
+     * @return row data
+     **/
+    Row nextRow();
 }

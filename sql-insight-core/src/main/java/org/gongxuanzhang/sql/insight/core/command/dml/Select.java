@@ -71,7 +71,6 @@ public class Select implements DmlCommand, WhereContainer {
         public boolean visit(SQLJoinTableSource x) {
             x.getLeft().accept(this);
             x.getRight().accept(this);
-
             return false;
         }
 
