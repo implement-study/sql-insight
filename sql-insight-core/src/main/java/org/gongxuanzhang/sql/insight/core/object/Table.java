@@ -46,6 +46,8 @@ public final class Table implements FillDataVisitor, CommentContainer {
 
     private final List<Column> columnList = new ArrayList<>();
 
+    private final List<Index> indexList = new ArrayList<>();
+
     private String comment;
 
     private String engine;

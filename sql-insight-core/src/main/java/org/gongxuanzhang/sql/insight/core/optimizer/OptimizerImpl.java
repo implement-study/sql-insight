@@ -43,8 +43,7 @@ public class OptimizerImpl implements Optimizer {
         if (command instanceof DmlCommand) {
             return ((DmlCommand) command).plan();
         }
-        //  todo dcl
-        return null;
+        throw new UnsupportedOperationException("dont support explain " + command.getSql());
     }
 
 

@@ -22,6 +22,7 @@ import com.alibaba.druid.sql.ast.statement.SQLDeleteStatement;
 import com.alibaba.druid.sql.ast.statement.SQLDropDatabaseStatement;
 import com.alibaba.druid.sql.ast.statement.SQLDropTableStatement;
 import com.alibaba.druid.sql.ast.statement.SQLInsertStatement;
+import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
 import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 import org.gongxuanzhang.sql.insight.core.command.Command;
@@ -32,6 +33,7 @@ import org.gongxuanzhang.sql.insight.core.command.ddl.DropDatabase;
 import org.gongxuanzhang.sql.insight.core.command.ddl.DropTable;
 import org.gongxuanzhang.sql.insight.core.command.dml.Delete;
 import org.gongxuanzhang.sql.insight.core.command.dml.Insert;
+import org.gongxuanzhang.sql.insight.core.command.dml.Select;
 import org.gongxuanzhang.sql.insight.core.command.dml.Update;
 
 /**
@@ -95,6 +97,14 @@ public class DruidAnalyzerAdaptor implements SQLASTVisitor, CommandContainer {
     @Override
     public boolean visit(SQLUpdateStatement x) {
         this.command = new Update(sql);
+        x.accept(this.command);
+        return false;
+    }
+
+
+    @Override
+    public boolean visit(SQLSelectQueryBlock x) {
+        this.command = new Select(sql);
         x.accept(this.command);
         return false;
     }

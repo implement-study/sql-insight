@@ -16,31 +16,32 @@
 
 package org.gongxuanzhang.sql.insight.core.optimizer.plan;
 
-import org.gongxuanzhang.sql.insight.core.command.dml.Insert;
+import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
+import org.gongxuanzhang.sql.insight.core.object.Table;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class InsertExecutionPlan implements ExecutionPlan {
+public class SelectPlanNode implements PlanNode {
 
-    private final Insert insert;
 
-    public InsertExecutionPlan(Insert insert) {
-        this.insert = insert;
+    private Table table;
+
+    @Override
+    public boolean withoutStorageEngine() {
+        return false;
     }
 
     @Override
-    public String showExplain() {
-        return "insert ";
+    public String neededStorageEngineName() {
+        return table.getEngine();
     }
 
     @Override
-    public PlanChain getPlanChain() {
-        return new InsertPlanChain(insert);
-    }
+    public void doPlan(StorageEngine storageEngine, ExecuteContext context) throws Exception {
 
-    @Override
-    public String getOriginalSql() {
-        return insert.getSql();
+//        storageEngine.query()
+
     }
 }

@@ -19,9 +19,6 @@ package org.gongxuanzhang.sql.insight.core.optimizer.plan;
 import org.gongxuanzhang.sql.insight.core.command.dml.Update;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Iterator;
 
 /**
  * @author gongxuanzhangmelt@gmail.com

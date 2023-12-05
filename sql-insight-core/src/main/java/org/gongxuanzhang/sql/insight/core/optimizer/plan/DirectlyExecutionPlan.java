@@ -53,7 +53,7 @@ public class DirectlyExecutionPlan implements ExecutionPlan, CommandContainer {
     }
 
     @Override
-    public String getOrginalSql() {
+    public String getOriginalSql() {
         return this.command.getSql();
     }
 

@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.command.dml;
 
+import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
 import org.gongxuanzhang.sql.insight.core.command.Command;
 import org.gongxuanzhang.sql.insight.core.optimizer.plan.ExecutionPlan;
 
@@ -37,8 +38,10 @@ public interface DmlCommand extends Command {
 
     /**
      * package to execution plan
-     * @return 返回个啥
+     *
+     * @return
      **/
+    @Temporary(detail = "create plan visa command or optimizer?")
     ExecutionPlan plan();
 
 }

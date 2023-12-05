@@ -41,7 +41,7 @@ public interface ExecutionPlan {
      **/
     PlanChain getPlanChain();
 
-    String getOrginalSql();
+    String getOriginalSql();
 
 
 }

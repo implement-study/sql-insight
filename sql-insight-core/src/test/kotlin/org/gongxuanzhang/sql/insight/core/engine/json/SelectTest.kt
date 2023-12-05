@@ -14,33 +14,36 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.optimizer.plan;
+package org.gongxuanzhang.sql.insight.core.engine.json
 
-import org.gongxuanzhang.sql.insight.core.command.dml.Insert;
+import org.gongxuanzhang.sql.insight.core.command.dml.Select
+import org.gongxuanzhang.sql.insight.doSql
+import org.gongxuanzhang.sql.insight.insert
+import org.gongxuanzhang.sql.insight.toCommand
+import org.junit.jupiter.api.Test
+
 
 /**
- * @author gongxuanzhangmelt@gmail.com
+ * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public class InsertExecutionPlan implements ExecutionPlan {
+class SelectTest {
 
-    private final Insert insert;
 
-    public InsertExecutionPlan(Insert insert) {
-        this.insert = insert;
+    @Test
+    fun selectCommand() {
+        insert("aa", "user")
+        val toCommand = "select * from aa.user where id>1".toCommand()
+        assert(toCommand is Select)
     }
 
-    @Override
-    public String showExplain() {
-        return "insert ";
+    @Test
+    fun updateTest() {
+        insert("aa", "user")
+        "select * from aa.user where id>1".doSql()
     }
 
-    @Override
-    public PlanChain getPlanChain() {
-        return new InsertPlanChain(insert);
-    }
 
-    @Override
-    public String getOriginalSql() {
-        return insert.getSql();
-    }
+
+
 }
+

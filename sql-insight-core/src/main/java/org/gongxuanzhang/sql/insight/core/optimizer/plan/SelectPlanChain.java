@@ -16,31 +16,40 @@
 
 package org.gongxuanzhang.sql.insight.core.optimizer.plan;
 
-import org.gongxuanzhang.sql.insight.core.command.dml.Insert;
+import org.gongxuanzhang.sql.insight.core.command.dml.Select;
+import org.gongxuanzhang.sql.insight.core.object.Table;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class InsertExecutionPlan implements ExecutionPlan {
+public class SelectPlanChain implements PlanChain {
 
-    private final Insert insert;
 
-    public InsertExecutionPlan(Insert insert) {
-        this.insert = insert;
+    private final Select select;
+
+    private List<PlanNode> selectNodes = new ArrayList<>();
+
+    public SelectPlanChain(Select select) {
+        this.select = select;
+        initPlanNode();
     }
 
-    @Override
-    public String showExplain() {
-        return "insert ";
+    private void initPlanNode() {
+        List<Table> tableList = select.getTableList();
+        for (Table table : tableList) {
+
+        }
     }
 
-    @Override
-    public PlanChain getPlanChain() {
-        return new InsertPlanChain(insert);
-    }
 
+    @NotNull
     @Override
-    public String getOriginalSql() {
-        return insert.getSql();
+    public Iterator<PlanNode> iterator() {
+        return this.selectNodes.iterator();
     }
 }

@@ -16,31 +16,31 @@
 
 package org.gongxuanzhang.sql.insight.core.optimizer.plan;
 
-import org.gongxuanzhang.sql.insight.core.command.dml.Insert;
+import org.gongxuanzhang.sql.insight.core.command.dml.Select;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class InsertExecutionPlan implements ExecutionPlan {
+public class SelectExecutionPlan implements ExecutionPlan {
 
-    private final Insert insert;
+    private final Select select;
 
-    public InsertExecutionPlan(Insert insert) {
-        this.insert = insert;
+    public SelectExecutionPlan(Select select) {
+        this.select = select;
     }
 
     @Override
     public String showExplain() {
-        return "insert ";
+        return "select ";
     }
 
     @Override
     public PlanChain getPlanChain() {
-        return new InsertPlanChain(insert);
+        return new SelectPlanChain(select);
     }
 
     @Override
     public String getOriginalSql() {
-        return insert.getSql();
+        return select.getSql();
     }
 }

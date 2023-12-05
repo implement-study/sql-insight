@@ -18,8 +18,10 @@ package org.gongxuanzhang.sql.insight.core.engine.storage;
 
 
 import org.gongxuanzhang.sql.insight.core.command.dml.Delete;
+import org.gongxuanzhang.sql.insight.core.command.dml.Select;
 import org.gongxuanzhang.sql.insight.core.command.dml.Update;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
+import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 
@@ -77,7 +79,9 @@ public interface StorageEngine {
     /**
      * select
      **/
-    ResultInterface query();
+    ResultInterface query(Select select);
+
+    Row nextRow();
 
 
 }

@@ -40,7 +40,7 @@ public class UpdateExecutionPlan implements ExecutionPlan {
     }
 
     @Override
-    public String getOrginalSql() {
+    public String getOriginalSql() {
         return update.getSql();
     }
 }

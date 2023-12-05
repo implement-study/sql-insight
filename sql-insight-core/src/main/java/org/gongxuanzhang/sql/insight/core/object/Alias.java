@@ -14,33 +14,10 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.optimizer.plan;
-
-import org.gongxuanzhang.sql.insight.core.command.dml.Insert;
+package org.gongxuanzhang.sql.insight.core.object;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class InsertExecutionPlan implements ExecutionPlan {
-
-    private final Insert insert;
-
-    public InsertExecutionPlan(Insert insert) {
-        this.insert = insert;
-    }
-
-    @Override
-    public String showExplain() {
-        return "insert ";
-    }
-
-    @Override
-    public PlanChain getPlanChain() {
-        return new InsertPlanChain(insert);
-    }
-
-    @Override
-    public String getOriginalSql() {
-        return insert.getSql();
-    }
+public class Alias {
 }

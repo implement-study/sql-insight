@@ -40,7 +40,7 @@ public class DeleteExecutionPlan implements ExecutionPlan {
     }
 
     @Override
-    public String getOrginalSql() {
+    public String getOriginalSql() {
         return delete.getSql();
     }
 }
