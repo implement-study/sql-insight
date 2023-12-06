@@ -16,11 +16,10 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb;
 
-import org.gongxuanzhang.sql.insight.core.command.dml.Delete;
-import org.gongxuanzhang.sql.insight.core.command.dml.Select;
 import org.gongxuanzhang.sql.insight.core.command.dml.Update;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
+import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 
@@ -53,23 +52,19 @@ public class Innodb implements StorageEngine {
     }
 
     @Override
-    public ResultInterface insert(InsertRow row) {
+    public ResultInterface insertRow(InsertRow row) {
         return null;
     }
 
     @Override
-    public ResultInterface update(Update update) {
+    public ResultInterface update(Row oldRow, Update update) {
         return null;
     }
 
     @Override
-    public ResultInterface delete(Delete delete) {
+    public ResultInterface delete(Row deletedRow) {
         return null;
     }
 
-    @Override
-    public ResultInterface query(Select select) {
-        return null;
-    }
 
 }

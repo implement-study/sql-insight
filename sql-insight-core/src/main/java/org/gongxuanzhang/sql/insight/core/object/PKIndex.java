@@ -6,12 +6,21 @@ package org.gongxuanzhang.sql.insight.core.object;
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class PKIndex implements Index {
+public abstract class PKIndex implements Index {
 
     Table table;
 
+    protected PKIndex(Table table) {
+        this.table = table;
+    }
+
     @Override
-    public Row nextRow() {
-        return null;
+    public Table getTable() {
+        return table;
+    }
+
+    @Override
+    public void setTable(Table table) {
+        this.table = table;
     }
 }

@@ -32,7 +32,7 @@ class SelectTest {
     @Test
     fun selectCommand() {
         insert("aa", "user")
-        val toCommand = "select * from aa.user where id>1".toCommand()
+        val toCommand = "select * from aa.user where id>1 order by id limit 1,2 ".toCommand()
         assert(toCommand is Select)
     }
 
@@ -41,8 +41,6 @@ class SelectTest {
         insert("aa", "user")
         "select * from aa.user where id>1".doSql()
     }
-
-
 
 
 }

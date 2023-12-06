@@ -19,7 +19,6 @@ package org.gongxuanzhang.sql.insight.core.engine.json;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.command.dml.Delete;
-import org.gongxuanzhang.sql.insight.core.command.dml.Select;
 import org.gongxuanzhang.sql.insight.core.command.dml.Update;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
 import org.gongxuanzhang.sql.insight.core.exception.CreateTableException;
@@ -29,6 +28,7 @@ import org.gongxuanzhang.sql.insight.core.object.Column;
 import org.gongxuanzhang.sql.insight.core.object.DataType;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.PhysicRow;
+import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.Where;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
@@ -110,7 +110,7 @@ public class JsonEngine implements StorageEngine {
     }
 
     @Override
-    public ResultInterface insert(InsertRow row) {
+    public ResultInterface insertRow(InsertRow row) {
         counter.dealAutoIncrement(row);
         JSONObject jsonObject = fullAllColumnRow(row);
         File jsonFile = JsonEngineSupport.getJsonFile(row.getTable());
@@ -134,8 +134,17 @@ public class JsonEngine implements StorageEngine {
         return new InsertResult(1);
     }
 
+    @Override
+    public ResultInterface update(Row oldRow, Update update) {
+        return null;
+    }
 
     @Override
+    public ResultInterface delete(Row deletedRow) {
+        return null;
+    }
+
+
     public ResultInterface update(Update update) {
         File jsonFile = JsonEngineSupport.getJsonFile(update.getTable());
         int updateCount = 0;
@@ -170,7 +179,6 @@ public class JsonEngine implements StorageEngine {
         return new DeleteResult(updateCount);
     }
 
-    @Override
     public ResultInterface delete(Delete delete) {
         File jsonFile = JsonEngineSupport.getJsonFile(delete.getTable());
         int deleteCount = 0;
@@ -197,10 +205,6 @@ public class JsonEngine implements StorageEngine {
         return new DeleteResult(deleteCount);
     }
 
-    @Override
-    public ResultInterface query(Select select) {
-        return null;
-    }
 
 
     private JSONObject fullAllColumnRow(InsertRow row) {

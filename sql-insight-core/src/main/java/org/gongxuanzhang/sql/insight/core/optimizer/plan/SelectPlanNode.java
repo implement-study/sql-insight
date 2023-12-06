@@ -18,7 +18,14 @@ package org.gongxuanzhang.sql.insight.core.optimizer.plan;
 
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
+import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
+import org.gongxuanzhang.sql.insight.core.object.Cursor;
+import org.gongxuanzhang.sql.insight.core.object.Index;
+import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.Table;
+import org.gongxuanzhang.sql.insight.core.object.Where;
+
+import java.util.List;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -26,7 +33,14 @@ import org.gongxuanzhang.sql.insight.core.object.Table;
 public class SelectPlanNode implements PlanNode {
 
 
+    private final Where where;
+
     private Table table;
+
+    public SelectPlanNode(Table table, Where where) {
+        this.table = table;
+        this.where = where;
+    }
 
     @Override
     public boolean withoutStorageEngine() {
@@ -40,7 +54,16 @@ public class SelectPlanNode implements PlanNode {
 
     @Override
     public void doPlan(StorageEngine storageEngine, ExecuteContext context) throws Exception {
-
+        List<Index> indexList = this.table.getIndexList();
+        //  decide index
+        Index main = indexList.get(0);
+        Cursor cursor = main.find(SessionContext.getCurrentSession());
+        while (cursor.hasNext()) {
+            Row next = cursor.next();
+            if(Boolean.TRUE.equals(this.where.getBooleanValue(next))){
+                System.out.println(next);
+            }
+        }
 //        storageEngine.query()
 
     }

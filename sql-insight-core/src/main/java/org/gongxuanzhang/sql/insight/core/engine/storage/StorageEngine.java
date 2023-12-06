@@ -17,8 +17,6 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage;
 
 
-import org.gongxuanzhang.sql.insight.core.command.dml.Delete;
-import org.gongxuanzhang.sql.insight.core.command.dml.Select;
 import org.gongxuanzhang.sql.insight.core.command.dml.Update;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Row;
@@ -63,25 +61,25 @@ public interface StorageEngine {
 
     /**
      * insert data
+     *
+     * @param row insert
      **/
-    ResultInterface insert(InsertRow row);
+    ResultInterface insertRow(InsertRow row);
 
     /**
      * update
+     *
+     * @param oldRow hit update condition
+     * @param update update set info
      **/
-    ResultInterface update(Update update);
+    ResultInterface update(Row oldRow, Update update);
 
     /**
      * delete
+     *
+     * @param deletedRow hit delete condition
      **/
-    ResultInterface delete(Delete delete);
-
-    /**
-     * select
-     **/
-    ResultInterface query(Select select);
-
-    Row nextRow();
+    ResultInterface delete(Row deletedRow);
 
 
 }

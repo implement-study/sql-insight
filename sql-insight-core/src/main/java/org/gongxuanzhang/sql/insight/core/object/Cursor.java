@@ -16,24 +16,18 @@
 
 package org.gongxuanzhang.sql.insight.core.object;
 
-import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
+import java.util.Iterator;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface Index extends TableContainer {
+public interface Cursor extends Iterator<Row> {
 
 
     /**
-     * before search init method
-     **/
-    void rndInit();
-
-
-    /**
-     * find a cursor from session
+     * close the cursor
      *
-     * @return cursor
      **/
-    Cursor find(SessionContext sessionContext);
+    void close();
+
 }

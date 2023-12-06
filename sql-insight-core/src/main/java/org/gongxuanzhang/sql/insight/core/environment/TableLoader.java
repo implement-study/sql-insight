@@ -52,7 +52,7 @@ public class TableLoader {
                 continue;
             }
             for (File frmFile : frmFileArray) {
-                tableList.add(load(frmFile));
+                tableList.add(loadTableMeta(frmFile));
             }
         }
         return tableList;
@@ -60,7 +60,7 @@ public class TableLoader {
 
 
     @Temporary(detail = "temp use json parse")
-    private static Table load(File frmFile) {
+    private static Table loadTableMeta(File frmFile) {
         try (FileInputStream fileInputStream = new FileInputStream(frmFile)) {
             JSONObject jsonObject = JSON.parseObject(fileInputStream);
             return jsonObject.toJavaObject(Table.class);

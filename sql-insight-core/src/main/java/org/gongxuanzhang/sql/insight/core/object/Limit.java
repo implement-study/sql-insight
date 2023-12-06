@@ -16,24 +16,26 @@
 
 package org.gongxuanzhang.sql.insight.core.object;
 
-import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface Index extends TableContainer {
+public class Limit {
 
+    private final int skip;
 
-    /**
-     * before search init method
-     **/
-    void rndInit();
+    private final int max;
 
+    public Limit(int skip, int max) {
+        this.skip = skip;
+        this.max = max;
+    }
 
-    /**
-     * find a cursor from session
-     *
-     * @return cursor
-     **/
-    Cursor find(SessionContext sessionContext);
+    public int getSkip() {
+        return skip;
+    }
+
+    public int getMax() {
+        return max;
+    }
 }

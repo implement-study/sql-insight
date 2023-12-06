@@ -16,12 +16,17 @@
 
 package org.gongxuanzhang.sql.insight.core.command.dml;
 
+import com.alibaba.druid.sql.ast.SQLLimit;
+import com.alibaba.druid.sql.ast.SQLOrderBy;
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLJoinTableSource;
+import com.alibaba.druid.sql.ast.statement.SQLSelectOrderByItem;
 import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 import org.gongxuanzhang.sql.insight.core.analysis.SqlType;
 import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
+import org.gongxuanzhang.sql.insight.core.object.Limit;
+import org.gongxuanzhang.sql.insight.core.object.OrderBy;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.TableVisitor;
 import org.gongxuanzhang.sql.insight.core.object.Where;
@@ -45,6 +50,10 @@ public class Select implements DmlCommand, WhereContainer {
 
     private Where where;
 
+    private OrderBy orderBy;
+
+    private Limit limit;
+
     public Select(String sql) {
         this.sql = sql;
     }
@@ -59,9 +68,30 @@ public class Select implements DmlCommand, WhereContainer {
         tableList = new ArrayList<>();
         x.getFrom().accept(new FromVisitor());
         x.getWhere().accept(new WhereFillVisitor(this));
+        if(x.getOrderBy()!=null){
+            x.getOrderBy().accept(new OrderByVisitor());
+        }
+        if(x.getLimit()!=null){
+            x.getLimit().accept(this);
+        }
         return false;
     }
 
+    @Override
+    public boolean visit(SQLLimit x) {
+        System.out.println(x);
+        return false;
+    }
+
+    private class OrderByVisitor implements SQLASTVisitor{
+        @Override
+        public boolean visit(SQLOrderBy x) {
+            for (SQLSelectOrderByItem item : x.getItems()) {
+                System.out.println(item);
+            }
+            return false;
+        }
+    }
 
     private class FromVisitor implements SQLASTVisitor {
 

@@ -16,24 +16,14 @@
 
 package org.gongxuanzhang.sql.insight.core.object;
 
-import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
+import java.util.List;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface Index extends TableContainer {
+public class OrderBy {
 
+    private Table table;
 
-    /**
-     * before search init method
-     **/
-    void rndInit();
-
-
-    /**
-     * find a cursor from session
-     *
-     * @return cursor
-     **/
-    Cursor find(SessionContext sessionContext);
+    private List<String> columnNames;
 }

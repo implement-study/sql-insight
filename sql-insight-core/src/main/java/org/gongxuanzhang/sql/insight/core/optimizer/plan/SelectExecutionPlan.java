@@ -16,11 +16,13 @@
 
 package org.gongxuanzhang.sql.insight.core.optimizer.plan;
 
+import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
 import org.gongxuanzhang.sql.insight.core.command.dml.Select;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
+@Temporary(detail = "this class acts as an optimizer")
 public class SelectExecutionPlan implements ExecutionPlan {
 
     private final Select select;

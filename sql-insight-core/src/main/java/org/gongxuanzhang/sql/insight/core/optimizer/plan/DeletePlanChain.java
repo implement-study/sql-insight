@@ -36,6 +36,7 @@ public class DeletePlanChain extends SingleStoragePlanChain {
 
     @Override
     protected void doPlan(StorageEngine storageEngine, ExecuteContext context) {
-        storageEngine.delete(delete);
+//        storageEngine.delete(delete);   todo
+
     }
 }

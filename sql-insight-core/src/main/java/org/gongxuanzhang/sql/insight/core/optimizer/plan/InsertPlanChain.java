@@ -79,7 +79,7 @@ public class InsertPlanChain implements PlanChain {
         @Override
         public void doPlan(StorageEngine storageEngine, ExecuteContext context) throws Exception {
             EventPublisher.getInstance().publishEvent(new BeforeInsertEvent(row));
-            storageEngine.insert(row);
+            storageEngine.insertRow(row);
         }
 
     }

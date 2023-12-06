@@ -32,7 +32,7 @@ public class SelectPlanChain implements PlanChain {
 
     private final Select select;
 
-    private List<PlanNode> selectNodes = new ArrayList<>();
+    private final List<PlanNode> selectNodes = new ArrayList<>();
 
     public SelectPlanChain(Select select) {
         this.select = select;
@@ -41,9 +41,11 @@ public class SelectPlanChain implements PlanChain {
 
     private void initPlanNode() {
         List<Table> tableList = select.getTableList();
-        for (Table table : tableList) {
-
+        if (tableList.size() > 1) {
+            throw new UnsupportedOperationException("join support in to-do list");
         }
+        Table table = tableList.get(0);
+        this.selectNodes.add(new SelectPlanNode(table, select.getWhere()));
     }
 
 
