@@ -18,11 +18,13 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb;
 
 import org.gongxuanzhang.sql.insight.core.command.dml.Update;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+import org.gongxuanzhang.sql.insight.core.object.Index;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,7 +45,8 @@ public class Innodb implements StorageEngine {
 
     @Override
     public void openTable(Table table) {
-
+        List<Index> indexList = table.getIndexList();
+        File dbFolder = table.getDatabase().getDbFolder();
     }
 
     @Override
