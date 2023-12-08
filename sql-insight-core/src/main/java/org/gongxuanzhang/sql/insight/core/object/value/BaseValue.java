@@ -28,4 +28,10 @@ public abstract class BaseValue implements Value {
     protected BaseValue(Value value) {
 
     }
+
+
+    @Override
+    public String toString() {
+        return this.getSource().toString();
+    }
 }

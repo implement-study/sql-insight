@@ -22,20 +22,26 @@ package org.gongxuanzhang.sql.insight.core.object;
  **/
 public class Limit {
 
-    private final int skip;
+    private int skip = 0;
 
-    private final int max;
+    private int rowCount = Integer.MAX_VALUE;
 
-    public Limit(int skip, int max) {
+
+    public Limit setSkip(int skip) {
         this.skip = skip;
-        this.max = max;
+        return this;
+    }
+
+    public Limit setRowCount(int rowCount) {
+        this.rowCount = rowCount;
+        return this;
     }
 
     public int getSkip() {
         return skip;
     }
 
-    public int getMax() {
-        return max;
+    public int getRowCount() {
+        return rowCount;
     }
 }

@@ -45,7 +45,7 @@ public class SelectPlanChain implements PlanChain {
             throw new UnsupportedOperationException("join support in to-do list");
         }
         Table table = tableList.get(0);
-        this.selectNodes.add(new SelectPlanNode(table, select.getWhere()));
+        this.selectNodes.add(new SelectPlanNode(table, select));
     }
 
 

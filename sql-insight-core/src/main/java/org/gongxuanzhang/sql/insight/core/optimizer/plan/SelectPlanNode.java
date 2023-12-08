@@ -16,10 +16,12 @@
 
 package org.gongxuanzhang.sql.insight.core.optimizer.plan;
 
+import org.gongxuanzhang.sql.insight.core.command.dml.Select;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
 import org.gongxuanzhang.sql.insight.core.object.Cursor;
 import org.gongxuanzhang.sql.insight.core.object.Index;
+import org.gongxuanzhang.sql.insight.core.object.Limit;
 import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.Where;
@@ -32,13 +34,13 @@ import java.util.List;
 public class SelectPlanNode implements PlanNode {
 
 
-    private final Where where;
-
     private Table table;
 
-    public SelectPlanNode(Table table, Where where) {
+    private Select select;
+
+    public SelectPlanNode(Table table, Select select) {
         this.table = table;
-        this.where = where;
+        this.select = select;
     }
 
     @Override
@@ -58,13 +60,36 @@ public class SelectPlanNode implements PlanNode {
         //  decide index
         Index main = indexList.get(0);
         main.rndInit();
+        Where where = this.select.getWhere();
         Cursor cursor = main.find(context.getSessionContext());
-        while (cursor.hasNext()) {
+        Limit limit = selectLimit();
+        int skipped = 0;
+        int rowCount = 0;
+        while (rowCount < limit.getRowCount() && cursor.hasNext()) {
             Row next = cursor.next();
-            if (Boolean.TRUE.equals(this.where.getBooleanValue(next))) {
+            if (Boolean.TRUE.equals(where.getBooleanValue(next))) {
+                if (skipped != limit.getSkip()) {
+                    skipped++;
+                    continue;
+                }
+                rowCount++;
                 context.addRow(next);
             }
         }
+        cursor.close();
 
     }
+
+    private Limit selectLimit() {
+        Limit limit = new Limit();
+        if (this.select.getLimit() != null) {
+            limit.setSkip(this.select.getLimit().getSkip());
+            limit.setRowCount(this.select.getLimit().getRowCount());
+        }
+        if (this.select.getOrderBy() != null) {
+            limit.setRowCount(Integer.MAX_VALUE);
+        }
+        return limit;
+    }
+
 }

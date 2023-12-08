@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.command.dml;
 
 import com.alibaba.druid.sql.ast.SQLLimit;
 import com.alibaba.druid.sql.ast.SQLOrderBy;
+import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLJoinTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLSelectOrderByItem;
@@ -79,9 +80,28 @@ public class Select implements DmlCommand, WhereContainer {
 
     @Override
     public boolean visit(SQLLimit x) {
-        System.out.println(x);
+        IntegerVisitor visitor = new IntegerVisitor();
+        this.limit = new Limit();
+        if (x.getOffset() != null) {
+            x.getOffset().accept(visitor);
+            limit.setSkip(visitor.value);
+        }
+        x.getRowCount().accept(visitor);
+        limit.setRowCount(visitor.value);
         return false;
     }
+
+    private static class IntegerVisitor implements SQLASTVisitor {
+
+        int value = 0;
+
+        @Override
+        public void endVisit(SQLIntegerExpr x) {
+            this.value = x.getNumber().intValue();
+        }
+    }
+
+
 
     private class OrderByVisitor implements SQLASTVisitor {
         @Override
@@ -91,6 +111,7 @@ public class Select implements DmlCommand, WhereContainer {
             }
             return false;
         }
+
     }
 
     private class FromVisitor implements SQLASTVisitor {
@@ -139,4 +160,13 @@ public class Select implements DmlCommand, WhereContainer {
     public void setWhere(Where where) {
         this.where = where;
     }
+
+    public Limit getLimit() {
+        return limit;
+    }
+
+    public OrderBy getOrderBy() {
+        return orderBy;
+    }
+
 }

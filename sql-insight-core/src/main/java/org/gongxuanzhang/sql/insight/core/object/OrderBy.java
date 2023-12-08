@@ -16,14 +16,15 @@
 
 package org.gongxuanzhang.sql.insight.core.object;
 
-import java.util.List;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
 public class OrderBy {
 
-    private Table table;
+    String[] column;
 
-    private List<String> columnNames;
+    boolean[] asc;
+
+
 }

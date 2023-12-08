@@ -47,10 +47,20 @@ class SelectTest {
     @Test
     fun selectOrderBy(){
         insertLarge("aa", "user",50)
-        val doSql = "select * from aa.user where id > 10".doSql()
+        val doSql = "select * from aa.user where id > 10 order by name".doSql()
         assert(doSql is SelectResult)
         val result = (doSql as SelectResult).result
         result.forEach { println(it) }
+    }
+
+    @Test
+    fun selectLimit(){
+        insertLarge("aa", "user",50)
+        val doSql = "select * from aa.user where id > 10 limit 4,10".doSql()
+        assert(doSql is SelectResult)
+        val result = (doSql as SelectResult).result
+        assert(result.size == 10)
+        assert(result[0].rowId..result[result.size-1].rowId == 15L..24)
     }
 
 

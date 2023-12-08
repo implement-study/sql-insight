@@ -19,6 +19,7 @@ package org.gongxuanzhang.sql.insight.core.object;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 
 /**
@@ -69,5 +70,15 @@ public class PhysicRow implements Row, TableContainer {
     @Override
     public void setTable(Table table) {
         this.table = table;
+    }
+
+
+    @Override
+    public String toString() {
+        StringJoiner stringJoiner = new StringJoiner("|", "|", "|");
+        for (Value value : this.valueList) {
+            stringJoiner.add(value.toString());
+        }
+        return stringJoiner.toString();
     }
 }
