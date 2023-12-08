@@ -33,7 +33,7 @@ public class DruidAnalyzer implements Analyzer {
 
     @Override
     public Command analysisSql(String sql) throws SqlAnalysisException {
-        SQLStatement sqlStatement =  SQLUtils.parseSingleMysqlStatement(sql);
+        SQLStatement sqlStatement = SQLUtils.parseSingleMysqlStatement(sql);
         DruidAnalyzerAdaptor druidAnalyzerAdaptor = new DruidAnalyzerAdaptor(sql);
         sqlStatement.accept(druidAnalyzerAdaptor);
         Command command = druidAnalyzerAdaptor.getCommand();

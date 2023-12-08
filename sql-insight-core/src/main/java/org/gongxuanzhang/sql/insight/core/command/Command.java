@@ -66,7 +66,7 @@ public interface Command extends SQLASTVisitor {
      *
      * @param context context
      **/
-    default void run(ExecuteContext context) throws Exception{
+    default void run(ExecuteContext context) throws Exception {
         throw new UnsupportedOperationException("this method must be override");
     }
 

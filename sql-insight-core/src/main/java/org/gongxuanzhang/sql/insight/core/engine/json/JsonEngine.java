@@ -18,7 +18,6 @@ package org.gongxuanzhang.sql.insight.core.engine.json;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.gongxuanzhang.sql.insight.core.command.dml.Delete;
 import org.gongxuanzhang.sql.insight.core.command.dml.Update;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
 import org.gongxuanzhang.sql.insight.core.exception.CreateTableException;
@@ -27,14 +26,10 @@ import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.object.Column;
 import org.gongxuanzhang.sql.insight.core.object.DataType;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
-import org.gongxuanzhang.sql.insight.core.object.PhysicRow;
 import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.Table;
-import org.gongxuanzhang.sql.insight.core.object.Where;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
-import org.gongxuanzhang.sql.insight.core.result.DeleteResult;
 import org.gongxuanzhang.sql.insight.core.result.ExceptionResult;
-import org.gongxuanzhang.sql.insight.core.result.InsertResult;
 import org.gongxuanzhang.sql.insight.core.result.MessageResult;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 
@@ -65,6 +60,15 @@ public class JsonEngine implements StorageEngine {
     @Override
     public List<String> tableExtensions() {
         return Collections.singletonList("json");
+    }
+
+    @Override
+    public void openTable(Table table) {
+        if (!table.getIndexList().isEmpty()) {
+            return;
+        }
+        JsonPkIndex jsonPkIndex = new JsonPkIndex(table);
+        table.getIndexList().add(jsonPkIndex);
     }
 
     @Override
@@ -110,7 +114,7 @@ public class JsonEngine implements StorageEngine {
     }
 
     @Override
-    public ResultInterface insertRow(InsertRow row) {
+    public void insertRow(InsertRow row) {
         counter.dealAutoIncrement(row);
         JSONObject jsonObject = fullAllColumnRow(row);
         File jsonFile = JsonEngineSupport.getJsonFile(row.getTable());
@@ -130,81 +134,46 @@ public class JsonEngine implements StorageEngine {
         } catch (IOException e) {
             throw new RuntimeIoException(e);
         }
-        //  拿到对应行的id 插入位置
-        return new InsertResult(1);
     }
 
     @Override
-    public ResultInterface update(Row oldRow, Update update) {
-        return null;
-    }
-
-    @Override
-    public ResultInterface delete(Row deletedRow) {
-        return null;
-    }
-
-
-    public ResultInterface update(Update update) {
+    public void update(Row oldRow, Update update) {
         File jsonFile = JsonEngineSupport.getJsonFile(update.getTable());
-        int updateCount = 0;
+        final int rowId = (int) oldRow.getRowId();
         try {
             List<String> lines = Files.readAllLines(jsonFile.toPath());
-            Where where = update.getWhere();
-            for (int i = 0; i < lines.size(); i++) {
-                String line = lines.get(i);
-                if (line.isEmpty()) {
-                    continue;
-                }
-                final int lineNumber = i;
-                JSONObject jsonObject = JSONObject.parseObject(line);
-                PhysicRow row = JsonEngineSupport.getPhysicRowFromJson(jsonObject, update.getTable());
-                if (Boolean.TRUE.equals(where.getBooleanValue(row))) {
-                    update.getUpdateField().forEach((colName, expression) -> {
-                        Value expressionValue = expression.getExpressionValue(row);
-                        jsonObject.put(colName, expressionValue.getSource());
-                        String newLine = jsonObject.toString();
-                        lines.set(lineNumber, newLine);
-                        log.info("update {} to {} ", line, newLine);
-                    });
-                    updateCount++;
-                }
-            }
-            if (updateCount > 0) {
-                Files.write(jsonFile.toPath(), lines);
-            }
+            String line = lines.get(rowId);
+            JSONObject jsonObject = JSONObject.parseObject(line);
+            update.getUpdateField().forEach((colName, expression) -> {
+                Value expressionValue = expression.getExpressionValue(oldRow);
+                jsonObject.put(colName, expressionValue.getSource());
+                String newLine = jsonObject.toString();
+                lines.set(rowId, newLine);
+                log.info("update {} to {} ", line, newLine);
+            });
+            Files.write(jsonFile.toPath(), lines);
         } catch (IOException e) {
             throw new RuntimeIoException(e);
         }
-        return new DeleteResult(updateCount);
     }
 
-    public ResultInterface delete(Delete delete) {
-        File jsonFile = JsonEngineSupport.getJsonFile(delete.getTable());
-        int deleteCount = 0;
+    @Override
+    public void delete(Row deletedRow) {
+        long rowId = deletedRow.getRowId();
+        File jsonFile = JsonEngineSupport.getJsonFile(deletedRow.belongTo());
         try {
             List<String> lines = Files.readAllLines(jsonFile.toPath());
-            for (int i = 0; i < lines.size(); i++) {
-                String line = lines.get(i);
-                if (line.isEmpty()) {
-                    continue;
-                }
-                PhysicRow row = JsonEngineSupport.getPhysicRowFromJson(JSONObject.parseObject(line), delete.getTable());
-                if (Boolean.TRUE.equals(delete.getWhere().getBooleanValue(row))) {
-                    log.info("delete row {} ", line);
-                    lines.set(i, "");
-                    deleteCount++;
-                }
-            }
-            if (deleteCount > 0) {
-                Files.write(jsonFile.toPath(), lines);
-            }
+            lines.set((int) rowId, "");
+            Files.write(jsonFile.toPath(), lines);
         } catch (IOException e) {
             throw new RuntimeIoException(e);
         }
-        return new DeleteResult(deleteCount);
     }
 
+    @Override
+    public void refresh(Table table) {
+        log.warn("The json engine dose not refresh manually because in update or delete already refresh");
+    }
 
 
     private JSONObject fullAllColumnRow(InsertRow row) {

@@ -17,8 +17,10 @@
 package org.gongxuanzhang.sql.insight.core.engine.json
 
 import org.gongxuanzhang.sql.insight.core.command.dml.Select
+import org.gongxuanzhang.sql.insight.core.result.SelectResult
 import org.gongxuanzhang.sql.insight.doSql
 import org.gongxuanzhang.sql.insight.insert
+import org.gongxuanzhang.sql.insight.insertLarge
 import org.gongxuanzhang.sql.insight.toCommand
 import org.junit.jupiter.api.Test
 
@@ -37,9 +39,18 @@ class SelectTest {
     }
 
     @Test
-    fun updateTest() {
+    fun selectTest() {
         insert("aa", "user")
         "select * from aa.user where id>1".doSql()
+    }
+
+    @Test
+    fun selectOrderBy(){
+        insertLarge("aa", "user",50)
+        val doSql = "select * from aa.user where id > 10".doSql()
+        assert(doSql is SelectResult)
+        val result = (doSql as SelectResult).result
+        result.forEach { println(it) }
     }
 
 

@@ -26,7 +26,6 @@ public interface Cursor extends Iterator<Row> {
 
     /**
      * close the cursor
-     *
      **/
     void close();
 

@@ -55,10 +55,15 @@ public class PhysicRow implements Row, TableContainer {
         return this.valueList.get(columnIndexByName);
     }
 
+    @Override
+    public Table belongTo() {
+        return this.table;
+    }
+
 
     @Override
     public Table getTable() {
-        return this.table;
+        return belongTo();
     }
 
     @Override

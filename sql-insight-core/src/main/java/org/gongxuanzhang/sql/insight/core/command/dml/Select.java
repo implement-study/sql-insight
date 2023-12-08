@@ -68,10 +68,10 @@ public class Select implements DmlCommand, WhereContainer {
         tableList = new ArrayList<>();
         x.getFrom().accept(new FromVisitor());
         x.getWhere().accept(new WhereFillVisitor(this));
-        if(x.getOrderBy()!=null){
+        if (x.getOrderBy() != null) {
             x.getOrderBy().accept(new OrderByVisitor());
         }
-        if(x.getLimit()!=null){
+        if (x.getLimit() != null) {
             x.getLimit().accept(this);
         }
         return false;
@@ -83,7 +83,7 @@ public class Select implements DmlCommand, WhereContainer {
         return false;
     }
 
-    private class OrderByVisitor implements SQLASTVisitor{
+    private class OrderByVisitor implements SQLASTVisitor {
         @Override
         public boolean visit(SQLOrderBy x) {
             for (SQLSelectOrderByItem item : x.getItems()) {

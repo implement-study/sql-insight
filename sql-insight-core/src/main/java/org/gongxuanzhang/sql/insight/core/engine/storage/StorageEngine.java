@@ -49,6 +49,12 @@ public interface StorageEngine {
      **/
     List<String> tableExtensions();
 
+
+    /**
+     * open the table and index
+     **/
+    void openTable(Table table);
+
     /**
      * create table
      **/
@@ -64,7 +70,7 @@ public interface StorageEngine {
      *
      * @param row insert
      **/
-    ResultInterface insertRow(InsertRow row);
+    void insertRow(InsertRow row);
 
     /**
      * update
@@ -72,14 +78,19 @@ public interface StorageEngine {
      * @param oldRow hit update condition
      * @param update update set info
      **/
-    ResultInterface update(Row oldRow, Update update);
+    void update(Row oldRow, Update update);
 
     /**
      * delete
      *
      * @param deletedRow hit delete condition
      **/
-    ResultInterface delete(Row deletedRow);
+    void delete(Row deletedRow);
+
+    /**
+     * refresh the data
+     **/
+    void refresh(Table table);
 
 
 }

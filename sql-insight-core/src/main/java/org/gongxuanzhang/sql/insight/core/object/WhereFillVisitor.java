@@ -35,8 +35,6 @@ public class WhereFillVisitor implements FillDataVisitor {
     }
 
 
-
-
     @Override
     public boolean visit(SQLBinaryOpExpr x) {
         ExpressionVisitor visitor = new ExpressionVisitor();

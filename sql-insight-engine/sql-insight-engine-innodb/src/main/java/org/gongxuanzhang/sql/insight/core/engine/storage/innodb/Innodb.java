@@ -42,6 +42,11 @@ public class Innodb implements StorageEngine {
     }
 
     @Override
+    public void openTable(Table table) {
+
+    }
+
+    @Override
     public ResultInterface createTable(Table table) {
         return null;
     }
@@ -52,18 +57,23 @@ public class Innodb implements StorageEngine {
     }
 
     @Override
-    public ResultInterface insertRow(InsertRow row) {
-        return null;
+    public void insertRow(InsertRow row) {
+
     }
 
     @Override
-    public ResultInterface update(Row oldRow, Update update) {
-        return null;
+    public void update(Row oldRow, Update update) {
+
     }
 
     @Override
-    public ResultInterface delete(Row deletedRow) {
-        return null;
+    public void delete(Row deletedRow) {
+
+    }
+
+    @Override
+    public void refresh(Table table) {
+
     }
 
 

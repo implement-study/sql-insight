@@ -18,7 +18,6 @@ package org.gongxuanzhang.sql.insight.core.optimizer.plan;
 
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
-import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
 import org.gongxuanzhang.sql.insight.core.object.Cursor;
 import org.gongxuanzhang.sql.insight.core.object.Index;
 import org.gongxuanzhang.sql.insight.core.object.Row;
@@ -54,17 +53,18 @@ public class SelectPlanNode implements PlanNode {
 
     @Override
     public void doPlan(StorageEngine storageEngine, ExecuteContext context) throws Exception {
+        storageEngine.openTable(this.table);
         List<Index> indexList = this.table.getIndexList();
         //  decide index
         Index main = indexList.get(0);
-        Cursor cursor = main.find(SessionContext.getCurrentSession());
+        main.rndInit();
+        Cursor cursor = main.find(context.getSessionContext());
         while (cursor.hasNext()) {
             Row next = cursor.next();
-            if(Boolean.TRUE.equals(this.where.getBooleanValue(next))){
-                System.out.println(next);
+            if (Boolean.TRUE.equals(this.where.getBooleanValue(next))) {
+                context.addRow(next);
             }
         }
-//        storageEngine.query()
 
     }
 }

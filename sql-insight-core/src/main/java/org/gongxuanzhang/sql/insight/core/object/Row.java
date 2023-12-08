@@ -48,5 +48,12 @@ public interface Row {
      **/
     Value getValueByColumnName(String colName);
 
+    /**
+     * the row related table
+     *
+     * @return table
+     **/
+    Table belongTo();
+
 
 }

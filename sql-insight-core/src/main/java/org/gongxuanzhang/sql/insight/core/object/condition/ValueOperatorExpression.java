@@ -18,12 +18,11 @@ package org.gongxuanzhang.sql.insight.core.object.condition;
 
 import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
-import org.gongxuanzhang.sql.insight.core.object.value.ValueBoolean;
 
 /**
- *
  * calc two value to one value.
  * can combine differ value type
+ *
  * @author gongxuanzhangmelt@gmail.com
  **/
 public abstract class ValueOperatorExpression implements Expression {

@@ -19,6 +19,10 @@ package org.gongxuanzhang.sql.insight.core.optimizer.plan;
 import org.gongxuanzhang.sql.insight.core.command.dml.Delete;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
 import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
+import org.gongxuanzhang.sql.insight.core.object.Cursor;
+import org.gongxuanzhang.sql.insight.core.object.Index;
+import org.gongxuanzhang.sql.insight.core.object.Row;
+import org.gongxuanzhang.sql.insight.core.object.Table;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -36,7 +40,16 @@ public class DeletePlanChain extends SingleStoragePlanChain {
 
     @Override
     protected void doPlan(StorageEngine storageEngine, ExecuteContext context) {
-//        storageEngine.delete(delete);   todo
-
+        Table table = delete.getTable();
+        storageEngine.openTable(table);
+        Index main = table.getIndexList().get(0);
+        main.rndInit();
+        Cursor cursor = main.find(context.getSessionContext());
+        while (cursor.hasNext()) {
+            Row next = cursor.next();
+            if(Boolean.TRUE.equals(this.delete.getWhere().getBooleanValue(next))){
+                storageEngine.delete(next);
+            }
+        }
     }
 }

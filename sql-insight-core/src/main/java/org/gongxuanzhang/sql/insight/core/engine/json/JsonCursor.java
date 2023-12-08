@@ -52,12 +52,17 @@ public class JsonCursor implements Cursor {
             return true;
         }
         try {
-            String line = reader.readLine();
-            if (line == null) {
-                return false;
+            while (true) {
+                String line = reader.readLine();
+                if (line == null) {
+                    return false;
+                }
+                if (line.isEmpty()) {
+                    continue;
+                }
+                this.current = JsonEngineSupport.getPhysicRowFromJson(JSONObject.parseObject(line), index.getTable());
+                return true;
             }
-            this.current = JsonEngineSupport.getPhysicRowFromJson(JSONObject.parseObject(line), index.getTable());
-            return true;
         } catch (IOException e) {
             throw new RuntimeIoException(e);
         }
@@ -68,7 +73,9 @@ public class JsonCursor implements Cursor {
         if (current == null) {
             throw new NoSuchElementException();
         }
-        return current;
+        Row result = current;
+        current = null;
+        return result;
     }
 
     @Override

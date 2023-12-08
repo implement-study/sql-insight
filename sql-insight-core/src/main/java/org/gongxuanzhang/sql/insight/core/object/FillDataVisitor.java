@@ -20,10 +20,10 @@ import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 
 /**
- *
  * subclass can fill info via visit statement
- * @see SQLStatement
+ *
  * @author gongxuanzhangmelt@gmail.com
+ * @see SQLStatement
  **/
 public interface FillDataVisitor extends SQLASTVisitor {
 

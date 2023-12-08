@@ -14,30 +14,25 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.object.condition;
+package org.gongxuanzhang.sql.insight.core.result;
 
-import org.gongxuanzhang.sql.insight.core.object.value.ValueInt;
 
+import org.gongxuanzhang.sql.insight.core.object.Row;
+
+import java.util.List;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class PlusExpression extends NumberOperatorExpression {
+public class SelectResult implements ResultInterface {
 
+    private final List<Row> result;
 
-    public PlusExpression(Expression left, Expression right) {
-        super(left, right);
+    public SelectResult(List<Row> result) {
+        this.result = result;
     }
 
-    @Override
-    protected NumberValueOperatorFunction operator() {
-        return (left, right) -> new ValueInt(left.getSource() * right.getSource());
+    public List<Row> getResult() {
+        return result;
     }
-
-    @Override
-    protected char operatorDesc() {
-        return '*';
-    }
-
-
 }

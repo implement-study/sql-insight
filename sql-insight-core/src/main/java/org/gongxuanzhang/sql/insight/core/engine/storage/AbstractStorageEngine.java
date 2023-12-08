@@ -39,6 +39,11 @@ public abstract class AbstractStorageEngine implements StorageEngine {
     }
 
     @Override
+    public void openTable(Table table) {
+
+    }
+
+    @Override
     public ResultInterface createTable(Table table) {
         throw new UnsupportedOperationException();
     }
@@ -50,18 +55,23 @@ public abstract class AbstractStorageEngine implements StorageEngine {
     }
 
     @Override
-    public ResultInterface insertRow(InsertRow row) {
+    public void insertRow(InsertRow row) {
         throw new UnsupportedOperationException();
     }
 
 
     @Override
-    public ResultInterface update(Row oldRow, Update update) {
+    public void update(Row oldRow, Update update) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public ResultInterface delete(Row deletedRow) {
+    public void delete(Row deletedRow) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void refresh(Table table) {
+
     }
 }

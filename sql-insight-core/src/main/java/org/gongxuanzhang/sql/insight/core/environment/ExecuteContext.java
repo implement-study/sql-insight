@@ -17,8 +17,13 @@
 package org.gongxuanzhang.sql.insight.core.environment;
 
 import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
+import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
+import org.gongxuanzhang.sql.insight.core.result.SelectResult;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * context during execute
@@ -29,6 +34,8 @@ public class ExecuteContext extends AbstractMapContext {
 
     private final String sql;
 
+    private final List<Row> rows = new ArrayList<>();
+
     public ExecuteContext(String sql) {
         this.sql = sql;
     }
@@ -37,8 +44,14 @@ public class ExecuteContext extends AbstractMapContext {
         return sql;
     }
 
+
+    @Temporary
     public ResultInterface toResult() {
-        return null;
+        return new SelectResult(rows);
+    }
+
+    public void addRow(Row row) {
+        this.rows.add(row);
     }
 
     public TableDefinitionManager getTableDefinitionManager() {
@@ -53,9 +66,8 @@ public class ExecuteContext extends AbstractMapContext {
         return GlobalContext.getInstance();
     }
 
-    @Temporary(detail = "temp new session")
     public SessionContext getSessionContext() {
-        return new SessionContext();
+        return SessionContext.getCurrentSession();
     }
 
     @Nullable

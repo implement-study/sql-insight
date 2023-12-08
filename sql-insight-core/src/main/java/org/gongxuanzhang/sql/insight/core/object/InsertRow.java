@@ -75,6 +75,12 @@ public class InsertRow implements Row, FillDataVisitor, TableContainer {
     }
 
     @Override
+    public Table belongTo() {
+        return this.getTable();
+    }
+
+
+    @Override
     public void endVisit(SQLIntegerExpr x) {
         int value = x.getNumber().intValue();
         DataType.Type currentType = currentColumn().getDataType().getType();

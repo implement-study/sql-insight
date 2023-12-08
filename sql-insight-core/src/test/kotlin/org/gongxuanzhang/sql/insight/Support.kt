@@ -20,6 +20,7 @@ import org.gongxuanzhang.sql.insight.core.environment.DefaultProperty
 import org.gongxuanzhang.sql.insight.core.environment.GlobalContext
 import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext
 import java.io.File
+import kotlin.random.Random
 
 
 fun databaseFile(database: String): File {
@@ -56,4 +57,23 @@ fun insert(databaseName: String, tableName: String) {
             (1,'a') ,(2,'b') ,(null,'c')
             ,(null,'b') ,(null,'c')
         """.trimMargin().doSql()
+}
+
+fun insertLarge(databaseName: String, tableName: String, length: Int) {
+    clearDatabase(databaseName)
+    createTable(databaseName, tableName)
+    val values = (1..length).map {
+        "(null,'${generatorRandomString(10)}')"
+    }.joinToString(",")
+    """insert into aa.user (id,name) values $values
+        """.trimMargin().doSql()
+}
+
+
+fun generatorRandomString(length: Int): String {
+    val charPool = ('a'..'z') + ('A'..'Z') + ('0'..'9') // 可选的字符集
+    return (1..length)
+        .map { Random.nextInt(0, charPool.size) }
+        .map(charPool::get)
+        .joinToString("")
 }

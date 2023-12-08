@@ -19,15 +19,16 @@ package org.gongxuanzhang.sql.insight
 import org.gongxuanzhang.sql.insight.core.analysis.druid.DruidAnalyzer
 import org.gongxuanzhang.sql.insight.core.command.Command
 import org.gongxuanzhang.sql.insight.core.engine.json.InsightFactory
+import org.gongxuanzhang.sql.insight.core.result.ResultInterface
 
 
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 
-fun String.doSql() {
+fun String.doSql(): ResultInterface {
     val pipeline = InsightFactory.createSqlPipeline()
-     pipeline.doSql(this)
+    return pipeline.doSql(this)
 }
 
 

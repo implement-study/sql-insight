@@ -67,7 +67,7 @@ public class JsonEngineSupport {
     }
 
 
-    static PhysicRow getPhysicRowFromJson(JSONObject jsonObject , Table table) {
+    static PhysicRow getPhysicRowFromJson(JSONObject jsonObject, Table table) {
         Column primaryKey = table.getColumnList().get(table.getPrimaryKeyIndex());
         long id = jsonObject.getLongValue(primaryKey.getName());
         List<Value> valueList = new ArrayList<>(table.getColumnList().size());
