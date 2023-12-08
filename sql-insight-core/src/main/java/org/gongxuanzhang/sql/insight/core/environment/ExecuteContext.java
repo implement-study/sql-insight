@@ -45,6 +45,10 @@ public class ExecuteContext extends AbstractMapContext {
     }
 
 
+    public List<Row> getRows() {
+        return rows;
+    }
+
     @Temporary
     public ResultInterface toResult() {
         return new SelectResult(rows);

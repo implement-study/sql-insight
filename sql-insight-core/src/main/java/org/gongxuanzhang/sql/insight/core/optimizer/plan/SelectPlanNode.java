@@ -22,6 +22,7 @@ import org.gongxuanzhang.sql.insight.core.environment.ExecuteContext;
 import org.gongxuanzhang.sql.insight.core.object.Cursor;
 import org.gongxuanzhang.sql.insight.core.object.Index;
 import org.gongxuanzhang.sql.insight.core.object.Limit;
+import org.gongxuanzhang.sql.insight.core.object.OrderBy;
 import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.Where;
@@ -77,6 +78,10 @@ public class SelectPlanNode implements PlanNode {
             }
         }
         cursor.close();
+        OrderBy orderBy = this.select.getOrderBy();
+        if (orderBy != null) {
+            context.getRows().sort(orderBy);
+        }
 
     }
 

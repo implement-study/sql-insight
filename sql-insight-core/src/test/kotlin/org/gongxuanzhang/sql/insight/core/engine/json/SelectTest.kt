@@ -47,7 +47,7 @@ class SelectTest {
     @Test
     fun selectOrderBy(){
         insertLarge("aa", "user",50)
-        val doSql = "select * from aa.user where id > 10 order by name".doSql()
+        val doSql = "select * from aa.user where id > 10 order by name asc".doSql()
         assert(doSql is SelectResult)
         val result = (doSql as SelectResult).result
         result.forEach { println(it) }

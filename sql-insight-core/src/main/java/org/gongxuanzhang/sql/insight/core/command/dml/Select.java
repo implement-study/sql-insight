@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.command.dml;
 
 import com.alibaba.druid.sql.ast.SQLLimit;
 import com.alibaba.druid.sql.ast.SQLOrderBy;
+import com.alibaba.druid.sql.ast.SQLOrderingSpecification;
 import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLJoinTableSource;
@@ -102,13 +103,21 @@ public class Select implements DmlCommand, WhereContainer {
     }
 
 
-
     private class OrderByVisitor implements SQLASTVisitor {
+
         @Override
         public boolean visit(SQLOrderBy x) {
-            for (SQLSelectOrderByItem item : x.getItems()) {
-                System.out.println(item);
+            String[] orderByColumnNames = new String[x.getItems().size()];
+            boolean[] asc = new boolean[orderByColumnNames.length];
+            List<SQLSelectOrderByItem> items = x.getItems();
+            for (int i = 0; i < items.size(); i++) {
+                SQLSelectOrderByItem item = items.get(i);
+                if (item.getType() == SQLOrderingSpecification.ASC) {
+                    asc[i] = true;
+                }
+                orderByColumnNames[i] = item.getExpr().toString();
             }
+            Select.this.orderBy = new OrderBy(orderByColumnNames, asc);
             return false;
         }
 

@@ -17,14 +17,41 @@
 package org.gongxuanzhang.sql.insight.core.object;
 
 
+import java.util.Comparator;
+
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class OrderBy {
+public class OrderBy implements Comparator<Row> {
 
-    String[] column;
+    private final String[] column;
 
-    boolean[] asc;
+    private final boolean[] asc;
+
+    private final Comparator<Row> comparator;
+
+    public OrderBy(String[] column, boolean[] asc) {
+        this.column = column;
+        this.asc = asc;
+        this.comparator = createComparator();
+    }
+
+    private Comparator<Row> createComparator() {
+        return (r1, r2) -> {
+            for (int i = 0; i < column.length; i++) {
+                String col = column[i];
+                int val = r1.getValueByColumnName(col).compareTo(r2.getValueByColumnName(col));
+                if (val != 0) {
+                    return asc[i] ? val : -val;
+                }
+            }
+            return 0;
+        };
+    }
 
 
+    @Override
+    public int compare(Row o1, Row o2) {
+        return comparator.compare(o1, o2);
+    }
 }
