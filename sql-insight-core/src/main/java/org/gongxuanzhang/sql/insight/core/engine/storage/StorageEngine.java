@@ -56,7 +56,9 @@ public interface StorageEngine {
     void openTable(Table table);
 
     /**
-     * create table
+     * create table.
+     * server layer is responsible for creating table meta data to frm data.
+     * storage engine is responsible creating engine index file if necessary.
      **/
     ResultInterface createTable(Table table);
 

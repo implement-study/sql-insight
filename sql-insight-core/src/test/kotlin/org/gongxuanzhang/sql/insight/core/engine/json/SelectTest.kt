@@ -56,7 +56,7 @@ class SelectTest {
     @Test
     fun selectLimit(){
         insertLarge("aa", "user",50)
-        val doSql = "select * from aa.user where id > 10 limit 4,10".doSql()
+        val doSql = "select * from aa.user where id > 10 limit 4,10 ".doSql()
         assert(doSql is SelectResult)
         val result = (doSql as SelectResult).result
         assert(result.size == 10)

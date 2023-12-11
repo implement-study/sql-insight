@@ -51,6 +51,7 @@ public class Innodb implements StorageEngine {
 
     @Override
     public ResultInterface createTable(Table table) {
+        //
         return null;
     }
 
