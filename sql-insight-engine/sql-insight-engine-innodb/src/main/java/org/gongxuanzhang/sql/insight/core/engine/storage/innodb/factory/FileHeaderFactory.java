@@ -7,8 +7,11 @@ import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.FileHeader;
  **/
 public abstract class FileHeaderFactory {
 
-    public static FileHeader init(){
-        FileHeader fileHeader = new FileHeader();
-        return fileHeader;
+
+    /**
+     * create table root page file header
+     **/
+    public static FileHeader initRootFileHeader() {
+        return new FileHeader();
     }
 }

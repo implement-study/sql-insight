@@ -1,6 +1,7 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory;
 
 import lombok.extern.slf4j.Slf4j;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
@@ -29,4 +30,9 @@ public abstract class PageFactory {
         }
     }
 
+    private static InnoDbPage createRoot(){
+        InnoDbPage innoDbPage = new InnoDbPage();
+        innoDbPage.setFileHeader(FileHeaderFactory.initRootFileHeader());
+        return innoDbPage;
+    }
 }

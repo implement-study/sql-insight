@@ -48,7 +48,7 @@ public class Infimum implements UserRecord {
     /**
      * fixed 8 bytes. "infimum" is 7 bytes . fill 0 zero occupy the space
      **/
-    final byte[] body = INFIMUM_BODY.getBytes();
+    final byte[] body = INFIMUM_BODY_ARRAY;
 
 
     @Override
