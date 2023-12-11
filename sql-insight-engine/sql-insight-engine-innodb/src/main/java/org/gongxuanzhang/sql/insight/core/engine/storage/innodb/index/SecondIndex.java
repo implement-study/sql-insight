@@ -1,7 +1,10 @@
-package org.gongxuanzhang.sql.insight.core.object;
+package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index;
 
 
 import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
+import org.gongxuanzhang.sql.insight.core.object.Cursor;
+import org.gongxuanzhang.sql.insight.core.object.Index;
+import org.gongxuanzhang.sql.insight.core.object.Table;
 
 /**
  * second index
