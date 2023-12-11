@@ -24,22 +24,20 @@ import java.nio.ByteBuffer;
 
 
 /**
- * 文件尾 8字节
- *
+ * use it with {@link FileHeader}
+ * only in order to check.
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
 public class FileTrailer implements ByteWrapper, ShowLength {
 
     /**
-     * 校验和，和文件头的4字节校验和一起校验
-     * {@link FileHeader#checkSum}
+     * use it with {@link FileHeader#checkSum}
      */
     int checkSum;
 
     /**
-     * 和文件头的lsn一起校验
-     * {@link FileHeader#lsn}
+     * use it with {@link FileHeader#lsn}
      **/
     int lsn;
 

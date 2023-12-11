@@ -24,19 +24,19 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
  **/
 public enum RecordType {
     /**
-     * 普通记录
+     * leaf-node
      **/
     NORMAL(0x00),
     /**
-     * 非叶子节点记录(目录项)
+     * non-leaf-node(index)
      **/
     PAGE(0x01),
     /**
-     * 下确界
+     * infimum
      **/
     INFIMUM(0x02),
     /**
-     * 上确界
+     * supremum
      **/
     SUPREMUM(0x03);
 

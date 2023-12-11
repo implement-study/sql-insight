@@ -31,38 +31,36 @@ public class FileHeader implements ByteWrapper, ShowLength {
 
 
     /**
-     * 校验和,和文件尾的校验和一起使用  4字节
-     * {@link FileTrailer#checkSum}
+     * use it with {@link FileTrailer#checkSum}
      **/
     int checkSum;
     /**
-     * 偏移量,页号 4字节int
+     * page offset
      **/
     int offset;
     /**
-     * 页类型 2字节表示
+     * page type
      **/
     short pageType;
     /**
-     * 上一页 4字节
+     * pre page offset
      **/
     int pre;
     /**
-     * 下一页 4字节
+     * next page offset
      **/
     int next;
     /**
      * Log Sequence Number 8字节
-     * 和文件尾一起校验使用
      * {@link FileTrailer#lsn}
      **/
     long lsn;
     /**
-     * 系统表空间的定义
+     * system table space
      **/
     long flushLsn;
     /**
-     * 所属表空间
+     * table space id
      **/
     int spaceId;
 

@@ -37,9 +37,6 @@ import java.nio.ByteBuffer;
 public class PageDirectory implements ShowLength, ByteWrapper {
 
 
-    /**
-     * slot的每个数字记录每个槽中最大数据的偏移位置
-     **/
     short[] slots;
 
     @Override
@@ -58,7 +55,7 @@ public class PageDirectory implements ShowLength, ByteWrapper {
     }
 
     /**
-     * 页中有多少个组(槽)
+     *
      **/
     public int slotCount() {
         return slots.length;

@@ -53,7 +53,6 @@ public class PageHeader implements ShowLength, ByteWrapper {
 
     /**
      * the first deleted record in page. use next_record field can find delete linked list
-     * sql-insight中约定如果没有删除记录此字段为0
      **/
     short free;
 
@@ -64,7 +63,6 @@ public class PageHeader implements ShowLength, ByteWrapper {
 
     /**
      * last insert record offset
-     * 理论上和空闲空间保持一致，但是如果删除记录被释放的时候就不一样了
      **/
     short lastInsertOffset;
     /**
