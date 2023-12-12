@@ -21,6 +21,16 @@ public class SecondIndex implements Index {
     }
 
     @Override
+    public int getId() {
+        return 0;
+    }
+
+    @Override
+    public Table belongTo() {
+        return null;
+    }
+
+    @Override
     public Cursor find(SessionContext sessionContext) {
         return null;
     }
@@ -30,13 +40,4 @@ public class SecondIndex implements Index {
 
     }
 
-    @Override
-    public Table getTable() {
-        return null;
-    }
-
-    @Override
-    public void setTable(Table table) {
-
-    }
 }
