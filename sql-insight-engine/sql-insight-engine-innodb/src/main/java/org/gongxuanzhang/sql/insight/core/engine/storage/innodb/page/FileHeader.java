@@ -40,6 +40,7 @@ public class FileHeader implements ByteWrapper, ShowLength {
     int offset;
     /**
      * page type
+     * {@link PageType}
      **/
     short pageType;
     /**

@@ -14,30 +14,10 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
-
-import org.gongxuanzhang.sql.insight.core.object.RowFormat;
-import org.gongxuanzhang.sql.insight.core.object.UserRecord;
+package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.core;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class Compact implements RowFormat {
-
-
-
-    @Override
-    public String getName() {
-        return null;
-    }
-
-    @Override
-    public byte[] rowBytes() {
-        return new byte[0];
-    }
-
-    @Override
-    public UserRecord toUserRecord() {
-        return null;
-    }
+public interface BTree {
 }

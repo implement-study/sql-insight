@@ -34,12 +34,6 @@ public class Infimum implements UserRecord {
 
     private static final String INFIMUM_BODY = "infimum";
 
-    private static final byte[] INFIMUM_BODY_ARRAY;
-
-    static {
-        INFIMUM_BODY_ARRAY = DynamicByteBuffer.wrap(INFIMUM_BODY.getBytes()).append((byte) 0).toBytes();
-    }
-
     /**
      * 5 bytes.
      **/
@@ -48,8 +42,11 @@ public class Infimum implements UserRecord {
     /**
      * fixed 8 bytes. "infimum" is 7 bytes . fill 0 zero occupy the space
      **/
-    final byte[] body = INFIMUM_BODY_ARRAY;
+    final byte[] body;
 
+    public Infimum() {
+        body = DynamicByteBuffer.wrap(INFIMUM_BODY.getBytes()).append((byte) 0).toBytes();
+    }
 
     @Override
     public byte[] rowBytes() {

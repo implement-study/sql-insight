@@ -16,28 +16,42 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
-import org.gongxuanzhang.sql.insight.core.object.RowFormat;
-import org.gongxuanzhang.sql.insight.core.object.UserRecord;
 
 /**
- * @author gongxuanzhangmelt@gmail.com
+ * @author gxz gongxuanzhang@foxmail.com
  **/
-public class Compact implements RowFormat {
+public enum PageType {
+    /**
+     * log page
+     **/
+    FIL_PAGE_TYPE_UNDO_LOG((short) 0X0001),
+    /**
+     * data page
+     **/
+    FIL_PAGE_INDEX((short) 0X45bf),
+    /**
+     * index page
+     **/
+    FIL_PAGE_INODE((short) 0x0003);
 
 
+    private final short value;
 
-    @Override
-    public String getName() {
-        return null;
+    PageType(short value) {
+        this.value = value;
     }
 
-    @Override
-    public byte[] rowBytes() {
-        return new byte[0];
+    public short getValue() {
+        return value;
     }
 
-    @Override
-    public UserRecord toUserRecord() {
-        return null;
+    static PageType valueOf(int value) {
+        for (PageType pageType : values()) {
+            if (pageType.getValue() == value) {
+                return pageType;
+            }
+        }
+        throw new IllegalArgumentException("page type error value[ " + value + " ]");
     }
 }
+

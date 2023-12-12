@@ -29,7 +29,7 @@ import java.util.Arrays;
  * └────────────┴────────────┴──────────────┴───────────────┴──────────┴───────────┴──────────────┴───────────────┘
  * delete_mask
  * min_rec_mask: whether non-leaf node min record，only index node may be 1
- * n_owned : records count in group. only max record in group have this count
+ * n_owned : records count in group. only max record in group have this count.
  * heap_no: the record number in page, infimum is 0, supremum is 1,user record start with 2.
  * record_type:0 normal record 1 non leaf node (index) 2 infimum 3 supremum
  * next_record:next record offset in this page. supremum next_record is 0
