@@ -19,6 +19,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFactory;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.RootPage;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 
 import java.io.File;
@@ -30,13 +31,13 @@ import java.io.IOException;
  **/
 public class PageSupport {
 
-    public static InnoDbPage getRoot(File ibd) {
+    public static RootPage getRoot(File ibd) {
         try (FileInputStream fileInputStream = new FileInputStream(ibd)) {
             byte[] pageByte = ConstantSize.PAGE.emptyBuff();
             if (fileInputStream.read(pageByte) != pageByte.length) {
                 throw new IllegalArgumentException("idb file error [ " + ibd.getAbsoluteFile() + " ]");
             }
-            return PageFactory.swap(pageByte);
+            return (RootPage) PageFactory.swap(pageByte);
         } catch (IOException e) {
             throw new RuntimeIoException(e);
         }

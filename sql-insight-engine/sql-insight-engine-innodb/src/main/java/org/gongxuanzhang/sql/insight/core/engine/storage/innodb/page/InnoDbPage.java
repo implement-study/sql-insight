@@ -20,6 +20,8 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 import lombok.Data;
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
+import org.gongxuanzhang.sql.insight.core.object.InsertRow;
+import org.gongxuanzhang.sql.insight.core.object.UserRecord;
 
 /**
  * InnoDb Page
@@ -81,6 +83,12 @@ public class InnoDbPage implements ByteWrapper {
         return buffer.toBytes();
     }
 
+
+    public PageType pageType() {
+        return PageType.valueOf(this.fileHeader.pageType);
+    }
+
+
 //    /**
 //     * 判断当前空闲空间是否足够
 //     *
@@ -91,32 +99,6 @@ public class InnoDbPage implements ByteWrapper {
 //        return this.freeSpace >= length;
 //    }
 //
-//    /**
-//     * 外部需要判断空间是否足够  否则会有问题
-//     * 插入目标位置
-//     *
-//     * @param row 插入数据
-//     **/
-//    public void insert(InsertRow row) throws MySQLException {
-//        if (!isEnough(row.length())) {
-//            throw new MySQLException("页选择异常");
-//        }
-//        Compact insertCompact = row.toUserRecord(Compact.class);
-//        int insertSlot = findInsertSlot(insertCompact);
-//        //  插入链表
-//        short preOffset = this.pageDirectory.getSlots()[insertSlot - 1];
-//        UserRecord preGroupMax = getUserRecordByOffset(this, preOffset);
-//        insertLinkedList(insertCompact, preGroupMax);
-//        //  调整组
-//        UserRecord insertGroupMax = getUserRecordByOffset(this, pageDirectory.getSlots()[insertSlot]);
-//        int currentOwned = insertGroupMax.getRecordHeader().getNOwned() + 1;
-//        insertGroupMax.getRecordHeader().setnOwned(currentOwned);
-//        if (currentOwned > Constant.RECORD_SPLIT_SIZE) {
-//            groupSplit(insertSlot);
-//            this.freeSpace -= 2;
-//        }
-//        this.refresh();
-//    }
 //
 //
 //    /**

@@ -16,9 +16,11 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index;
 
+import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.AutoIncrementKeyCounter;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.core.InnodbIc;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.RootPage;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport;
 import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
 import org.gongxuanzhang.sql.insight.core.object.Cursor;
@@ -31,6 +33,7 @@ import java.io.File;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
+@Slf4j
 public class ClusteredIndex extends PKIndex {
 
     private final Table table;
@@ -67,16 +70,12 @@ public class ClusteredIndex extends PKIndex {
     @Override
     public void insert(InsertRow row) {
         if (this.autoIncrementKeyCounter.dealAutoIncrement(row)) {
-            insertEnd(row);
-            return;
+            log.info("auto increment primary key {}", table.getColumnList().get(table.getAutoColIndex()).getName());
         }
-
+        RootPage targetPage = PageSupport.getRoot(this.ibd);
+        targetPage.insert(row);
     }
 
 
 
-    private void insertEnd(InsertRow row) {
-        InnoDbPage root = PageSupport.getRoot(ibd);
-
-    }
 }

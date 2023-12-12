@@ -8,6 +8,7 @@ import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Infimum;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageDirectory;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.RecordHeader;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.RootPage;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Supremum;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.UserRecords;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
@@ -49,7 +50,7 @@ public abstract class PageFactory {
      * swap byte array to page
      **/
     public static InnoDbPage swap(byte[] bytes) {
-        InnoDbPage bean = new InnoDbPage();
+        InnoDbPage bean = new RootPage();
         ConstantSize.PAGE.checkSize(bytes);
 
         DynamicByteBuffer buffer = DynamicByteBuffer.wrap(bytes);
@@ -89,18 +90,18 @@ public abstract class PageFactory {
         return bean;
     }
 
-    private static InnoDbPage createRoot() {
-        InnoDbPage innoDbPage = new InnoDbPage();
-        innoDbPage.setFileHeader(FileHeaderFactory.rootFileHeader());
-        innoDbPage.setPageHeader(PageHeaderFactory.rootPageHeader());
-        innoDbPage.setInfimum(new Infimum());
-        innoDbPage.setSupremum(new Supremum());
-        innoDbPage.setUserRecords(new UserRecords());
-        innoDbPage.setFreeSpace(innoDbPage.getPageHeader().getHeapTop());
+    private static RootPage createRoot() {
+        RootPage root = new RootPage();
+        root.setFileHeader(FileHeaderFactory.rootFileHeader());
+        root.setPageHeader(PageHeaderFactory.rootPageHeader());
+        root.setInfimum(new Infimum());
+        root.setSupremum(new Supremum());
+        root.setUserRecords(new UserRecords());
+        root.setFreeSpace(root.getPageHeader().getHeapTop());
         //   todo page directory
-        innoDbPage.setPageDirectory(new PageDirectory());
-        innoDbPage.setFileTrailer(new FileTrailer());
-        return innoDbPage;
+        root.setPageDirectory(new PageDirectory());
+        root.setFileTrailer(new FileTrailer());
+        return root;
     }
 
     public static Supremum swapSupremum(byte[] bytes) {
