@@ -19,6 +19,8 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 import lombok.Getter;
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.BitOperator;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.BitUtils;
 
 import java.util.Arrays;
 
@@ -54,115 +56,115 @@ public class RecordHeader implements ByteWrapper {
     public RecordHeader() {
         this.source = new byte[5];
     }
-//
-//    public RecordHeader(byte[] source) {
-//        ConstantSize.RECORD_HEADER.checkSize(source);
-//        this.source = source;
-//        swapProperties();
-//    }
-//
-//    private void initType() {
-//        int type = source[2] & 0x07;
-//        for (RecordType recordType : RecordType.values()) {
-//            if (recordType.value == type) {
-//                this.recordType = recordType;
-//                return;
-//            }
-//        }
-//        throw new IllegalArgumentException("非法");
-//    }
-//
-//    private void swapProperties() {
-//        final int deleteMask = 1 << 5;
-//        this.delete = (source[0] & deleteMask) == deleteMask;
-//
-//        final int minRecMask = 1 << 4;
-//        this.minRec = (source[0] & minRecMask) == minRecMask;
-//
-//        final int nOwned = 0x0F;
-//        this.nOwned = source[0] & nOwned;
-//
-//        int high = Byte.toUnsignedInt(source[1]);
-//        int low = Byte.toUnsignedInt(source[2]);
-//        this.heapNo = ((high << 8 | low) >> 3);
-//
-//        high = Byte.toUnsignedInt(source[3]);
-//        low = Byte.toUnsignedInt(source[4]);
-//        this.nextRecordOffset = (high << 8 | low);
-//
-//        initType();
-//    }
-//
-//    public RecordHeader setDelete(boolean delete) {
-//        if (this.delete == delete) {
-//            return this;
-//        }
-//        this.delete = delete;
-//        if (delete) {
-//            this.source[0] = BitSetter.setBitToOne(this.source[0], 5);
-//        } else {
-//            this.source[0] = BitSetter.setBitToZero(this.source[0], 5);
-//        }
-//        return this;
-//    }
-//
-//    public RecordHeader setMinRec(boolean minRec) {
-//        if (this.minRec == minRec) {
-//            return this;
-//        }
-//        this.minRec = minRec;
-//        if (minRec) {
-//            this.source[0] = BitSetter.setBitToOne(this.source[0], 4);
-//        } else {
-//            this.source[0] = BitSetter.setBitToZero(this.source[0], 4);
-//        }
-//        return this;
-//    }
-//
-//    public RecordHeader setnOwned(int nOwned) {
-//        if (this.nOwned == nOwned) {
-//            return this;
-//        }
-//        //  清零source[0]的后四位
-//        this.source[0] &= 0xF0;
-//        this.source[0] |= nOwned;
-//        this.nOwned = nOwned;
-//        return this;
-//    }
-//
-//    public RecordHeader setHeapNo(int heapNo) {
-//        if (this.heapNo == heapNo) {
-//            return this;
-//        }
-//        this.heapNo = heapNo;
-//        this.source[1] = (byte) (heapNo >> 5);
-//        this.source[2] &= 0b00000111;
-//        this.source[2] |= (byte) (heapNo << 3);
-//        return this;
-//    }
-//
-//
-//    public RecordHeader setNextRecordOffset(int nextRecordOffset) {
-//        if (this.nextRecordOffset == nextRecordOffset) {
-//            return this;
-//        }
-//        this.nextRecordOffset = nextRecordOffset;
-//        byte[] bytes = BitUtils.cutToByteArray(nextRecordOffset, 2);
-//        this.source[3] = bytes[0];
-//        this.source[4] = bytes[1];
-//        return this;
-//    }
-//
-//    public RecordHeader setRecordType(RecordType recordType) {
-//        if (this.recordType == recordType) {
-//            return this;
-//        }
-//        this.recordType = recordType;
-//        // 后三位置0
-//        this.source[2] &= 0b11111000;
-//        this.source[2] |= recordType.value;
-//        return this;
-//    }
+
+    public RecordHeader(byte[] source) {
+        ConstantSize.RECORD_HEADER.checkSize(source);
+        this.source = source;
+        swapProperties();
+    }
+
+    private void initType() {
+        int type = source[2] & 0x07;
+        for (RecordType recordType : RecordType.values()) {
+            if (recordType.value == type) {
+                this.recordType = recordType;
+                return;
+            }
+        }
+        throw new IllegalArgumentException();
+    }
+
+    private void swapProperties() {
+        final int deleteMask = 1 << 5;
+        this.delete = (source[0] & deleteMask) == deleteMask;
+
+        final int minRecMask = 1 << 4;
+        this.minRec = (source[0] & minRecMask) == minRecMask;
+
+        final int nOwnedBase = 0x0F;
+        this.nOwned = source[0] & nOwnedBase;
+
+        int high = Byte.toUnsignedInt(source[1]);
+        int low = Byte.toUnsignedInt(source[2]);
+        this.heapNo = ((high << 8 | low) >> 3);
+
+        high = Byte.toUnsignedInt(source[3]);
+        low = Byte.toUnsignedInt(source[4]);
+        this.nextRecordOffset = (high << 8 | low);
+
+        initType();
+    }
+
+    public RecordHeader setDelete(boolean delete) {
+        if (this.delete == delete) {
+            return this;
+        }
+        this.delete = delete;
+        if (delete) {
+            this.source[0] = BitOperator.setBitToOne(this.source[0], 5);
+        } else {
+            this.source[0] = BitOperator.setBitToZero(this.source[0], 5);
+        }
+        return this;
+    }
+
+    public RecordHeader setMinRec(boolean minRec) {
+        if (this.minRec == minRec) {
+            return this;
+        }
+        this.minRec = minRec;
+        if (minRec) {
+            this.source[0] = BitOperator.setBitToOne(this.source[0], 4);
+        } else {
+            this.source[0] = BitOperator.setBitToZero(this.source[0], 4);
+        }
+        return this;
+    }
+
+    public RecordHeader setnOwned(int nOwned) {
+        if (this.nOwned == nOwned) {
+            return this;
+        }
+        //  清零source[0]的后四位
+        this.source[0] &= 0xF0;
+        this.source[0] |= nOwned;
+        this.nOwned = nOwned;
+        return this;
+    }
+
+    public RecordHeader setHeapNo(int heapNo) {
+        if (this.heapNo == heapNo) {
+            return this;
+        }
+        this.heapNo = heapNo;
+        this.source[1] = (byte) (heapNo >> 5);
+        this.source[2] &= 0b00000111;
+        this.source[2] |= (byte) (heapNo << 3);
+        return this;
+    }
+
+
+    public RecordHeader setNextRecordOffset(int nextRecordOffset) {
+        if (this.nextRecordOffset == nextRecordOffset) {
+            return this;
+        }
+        this.nextRecordOffset = nextRecordOffset;
+        byte[] bytes = BitUtils.cutToByteArray(nextRecordOffset, 2);
+        this.source[3] = bytes[0];
+        this.source[4] = bytes[1];
+        return this;
+    }
+
+    public RecordHeader setRecordType(RecordType recordType) {
+        if (this.recordType == recordType) {
+            return this;
+        }
+        this.recordType = recordType;
+        // 后三位置0
+        this.source[2] &= 0b11111000;
+        this.source[2] |= recordType.value;
+        return this;
+    }
 
     @Override
     public byte[] toBytes() {

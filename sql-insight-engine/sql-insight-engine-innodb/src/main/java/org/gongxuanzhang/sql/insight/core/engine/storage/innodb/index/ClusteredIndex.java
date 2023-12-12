@@ -16,27 +16,67 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index;
 
+import org.gongxuanzhang.sql.insight.core.engine.AutoIncrementKeyCounter;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.core.InnodbIc;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport;
 import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
 import org.gongxuanzhang.sql.insight.core.object.Cursor;
+import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.PKIndex;
 import org.gongxuanzhang.sql.insight.core.object.Table;
+
+import java.io.File;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
 public class ClusteredIndex extends PKIndex {
 
+    private final Table table;
+
+    private File ibd;
+
+    private AutoIncrementKeyCounter autoIncrementKeyCounter;
+
     protected ClusteredIndex(Table table) {
-        super(table);
+        this.table = table;
     }
 
     @Override
     public void rndInit() {
+        if (this.ibd != null) {
+            return;
+        }
+        this.ibd = new File(table.getDatabase().getDbFolder(), table.getName() + ".ibd");
+        if (this.table.getAutoColIndex() >= 0) {
+            this.autoIncrementKeyCounter = new InnodbIc(table);
+        }
+    }
 
+    @Override
+    public Table belongTo() {
+        return this.table;
     }
 
     @Override
     public Cursor find(SessionContext sessionContext) {
         return null;
+    }
+
+    @Override
+    public void insert(InsertRow row) {
+        if (this.autoIncrementKeyCounter.dealAutoIncrement(row)) {
+            insertEnd(row);
+            return;
+        }
+
+    }
+
+
+
+    private void insertEnd(InsertRow row) {
+        InnoDbPage root = PageSupport.getRoot(ibd);
+
     }
 }

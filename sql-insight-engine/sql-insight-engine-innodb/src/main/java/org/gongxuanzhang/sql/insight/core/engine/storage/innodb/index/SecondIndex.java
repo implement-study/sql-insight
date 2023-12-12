@@ -4,6 +4,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index;
 import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
 import org.gongxuanzhang.sql.insight.core.object.Cursor;
 import org.gongxuanzhang.sql.insight.core.object.Index;
+import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
 /**
@@ -22,6 +23,11 @@ public class SecondIndex implements Index {
     @Override
     public Cursor find(SessionContext sessionContext) {
         return null;
+    }
+
+    @Override
+    public void insert(InsertRow row) {
+
     }
 
     @Override

@@ -34,8 +34,9 @@ public interface AutoIncrementKeyCounter {
      * if value is empty the counter should set a increment value
      *
      * @param row insert row
+     * @return increment succeed
      **/
-    void dealAutoIncrement(InsertRow row);
+    boolean dealAutoIncrement(InsertRow row);
 
     /**
      * reset the counter

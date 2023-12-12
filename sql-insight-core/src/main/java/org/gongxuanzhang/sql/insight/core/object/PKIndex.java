@@ -8,19 +8,9 @@ package org.gongxuanzhang.sql.insight.core.object;
  **/
 public abstract class PKIndex implements Index {
 
-    Table table;
-
-    protected PKIndex(Table table) {
-        this.table = table;
-    }
 
     @Override
-    public Table getTable() {
-        return table;
-    }
-
-    @Override
-    public void setTable(Table table) {
-        this.table = table;
+    public int getId() {
+        return 1;
     }
 }

@@ -75,6 +75,11 @@ public class Supremum implements UserRecord {
         return supremumUnsupport();
     }
 
+    public Supremum setRecordHeader(RecordHeader recordHeader) {
+        this.recordHeader = recordHeader;
+        return this;
+    }
+
     private <T> T supremumUnsupport() {
         throw new UnsupportedOperationException("this is supremum!");
     }

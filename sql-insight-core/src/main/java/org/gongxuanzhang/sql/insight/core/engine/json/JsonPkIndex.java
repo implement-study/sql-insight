@@ -19,6 +19,7 @@ package org.gongxuanzhang.sql.insight.core.engine.json;
 import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.object.Cursor;
+import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.PKIndex;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
@@ -33,17 +34,25 @@ import java.nio.file.Path;
  **/
 public class JsonPkIndex extends PKIndex {
 
+    private final Table table;
+
     private Path jsonFilePath;
 
 
     protected JsonPkIndex(Table table) {
-        super(table);
+        this.table = table;
+
     }
 
 
     @Override
     public void rndInit() {
-        this.jsonFilePath = JsonEngineSupport.getJsonFile(getTable()).toPath();
+        this.jsonFilePath = JsonEngineSupport.getJsonFile(table).toPath();
+    }
+
+    @Override
+    public Table belongTo() {
+        return this.table;
     }
 
     @Override
@@ -54,6 +63,11 @@ public class JsonPkIndex extends PKIndex {
         } catch (IOException e) {
             throw new RuntimeIoException(e);
         }
+    }
+
+    @Override
+    public void insert(InsertRow row) {
+        throw new UnsupportedOperationException("json engine index dont support insert");
     }
 
 

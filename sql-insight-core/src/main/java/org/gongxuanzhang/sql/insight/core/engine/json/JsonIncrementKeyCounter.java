@@ -51,10 +51,10 @@ public class JsonIncrementKeyCounter implements AutoIncrementKeyCounter {
      * @param row insert row
      **/
     @Override
-    public void dealAutoIncrement(InsertRow row) {
+    public boolean dealAutoIncrement(InsertRow row) {
         int autoColIndex = row.getTable().getAutoColIndex();
         if (autoColIndex < 0) {
-            return;
+            return false;
         }
         String databaseName = row.getTable().getDatabase().getName();
         AtomicLong atomicLong = loadMaxAutoIncrementKey(row.getTable());
@@ -63,7 +63,7 @@ public class JsonIncrementKeyCounter implements AutoIncrementKeyCounter {
 
         if (autoIncrementValue.getSource() == null) {
             row.getValues().set(autoColIndex, new ValueInt((int) atomicLong.incrementAndGet()));
-            return;
+            return true;
         }
         int insertValue = (int) autoIncrementValue.getSource();
         if (insertValue > atomicLong.get()) {
@@ -71,6 +71,7 @@ public class JsonIncrementKeyCounter implements AutoIncrementKeyCounter {
                     , insertValue);
             atomicLong.set(insertValue);
         }
+        return false;
     }
 
     @Override

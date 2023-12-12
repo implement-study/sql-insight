@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb;
 
+import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.command.dml.Update;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFactory;
@@ -23,16 +24,16 @@ import org.gongxuanzhang.sql.insight.core.object.Index;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.Table;
+import org.gongxuanzhang.sql.insight.core.result.MessageResult;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
-import sun.jvm.hotspot.debugger.Page;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
+@Slf4j
 public class Innodb implements StorageEngine {
 
     @Override
@@ -54,9 +55,8 @@ public class Innodb implements StorageEngine {
     @Override
     public ResultInterface createTable(Table table) {
         PageFactory.initialization(table);
-
-
-        return null;
+        log.info("create table {} with innodb,create ibd file", table.getName());
+        return new MessageResult(String.format("成功创建%s", table.getName()));
     }
 
     @Override
@@ -66,7 +66,12 @@ public class Innodb implements StorageEngine {
 
     @Override
     public void insertRow(InsertRow row) {
-
+        Table table = row.getTable();
+        openTable(table);
+        List<Index> indexList = table.getIndexList();
+        for (Index index : indexList) {
+            index.insert(row);
+        }
     }
 
     @Override

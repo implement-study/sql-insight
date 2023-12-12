@@ -42,7 +42,7 @@
         <dependency>
             <groupId>io.github.gongxuanzhang</groupId>
             <artifactId>easy-byte</artifactId>
-            <version>0.0.1</version>
+            <version>0.0.2-beta</version>
         </dependency>
     </dependencies>
 

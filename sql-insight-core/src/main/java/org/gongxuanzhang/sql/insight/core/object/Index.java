@@ -21,7 +21,7 @@ import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface Index extends TableContainer {
+public interface Index {
 
 
     /**
@@ -29,6 +29,16 @@ public interface Index extends TableContainer {
      **/
     void rndInit();
 
+    /**
+     * index id in table.
+     * primary key index always 1.
+     **/
+    int getId();
+
+    /**
+     * which table index belong to
+     **/
+    Table belongTo();
 
     /**
      * find a cursor from session
@@ -36,4 +46,11 @@ public interface Index extends TableContainer {
      * @return cursor
      **/
     Cursor find(SessionContext sessionContext);
+
+    /**
+     * insert row to index
+     *
+     * @param row row
+     **/
+    void insert(InsertRow row);
 }

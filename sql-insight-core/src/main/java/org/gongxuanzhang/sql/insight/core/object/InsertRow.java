@@ -44,6 +44,11 @@ public class InsertRow implements Row, FillDataVisitor, TableContainer {
 
     private final List<Value> valueList = new ArrayList<>();
 
+    /**
+     * all table column value
+     **/
+    private final List<Value> absoluteValueList = new ArrayList<>();
+
     private final long insertRowId;
 
     public InsertRow(List<Column> insertColumns, long insertRowId) {
@@ -156,5 +161,19 @@ public class InsertRow implements Row, FillDataVisitor, TableContainer {
     @Override
     public void setTable(Table table) {
         this.table = table;
+    }
+
+    public List<Value> getAbsoluteValueList() {
+        if (absoluteValueList.isEmpty()) {
+            for (int i = 0; i < table.getColumnList().size(); i++) {
+                absoluteValueList.add(ValueNull.getInstance());
+            }
+            for (int i = 0; i < insertColumns.size(); i++) {
+                Column current = insertColumns.get(i);
+                Integer columnIndexByName = this.table.getColumnIndexByName(current.getName());
+                absoluteValueList.set(columnIndexByName, valueList.get(i));
+            }
+        }
+        return absoluteValueList;
     }
 }
