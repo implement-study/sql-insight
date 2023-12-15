@@ -19,6 +19,7 @@ package org.gongxuanzhang.sql.insight.core.object;
 import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
 import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
 import com.alibaba.druid.sql.ast.expr.SQLNullExpr;
+import lombok.Data;
 import org.gongxuanzhang.sql.insight.core.annotation.Temporary;
 import org.gongxuanzhang.sql.insight.core.exception.InsertException;
 import org.gongxuanzhang.sql.insight.core.exception.UnknownColumnException;
@@ -27,16 +28,19 @@ import org.gongxuanzhang.sql.insight.core.object.value.ValueChar;
 import org.gongxuanzhang.sql.insight.core.object.value.ValueInt;
 import org.gongxuanzhang.sql.insight.core.object.value.ValueNull;
 import org.gongxuanzhang.sql.insight.core.object.value.ValueVarchar;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class InsertRow implements Row, FillDataVisitor, TableContainer {
+public class InsertRow implements Row, FillDataVisitor, TableContainer, Iterable<InsertRow.InsertItem> {
 
     private Table table;
 
@@ -175,5 +179,43 @@ public class InsertRow implements Row, FillDataVisitor, TableContainer {
             }
         }
         return absoluteValueList;
+    }
+
+    @NotNull
+    @Override
+    public Iterator<InsertItem> iterator() {
+        return new Iter();
+    }
+
+    private class Iter implements Iterator<InsertItem> {
+
+        int cursor;
+
+        @Override
+        public boolean hasNext() {
+            return cursor != absoluteValueList.size();
+        }
+
+        @Override
+        public InsertItem next() {
+            int i = cursor;
+            if (i >= absoluteValueList.size()) {
+                throw new NoSuchElementException();
+            }
+            cursor = i + 1;
+            InsertItem insertItem = new InsertItem();
+            insertItem.column = table.getColumnList().get(i);
+            insertItem.value = absoluteValueList.get(i);
+            insertItem.index = i;
+            return insertItem;
+        }
+    }
+
+
+    @Data
+    public static class InsertItem {
+        Column column;
+        Value value;
+        int index;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 sql-insight  and the original author or authors <gongxuanzhangmelt@gmail.com>.
+ * Copyright 2023 java-mysql  and the original author or authors <gongxuanzhangmelt@gmail.com>.
  *
  * Licensed under the GNU Affero General Public License v3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
+package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
 
 
 import lombok.Getter;
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.BitOperator;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.BitUtils;
 

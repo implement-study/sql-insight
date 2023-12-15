@@ -29,9 +29,7 @@ import org.gongxuanzhang.sql.insight.core.analysis.druid.CommentVisitor;
 import org.gongxuanzhang.sql.insight.core.exception.UnknownColumnException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -54,22 +52,11 @@ public final class Table implements FillDataVisitor, CommentContainer {
 
     //  support operator
 
-    private final Map<String, Column> columnMap = new HashMap<>();
-
-    private final Map<String, Integer> columnIndex = new HashMap<>();
-
-    private int autoColIndex = -1;
-
-    /**
-     * not null column index list
-     **/
-    private final List<Integer> notNullIndex = new ArrayList<>();
-
-    private int primaryKeyIndex = -1;
+    private TableExt ext;
 
 
     public Integer getColumnIndexByName(String colName) {
-        Integer index = this.columnIndex.get(colName);
+        Integer index = this.ext.columnIndex.get(colName);
         if (index == null) {
             throw new UnknownColumnException(colName);
         }
@@ -77,7 +64,7 @@ public final class Table implements FillDataVisitor, CommentContainer {
     }
 
     public Column getColumnByName(String name) {
-        Column column = columnMap.get(name);
+        Column column = this.ext.columnMap.get(name);
         if (column == null) {
             throw new UnknownColumnException(name);
         }
@@ -90,22 +77,22 @@ public final class Table implements FillDataVisitor, CommentContainer {
         x.accept(column);
         this.columnList.add(column);
         if (column.isAutoIncrement()) {
-            if (this.autoColIndex != -1) {
+            if (this.ext.autoColIndex != -1) {
                 throw new UnsupportedOperationException("only support single column autoincrement");
             }
-            this.autoColIndex = columnList.size() - 1;
+            this.ext.autoColIndex = columnList.size() - 1;
         }
         if (column.isPrimaryKey()) {
-            if (this.primaryKeyIndex != -1) {
+            if (this.ext.primaryKeyIndex != -1) {
                 throw new UnsupportedOperationException("only support single column primary key");
             }
-            this.primaryKeyIndex = columnList.size() - 1;
+            this.ext.primaryKeyIndex = columnList.size() - 1;
         }
         if (column.isNotNull()) {
-            this.notNullIndex.add(columnList.size() - 1);
+            this.ext.notNullIndex.add(columnList.size() - 1);
         }
-        this.columnIndex.put(column.getName(), this.columnList.size() - 1);
-        this.columnMap.put(column.getName(), column);
+        this.ext.columnIndex.put(column.getName(), this.columnList.size() - 1);
+        this.ext.columnMap.put(column.getName(), column);
     }
 
 

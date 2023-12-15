@@ -51,6 +51,8 @@ public class Column implements FillDataVisitor, CommentContainer {
 
     private String comment;
 
+    private boolean variable;
+
 
     @Override
     public Column setComment(String comment) {
@@ -65,6 +67,9 @@ public class Column implements FillDataVisitor, CommentContainer {
         this.autoIncrement = x.isAutoIncrement();
         this.dataType = new DataType();
         x.accept(dataType);
+        if (dataType.getType() == DataType.Type.VARCHAR) {
+            this.variable = true;
+        }
         x.accept(new ConstraintVisitor());
         if (x.getComment() != null) {
             x.getComment().accept(new CommentVisitor(this));

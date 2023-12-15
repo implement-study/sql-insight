@@ -19,7 +19,6 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.AutoIncrementKeyCounter;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.core.InnodbIc;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.RootPage;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport;
 import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
@@ -52,7 +51,7 @@ public class ClusteredIndex extends PKIndex {
             return;
         }
         this.ibd = new File(table.getDatabase().getDbFolder(), table.getName() + ".ibd");
-        if (this.table.getAutoColIndex() >= 0) {
+        if (this.table.getExt().getAutoColIndex() >= 0) {
             this.autoIncrementKeyCounter = new InnodbIc(table);
         }
     }
@@ -70,7 +69,7 @@ public class ClusteredIndex extends PKIndex {
     @Override
     public void insert(InsertRow row) {
         if (this.autoIncrementKeyCounter.dealAutoIncrement(row)) {
-            log.info("auto increment primary key {}", table.getColumnList().get(table.getAutoColIndex()).getName());
+            log.info("auto increment primary key {}", table.getColumnList().get(table.getExt().getAutoColIndex()).getName());
         }
         RootPage targetPage = PageSupport.getRoot(this.ibd);
         targetPage.insert(row);

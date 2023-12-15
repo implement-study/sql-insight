@@ -14,30 +14,38 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
+package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
 
-import org.gongxuanzhang.sql.insight.core.object.RowFormat;
-import org.gongxuanzhang.sql.insight.core.object.UserRecord;
 
 /**
- * @author gongxuanzhangmelt@gmail.com
+ * Compact行格式的记录类型
+ *
+ * @author gxz gongxuanzhang@foxmail.com
  **/
-public class Compact implements RowFormat {
+public enum RecordType {
+    /**
+     * leaf-node
+     **/
+    NORMAL(0x00),
+    /**
+     * non-leaf-node(index)
+     **/
+    PAGE(0x01),
+    /**
+     * infimum
+     **/
+    INFIMUM(0x02),
+    /**
+     * supremum
+     **/
+    SUPREMUM(0x03);
 
 
+    final int value;
 
-    @Override
-    public String getName() {
-        return null;
+    RecordType(int value) {
+        this.value = value;
     }
 
-    @Override
-    public byte[] rowBytes() {
-        return new byte[0];
-    }
 
-    @Override
-    public UserRecord toUserRecord() {
-        return null;
-    }
 }

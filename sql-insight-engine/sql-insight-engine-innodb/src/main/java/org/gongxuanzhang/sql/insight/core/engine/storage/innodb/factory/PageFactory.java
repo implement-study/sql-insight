@@ -7,10 +7,10 @@ import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.FileTrailer
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Infimum;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageDirectory;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.RootPage;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Supremum;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.UserRecords;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 

@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.UserRecord;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;

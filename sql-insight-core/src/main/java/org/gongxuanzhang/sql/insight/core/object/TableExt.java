@@ -16,29 +16,32 @@
 
 package org.gongxuanzhang.sql.insight.core.object;
 
+import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-@Deprecated
-public interface RowFormat extends UserRecord {
+@Data
+public class TableExt {
+
+    final Map<String, Column> columnMap = new HashMap<>();
+
+    final Map<String, Integer> columnIndex = new HashMap<>();
+
+    int autoColIndex = -1;
+
+    int primaryKeyIndex = -1;
 
     /**
-     * name for row format
+     * not null column index list
      **/
-    String getName();
+    final List<Integer> notNullIndex = new ArrayList<>();
 
 
-    /**
-     * how to format row to byte array
-     **/
-    byte[] rowBytes();
 
-    /**
-     * row format is ni physics row in disk.
-     * user record is logic and more info.
-     * this method meaning physics module to logic module
-     *
-     * @return user record
-     **/
-    UserRecord toUserRecord();
 }

@@ -52,7 +52,7 @@ public class JsonIncrementKeyCounter implements AutoIncrementKeyCounter {
      **/
     @Override
     public boolean dealAutoIncrement(InsertRow row) {
-        int autoColIndex = row.getTable().getAutoColIndex();
+        int autoColIndex = row.getTable().getExt().getAutoColIndex();
         if (autoColIndex < 0) {
             return false;
         }

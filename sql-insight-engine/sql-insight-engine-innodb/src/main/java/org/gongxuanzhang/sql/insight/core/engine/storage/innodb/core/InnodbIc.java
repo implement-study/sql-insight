@@ -38,7 +38,7 @@ public class InnodbIc implements AutoIncrementKeyCounter {
 
     public InnodbIc(Table table) {
         this.table = table;
-        this.incrementColIndex = table.getAutoColIndex();
+        this.incrementColIndex = table.getExt().getAutoColIndex();
         //  todo
         this.counter = new AtomicLong(0);
     }

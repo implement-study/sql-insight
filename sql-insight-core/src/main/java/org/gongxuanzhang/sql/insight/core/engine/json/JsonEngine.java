@@ -74,10 +74,10 @@ public class JsonEngine implements StorageEngine {
     @Override
     public ResultInterface createTable(Table table) {
         File dbFolder = table.getDatabase().getDbFolder();
-        if (table.getPrimaryKeyIndex() == -1) {
+        if (table.getExt().getPrimaryKeyIndex() == -1) {
             throw new CreateTableException("engine json table must have a primary key");
         }
-        if (table.getColumnList().get(table.getPrimaryKeyIndex()).getDataType().getType() != DataType.Type.INT) {
+        if (table.getColumnList().get(table.getExt().getPrimaryKeyIndex()).getDataType().getType() != DataType.Type.INT) {
             throw new CreateTableException("engine json table primary key must int ");
         }
         File jsonFile = new File(dbFolder, table.getName() + ".json");

@@ -1,5 +1,7 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RowFormatFactory;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 
 
@@ -19,7 +21,7 @@ public class RootPage extends InnoDbPage {
      **/
     public void insert(InsertRow row) {
         InnoDbPage targetPage = findTargetPage(row);
-        dataInsert(row,targetPage);
+        dataInsert(row, targetPage);
 //        if (!isEnough(row.length())) {
 //            throw new MySQLException("页选择异常");
 //        }
@@ -41,12 +43,15 @@ public class RootPage extends InnoDbPage {
     }
 
     private RootPage findTargetPage(InsertRow row) {
+        Compact compact = RowFormatFactory.fromInsertRow(row);
+        if (this.pageType() == PageType.FIL_PAGE_INODE) {
+
+        }
         return null;
     }
 
     private void dataInsert(InsertRow row, InnoDbPage rootPage) {
     }
-
 
 
 }

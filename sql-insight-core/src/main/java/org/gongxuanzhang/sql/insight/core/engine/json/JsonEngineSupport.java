@@ -52,7 +52,7 @@ public class JsonEngineSupport {
      **/
     static Integer getJsonInsertRowPrimaryKey(Table table, JSONObject json) {
         List<Column> columnList = table.getColumnList();
-        Column column = columnList.get(table.getPrimaryKeyIndex());
+        Column column = columnList.get(table.getExt().getPrimaryKeyIndex());
         return json.getInteger(column.getName());
     }
 
@@ -68,7 +68,7 @@ public class JsonEngineSupport {
 
 
     static PhysicRow getPhysicRowFromJson(JSONObject jsonObject, Table table) {
-        Column primaryKey = table.getColumnList().get(table.getPrimaryKeyIndex());
+        Column primaryKey = table.getColumnList().get(table.getExt().getPrimaryKeyIndex());
         long id = jsonObject.getLongValue(primaryKey.getName());
         List<Value> valueList = new ArrayList<>(table.getColumnList().size());
         for (Column column : table.getColumnList()) {

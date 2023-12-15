@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 sql-insight  and the original author or authors <gongxuanzhangmelt@gmail.com>.
+ * Copyright 2023 java-mysql  and the original author or authors <gongxuanzhangmelt@gmail.com>.
  *
  * Licensed under the GNU Affero General Public License v3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,38 +14,25 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
+package org.gongxuanzhang.sql.insight.core.annotation;
 
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Compact行格式的记录类型
+ * Indicates that a field is temporarily unavailable and is reserved only for program features
  *
  * @author gxz gongxuanzhang@foxmail.com
  **/
-public enum RecordType {
-    /**
-     * leaf-node
-     **/
-    NORMAL(0x00),
-    /**
-     * non-leaf-node(index)
-     **/
-    PAGE(0x01),
-    /**
-     * infimum
-     **/
-    INFIMUM(0x02),
-    /**
-     * supremum
-     **/
-    SUPREMUM(0x03);
+@Target({ElementType.FIELD})
+@Retention(RetentionPolicy.SOURCE)
+@Documented
+public @interface Unused {
 
-
-    final int value;
-
-    RecordType(int value) {
-        this.value = value;
-    }
-
+    String value() default "";
 
 }

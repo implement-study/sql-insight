@@ -60,7 +60,7 @@ public class JsonCursor implements Cursor {
                 if (line.isEmpty()) {
                     continue;
                 }
-                this.current = JsonEngineSupport.getPhysicRowFromJson(JSONObject.parseObject(line), index.getTable());
+                this.current = JsonEngineSupport.getPhysicRowFromJson(JSONObject.parseObject(line), index.belongTo());
                 return true;
             }
         } catch (IOException e) {
