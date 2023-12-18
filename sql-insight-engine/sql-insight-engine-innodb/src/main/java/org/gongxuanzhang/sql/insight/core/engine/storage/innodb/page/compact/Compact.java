@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
 
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 import org.gongxuanzhang.sql.insight.core.annotation.Unused;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageObject;
 import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.UserRecord;
@@ -28,7 +29,7 @@ import java.util.List;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class Compact implements UserRecord {
+public class Compact implements UserRecord, PageObject {
 
 
     /**
@@ -99,5 +100,10 @@ public class Compact implements UserRecord {
     @Override
     public Table belongTo() {
         return sourceRow.belongTo();
+    }
+
+    @Override
+    public int length() {
+        return variables.length() + nullValues.length() + recordHeader.length() + body.length;
     }
 }

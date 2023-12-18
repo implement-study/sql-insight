@@ -20,6 +20,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
 import lombok.Getter;
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageObject;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.BitOperator;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.BitUtils;
 
@@ -40,7 +41,7 @@ import java.util.Arrays;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Getter
-public class RecordHeader implements ByteWrapper {
+public class RecordHeader implements ByteWrapper, PageObject {
 
     /**
      * 记录头本质上只有5个字节 但是40bit有不同作用
@@ -188,5 +189,10 @@ public class RecordHeader implements ByteWrapper {
     @Override
     public int hashCode() {
         return Arrays.hashCode(source);
+    }
+
+    @Override
+    public int length() {
+        return source.length;
     }
 }

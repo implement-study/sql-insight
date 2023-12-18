@@ -20,8 +20,13 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 import lombok.Data;
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.UserRecord;
+
+import java.nio.ByteBuffer;
 
 /**
  * InnoDb Page
@@ -32,7 +37,7 @@ import org.gongxuanzhang.sql.insight.core.object.UserRecord;
  **/
 
 @Data
-public class InnoDbPage implements ByteWrapper {
+public abstract class InnoDbPage implements ByteWrapper {
 
 
     /**
@@ -69,8 +74,13 @@ public class InnoDbPage implements ByteWrapper {
      **/
     FileTrailer fileTrailer;
 
+    byte[] source;
+
     @Override
     public byte[] toBytes() {
+        if (source != null) {
+            return source;
+        }
         DynamicByteBuffer buffer = DynamicByteBuffer.allocate();
         buffer.append(fileHeader.toBytes());
         buffer.append(pageHeader.toBytes());
@@ -80,12 +90,93 @@ public class InnoDbPage implements ByteWrapper {
         buffer.append(new byte[freeSpace]);
         buffer.append(pageDirectory.toBytes());
         buffer.append(fileTrailer.toBytes());
-        return buffer.toBytes();
+        this.source = buffer.toBytes();
+        return this.source;
     }
 
 
     public PageType pageType() {
         return PageType.valueOf(this.fileHeader.pageType);
+    }
+
+    /**
+     * page split
+     **/
+    public abstract void splitPage();
+
+    /**
+     *
+     **/
+    public abstract void insertRow(InsertRow row);
+
+
+    /**
+     * find insert slot index in this page
+     *
+     * @return result must be greater than 0 because 0 only contains infimum
+     **/
+    private int findTagetSlot(Compact insertCompact) {
+        int left = 0;
+        int right = pageDirectory.slotCount() - 1;
+//        while (left < right - 1) {
+//            int mid = (right + left) / 2;
+//            short offset = this.pageDirectory.getSlots()[mid];
+//            UserRecord base = getUserRecordByOffset(offset);
+//            int compare = this.compare(insertCompact, base);
+//            if (compare == 0) {
+//                throw new MySQLException("主键重复");
+//            }
+//            if (compare < 0) {
+//                right = mid;
+//            } else {
+//                left = mid;
+//            }
+//        }
+//        UserRecord base = getUserRecordByOffset(this.pageDirectory.getSlots()[left]);
+//        int compare = this.compare(insertCompact, base);
+//        if (compare == 0) {
+//            throw new MySQLException("主键重复");
+//        }
+//        if (compare < 0) {
+//            return left;
+//        }
+        return right;
+    }
+
+    /**
+     * @param offset offset in page
+     * @return user record
+     **/
+    protected UserRecord getUserRecordByOffset(short offset) {
+        if (offset == ConstantSize.INFIMUM.offset()) {
+            return this.infimum;
+        }
+        if (offset == ConstantSize.SUPREMUM.offset()) {
+            return this.supremum;
+        }
+        ByteBuffer buffer = ByteBuffer.wrap(this.source, offset, this.source.length - offset);
+//        buffer.get()
+        RecordHeader recordHeader = PageSupport.readRecordHeader(this, offset);
+//        byte[] variablesBuffer = new byte[tableInfo.getVariableCount()];
+//        wrap.get(variablesBuffer);
+//        Variables variables = new Variables(variablesBuffer);
+//        CompactNullValue compactNullValue = new CompactNullValue(wrap.getShort());
+//        Compact compact = new Compact();
+//        long rowId = BitUtils.readLong(wrap, 6);
+//        long transactionId = BitUtils.readLong(wrap, 6);
+//        long rollPointer = BitUtils.readLong(wrap, 7);
+//        int bodyLength = bodyLength(variables, compactNullValue, tableInfo);
+//        byte[] body = new byte[bodyLength];
+//        wrap.get(body);
+//        compact.setBody(body);
+//        compact.setVariables(variables);
+//        compact.setNullValues(compactNullValue);
+//        compact.setRecordHeader(recordHeader);
+//        compact.setRollPointer(rollPointer);
+//        compact.setRowId(rowId);
+//        compact.setTransactionId(transactionId);
+//        compact.setPageOffset(offset);
+        return null;
     }
 
 
@@ -166,38 +257,7 @@ public class InnoDbPage implements ByteWrapper {
 //    }
 //
 //
-//    /**
-//     * 找到最终插到哪个slot中
-//     *
-//     * @return 返回需要插入的slot 必不可能是第0个槽 至少返回1
-//     **/
-//    private int findInsertSlot(Compact insertCompact) throws MySQLException {
-//        int left = 0;
-//        int right = pageDirectory.slotCount() - 1;
-//        while (left < right - 1) {
-//            int mid = (right + left) / 2;
-//            short offset = this.pageDirectory.getSlots()[mid];
-//            UserRecord base = getUserRecordByOffset(this, offset);
-//            int compare = this.compare(insertCompact, base);
-//            if (compare == 0) {
-//                throw new MySQLException("主键重复");
-//            }
-//            if (compare < 0) {
-//                right = mid;
-//            } else {
-//                left = mid;
-//            }
-//        }
-//        UserRecord base = getUserRecordByOffset(this, this.pageDirectory.getSlots()[left]);
-//        int compare = this.compare(insertCompact, base);
-//        if (compare == 0) {
-//            throw new MySQLException("主键重复");
-//        }
-//        if (compare < 0) {
-//            return left;
-//        }
-//        return right;
-//    }
+
 //
 //
 //    /**

@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.core;
+package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 /**
- * subclass have length byte array
+ * innodb engine page object
  *
- * @author gxz gongxuanzhang@foxmail.com
+ * @author gongxuanzhangmelt@gmail.com
  **/
-public interface ShowLength {
+public interface PageObject {
 
     /**
-     * byte array length
-     *
-     * @return greater equals zero
+     * the component length
      **/
     int length();
 }

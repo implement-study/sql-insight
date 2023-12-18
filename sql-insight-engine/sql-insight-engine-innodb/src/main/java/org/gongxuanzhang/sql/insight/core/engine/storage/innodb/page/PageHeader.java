@@ -19,7 +19,6 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 import lombok.Data;
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.core.ShowLength;
 
 
 /**
@@ -29,7 +28,7 @@ import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.core.ShowLength;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class PageHeader implements ShowLength, ByteWrapper {
+public class PageHeader implements PageObject, ByteWrapper {
 
     /**
      * page slot count

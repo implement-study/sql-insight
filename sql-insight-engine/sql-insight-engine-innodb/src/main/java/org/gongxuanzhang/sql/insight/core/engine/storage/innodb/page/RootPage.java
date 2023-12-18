@@ -19,9 +19,24 @@ public class RootPage extends InnoDbPage {
      * <p>
      * page will split if space dont enough.
      **/
-    public void insert(InsertRow row) {
-        InnoDbPage targetPage = findTargetPage(row);
-        dataInsert(row, targetPage);
+    @Override
+    public void insertRow(InsertRow row) {
+        Compact compact = RowFormatFactory.fromInsertRow(row);
+        if (this.pageType() == PageType.FIL_PAGE_INODE) {
+            if (this.freeSpace > compact.length()) {
+                //  插入
+                //  拿到目标槽位
+                //  
+                return;
+            }
+            splitPage();
+            insertRow(row);
+            return;
+        }
+        if(this.pageType() == PageType.FIL_PAGE_INDEX){
+            InnoDbPage targetPage = findTargetPage(compact);
+            targetPage.insertRow(row);
+        }
 //        if (!isEnough(row.length())) {
 //            throw new MySQLException("页选择异常");
 //        }
@@ -42,16 +57,22 @@ public class RootPage extends InnoDbPage {
 //        this.refresh();
     }
 
-    private RootPage findTargetPage(InsertRow row) {
-        Compact compact = RowFormatFactory.fromInsertRow(row);
+    private InnoDbPage findTargetPage(Compact compact) {
         if (this.pageType() == PageType.FIL_PAGE_INODE) {
+            if (this.freeSpace < compact.length()) {
 
+            }
         }
         return null;
     }
 
     private void dataInsert(InsertRow row, InnoDbPage rootPage) {
+
     }
 
 
+    @Override
+    public void splitPage() {
+
+    }
 }

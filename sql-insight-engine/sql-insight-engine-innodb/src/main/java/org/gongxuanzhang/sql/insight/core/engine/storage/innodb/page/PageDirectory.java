@@ -18,7 +18,6 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 import lombok.Data;
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.core.ShowLength;
 
 import java.nio.ByteBuffer;
 
@@ -34,19 +33,18 @@ import java.nio.ByteBuffer;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class PageDirectory implements ShowLength, ByteWrapper {
+public class PageDirectory implements PageObject, ByteWrapper {
 
 
     short[] slots;
 
     @Override
     public int length() {
-        return this.slots.length * 2;
+        return this.slots.length * Short.BYTES;
     }
 
     @Override
     public byte[] toBytes() {
-
         ByteBuffer buffer = ByteBuffer.allocate(length());
         for (short slot : slots) {
             buffer.putShort(slot);

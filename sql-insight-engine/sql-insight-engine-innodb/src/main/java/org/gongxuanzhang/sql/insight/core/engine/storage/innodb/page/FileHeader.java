@@ -19,7 +19,6 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 import lombok.Data;
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.core.ShowLength;
 
 /**
  * describe page total info.
@@ -27,7 +26,7 @@ import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.core.ShowLength;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class FileHeader implements ByteWrapper, ShowLength {
+public class FileHeader implements ByteWrapper, PageObject {
 
 
     /**

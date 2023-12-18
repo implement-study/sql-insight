@@ -20,11 +20,13 @@ import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFact
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.RootPage;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -41,5 +43,25 @@ public class PageSupport {
         } catch (IOException e) {
             throw new RuntimeIoException(e);
         }
+    }
+
+
+    /**
+     * @param page   innodb page
+     * @param offset record header page
+     * @return record
+     **/
+    public static RecordHeader readRecordHeader(InnoDbPage page, int offset) {
+        ByteBuffer buffer = ByteBuffer.wrap(page.getSource(), offset, ConstantSize.RECORD_HEADER.getSize());
+        return new RecordHeader(buffer.array());
+    }
+
+
+    /**
+     *
+     *
+     **/
+    public static int recordLength(){
+
     }
 }

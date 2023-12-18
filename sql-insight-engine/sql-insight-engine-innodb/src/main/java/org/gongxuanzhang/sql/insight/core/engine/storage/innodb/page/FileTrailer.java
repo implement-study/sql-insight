@@ -18,7 +18,6 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 import lombok.Data;
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.core.ShowLength;
 
 import java.nio.ByteBuffer;
 
@@ -29,7 +28,7 @@ import java.nio.ByteBuffer;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class FileTrailer implements ByteWrapper, ShowLength {
+public class FileTrailer implements ByteWrapper, PageObject {
 
     /**
      * use it with {@link FileHeader#checkSum}

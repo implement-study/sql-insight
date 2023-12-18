@@ -18,13 +18,14 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
 
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageObject;
 
 /**
  * variable data type like varchar
  *
  * @author gongxuanzhang
  **/
-public class Variables implements ByteWrapper {
+public class Variables implements ByteWrapper, PageObject {
 
     byte[] varBytes;
 
@@ -54,5 +55,10 @@ public class Variables implements ByteWrapper {
     @Override
     public byte[] toBytes() {
         return this.varBytes;
+    }
+
+    @Override
+    public int length() {
+        return this.varBytes.length;
     }
 }

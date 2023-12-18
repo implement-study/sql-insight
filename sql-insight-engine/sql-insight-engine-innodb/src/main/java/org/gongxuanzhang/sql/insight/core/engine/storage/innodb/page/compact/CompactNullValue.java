@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
 
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageObject;
 import org.gongxuanzhang.sql.insight.core.exception.SqlInsightException;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ import java.util.List;
  *
  * @author gongxuanzhang
  **/
-public class CompactNullValue implements ByteWrapper {
+public class CompactNullValue implements ByteWrapper , PageObject {
 
     short value;
 
@@ -76,5 +77,10 @@ public class CompactNullValue implements ByteWrapper {
     @Override
     public byte[] toBytes() {
         return new byte[]{((byte) (this.value >> Byte.SIZE)), (byte) this.value};
+    }
+
+    @Override
+    public int length() {
+        return Short.BYTES;
     }
 }
