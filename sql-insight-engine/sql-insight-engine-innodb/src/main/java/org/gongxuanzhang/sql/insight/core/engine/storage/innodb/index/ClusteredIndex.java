@@ -71,7 +71,7 @@ public class ClusteredIndex extends PKIndex {
         if (this.autoIncrementKeyCounter.dealAutoIncrement(row)) {
             log.info("auto increment primary key {}", table.getColumnList().get(table.getExt().getAutoColIndex()).getName());
         }
-        RootPage targetPage = PageSupport.getRoot(this.ibd);
+        RootPage targetPage = PageSupport.getRoot(this.ibd,table);
         targetPage.insertRow(row);
     }
 

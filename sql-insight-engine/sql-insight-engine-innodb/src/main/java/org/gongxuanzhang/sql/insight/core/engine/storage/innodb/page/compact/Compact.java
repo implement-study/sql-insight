@@ -42,7 +42,6 @@ public class Compact implements UserRecord, PageObject {
     /**
      * null list.
      * size is table nullable column count / 8.
-     *
      **/
     CompactNullList nullList;
 

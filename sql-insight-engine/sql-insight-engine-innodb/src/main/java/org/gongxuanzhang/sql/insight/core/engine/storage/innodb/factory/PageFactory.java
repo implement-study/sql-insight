@@ -39,7 +39,7 @@ public abstract class PageFactory {
             if (!primaryFile.createNewFile()) {
                 log.warn("{} already exists , execute create table will overwrite file", primaryFile.getAbsoluteFile());
             }
-            InnoDbPage root = createRoot();
+            InnoDbPage root = createRoot(table);
             Files.write(primaryFile.toPath(), root.toBytes());
         } catch (IOException e) {
             throw new RuntimeIoException(e);
@@ -49,8 +49,8 @@ public abstract class PageFactory {
     /**
      * swap byte array to page
      **/
-    public static InnoDbPage swap(byte[] bytes) {
-        InnoDbPage bean = new RootPage();
+    public static InnoDbPage swap(byte[] bytes, Table table) {
+        InnoDbPage bean = new RootPage(table);
         ConstantSize.PAGE.checkSize(bytes);
 
         DynamicByteBuffer buffer = DynamicByteBuffer.wrap(bytes);
@@ -90,8 +90,8 @@ public abstract class PageFactory {
         return bean;
     }
 
-    private static RootPage createRoot() {
-        RootPage root = new RootPage();
+    private static RootPage createRoot(Table table) {
+        RootPage root = new RootPage(table);
         root.setFileHeader(FileHeaderFactory.rootFileHeader());
         root.setPageHeader(PageHeaderFactory.rootPageHeader());
         root.setInfimum(new Infimum());

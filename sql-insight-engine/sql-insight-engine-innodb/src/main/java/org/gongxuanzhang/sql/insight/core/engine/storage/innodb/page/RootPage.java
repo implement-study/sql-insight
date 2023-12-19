@@ -3,6 +3,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RowFormatFactory;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
+import org.gongxuanzhang.sql.insight.core.object.Table;
 
 
 /**
@@ -14,6 +15,11 @@ import org.gongxuanzhang.sql.insight.core.object.InsertRow;
  **/
 public class RootPage extends InnoDbPage {
 
+
+    public RootPage(Table table) {
+        super(table);
+    }
+
     /**
      * insert row to page.
      * <p>
@@ -21,19 +27,19 @@ public class RootPage extends InnoDbPage {
      **/
     @Override
     public void insertRow(InsertRow row) {
-        Compact compact = RowFormatFactory.fromInsertRow(row);
+        Compact compact = RowFormatFactory.compactFromInsertRow(row);
         if (this.pageType() == PageType.FIL_PAGE_INODE) {
             if (this.freeSpace > compact.length()) {
                 //  插入
                 //  拿到目标槽位
-                //  
+                //
                 return;
             }
             splitPage();
             insertRow(row);
             return;
         }
-        if(this.pageType() == PageType.FIL_PAGE_INDEX){
+        if (this.pageType() == PageType.FIL_PAGE_INDEX) {
             InnoDbPage targetPage = findTargetPage(compact);
             targetPage.insertRow(row);
         }
