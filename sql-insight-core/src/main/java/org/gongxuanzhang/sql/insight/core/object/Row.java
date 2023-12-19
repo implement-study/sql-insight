@@ -17,6 +17,7 @@
 package org.gongxuanzhang.sql.insight.core.object;
 
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ import java.util.List;
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface Row {
+public interface Row extends Comparable<Row> {
 
 
     /**
@@ -55,5 +56,8 @@ public interface Row {
      **/
     Table belongTo();
 
-
+    @Override
+    default int compareTo(@NotNull Row that) {
+        return Long.compare(this.getRowId(), that.getRowId());
+    }
 }

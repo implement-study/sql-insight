@@ -24,16 +24,17 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 public enum ConstantSize {
     PAGE(16 * 1024),
+    RECORD_HEADER(5),
     FILE_HEADER(38, 0),
     PAGE_HEADER(56, FILE_HEADER.size),
-    INFIMUM(13, PAGE_HEADER.offset + PAGE_HEADER.size),
-    SUPREMUM(13, INFIMUM.size + INFIMUM.offset),
+    INFIMUM(13, FILE_HEADER.size + PAGE_HEADER.size + RECORD_HEADER.size),
+    SUPREMUM(13, FILE_HEADER.size + PAGE_HEADER.size + INFIMUM.size + RECORD_HEADER.size),
     SUPREMUM_BODY(8),
     INFIMUM_BODY(8),
     USER_RECORDS(-1, SUPREMUM.size + SUPREMUM.offset),
     FILE_TRAILER(8),
     COMPACT_NULL(8),
-    RECORD_HEADER(5),
+
     INIT_PAGE_FREE_SPACE(
             PAGE.size - FILE_HEADER.size - PAGE_HEADER.size - INFIMUM.size * 2 - FILE_TRAILER.size - 4,
             SUPREMUM.offset() + SUPREMUM.size());

@@ -22,6 +22,7 @@ import org.gongxuanzhang.easybyte.core.ByteWrapper;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RowFormatFactory;
+import org.gongxuanzhang.sql.insight.core.exception.DuplicationPrimaryKeyException;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.UserRecord;
@@ -76,7 +77,7 @@ public abstract class InnoDbPage implements ByteWrapper {
 
     Table table;
 
-    protected InnoDbPage (Table table){
+    protected InnoDbPage(Table table) {
         this.table = table;
     }
 
@@ -115,20 +116,20 @@ public abstract class InnoDbPage implements ByteWrapper {
 
 
     /**
-     * find insert slot index in this page
+     * find insert slot index in this page.
      *
-     * @return result must be greater than 0 because 0 only contains infimum
+     * @return result must be greater than 0 because 0 only contains infimum, but the slot may be already full
      **/
-    private int findTagetSlot(Compact insertCompact) {
+    protected int findTargetSlot(Compact insertCompact) {
         int left = 0;
         int right = pageDirectory.slotCount() - 1;
         while (left < right - 1) {
             int mid = (right + left) / 2;
             short offset = this.pageDirectory.getSlots()[mid];
-            UserRecord base = getUserRecordByOffset(offset);
-            int compare = this.compare(insertCompact, base);
+            UserRecord base = getUserRecordByOffset(offset, insertCompact.belongTo());
+            int compare = Long.compare(insertCompact.getRowId(), base.getRowId());
             if (compare == 0) {
-                throw new MySQLException("主键重复");
+                throw new DuplicationPrimaryKeyException(base.getRowId());
             }
             if (compare < 0) {
                 right = mid;
@@ -136,10 +137,10 @@ public abstract class InnoDbPage implements ByteWrapper {
                 left = mid;
             }
         }
-        UserRecord base = getUserRecordByOffset(this.pageDirectory.getSlots()[left]);
-        int compare = this.compare(insertCompact, base);
+        UserRecord base = getUserRecordByOffset(this.pageDirectory.getSlots()[left], insertCompact.belongTo());
+        int compare = Long.compare(insertCompact.getRowId(), base.getRowId());
         if (compare == 0) {
-            throw new MySQLException("主键重复");
+            throw new DuplicationPrimaryKeyException(base.getRowId());
         }
         if (compare < 0) {
             return left;
@@ -151,7 +152,7 @@ public abstract class InnoDbPage implements ByteWrapper {
      * @param offset offset in page
      * @return user record
      **/
-    protected UserRecord getUserRecordByOffset(short offset, Table table) {
+    protected InnodbUserRecord getUserRecordByOffset(short offset, Table table) {
         if (offset == ConstantSize.INFIMUM.offset()) {
             return this.infimum;
         }

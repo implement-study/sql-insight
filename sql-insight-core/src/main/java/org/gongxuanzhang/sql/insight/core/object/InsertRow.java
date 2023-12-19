@@ -206,7 +206,6 @@ public class InsertRow implements Row, FillDataVisitor, TableContainer, Iterable
             InsertItem insertItem = new InsertItem();
             insertItem.column = table.getColumnList().get(i);
             insertItem.value = absoluteValueList.get(i);
-            insertItem.index = i;
             return insertItem;
         }
     }
@@ -216,6 +215,5 @@ public class InsertRow implements Row, FillDataVisitor, TableContainer, Iterable
     public static class InsertItem {
         Column column;
         Value value;
-        int index;
     }
 }

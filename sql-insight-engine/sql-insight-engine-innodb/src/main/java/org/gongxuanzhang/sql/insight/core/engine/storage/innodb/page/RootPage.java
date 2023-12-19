@@ -1,9 +1,12 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RowFormatFactory;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
+
+import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport.getNextUserRecord;
 
 
 /**
@@ -29,10 +32,17 @@ public class RootPage extends InnoDbPage {
     public void insertRow(InsertRow row) {
         Compact compact = RowFormatFactory.compactFromInsertRow(row);
         if (this.pageType() == PageType.FIL_PAGE_INODE) {
+            //   todo  how to define enough?
             if (this.freeSpace > compact.length()) {
-                //  插入
-                //  拿到目标槽位
-                //
+                int targetSlot = findTargetSlot(compact);
+                InnodbUserRecord pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot), row.belongTo());
+                InnodbUserRecord next = getNextUserRecord(this, pre);
+                while (compact.compareTo(next) > 0) {
+                    pre = next;
+                    next = getNextUserRecord(this, pre);
+                }
+                linkedInsertRow(pre, compact, next);
+                adjustGroup(targetSlot,compact);
                 return;
             }
             splitPage();
@@ -63,6 +73,10 @@ public class RootPage extends InnoDbPage {
 //        this.refresh();
     }
 
+    private void adjustGroup(int targetSlot, Compact compact) {
+
+    }
+
     private InnoDbPage findTargetPage(Compact compact) {
         if (this.pageType() == PageType.FIL_PAGE_INODE) {
             if (this.freeSpace < compact.length()) {
@@ -72,8 +86,19 @@ public class RootPage extends InnoDbPage {
         return null;
     }
 
-    private void dataInsert(InsertRow row, InnoDbPage rootPage) {
-
+    private void linkedInsertRow(InnodbUserRecord pre, Compact insertCompact, InnodbUserRecord next) {
+        RecordHeader insertHeader = new RecordHeader();
+        insertHeader.setHeapNo(this.pageHeader.absoluteRecordCount);
+        insertHeader.setNextRecordOffset(next.offset());
+        pre.getRecordHeader().setNextRecordOffset(insertCompact.offset());
+        insertCompact.setRecordHeader(insertHeader);
+        //  adjust page
+        this.userRecords.addRecords(insertCompact);
+        this.pageHeader.absoluteRecordCount++;
+        this.pageHeader.recordCount++;
+        this.freeSpace -= (short) insertCompact.length();
+        this.pageHeader.heapTop += (short) insertCompact.length();
+        this.pageHeader.lastInsertOffset += (short) insertCompact.length();
     }
 
 

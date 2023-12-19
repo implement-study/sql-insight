@@ -14,31 +14,21 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.object;
+package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
+
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
+import org.gongxuanzhang.sql.insight.core.object.UserRecord;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-@Deprecated
-public interface RowFormat extends UserRecord {
+public interface InnodbUserRecord extends UserRecord {
 
     /**
-     * name for row format
+     * @return record header
      **/
-    String getName();
+    RecordHeader getRecordHeader();
 
 
-    /**
-     * how to format row to byte array
-     **/
-    byte[] rowBytes();
 
-    /**
-     * row format is ni physics row in disk.
-     * user record is logic and more info.
-     * this method meaning physics module to logic module
-     *
-     * @return user record
-     **/
-    UserRecord toUserRecord();
 }

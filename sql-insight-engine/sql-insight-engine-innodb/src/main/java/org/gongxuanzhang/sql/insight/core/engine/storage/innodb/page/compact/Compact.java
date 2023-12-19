@@ -19,10 +19,11 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
 import lombok.Data;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 import org.gongxuanzhang.sql.insight.core.annotation.Unused;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnodbUserRecord;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageObject;
 import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.Table;
-import org.gongxuanzhang.sql.insight.core.object.UserRecord;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
 
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.List;
  * @author gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class Compact implements UserRecord, PageObject {
+public class Compact implements InnodbUserRecord, PageObject {
 
 
     /**
@@ -107,6 +108,19 @@ public class Compact implements UserRecord, PageObject {
 
     @Override
     public int length() {
-        return variables.length() + nullList.length() + recordHeader.length() + body.length;
+        //    record header must write "ConstantSize.RECORD_HEADER.size()"
+        //    because  the compact may come from insert row result in NullPointException
+        return variables.length() + nullList.length() + ConstantSize.RECORD_HEADER.size() + body.length;
     }
+
+    @Override
+    public int offset() {
+        return variables.length() + nullList.length() + ConstantSize.RECORD_HEADER.size();
+    }
+
+    @Override
+    public int nextRecordOffset() {
+        return this.recordHeader.getNextRecordOffset();
+    }
+
 }

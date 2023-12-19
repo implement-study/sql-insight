@@ -14,37 +14,16 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.object;
-
-import org.gongxuanzhang.easybyte.core.ByteWrapper;
+package org.gongxuanzhang.sql.insight.core.exception;
 
 /**
- * user record represents a physics row in disk.
- * different row format have different performance in storage.
- *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface UserRecord extends ByteWrapper, Row {
+public class DuplicationPrimaryKeyException extends SqlInsightException {
 
 
-    /**
-     * the record to byte array.
-     **/
-    byte[] rowBytes();
-
-
-    /**
-     * offset in page
-     **/
-    int offset();
-
-    /**
-     * next node offset
-     **/
-    int nextRecordOffset();
-
-    @Override
-    default byte[] toBytes() {
-        return rowBytes();
+    public DuplicationPrimaryKeyException(long primaryKey) {
+        super("primary key duplication " + primaryKey);
     }
+
 }

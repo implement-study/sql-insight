@@ -18,9 +18,14 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils;
 
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFactory;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnodbUserRecord;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.RootPage;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Supremum;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RowFormatFactory;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.object.Table;
+import org.gongxuanzhang.sql.insight.core.object.UserRecord;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,6 +46,14 @@ public class PageSupport {
         } catch (IOException e) {
             throw new RuntimeIoException(e);
         }
+    }
+
+    public static InnodbUserRecord getNextUserRecord(InnoDbPage page, UserRecord userRecord) {
+        if (userRecord instanceof Supremum) {
+            throw new NullPointerException("supremum 没有下一个");
+        }
+        int nextRecordOffset = userRecord.nextRecordOffset();
+        return RowFormatFactory.readCompactInPage(page, nextRecordOffset, userRecord.belongTo());
     }
 
 

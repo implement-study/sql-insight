@@ -39,11 +39,6 @@
             <artifactId>sql-insight-core</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>io.github.gongxuanzhang</groupId>
-            <artifactId>easy-byte</artifactId>
-            <version>0.0.2-beta</version>
-        </dependency>
     </dependencies>
 
 </project>

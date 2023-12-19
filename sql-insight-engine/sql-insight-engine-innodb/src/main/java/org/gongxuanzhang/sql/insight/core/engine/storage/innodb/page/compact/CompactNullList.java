@@ -19,6 +19,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageObject;
+import org.gongxuanzhang.sql.insight.core.object.Table;
 
 /**
  * contains byte array.
@@ -39,8 +40,8 @@ public class CompactNullList implements ByteWrapper, PageObject {
         this.nullList = nullList;
     }
 
-    public CompactNullList() {
-        this(new byte[0]);
+    public CompactNullList(Table table) {
+        this(new byte[table.getExt().getNullableColCount() / Byte.SIZE]);
     }
 
     /**

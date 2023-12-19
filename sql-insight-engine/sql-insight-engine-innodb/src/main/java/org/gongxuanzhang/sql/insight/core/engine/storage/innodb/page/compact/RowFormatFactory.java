@@ -44,23 +44,21 @@ public class RowFormatFactory {
 
     /**
      * create row format from insert row.
-     * the record header not adjust
+     * @return the compact don't have record header
      **/
     public static Compact compactFromInsertRow(InsertRow row) {
         Compact compact = new Compact();
         compact.variables = new Variables();
-        compact.nullList = new CompactNullList();
-        compact.recordHeader = new RecordHeader();
+        compact.nullList = new CompactNullList(row.getTable());
         compact.sourceRow = row;
         for (InsertRow.InsertItem insertItem : row) {
             Column column = insertItem.getColumn();
             Value value = insertItem.getValue();
-            int index = insertItem.getIndex();
             if (value.getSource() == null && column.isNotNull()) {
                 throw new SqlInsightException(column.getName() + " must not null");
             }
             if (value.getSource() == null) {
-                compact.nullList.setNull(index);
+                compact.nullList.setNull(column.getNullListIndex());
                 continue;
             }
             if (column.isVariable()) {

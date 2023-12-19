@@ -19,7 +19,6 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.object.Table;
-import org.gongxuanzhang.sql.insight.core.object.UserRecord;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
 
 import java.util.List;
@@ -30,7 +29,7 @@ import java.util.List;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 
-public class Supremum implements UserRecord {
+public class Supremum implements InnodbUserRecord {
 
     public static final String SUPREMUM_BODY = "supremum";
 
@@ -56,6 +55,7 @@ public class Supremum implements UserRecord {
         return this.recordHeader.toString() + "[body:" + new String(this.body) + "]";
     }
 
+
     @Override
     public List<Value> getValues() {
         return supremumUnsupport();
@@ -63,12 +63,24 @@ public class Supremum implements UserRecord {
 
     @Override
     public long getRowId() {
-        return supremumUnsupport();
+        return Long.MAX_VALUE;
     }
 
     @Override
     public Value getValueByColumnName(String colName) {
         return supremumUnsupport();
+    }
+
+
+    @Override
+    public int offset() {
+        return ConstantSize.SUPREMUM.offset();
+    }
+
+
+    @Override
+    public int nextRecordOffset() {
+        return 0;
     }
 
     @Override
@@ -83,5 +95,10 @@ public class Supremum implements UserRecord {
 
     private <T> T supremumUnsupport() {
         throw new UnsupportedOperationException("this is supremum!");
+    }
+
+    @Override
+    public RecordHeader getRecordHeader() {
+        return recordHeader;
     }
 }

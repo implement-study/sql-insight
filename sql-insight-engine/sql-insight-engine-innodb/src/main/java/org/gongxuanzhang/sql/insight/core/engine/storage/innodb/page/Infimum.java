@@ -20,7 +20,6 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.object.Table;
-import org.gongxuanzhang.sql.insight.core.object.UserRecord;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
 
 import java.util.List;
@@ -31,7 +30,7 @@ import java.util.List;
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public class Infimum implements UserRecord {
+public class Infimum implements InnodbUserRecord {
 
     private static final String INFIMUM_BODY = "infimum";
 
@@ -52,6 +51,16 @@ public class Infimum implements UserRecord {
     @Override
     public byte[] rowBytes() {
         return DynamicByteBuffer.wrap(recordHeader.toBytes()).append(this.body).toBytes();
+    }
+
+    @Override
+    public int nextRecordOffset() {
+        return recordHeader.getNextRecordOffset();
+    }
+
+    @Override
+    public int offset() {
+        return ConstantSize.INFIMUM.offset();
     }
 
 
@@ -82,5 +91,10 @@ public class Infimum implements UserRecord {
 
     private <T> T infimumUnsupport() {
         throw new UnsupportedOperationException("this is infimum!");
+    }
+
+    @Override
+    public RecordHeader getRecordHeader() {
+        return this.recordHeader;
     }
 }
