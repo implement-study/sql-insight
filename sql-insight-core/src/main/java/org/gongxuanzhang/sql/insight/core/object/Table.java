@@ -81,15 +81,22 @@ public final class Table implements FillDataVisitor, CommentContainer {
                 throw new UnsupportedOperationException("only support single column autoincrement");
             }
             this.ext.autoColIndex = columnList.size() - 1;
+            column.setNotNull(true);
         }
         if (column.isPrimaryKey()) {
             if (this.ext.primaryKeyIndex != -1) {
                 throw new UnsupportedOperationException("only support single column primary key");
             }
             this.ext.primaryKeyIndex = columnList.size() - 1;
+            column.setNotNull(true);
         }
         if (column.isNotNull()) {
             this.ext.notNullIndex.add(columnList.size() - 1);
+        } else {
+            this.ext.nullableColCount++;
+        }
+        if (column.getDataType().getType() == DataType.Type.VARCHAR) {
+            this.ext.variableIndex.add(this.columnList.size() - 1);
         }
         this.ext.columnIndex.put(column.getName(), this.columnList.size() - 1);
         this.ext.columnMap.put(column.getName(), column);

@@ -21,52 +21,53 @@ import org.gongxuanzhang.easybyte.core.ByteWrapper;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageObject;
 
 /**
- * variable data type like varchar
+ * contains byte array.
+ * per byte bit represent wh column value
  *
  * @author gongxuanzhang
  **/
-public class Variables implements ByteWrapper, PageObject {
+public class CompactNullList implements ByteWrapper, PageObject {
 
-    byte[] varBytes;
+    byte[] nullList;
 
-    public Variables() {
-        this.varBytes = new byte[0];
+    /**
+     * the byte array is origin byte in page.
+     * begin with right.
+     * nullList length maybe 0
+     **/
+    public CompactNullList(byte[] nullList) {
+        this.nullList = nullList;
     }
 
-    public Variables(byte[] varBytes) {
-        this.varBytes = varBytes;
-    }
-
-    public void addVariableLength(byte length) {
-        if (this.varBytes.length == 0) {
-            this.varBytes = new byte[]{length};
-            return;
-        }
-        byte[] newBytes = new byte[varBytes.length + 1];
-        System.arraycopy(varBytes, 0, newBytes, 1, varBytes.length);
-        newBytes[0] = length;
-        this.varBytes = newBytes;
+    public CompactNullList() {
+        this(new byte[0]);
     }
 
     /**
-     * all variable column length
-     */
-    public int variableLength() {
-        int sumLength = 0;
-        for (byte varByte : this.varBytes) {
-            sumLength += varByte;
-        }
-        return sumLength;
+     * @param index start 0
+     **/
+    public boolean isNull(int index) {
+        int byteIndex = nullList.length - (index / Byte.SIZE) - 1;
+        byte bitMap = this.nullList[byteIndex];
+        int mask = 1 << (index % Byte.SIZE);
+        return (mask & bitMap) == mask;
+    }
+
+
+    public void setNull(int index) {
+        int byteIndex = nullList.length - (index / Byte.SIZE) - 1;
+        byte mask = (byte) (1 << (index % Byte.SIZE));
+        this.nullList[byteIndex] &= mask;
     }
 
 
     @Override
     public byte[] toBytes() {
-        return this.varBytes;
+        return this.nullList;
     }
 
     @Override
     public int length() {
-        return this.varBytes.length;
+        return this.nullList.length;
     }
 }

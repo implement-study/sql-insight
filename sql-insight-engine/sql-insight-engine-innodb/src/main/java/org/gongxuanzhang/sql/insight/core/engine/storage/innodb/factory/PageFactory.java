@@ -55,13 +55,13 @@ public abstract class PageFactory {
 
         DynamicByteBuffer buffer = DynamicByteBuffer.wrap(bytes);
         //  file header
-        byte[] fileHeaderBytes = buffer.getLength(FILE_HEADER.getSize());
+        byte[] fileHeaderBytes = buffer.getLength(FILE_HEADER.size());
         // page header
-        byte[] pageHeaderBytes = buffer.getLength(PAGE_HEADER.getSize());
+        byte[] pageHeaderBytes = buffer.getLength(PAGE_HEADER.size());
         //  infimum
-        byte[] infimumBytes = buffer.getLength(INFIMUM.getSize());
+        byte[] infimumBytes = buffer.getLength(INFIMUM.size());
         //  supremum
-        byte[] supremumBytes = buffer.getLength(SUPREMUM.getSize());
+        byte[] supremumBytes = buffer.getLength(SUPREMUM.size());
 
         //  user records 使用
 //        short heapTop = bean.pageHeader.getHeapTop();
@@ -108,7 +108,7 @@ public abstract class PageFactory {
         Supremum supremum = new Supremum();
         ConstantSize.SUPREMUM.checkSize(bytes);
         DynamicByteBuffer buffer = DynamicByteBuffer.wrap(bytes);
-        byte[] headBuffer = buffer.getLength(ConstantSize.RECORD_HEADER.getSize());
+        byte[] headBuffer = buffer.getLength(ConstantSize.RECORD_HEADER.size());
         supremum.setRecordHeader(new RecordHeader(headBuffer));
         return supremum;
     }

@@ -160,7 +160,7 @@ public abstract class InnoDbPage implements ByteWrapper {
 //        byte[] variablesBuffer = new byte[tableInfo.getVariableCount()];
 //        wrap.get(variablesBuffer);
 //        Variables variables = new Variables(variablesBuffer);
-//        CompactNullValue compactNullValue = new CompactNullValue(wrap.getShort());
+//        CompactNullList compactNullValue = new CompactNullList(wrap.getShort());
 //        Compact compact = new Compact();
 //        long rowId = BitUtils.readLong(wrap, 6);
 //        long transactionId = BitUtils.readLong(wrap, 6);

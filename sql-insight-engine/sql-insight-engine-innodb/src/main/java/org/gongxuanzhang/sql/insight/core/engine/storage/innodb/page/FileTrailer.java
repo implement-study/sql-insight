@@ -43,7 +43,7 @@ public class FileTrailer implements ByteWrapper, PageObject {
 
     @Override
     public int length() {
-        return ConstantSize.FILE_TRAILER.getSize();
+        return ConstantSize.FILE_TRAILER.size();
     }
 
     @Override

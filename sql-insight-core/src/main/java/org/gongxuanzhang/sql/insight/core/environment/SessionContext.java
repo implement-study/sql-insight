@@ -44,6 +44,12 @@ public class SessionContext extends AbstractMapContext {
 
     private Database database;
 
+    private Table table;
+
+    public Table getTable() {
+        return table;
+    }
+
     private final Map<String, String> tableAlias = new HashMap<>();
 
     public void tableAlias(String name, String alias) {

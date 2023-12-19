@@ -33,14 +33,19 @@ public class TableExt {
 
     final Map<String, Integer> columnIndex = new HashMap<>();
 
-    int autoColIndex = -1;
-
-    int primaryKeyIndex = -1;
-
     /**
      * not null column index list
      **/
     final List<Integer> notNullIndex = new ArrayList<>();
+
+    final List<Integer> variableIndex = new ArrayList<>();
+
+    int autoColIndex = -1;
+
+    int primaryKeyIndex = -1;
+
+    int nullableColCount;
+
 
 
 

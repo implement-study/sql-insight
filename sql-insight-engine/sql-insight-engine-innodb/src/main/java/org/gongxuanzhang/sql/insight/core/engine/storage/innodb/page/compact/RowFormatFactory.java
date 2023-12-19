@@ -37,7 +37,7 @@ public class RowFormatFactory {
     public static Compact fromInsertRow(InsertRow row) {
         Compact compact = new Compact();
         compact.variables = new Variables();
-        compact.nullValues = new CompactNullValue();
+        compact.nullList = new CompactNullList();
         compact.recordHeader = new RecordHeader();
         compact.sourceRow = row;
         for (InsertRow.InsertItem insertItem : row) {
@@ -48,7 +48,7 @@ public class RowFormatFactory {
                 throw new SqlInsightException(column.getName() + " must not null");
             }
             if (value.getSource() == null) {
-                compact.nullValues.setNull(index);
+                compact.nullList.setNull(index);
                 continue;
             }
             if (column.isVariable()) {

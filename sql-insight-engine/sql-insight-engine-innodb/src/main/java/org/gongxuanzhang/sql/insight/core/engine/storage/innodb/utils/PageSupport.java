@@ -20,13 +20,20 @@ import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFact
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.RootPage;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.CompactNullList;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Variables;
+import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
+import org.gongxuanzhang.sql.insight.core.object.Column;
+import org.gongxuanzhang.sql.insight.core.object.Table;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -48,20 +55,64 @@ public class PageSupport {
 
     /**
      * @param page   innodb page
-     * @param offset record header page
+     * @param offset record header offset
      * @return record
      **/
     public static RecordHeader readRecordHeader(InnoDbPage page, int offset) {
-        ByteBuffer buffer = ByteBuffer.wrap(page.getSource(), offset, ConstantSize.RECORD_HEADER.getSize());
+        int recordHeaderSize = ConstantSize.RECORD_HEADER.size();
+        ByteBuffer buffer = ByteBuffer.wrap(page.getSource(), offset - recordHeaderSize, recordHeaderSize);
         return new RecordHeader(buffer.array());
     }
 
 
     /**
-     *
-     *
+     * fill compact field null list and variables
+     * depend on table info.
      **/
-    public static int recordLength(){
-
+    private static void fillNullAndVar(InnoDbPage page, int offset, Compact compact) {
+        SessionContext currentSession = SessionContext.getCurrentSession();
+        Table table = currentSession.getTable();
+        int nullLength = table.getExt().getNullableColCount() / Byte.SIZE;
+        ByteBuffer pageBuffer = ByteBuffer.wrap(page.getSource());
+        byte[] nullListByte = new byte[nullLength];
+        offset -= ConstantSize.RECORD_HEADER.size() - nullLength;
+        pageBuffer.get(nullListByte, offset, nullLength);
+        //   read null list
+        CompactNullList compactNullList = new CompactNullList(nullListByte);
+        compact.setNullList(compactNullList);
+        //   read variable
+        int variableCount = variableColumnCount(table, compactNullList);
+        byte[] variableArray = new byte[variableCount];
+        offset -= variableCount;
+        pageBuffer.get(variableArray, offset, variableCount);
+        compact.setVariables(new Variables(variableArray));
     }
+
+    private static int variableColumnCount(Table table, CompactNullList nullList) {
+        List<Column> columnList = table.getColumnList();
+        int nullIndex = 0;
+        int result = 0;
+        for (Column column : columnList) {
+            if (!column.isNotNull() && nullList.isNull(nullIndex++)) {
+                continue;
+            }
+            if (column.isVariable()) {
+                result++;
+            }
+        }
+        return result;
+    }
+
+
+    public static Compact readCompact(InnoDbPage page, int offset) {
+        Compact compact = new Compact();
+        compact.setRecordHeader(readRecordHeader(page, offset));
+        fillNullAndVar(page, offset, compact);
+        int variableLength = compact.getVariables().variableLength();
+        byte[] body = new byte[variableLength];
+        compact.setBody(body);
+        return compact;
+    }
+
+
 }

@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
 
+import lombok.Data;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 import org.gongxuanzhang.sql.insight.core.annotation.Unused;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageObject;
@@ -29,6 +30,7 @@ import java.util.List;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
+@Data
 public class Compact implements UserRecord, PageObject {
 
 
@@ -38,9 +40,11 @@ public class Compact implements UserRecord, PageObject {
     Variables variables;
 
     /**
-     * null list 2 bytes
+     * null list.
+     * size is table nullable column count / 8.
+     *
      **/
-    CompactNullValue nullValues;
+    CompactNullList nullList;
 
     /**
      * record header 5 bytes
@@ -75,7 +79,7 @@ public class Compact implements UserRecord, PageObject {
     public byte[] rowBytes() {
         DynamicByteBuffer buffer = DynamicByteBuffer.allocate();
         buffer.append(this.variables.toBytes());
-        buffer.append(this.nullValues.toBytes());
+        buffer.append(this.nullList.toBytes());
         buffer.append(this.recordHeader.toBytes());
         buffer.append(this.body);
         return buffer.toBytes();
@@ -104,6 +108,6 @@ public class Compact implements UserRecord, PageObject {
 
     @Override
     public int length() {
-        return variables.length() + nullValues.length() + recordHeader.length() + body.length;
+        return variables.length() + nullList.length() + recordHeader.length() + body.length;
     }
 }

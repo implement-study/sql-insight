@@ -36,10 +36,10 @@ public abstract class PageHeaderFactory {
      * root heap top offset
      **/
     private static short rootHeapTop() {
-        return (short) (ConstantSize.FILE_HEADER.getSize() +
-                ConstantSize.PAGE_HEADER.getSize() +
-                ConstantSize.INFIMUM.getSize() +
-                ConstantSize.SUPREMUM.getSize());
+        return (short) (ConstantSize.FILE_HEADER.size() +
+                ConstantSize.PAGE_HEADER.size() +
+                ConstantSize.INFIMUM.size() +
+                ConstantSize.SUPREMUM.size());
     }
 
 }

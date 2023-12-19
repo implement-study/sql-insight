@@ -101,7 +101,7 @@ public class PageHeader implements PageObject, ByteWrapper {
 
     @Override
     public int length() {
-        return ConstantSize.PAGE_HEADER.getSize();
+        return ConstantSize.PAGE_HEADER.size();
     }
 
     @Override

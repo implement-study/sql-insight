@@ -67,7 +67,7 @@ public class FileHeader implements ByteWrapper, PageObject {
 
     @Override
     public int length() {
-        return ConstantSize.FILE_HEADER.getSize();
+        return ConstantSize.FILE_HEADER.size();
     }
 
     @Override
