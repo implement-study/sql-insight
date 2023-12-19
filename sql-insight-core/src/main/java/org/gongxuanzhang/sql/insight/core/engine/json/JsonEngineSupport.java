@@ -20,7 +20,7 @@ import com.alibaba.fastjson2.JSONObject;
 import org.gongxuanzhang.sql.insight.core.exception.DateTypeCastException;
 import org.gongxuanzhang.sql.insight.core.object.Column;
 import org.gongxuanzhang.sql.insight.core.object.DataType;
-import org.gongxuanzhang.sql.insight.core.object.PhysicRow;
+import org.gongxuanzhang.sql.insight.core.object.ReadRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
 import org.gongxuanzhang.sql.insight.core.object.value.ValueInt;
@@ -67,16 +67,16 @@ public class JsonEngineSupport {
     }
 
 
-    static PhysicRow getPhysicRowFromJson(JSONObject jsonObject, Table table) {
+    static ReadRow getPhysicRowFromJson(JSONObject jsonObject, Table table) {
         Column primaryKey = table.getColumnList().get(table.getExt().getPrimaryKeyIndex());
         long id = jsonObject.getLongValue(primaryKey.getName());
         List<Value> valueList = new ArrayList<>(table.getColumnList().size());
         for (Column column : table.getColumnList()) {
             valueList.add(wrapValue(column, jsonObject.get(column.getName())));
         }
-        PhysicRow physicRow = new PhysicRow(valueList, id);
-        physicRow.setTable(table);
-        return physicRow;
+        ReadRow readRow = new ReadRow(valueList, id);
+        readRow.setTable(table);
+        return readRow;
     }
 
 

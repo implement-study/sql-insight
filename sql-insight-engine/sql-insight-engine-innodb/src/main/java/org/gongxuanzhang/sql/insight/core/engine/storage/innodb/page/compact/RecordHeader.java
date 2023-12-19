@@ -22,7 +22,7 @@ import org.gongxuanzhang.easybyte.core.ByteWrapper;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageObject;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.BitOperator;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.BitUtils;
+import org.gongxuanzhang.sql.insight.core.tool.BitUtils;
 
 import java.util.Arrays;
 

@@ -19,13 +19,17 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageObject;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * variable data type like varchar
  *
  * @author gongxuanzhang
  **/
-public class Variables implements ByteWrapper, PageObject {
+public class Variables implements ByteWrapper, PageObject, Iterable<Byte> {
 
     byte[] varBytes;
 
@@ -68,5 +72,31 @@ public class Variables implements ByteWrapper, PageObject {
     @Override
     public int length() {
         return this.varBytes.length;
+    }
+
+    @NotNull
+    @Override
+    public Iterator<Byte> iterator() {
+        return new ReIter();
+    }
+
+    public class ReIter implements Iterator<Byte> {
+
+        int cursor = Variables.this.varBytes.length - 1;
+
+        @Override
+        public boolean hasNext() {
+            return cursor >= 0;
+        }
+
+        @Override
+        public Byte next() {
+            if (cursor < 0) {
+                throw new NoSuchElementException();
+            }
+            int i = cursor;
+            cursor--;
+            return Variables.this.varBytes[i];
+        }
     }
 }

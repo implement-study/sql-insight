@@ -24,15 +24,21 @@ import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Com
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.CompactNullList;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Variables;
-import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.object.Column;
+import org.gongxuanzhang.sql.insight.core.object.ReadRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
+import org.gongxuanzhang.sql.insight.core.object.value.Value;
+import org.gongxuanzhang.sql.insight.core.object.value.ValueInt;
+import org.gongxuanzhang.sql.insight.core.object.value.ValueNegotiator;
+import org.gongxuanzhang.sql.insight.core.object.value.ValueNull;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -69,9 +75,7 @@ public class PageSupport {
      * fill compact field null list and variables
      * depend on table info.
      **/
-    private static void fillNullAndVar(InnoDbPage page, int offset, Compact compact) {
-        SessionContext currentSession = SessionContext.getCurrentSession();
-        Table table = currentSession.getTable();
+    private static void fillNullAndVar(InnoDbPage page, int offset, Compact compact, Table table) {
         int nullLength = table.getExt().getNullableColCount() / Byte.SIZE;
         ByteBuffer pageBuffer = ByteBuffer.wrap(page.getSource());
         byte[] nullListByte = new byte[nullLength];
@@ -90,10 +94,9 @@ public class PageSupport {
 
     private static int variableColumnCount(Table table, CompactNullList nullList) {
         List<Column> columnList = table.getColumnList();
-        int nullIndex = 0;
         int result = 0;
         for (Column column : columnList) {
-            if (!column.isNotNull() && nullList.isNull(nullIndex++)) {
+            if (!column.isNotNull() && nullList.isNull(column.getNullListIndex())) {
                 continue;
             }
             if (column.isVariable()) {
@@ -104,14 +107,54 @@ public class PageSupport {
     }
 
 
-    public static Compact readCompact(InnoDbPage page, int offset) {
+    public static Compact readCompact(InnoDbPage page, int offset, Table table) {
         Compact compact = new Compact();
         compact.setRecordHeader(readRecordHeader(page, offset));
-        fillNullAndVar(page, offset, compact);
+        fillNullAndVar(page, offset, compact, table);
         int variableLength = compact.getVariables().variableLength();
-        byte[] body = new byte[variableLength];
+        int fixLength = compactFixLength(compact, table);
+        byte[] body = new byte[variableLength + fixLength];
         compact.setBody(body);
+        compact.setSourceRow(compactReadRow(compact, table));
         return compact;
+    }
+
+    private static int compactFixLength(Compact compact, Table table) {
+        int fixLength = 0;
+        for (Column column : table.getColumnList()) {
+            if (column.isVariable()) {
+                continue;
+            }
+            if (column.isNotNull() || (!compact.getNullList().isNull(column.getNullListIndex()))) {
+                fixLength += column.getDataType().getLength();
+            }
+        }
+        return fixLength;
+    }
+
+    private static ReadRow compactReadRow(Compact compact, Table table) {
+        List<Column> columnList = table.getColumnList();
+        List<Value> valueList = new ArrayList<>(columnList.size());
+        ByteBuffer bodyBuffer = ByteBuffer.wrap(compact.getBody());
+        Iterator<Byte> iterator = compact.getVariables().iterator();
+        int rowId = -1;
+        for (Column column : columnList) {
+            if (!column.isNotNull() && compact.getNullList().isNull(column.getNullListIndex())) {
+                valueList.add(column.getDefaultValue() == null ? ValueNull.getInstance() : column.getDefaultValue());
+                continue;
+            }
+            int length = column.isVariable() ? iterator.next() : column.getDataType().getLength();
+            byte[] item = new byte[length];
+            bodyBuffer.get(item);
+            Value value = ValueNegotiator.wrapValue(column, item);
+            valueList.add(value);
+            if (column.isPrimaryKey()) {
+                rowId = ((ValueInt) value).getSource();
+            }
+        }
+        ReadRow row = new ReadRow(valueList, rowId);
+        row.setTable(table);
+        return row;
     }
 
 

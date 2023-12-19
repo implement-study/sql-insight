@@ -53,6 +53,8 @@ public class Column implements FillDataVisitor, CommentContainer {
 
     private boolean variable;
 
+    private int nullListIndex;
+
 
     @Override
     public Column setComment(String comment) {

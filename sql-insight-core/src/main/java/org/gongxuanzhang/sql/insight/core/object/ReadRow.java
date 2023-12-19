@@ -25,7 +25,7 @@ import java.util.StringJoiner;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class PhysicRow implements Row, TableContainer {
+public class ReadRow implements Row, TableContainer {
 
     private Table table;
 
@@ -33,7 +33,7 @@ public class PhysicRow implements Row, TableContainer {
 
     private final long rowId;
 
-    public PhysicRow(List<Value> valueList, long rowId) {
+    public ReadRow(List<Value> valueList, long rowId) {
         this.rowId = rowId;
         this.valueList = valueList;
     }

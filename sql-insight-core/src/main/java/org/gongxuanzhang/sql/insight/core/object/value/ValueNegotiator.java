@@ -18,6 +18,8 @@ package org.gongxuanzhang.sql.insight.core.object.value;
 
 import org.gongxuanzhang.sql.insight.core.exception.DataTooLongException;
 import org.gongxuanzhang.sql.insight.core.object.Column;
+import org.gongxuanzhang.sql.insight.core.object.DataType;
+import org.gongxuanzhang.sql.insight.core.tool.BitUtils;
 
 import java.util.function.Consumer;
 
@@ -36,12 +38,25 @@ public class ValueNegotiator {
      * column default value
      **/
     public static Consumer<Value> columnDefaultValue(Column column) {
-        return (value) -> {
+        return value -> {
             if (value.getLength() > column.getDataType().getLength()) {
                 throw new DataTooLongException(column);
             }
             column.setDefaultValue(value);
         };
+    }
+
+    public static Value wrapValue(Column column, byte[] value) {
+        DataType dataType = column.getDataType();
+        switch (dataType.getType()) {
+            case INT:
+                return new ValueInt(BitUtils.byteArrayToInt(value));
+            case VARCHAR:
+            case CHAR:
+                return new ValueVarchar(new String(value));
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
 }

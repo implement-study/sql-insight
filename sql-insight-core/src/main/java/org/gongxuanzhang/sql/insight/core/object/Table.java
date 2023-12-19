@@ -93,6 +93,7 @@ public final class Table implements FillDataVisitor, CommentContainer {
         if (column.isNotNull()) {
             this.ext.notNullIndex.add(columnList.size() - 1);
         } else {
+            column.setNullListIndex(ext.nullableColCount);
             this.ext.nullableColCount++;
         }
         if (column.getDataType().getType() == DataType.Type.VARCHAR) {

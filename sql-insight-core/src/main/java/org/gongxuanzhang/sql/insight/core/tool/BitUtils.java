@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils;
+package org.gongxuanzhang.sql.insight.core.tool;
 
 import org.springframework.util.Assert;
 
@@ -41,6 +41,16 @@ public class BitUtils {
             integer >>= 8;
         }
         return result;
+    }
+
+    public static int byteArrayToInt(byte[] byteArray) {
+        if (byteArray.length != Integer.BYTES) {
+            throw new IllegalArgumentException("byte array length must be " + Integer.BYTES);
+        }
+        return ((byteArray[0] & 0xFF) << 24) |
+                ((byteArray[1] & 0xFF) << 16) |
+                ((byteArray[2] & 0xFF) << 8) |
+                (byteArray[3] & 0xFF);
     }
 
 
