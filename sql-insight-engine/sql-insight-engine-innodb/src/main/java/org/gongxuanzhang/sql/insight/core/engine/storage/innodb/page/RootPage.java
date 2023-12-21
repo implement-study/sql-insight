@@ -1,11 +1,13 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
+import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RowFormatFactory;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
+import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Constant.SLOT_MAX_COUNT;
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport.getNextUserRecord;
 
 
@@ -16,6 +18,7 @@ import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.Pag
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
+@Slf4j
 public class RootPage extends InnoDbPage {
 
 
@@ -42,7 +45,6 @@ public class RootPage extends InnoDbPage {
                     next = getNextUserRecord(this, pre);
                 }
                 linkedInsertRow(pre, compact, next);
-                adjustGroup(targetSlot,compact);
                 return;
             }
             splitPage();
@@ -73,9 +75,6 @@ public class RootPage extends InnoDbPage {
 //        this.refresh();
     }
 
-    private void adjustGroup(int targetSlot, Compact compact) {
-
-    }
 
     private InnoDbPage findTargetPage(Compact compact) {
         if (this.pageType() == PageType.FIL_PAGE_INODE) {
@@ -99,6 +98,26 @@ public class RootPage extends InnoDbPage {
         this.freeSpace -= (short) insertCompact.length();
         this.pageHeader.heapTop += (short) insertCompact.length();
         this.pageHeader.lastInsertOffset += (short) insertCompact.length();
+
+        //  adjust group
+        while (next.getRecordHeader().getNOwned() == 0) {
+            next = getNextUserRecord(this, next);
+        }
+        RecordHeader recordHeader = next.getRecordHeader();
+        int groupCount = recordHeader.getNOwned();
+        recordHeader.setnOwned(groupCount + 1);
+        if (next.getRecordHeader().getNOwned() > SLOT_MAX_COUNT) {
+            log.info("start group split ...");
+            for (int i = 0; i < this.pageDirectory.slots.length - 1; i++) {
+                if (this.pageDirectory.slots[i] == next.offset()) {
+                    InnodbUserRecord preGroupMax = getUserRecordByOffset(this.pageDirectory.slots[i + 1], this.table);
+                    for (int j = 0; j < SLOT_MAX_COUNT >> 1; j++) {
+                        preGroupMax = getNextUserRecord(this, preGroupMax);
+                    }
+                    this.pageDirectory.split(i, (short) preGroupMax.offset());
+                }
+            }
+        }
     }
 
 

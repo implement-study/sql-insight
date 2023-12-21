@@ -43,9 +43,6 @@ import java.util.Arrays;
 @Getter
 public class RecordHeader implements ByteWrapper, PageObject {
 
-    /**
-     * 记录头本质上只有5个字节 但是40bit有不同作用
-     **/
     private final byte[] source;
     private boolean delete;
     private boolean minRec;
