@@ -20,45 +20,37 @@ import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.AutoIncrementKeyCounter;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.core.InnodbIc;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.RootPage;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RowFormatFactory;
 import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
 import org.gongxuanzhang.sql.insight.core.object.Cursor;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
-import org.gongxuanzhang.sql.insight.core.object.PKIndex;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
-import java.io.File;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
 @Slf4j
-public class ClusteredIndex extends PKIndex {
-
-    private final Table table;
-
-    private File ibd;
+public class ClusteredIndex extends InnodbIndex {
 
     private AutoIncrementKeyCounter autoIncrementKeyCounter;
 
     protected ClusteredIndex(Table table) {
-        this.table = table;
+        super(table);
     }
+
 
     @Override
     public void rndInit() {
-        if (this.ibd != null) {
-            return;
-        }
-        this.ibd = new File(table.getDatabase().getDbFolder(), table.getName() + ".ibd");
         if (this.table.getExt().getAutoColIndex() >= 0) {
             this.autoIncrementKeyCounter = new InnodbIc(table);
         }
     }
 
     @Override
-    public Table belongTo() {
-        return this.table;
+    public int getId() {
+        return 1;
     }
 
     @Override
@@ -69,12 +61,13 @@ public class ClusteredIndex extends PKIndex {
     @Override
     public void insert(InsertRow row) {
         if (this.autoIncrementKeyCounter.dealAutoIncrement(row)) {
-            log.info("auto increment primary key {}", table.getColumnList().get(table.getExt().getAutoColIndex()).getName());
+            log.info("auto increment primary key {}",
+                    table.getColumnList().get(table.getExt().getAutoColIndex()).getName());
         }
-        RootPage targetPage = PageSupport.getRoot(this.ibd,table);
-        targetPage.insertRow(row);
+        Compact compact = RowFormatFactory.compactFromInsertRow(row);
+        RootPage root = getRoot();
+        root.insertData(compact);
     }
-
 
 
 }

@@ -23,14 +23,12 @@ import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RowFormatFactory;
 import org.gongxuanzhang.sql.insight.core.exception.DuplicationPrimaryKeyException;
-import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.UserRecord;
 
 /**
  * InnoDb Page
  * size default 16K.
- * don't support update size (todo)
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
@@ -104,15 +102,15 @@ public abstract class InnoDbPage implements ByteWrapper {
         return PageType.valueOf(this.fileHeader.pageType);
     }
 
-    /**
-     * page split
-     **/
-    public abstract void splitPage();
 
     /**
-     *
+     * add a data.
+     * data means a insert row .
+     * page is leaf node will insert data.
+     * page is index node will find target leaf node and insert data.
+     * may be split page in process
      **/
-    public abstract void insertRow(InsertRow row);
+    public abstract void insertData(Compact data);
 
 
     /**
@@ -126,7 +124,7 @@ public abstract class InnoDbPage implements ByteWrapper {
         while (left < right - 1) {
             int mid = (right + left) / 2;
             short offset = this.pageDirectory.getSlots()[mid];
-            UserRecord base = getUserRecordByOffset(offset, insertCompact.belongTo());
+            UserRecord base = getUserRecordByOffset(offset);
             int compare = Long.compare(insertCompact.getRowId(), base.getRowId());
             if (compare == 0) {
                 throw new DuplicationPrimaryKeyException(base.getRowId());
@@ -137,7 +135,7 @@ public abstract class InnoDbPage implements ByteWrapper {
                 left = mid;
             }
         }
-        UserRecord base = getUserRecordByOffset(this.pageDirectory.getSlots()[left], insertCompact.belongTo());
+        UserRecord base = getUserRecordByOffset(this.pageDirectory.getSlots()[left]);
         int compare = Long.compare(insertCompact.getRowId(), base.getRowId());
         if (compare == 0) {
             throw new DuplicationPrimaryKeyException(base.getRowId());
@@ -152,7 +150,7 @@ public abstract class InnoDbPage implements ByteWrapper {
      * @param offset offset in page
      * @return user record
      **/
-    protected InnodbUserRecord getUserRecordByOffset(short offset, Table table) {
+    protected InnodbUserRecord getUserRecordByOffset(short offset) {
         if (offset == ConstantSize.INFIMUM.offset()) {
             return this.infimum;
         }
@@ -163,15 +161,15 @@ public abstract class InnoDbPage implements ByteWrapper {
     }
 
 
-//    /**
-//     * 判断当前空闲空间是否足够
-//     *
-//     * @param length 需要的空间大小
-//     * @return true 是足够
-//     **/
-//    public boolean isEnough(int length) {
-//        return this.freeSpace >= length;
-//    }
+    /**
+     * free space if enough
+     * default implementation is always retain one-sixteenth page size
+     *
+     * @param insertLength insert length
+     **/
+    public boolean isEnough(int insertLength) {
+        return this.freeSpace - insertLength >= ConstantSize.PAGE.size() >> 4;
+    }
 //
 //
 //

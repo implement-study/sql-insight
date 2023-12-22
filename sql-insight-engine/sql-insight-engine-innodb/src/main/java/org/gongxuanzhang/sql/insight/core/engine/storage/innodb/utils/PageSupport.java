@@ -36,7 +36,8 @@ import java.io.IOException;
  **/
 public class PageSupport {
 
-    public static RootPage getRoot(File ibd, Table table) {
+    public static RootPage getRoot(Table table) {
+        File ibd = new File(table.getDatabase().getDbFolder(), table.getName() + ".ibd");
         try (FileInputStream fileInputStream = new FileInputStream(ibd)) {
             byte[] pageByte = ConstantSize.PAGE.emptyBuff();
             if (fileInputStream.read(pageByte) != pageByte.length) {
@@ -50,7 +51,7 @@ public class PageSupport {
 
     public static InnodbUserRecord getNextUserRecord(InnoDbPage page, UserRecord userRecord) {
         if (userRecord instanceof Supremum) {
-            throw new NullPointerException("supremum 没有下一个");
+            throw new NullPointerException("supremum is max record in page");
         }
         int nextRecordOffset = userRecord.nextRecordOffset();
         return RowFormatFactory.readCompactInPage(page, nextRecordOffset, userRecord.belongTo());

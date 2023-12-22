@@ -19,8 +19,8 @@ package org.gongxuanzhang.sql.insight.core.engine.json;
 import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.object.Cursor;
+import org.gongxuanzhang.sql.insight.core.object.Index;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
-import org.gongxuanzhang.sql.insight.core.object.PKIndex;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
 import java.io.BufferedReader;
@@ -32,7 +32,7 @@ import java.nio.file.Path;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class JsonPkIndex extends PKIndex {
+public class JsonPkIndex implements Index {
 
     private final Table table;
 
@@ -48,6 +48,11 @@ public class JsonPkIndex extends PKIndex {
     @Override
     public void rndInit() {
         this.jsonFilePath = JsonEngineSupport.getJsonFile(table).toPath();
+    }
+
+    @Override
+    public int getId() {
+        return 1;
     }
 
     @Override

@@ -19,5 +19,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.core;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface BTree {
+public enum NodeState {
+
+    LEAF, INDEX
 }
