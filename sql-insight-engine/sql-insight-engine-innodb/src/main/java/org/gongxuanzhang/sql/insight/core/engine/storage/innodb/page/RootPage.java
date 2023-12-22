@@ -5,6 +5,9 @@ import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Com
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Constant.SLOT_MAX_COUNT;
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport.getNextUserRecord;
 
@@ -38,13 +41,31 @@ public class RootPage extends InnoDbPage {
                 linkedInsertRow(pre, compact, next);
                 return;
             }
-            //  这里页分裂 把数据页变成索引页  同时创建两个数据页
-            return;
+            splitDataToIndexPage(compact);
         } else if (this.pageType() == PageType.FIL_PAGE_INODE) {
             //   找到目标位置 然后插入
         } else {
             throw new UnsupportedOperationException("error type " + this.pageType());
         }
+    }
+
+
+    /**
+     * root page split and type to index from data type.
+     **/
+    private void splitDataToIndexPage(Compact insertCompact) {
+        List<InnodbUserRecord> pageUserRecord = new ArrayList<>();
+        InnodbUserRecord base = this.infimum;
+        while (base != this.supremum) {
+            base = getNextUserRecord(this, base);
+            pageUserRecord.add(base);
+        }
+//        this.infimum.offset()
+//        List<UserRecord> allRecords = this.userRecords.getAllRecords();
+//        allRecords.stream().filter(() -> {
+//
+//        })
+
     }
 
 
@@ -55,7 +76,7 @@ public class RootPage extends InnoDbPage {
         pre.getRecordHeader().setNextRecordOffset(insertCompact.offset());
         insertCompact.setRecordHeader(insertHeader);
         //  adjust page
-        this.userRecords.addRecords(insertCompact);
+        this.userRecords.addRecord(insertCompact);
         this.pageHeader.absoluteRecordCount++;
         this.pageHeader.recordCount++;
         this.freeSpace -= (short) insertCompact.length();

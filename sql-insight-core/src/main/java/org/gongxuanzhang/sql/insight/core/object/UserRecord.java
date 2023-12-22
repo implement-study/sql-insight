@@ -43,6 +43,11 @@ public interface UserRecord extends ByteWrapper, Row {
      **/
     int nextRecordOffset();
 
+    /**
+     * @return user record delete sign
+     **/
+    boolean deleteSign();
+
     @Override
     default byte[] toBytes() {
         return rowBytes();

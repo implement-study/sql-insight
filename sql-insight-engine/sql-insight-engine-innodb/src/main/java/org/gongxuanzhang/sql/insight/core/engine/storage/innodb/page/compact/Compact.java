@@ -123,4 +123,9 @@ public class Compact implements InnodbUserRecord, PageObject {
         return this.recordHeader.getNextRecordOffset();
     }
 
+    @Override
+    public boolean deleteSign() {
+        return this.recordHeader.isDelete();
+    }
+
 }

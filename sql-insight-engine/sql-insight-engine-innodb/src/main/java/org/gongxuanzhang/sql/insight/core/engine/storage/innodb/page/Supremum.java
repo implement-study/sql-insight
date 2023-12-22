@@ -84,6 +84,11 @@ public class Supremum implements InnodbUserRecord {
     }
 
     @Override
+    public boolean deleteSign() {
+        return false;
+    }
+
+    @Override
     public Table belongTo() {
         return supremumUnsupport();
     }

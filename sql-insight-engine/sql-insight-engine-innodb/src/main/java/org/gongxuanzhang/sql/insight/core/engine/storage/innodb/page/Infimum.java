@@ -59,6 +59,11 @@ public class Infimum implements InnodbUserRecord {
     }
 
     @Override
+    public boolean deleteSign() {
+        return false;
+    }
+
+    @Override
     public int offset() {
         return ConstantSize.INFIMUM.offset();
     }

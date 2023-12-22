@@ -157,7 +157,7 @@ public abstract class InnoDbPage implements ByteWrapper {
         if (offset == ConstantSize.SUPREMUM.offset()) {
             return this.supremum;
         }
-        return RowFormatFactory.readCompactInPage(this, offset, table);
+        return RowFormatFactory.reaRecordInPage(this, offset, table);
     }
 
 

@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
 
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnodbUserRecord;
 import org.gongxuanzhang.sql.insight.core.exception.SqlInsightException;
 import org.gongxuanzhang.sql.insight.core.object.Column;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
@@ -44,6 +45,7 @@ public class RowFormatFactory {
 
     /**
      * create row format from insert row.
+     *
      * @return the compact don't have record header
      **/
     public static Compact compactFromInsertRow(InsertRow row) {
@@ -73,8 +75,13 @@ public class RowFormatFactory {
     }
 
 
-
-    public static Compact readCompactInPage(InnoDbPage page, int offset, Table table) {
+    public static InnodbUserRecord reaRecordInPage(InnoDbPage page, int offset, Table table) {
+        if (ConstantSize.INFIMUM.offset() == offset) {
+            return page.getInfimum();
+        }
+        if (ConstantSize.SUPREMUM.offset() == offset) {
+            return page.getSupremum();
+        }
         Compact compact = new Compact();
         compact.setRecordHeader(readRecordHeader(page, offset));
         fillNullAndVar(page, offset, compact, table);

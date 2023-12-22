@@ -18,30 +18,22 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
-import org.gongxuanzhang.sql.insight.core.object.UserRecord;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
 public class UserRecords implements ByteWrapper {
 
+    byte[] body;
 
-    private final List<UserRecord> records = new ArrayList<>();
-
-
-    public void addRecords(UserRecord userRecord) {
-        this.records.add(userRecord);
-    }
 
     @Override
     public byte[] toBytes() {
-        DynamicByteBuffer buffer = DynamicByteBuffer.allocate();
-        for (UserRecord record : records) {
-            buffer.append(record.toBytes());
-        }
-        return buffer.toBytes();
+        return this.body;
+    }
+
+    public void addRecord(Compact insertCompact) {
+        this.body = DynamicByteBuffer.wrap(body).append(insertCompact.toBytes()).toBytes();
     }
 }
