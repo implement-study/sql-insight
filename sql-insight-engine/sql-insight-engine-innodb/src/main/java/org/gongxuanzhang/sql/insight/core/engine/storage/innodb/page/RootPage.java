@@ -35,7 +35,7 @@ public class RootPage extends InnoDbPage {
         if (this.pageType() == PageType.FIL_PAGE_INDEX) {
             if (this.isEnough(compact.length())) {
                 int targetSlot = findTargetSlot(compact);
-                InnodbUserRecord pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot));
+                InnodbUserRecord pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot - 1));
                 InnodbUserRecord next = getNextUserRecord(this, pre);
                 while (compact.compareTo(next) > 0) {
                     pre = next;
@@ -72,6 +72,7 @@ public class RootPage extends InnoDbPage {
             pageUserRecord.add(base);
             allLength += base.length();
         }
+        //   todo non middle split ?
         if (this.pageHeader.directionCount < DIRECTION_COUNT_THRESHOLD) {
             middleSplit(pageUserRecord, allLength);
         }
@@ -91,6 +92,7 @@ public class RootPage extends InnoDbPage {
         for (int i = 0; i < pageUserRecord.size(); i++) {
             allLength -= pageUserRecord.get(i).length();
             if (allLength <= half) {
+
                 List<InnodbUserRecord> preData = pageUserRecord.subList(0, i);
                 List<InnodbUserRecord> nextData = pageUserRecord.subList(i, pageUserRecord.size());
             }
@@ -101,8 +103,8 @@ public class RootPage extends InnoDbPage {
     private void linkedInsertRow(InnodbUserRecord pre, Compact insertCompact, InnodbUserRecord next) {
         RecordHeader insertHeader = new RecordHeader();
         insertHeader.setHeapNo(this.pageHeader.absoluteRecordCount);
-        insertHeader.setNextRecordOffset(next.offset());
-        pre.getRecordHeader().setNextRecordOffset(insertCompact.offset());
+        insertHeader.setNextRecordOffset(next.offset() + insertCompact.getBody().length);
+        pre.getRecordHeader().setNextRecordOffset(insertCompact.offset() );
         insertCompact.setRecordHeader(insertHeader);
         //  adjust page
         this.userRecords.addRecord(insertCompact);

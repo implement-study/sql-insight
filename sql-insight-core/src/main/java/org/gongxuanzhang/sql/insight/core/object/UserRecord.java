@@ -34,12 +34,12 @@ public interface UserRecord extends ByteWrapper, Row {
 
 
     /**
-     * offset in page
+     * absolute offset in page
      **/
     int offset();
 
     /**
-     * next node offset
+     * next node relative offset
      **/
     int nextRecordOffset();
 

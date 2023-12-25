@@ -60,7 +60,7 @@ public abstract class PageFactory {
 
         dataPage.setSupremum(new Supremum());
         dataPage.setInfimum(new Infimum());
-
+        InnodbUserRecord pre = dataPage.getInfimum();
         for (InnodbUserRecord record : recordList) {
 
         }
