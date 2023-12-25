@@ -2,14 +2,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.FileTrailer;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Infimum;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageDirectory;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.RootPage;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Supremum;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.UserRecords;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.*;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.object.Table;
@@ -17,6 +10,7 @@ import org.gongxuanzhang.sql.insight.core.object.Table;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.FILE_HEADER;
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.INFIMUM;
@@ -44,6 +38,36 @@ public abstract class PageFactory {
         } catch (IOException e) {
             throw new RuntimeIoException(e);
         }
+    }
+
+
+    /**
+     * page split create a new data page.
+     *
+     * @param recordList data in the page that sorted
+     * @return the data page but the file header , page header is not complete
+     **/
+    public static DataPage createDataPage(List<InnodbUserRecord> recordList, Table table) {
+        DataPage dataPage = new DataPage(table);
+        FileHeader fileHeader = new FileHeader();
+        fileHeader.setPageType(PageType.FIL_PAGE_INDEX.getValue());
+        dataPage.setFileHeader(fileHeader);
+
+        PageHeader pageHeader = new PageHeader();
+        pageHeader.setSlotCount((short) (((recordList.size() + 1) / 8) + 1));
+        pageHeader.setAbsoluteRecordCount((short) (2 + recordList.size()));
+        pageHeader.setRecordCount((short) recordList.size());
+
+        dataPage.setSupremum(new Supremum());
+        dataPage.setInfimum(new Infimum());
+
+        for (InnodbUserRecord record : recordList) {
+
+        }
+
+        FileTrailer fileTrailer = new FileTrailer();
+        return dataPage;
+
     }
 
     /**

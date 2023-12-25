@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.exception;
+package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page
 
-import org.gongxuanzhang.sql.insight.core.object.Column;
-
-/**
- * @author gongxuanzhangmelt@gmail.com
- **/
-public class DataTooLongException extends SqlInsightException {
+import org.junit.jupiter.api.Test
 
 
-    //  todo at row 1
-    public DataTooLongException(Column col) {
-        super("Data too long for column '" + col.getName() + "'");
-    }
+class RootPageTest{
 
-    public DataTooLongException(String message) {
-        super(message);
+    @Test
+    fun subListTest(){
+        val list = ArrayList<Int>()
+        for (i in 0..10) {
+            list.add(i)
+        }
+        println(list.subList(0,list.size/2))
+        println(list.subList(list.size/2,list.size))
     }
 
 }

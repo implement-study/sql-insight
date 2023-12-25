@@ -25,7 +25,7 @@ import org.gongxuanzhang.sql.insight.core.object.Table;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public abstract class InnodbIndex implements  InnodbBTree {
+public abstract class InnodbIndex implements InnodbBTree {
 
 
     protected final Table table;

@@ -23,6 +23,7 @@ import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 /**
  * describe page total info.
  * in general. file header fixed.
+ *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data

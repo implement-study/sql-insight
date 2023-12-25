@@ -120,7 +120,7 @@ public class RecordHeader implements ByteWrapper, PageObject {
         return this;
     }
 
-    public RecordHeader setnOwned(int nOwned) {
+    public RecordHeader setNOwned(int nOwned) {
         if (this.nOwned == nOwned) {
             return this;
         }

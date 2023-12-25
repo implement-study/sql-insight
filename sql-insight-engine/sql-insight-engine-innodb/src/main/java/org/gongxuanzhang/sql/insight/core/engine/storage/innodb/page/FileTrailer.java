@@ -25,6 +25,7 @@ import java.nio.ByteBuffer;
 /**
  * use it with {@link FileHeader}
  * only in order to check.
+ *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Data

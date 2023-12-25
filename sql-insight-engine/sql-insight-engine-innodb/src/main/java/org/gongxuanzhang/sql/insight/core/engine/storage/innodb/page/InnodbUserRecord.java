@@ -22,13 +22,12 @@ import org.gongxuanzhang.sql.insight.core.object.UserRecord;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface InnodbUserRecord extends UserRecord {
+public interface InnodbUserRecord extends UserRecord, PageObject {
 
     /**
      * @return record header
      **/
     RecordHeader getRecordHeader();
-
 
 
 }

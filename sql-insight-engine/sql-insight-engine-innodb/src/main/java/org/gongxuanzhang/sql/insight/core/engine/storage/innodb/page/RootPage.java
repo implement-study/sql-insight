@@ -3,11 +3,14 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.RowComparator;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
+import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Constant.DIRECTION_COUNT_THRESHOLD;
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Constant.SLOT_MAX_COUNT;
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport.getNextUserRecord;
 
@@ -54,18 +57,44 @@ public class RootPage extends InnoDbPage {
      * root page split and type to index from data type.
      **/
     private void splitDataToIndexPage(Compact insertCompact) {
-        List<InnodbUserRecord> pageUserRecord = new ArrayList<>();
+        List<InnodbUserRecord> pageUserRecord = new ArrayList<>(this.pageHeader.recordCount + 1);
         InnodbUserRecord base = this.infimum;
+        Comparator<InnodbUserRecord> comparator = RowComparator.primaryKeyComparator();
+        boolean inserted = false;
+        int allLength = 0;
         while (base != this.supremum) {
             base = getNextUserRecord(this, base);
+            if (!inserted && comparator.compare(insertCompact, base) < 0) {
+                pageUserRecord.add(insertCompact);
+                allLength += insertCompact.length();
+                inserted = true;
+            }
             pageUserRecord.add(base);
+            allLength += base.length();
         }
-//        this.infimum.offset()
-//        List<UserRecord> allRecords = this.userRecords.getAllRecords();
-//        allRecords.stream().filter(() -> {
-//
-//        })
+        if (this.pageHeader.directionCount < DIRECTION_COUNT_THRESHOLD) {
+            middleSplit(pageUserRecord, allLength);
+        }
 
+    }
+
+
+    /**
+     * middle split.
+     * insert direction unidentified (directionCount less than 5)
+     *
+     * @param pageUserRecord all user record in page with inserted
+     * @param allLength      all user record length
+     **/
+    private void middleSplit(List<InnodbUserRecord> pageUserRecord, int allLength) {
+        int half = allLength / 2;
+        for (int i = 0; i < pageUserRecord.size(); i++) {
+            allLength -= pageUserRecord.get(i).length();
+            if (allLength <= half) {
+                List<InnodbUserRecord> preData = pageUserRecord.subList(0, i);
+                List<InnodbUserRecord> nextData = pageUserRecord.subList(i, pageUserRecord.size());
+            }
+        }
     }
 
 
@@ -89,7 +118,7 @@ public class RootPage extends InnoDbPage {
         }
         RecordHeader recordHeader = next.getRecordHeader();
         int groupCount = recordHeader.getNOwned();
-        recordHeader.setnOwned(groupCount + 1);
+        recordHeader.setNOwned(groupCount + 1);
         if (next.getRecordHeader().getNOwned() > SLOT_MAX_COUNT) {
             log.info("start group split ...");
             for (int i = 0; i < this.pageDirectory.slots.length - 1; i++) {

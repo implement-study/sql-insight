@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.exception;
+package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils;
 
-import org.gongxuanzhang.sql.insight.core.object.Column;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnodbUserRecord;
+import org.gongxuanzhang.sql.insight.core.object.Table;
+
+import java.util.Comparator;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class DataTooLongException extends SqlInsightException {
+public abstract class RowComparator {
 
 
-    //  todo at row 1
-    public DataTooLongException(Column col) {
-        super("Data too long for column '" + col.getName() + "'");
+    public static Comparator<InnodbUserRecord> primaryKeyComparator() {
+        return Comparator.comparing(innodbUserRecord -> {
+            Table table = innodbUserRecord.belongTo();
+            String primaryKeyName = table.getExt().getPrimaryKeyName();
+            return innodbUserRecord.getValueByColumnName(primaryKeyName);
+        });
     }
-
-    public DataTooLongException(String message) {
-        super(message);
-    }
-
 }

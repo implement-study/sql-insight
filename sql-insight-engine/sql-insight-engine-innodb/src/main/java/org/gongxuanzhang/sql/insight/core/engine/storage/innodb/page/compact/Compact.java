@@ -21,7 +21,6 @@ import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 import org.gongxuanzhang.sql.insight.core.annotation.Unused;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnodbUserRecord;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageObject;
 import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
@@ -32,7 +31,7 @@ import java.util.List;
  * @author gongxuanzhangmelt@gmail.com
  **/
 @Data
-public class Compact implements InnodbUserRecord, PageObject {
+public class Compact implements InnodbUserRecord {
 
 
     /**

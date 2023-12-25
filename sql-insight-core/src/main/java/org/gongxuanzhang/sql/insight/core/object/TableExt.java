@@ -46,7 +46,7 @@ public class TableExt {
 
     int nullableColCount;
 
-
+    String primaryKeyName;
 
 
 }

@@ -88,6 +88,7 @@ public final class Table implements FillDataVisitor, CommentContainer {
                 throw new UnsupportedOperationException("only support single column primary key");
             }
             this.ext.primaryKeyIndex = columnList.size() - 1;
+            this.ext.primaryKeyName = column.getName();
             column.setNotNull(true);
         }
         if (column.isNotNull()) {

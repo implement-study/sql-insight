@@ -28,6 +28,7 @@ public class DataPage extends InnoDbPage {
         super(table);
     }
 
+
     @Override
     public void insertData(Compact data) {
 

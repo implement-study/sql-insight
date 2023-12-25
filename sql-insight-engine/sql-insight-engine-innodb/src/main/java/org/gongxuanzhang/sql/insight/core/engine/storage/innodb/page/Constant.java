@@ -21,4 +21,6 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
  **/
 public interface Constant {
     int SLOT_MAX_COUNT = 8;
+    int COMPACT_MAX_ROW_LENGTH = (ConstantSize.PAGE.size() >> 1);
+    int DIRECTION_COUNT_THRESHOLD = 5;
 }

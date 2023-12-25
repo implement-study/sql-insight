@@ -102,4 +102,9 @@ public class Infimum implements InnodbUserRecord {
     public RecordHeader getRecordHeader() {
         return this.recordHeader;
     }
+
+    @Override
+    public int length() {
+        return ConstantSize.INFIMUM.size();
+    }
 }

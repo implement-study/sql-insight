@@ -18,7 +18,6 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -33,7 +32,7 @@ public class UserRecords implements ByteWrapper {
         return this.body;
     }
 
-    public void addRecord(Compact insertCompact) {
-        this.body = DynamicByteBuffer.wrap(body).append(insertCompact.toBytes()).toBytes();
+    public void addRecord(InnodbUserRecord record) {
+        this.body = DynamicByteBuffer.wrap(body).append(record.toBytes()).toBytes();
     }
 }

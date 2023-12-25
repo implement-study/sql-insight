@@ -51,7 +51,7 @@ public class PageHeader implements PageObject, ByteWrapper {
     short recordCount;
 
     /**
-     * the first deleted record in page. use next_record field can find delete linked list
+     * the first deleted record in page. use next_record field can find delete linked list, init is 0
      **/
     short free;
 
@@ -65,7 +65,9 @@ public class PageHeader implements PageObject, ByteWrapper {
      **/
     short lastInsertOffset;
     /**
-     * insert direction that use for support insert
+     * insert direction that use for support insert.
+     * 0 is left.
+     * 1 is right.
      **/
     short direction;
     /**

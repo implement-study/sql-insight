@@ -106,4 +106,9 @@ public class Supremum implements InnodbUserRecord {
     public RecordHeader getRecordHeader() {
         return recordHeader;
     }
+
+    @Override
+    public int length() {
+        return ConstantSize.SUPREMUM.size();
+    }
 }
