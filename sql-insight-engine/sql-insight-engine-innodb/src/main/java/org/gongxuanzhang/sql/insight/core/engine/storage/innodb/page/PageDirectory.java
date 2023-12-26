@@ -38,6 +38,14 @@ public class PageDirectory implements PageObject, ByteWrapper {
 
     short[] slots;
 
+    public PageDirectory() {
+
+    }
+
+    public PageDirectory(short[] slots) {
+        this.slots = slots;
+    }
+
 
     public void split(int splitSlotIndex, short newGroupMaxOffset) {
         short[] newSlots = new short[this.slots.length + 1];

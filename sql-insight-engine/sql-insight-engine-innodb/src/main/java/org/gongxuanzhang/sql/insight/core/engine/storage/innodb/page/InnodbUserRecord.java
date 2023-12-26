@@ -30,6 +30,11 @@ public interface InnodbUserRecord extends UserRecord, PageObject {
     RecordHeader getRecordHeader();
 
 
+    /**
+     * next record offset is relative offset.
+     * offset is after header.
+     **/
+    int beforeSplitOffset();
 
 
 }

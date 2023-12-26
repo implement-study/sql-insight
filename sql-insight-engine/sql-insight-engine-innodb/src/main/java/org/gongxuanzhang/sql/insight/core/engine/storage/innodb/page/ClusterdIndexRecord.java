@@ -85,6 +85,12 @@ public class ClusterdIndexRecord implements InnodbUserRecord {
     }
 
     @Override
+    public int beforeSplitOffset() {
+        //  todo
+        return recordHeader.length();
+    }
+
+    @Override
     public int offset() {
         //   todo
         return 0;

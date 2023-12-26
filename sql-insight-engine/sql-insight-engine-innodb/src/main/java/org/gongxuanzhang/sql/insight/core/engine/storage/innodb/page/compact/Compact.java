@@ -115,10 +115,8 @@ public class Compact implements InnodbUserRecord {
     }
 
 
-    /**
-     * next record offset is relative offset.
-     * offset is after header.
-     **/
+
+    @Override
     public int beforeSplitOffset(){
         return variables.length() + nullList.length() + ConstantSize.RECORD_HEADER.size();
     }

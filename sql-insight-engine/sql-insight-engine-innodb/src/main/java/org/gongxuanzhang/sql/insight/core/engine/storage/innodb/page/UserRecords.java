@@ -22,9 +22,13 @@ import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class UserRecords implements ByteWrapper {
+public class UserRecords implements ByteWrapper ,PageObject{
 
     byte[] body;
+
+    public UserRecords(){
+        this.body = new byte[0];
+    }
 
 
     @Override
@@ -34,5 +38,10 @@ public class UserRecords implements ByteWrapper {
 
     public void addRecord(InnodbUserRecord userRecord) {
         this.body = DynamicByteBuffer.wrap(body).append(userRecord.toBytes()).toBytes();
+    }
+
+    @Override
+    public int length() {
+        return body.length;
     }
 }

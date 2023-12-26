@@ -1,6 +1,7 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 import lombok.extern.slf4j.Slf4j;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFactory;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordType;
@@ -93,10 +94,22 @@ public class RootPage extends InnoDbPage {
         for (int i = 0; i < pageUserRecord.size(); i++) {
             allLength -= pageUserRecord.get(i).length();
             if (allLength <= half) {
-                List<InnodbUserRecord> preData = pageUserRecord.subList(0, i);
-                List<InnodbUserRecord> nextData = pageUserRecord.subList(i, pageUserRecord.size());
+                DataPage first = PageFactory.createDataPage(pageUserRecord.subList(0, i), table);
+                DataPage second = PageFactory.createDataPage(pageUserRecord.subList(i, pageUserRecord.size()), table);
+                FileHeader firstFileHeader = first.getFileHeader();
+                FileHeader secondFileHeader = second.getFileHeader();
+                firstFileHeader.setOffset(2 * ConstantSize.PAGE.size());
+                secondFileHeader.setOffset(3 * ConstantSize.PAGE.size());
+
+                firstFileHeader.setPre(-1);
+                firstFileHeader.setNext(3 * ConstantSize.PAGE.size());
+
+                secondFileHeader.setPre(firstFileHeader.offset);
+                secondFileHeader.setNext(-1);
+                return;
             }
         }
+
     }
 
 

@@ -13,7 +13,9 @@ import java.nio.file.Files;
 import java.util.List;
 
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.FILE_HEADER;
+import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.FILE_TRAILER;
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.INFIMUM;
+import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.PAGE;
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.PAGE_HEADER;
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.SUPREMUM;
 
@@ -57,17 +59,38 @@ public abstract class PageFactory {
         pageHeader.setSlotCount((short) (((recordList.size() + 1) / 8) + 1));
         pageHeader.setAbsoluteRecordCount((short) (2 + recordList.size()));
         pageHeader.setRecordCount((short) recordList.size());
+        pageHeader.setLastInsertOffset((short) ConstantSize.USER_RECORDS.offset());
 
         dataPage.setSupremum(new Supremum());
         dataPage.setInfimum(new Infimum());
+
+        short[] slots = new short[((recordList.size() + 1) / Constant.SLOT_MAX_COUNT) + 1];
+        dataPage.setPageDirectory(new PageDirectory(slots));
+        dataPage.setFileTrailer(new FileTrailer());
+        UserRecords userRecords = new UserRecords();
+        dataPage.setUserRecords(userRecords);
+        //   相对偏移量
+
         InnodbUserRecord pre = dataPage.getInfimum();
-        for (InnodbUserRecord record : recordList) {
-
+        short preOffset = (short) SUPREMUM.offset();
+        for (int i = 0; i < recordList.size(); i++) {
+            InnodbUserRecord current = recordList.get(i);
+            int currentOffset = pageHeader.getLastInsertOffset() + current.beforeSplitOffset();
+            pageHeader.setLastInsertOffset((short) (pageHeader.getLastInsertOffset() + current.length()));
+            pre.getRecordHeader().setNextRecordOffset(currentOffset - preOffset);
+            pre = current;
+            if ((i + 1) % Constant.SLOT_MAX_COUNT == 0) {
+                slots[slots.length - 1 - ((i + 1) % Constant.SLOT_MAX_COUNT)] = (short) currentOffset;
+            }
         }
-
-        FileTrailer fileTrailer = new FileTrailer();
+        pre.getRecordHeader().setNextRecordOffset(SUPREMUM.offset());
+        dataPage.setPageDirectory(new PageDirectory(slots));
+        slots[0] = (short) SUPREMUM.offset();
+        slots[slots.length - 1] = (short) INFIMUM.offset();
+        dataPage.setFileTrailer(new FileTrailer());
+        dataPage.setFreeSpace((short) (PAGE.size() - PAGE_HEADER.size() - FILE_HEADER.size() - FILE_TRAILER.size() -
+                slots.length * Short.BYTES - userRecords.length()));
         return dataPage;
-
     }
 
     /**

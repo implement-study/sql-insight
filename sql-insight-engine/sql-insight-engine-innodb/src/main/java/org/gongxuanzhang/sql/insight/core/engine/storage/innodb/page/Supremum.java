@@ -113,6 +113,11 @@ public class Supremum implements InnodbUserRecord {
     }
 
     @Override
+    public int beforeSplitOffset() {
+        return recordHeader.length();
+    }
+
+    @Override
     public int length() {
         return ConstantSize.SUPREMUM.size();
     }

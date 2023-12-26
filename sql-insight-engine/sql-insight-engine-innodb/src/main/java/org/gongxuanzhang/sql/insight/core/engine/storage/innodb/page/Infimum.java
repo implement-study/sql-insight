@@ -56,6 +56,11 @@ public class Infimum implements InnodbUserRecord {
     }
 
     @Override
+    public int beforeSplitOffset() {
+        return recordHeader.length();
+    }
+
+    @Override
     public int nextRecordOffset() {
         return recordHeader.getNextRecordOffset();
     }

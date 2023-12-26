@@ -31,12 +31,10 @@ public enum ConstantSize {
     SUPREMUM(13, FILE_HEADER.size + PAGE_HEADER.size + INFIMUM.size + RECORD_HEADER.size),
     SUPREMUM_BODY(8),
     INFIMUM_BODY(8),
-    USER_RECORDS(-1, SUPREMUM.size + SUPREMUM.offset),
+    USER_RECORDS(-1, SUPREMUM.size + SUPREMUM_BODY.offset),
     FILE_TRAILER(8),
-    COMPACT_NULL(8),
-    INIT_PAGE_FREE_SPACE(
-            PAGE.size - FILE_HEADER.size - PAGE_HEADER.size - INFIMUM.size * 2 - FILE_TRAILER.size - 4,
-            SUPREMUM.offset() + SUPREMUM.size());
+    COMPACT_NULL(8);
+
 
     private final int size;
     private final int offset;
