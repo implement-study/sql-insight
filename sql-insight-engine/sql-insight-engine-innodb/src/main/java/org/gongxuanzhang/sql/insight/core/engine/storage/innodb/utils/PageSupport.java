@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFactory;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
@@ -24,26 +25,28 @@ import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.RootPage;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Supremum;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RowFormatFactory;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
-import org.gongxuanzhang.sql.insight.core.object.Table;
+import org.gongxuanzhang.sql.insight.core.object.Index;
 import org.gongxuanzhang.sql.insight.core.object.UserRecord;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
+@Slf4j
 public class PageSupport {
 
-    public static RootPage getRoot(Table table) {
-        File ibd = new File(table.getDatabase().getDbFolder(), table.getName() + ".ibd");
-        try (FileInputStream fileInputStream = new FileInputStream(ibd)) {
+    public static RootPage getRoot(Index index) {
+        File indexFile = index.getFile();
+        try (FileInputStream fileInputStream = new FileInputStream(indexFile)) {
             byte[] pageByte = ConstantSize.PAGE.emptyBuff();
             if (fileInputStream.read(pageByte) != pageByte.length) {
-                throw new IllegalArgumentException("idb file error [ " + ibd.getAbsoluteFile() + " ]");
+                throw new IllegalArgumentException("idb file error [ " + indexFile.getAbsoluteFile() + " ]");
             }
-            return (RootPage) PageFactory.swap(pageByte, table);
+            return (RootPage) PageFactory.swap(pageByte, index);
         } catch (IOException e) {
             throw new RuntimeIoException(e);
         }
@@ -57,5 +60,26 @@ public class PageSupport {
         return RowFormatFactory.readRecordInPage(page, nextRecordOffset + userRecord.offset(), userRecord.belongTo());
     }
 
+    public static void flushPage(InnoDbPage page) {
+        Index belongIndex = page.getBelongIndex();
+        File indexFile = belongIndex.getFile();
+        try (RandomAccessFile randomAccessFile = new RandomAccessFile(indexFile, "rw")) {
+            long minLength = page.getFileHeader().getOffset() + ConstantSize.PAGE.size();
+            if (randomAccessFile.length() < minLength) {
+                randomAccessFile.setLength(minLength);
+            }
+            randomAccessFile.seek(page.getFileHeader().getOffset());
+            randomAccessFile.write(page.toBytes());
+            log.info("write page to {}", indexFile.getAbsoluteFile());
+        } catch (IOException e) {
+            throw new RuntimeIoException(e);
+        }
+    }
+
+    public static void flushPages(InnoDbPage... pages) {
+        for (InnoDbPage page : pages) {
+            flushPage(page);
+        }
+    }
 
 }

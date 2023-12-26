@@ -73,7 +73,7 @@ public class Compact implements InnodbUserRecord {
 
     Row sourceRow;
 
-    int offsetInPage;
+    int offsetInPage = -1;
 
 
     @Override
@@ -115,14 +115,16 @@ public class Compact implements InnodbUserRecord {
     }
 
 
-
     @Override
-    public int beforeSplitOffset(){
+    public int beforeSplitOffset() {
         return variables.length() + nullList.length() + ConstantSize.RECORD_HEADER.size();
     }
 
     @Override
     public int offset() {
+        if (offsetInPage == -1) {
+            throw new IllegalArgumentException("unknown offset");
+        }
         return offsetInPage;
     }
 

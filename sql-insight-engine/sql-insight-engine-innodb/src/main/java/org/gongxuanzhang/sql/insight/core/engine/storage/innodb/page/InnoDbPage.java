@@ -23,7 +23,7 @@ import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RowFormatFactory;
 import org.gongxuanzhang.sql.insight.core.exception.DuplicationPrimaryKeyException;
-import org.gongxuanzhang.sql.insight.core.object.Table;
+import org.gongxuanzhang.sql.insight.core.object.Index;
 import org.gongxuanzhang.sql.insight.core.object.UserRecord;
 
 /**
@@ -73,10 +73,11 @@ public abstract class InnoDbPage implements ByteWrapper {
 
     byte[] source;
 
-    Table table;
+    Index belongIndex;
 
-    protected InnoDbPage(Table table) {
-        this.table = table;
+    protected InnoDbPage(Index index) {
+        this.belongIndex = index;
+
     }
 
     @Override
@@ -157,7 +158,7 @@ public abstract class InnoDbPage implements ByteWrapper {
         if (offsetInPage == ConstantSize.SUPREMUM.offset()) {
             return this.supremum;
         }
-        return RowFormatFactory.readRecordInPage(this, offsetInPage, table);
+        return RowFormatFactory.readRecordInPage(this, offsetInPage, this.belongIndex.belongTo());
     }
 
 

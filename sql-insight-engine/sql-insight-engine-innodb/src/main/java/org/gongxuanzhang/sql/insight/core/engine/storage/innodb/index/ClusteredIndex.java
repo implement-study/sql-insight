@@ -29,6 +29,8 @@ import org.gongxuanzhang.sql.insight.core.object.Cursor;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
+import java.io.File;
+
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -38,7 +40,7 @@ public class ClusteredIndex extends InnodbIndex {
 
     private AutoIncrementKeyCounter autoIncrementKeyCounter;
 
-    protected ClusteredIndex(Table table) {
+    public ClusteredIndex(Table table) {
         super(table);
     }
 
@@ -61,17 +63,28 @@ public class ClusteredIndex extends InnodbIndex {
     }
 
     @Override
+    public final String getName() {
+        return "";
+    }
+
+    @Override
     public void insert(InsertRow row) {
         if (this.autoIncrementKeyCounter.dealAutoIncrement(row)) {
             log.info("auto increment primary key {}",
                     table.getColumnList().get(table.getExt().getAutoColIndex()).getName());
         }
         Compact compact = RowFormatFactory.compactFromInsertRow(row);
-        RootPage root = getRoot();
+        RootPage root = getIndexRoot();
         if (compact.length() >= Constant.COMPACT_MAX_ROW_LENGTH) {
             throw new DataTooLongException("compact row can't greater than " + Constant.COMPACT_MAX_ROW_LENGTH);
         }
         root.insertData(compact);
+    }
+
+    @Override
+    public File getFile() {
+        File dbFolder = this.table.getDatabase().getDbFolder();
+        return new File(dbFolder, this.table.getName() + ".idb");
     }
 
 

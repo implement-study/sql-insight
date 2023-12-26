@@ -17,20 +17,26 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
-import org.gongxuanzhang.sql.insight.core.object.Table;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport;
+import org.gongxuanzhang.sql.insight.core.object.Index;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
 public class DataPage extends InnoDbPage {
 
-    public DataPage(Table table) {
-        super(table);
+    public DataPage(Index index) {
+        super(index);
     }
 
 
     @Override
     public void insertData(Compact data) {
 
+    }
+
+
+    public InnodbUserRecord firstData() {
+        return PageSupport.getNextUserRecord(this, infimum);
     }
 }

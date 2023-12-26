@@ -10,9 +10,9 @@ public abstract class FileHeaderFactory {
 
 
     /**
-     * root page file header
+     * create a empty file header
      **/
-    public static FileHeader rootFileHeader() {
+    public static FileHeader createFileHeader() {
         FileHeader fileHeader = new FileHeader();
         fileHeader.setNext(0);
         fileHeader.setPre(0);

@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
-
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
-import org.gongxuanzhang.sql.insight.core.object.Index;
+package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class IndexPage extends InnoDbPage {
+public class IndexHeader extends RecordHeader {
 
-    public IndexPage(Index index) {
-        super(index);
+    public IndexHeader() {
+        this.setRecordType(RecordType.PAGE);
+        this.setHeapNo(1);
+        this.setDelete(false);
+        this.setNOwned(1);
+        this.setNextRecordOffset(0);
     }
 
-    @Override
-    public void insertData(Compact data) {
-
-    }
 }

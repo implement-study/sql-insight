@@ -18,6 +18,8 @@ package org.gongxuanzhang.sql.insight.core.object;
 
 import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
 
+import java.io.File;
+
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
@@ -48,9 +50,19 @@ public interface Index {
     Cursor find(SessionContext sessionContext);
 
     /**
+     * index name
+     **/
+    String getName();
+
+    /**
      * insert row to index
      *
      * @param row row
      **/
     void insert(InsertRow row);
+
+    /**
+     * Index file
+     **/
+    File getFile();
 }

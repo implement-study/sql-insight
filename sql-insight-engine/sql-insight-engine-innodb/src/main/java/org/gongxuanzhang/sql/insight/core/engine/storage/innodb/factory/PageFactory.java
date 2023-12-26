@@ -2,9 +2,11 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.ClusteredIndex;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.*;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
+import org.gongxuanzhang.sql.insight.core.object.Index;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
 import java.io.File;
@@ -30,12 +32,13 @@ public abstract class PageFactory {
      * create idb file and add a root page .
      **/
     public static void initialization(Table table) {
-        File primaryFile = new File(table.getDatabase().getDbFolder(), table.getName() + ".idb");
+        ClusteredIndex clusteredIndex = new ClusteredIndex(table);
+        File primaryFile = clusteredIndex.getFile();
         try {
             if (!primaryFile.createNewFile()) {
                 log.warn("{} already exists , execute create table will overwrite file", primaryFile.getAbsoluteFile());
             }
-            InnoDbPage root = createRoot(table);
+            InnoDbPage root = createRoot(clusteredIndex);
             Files.write(primaryFile.toPath(), root.toBytes());
         } catch (IOException e) {
             throw new RuntimeIoException(e);
@@ -49,8 +52,8 @@ public abstract class PageFactory {
      * @param recordList data in the page that sorted
      * @return the data page but the file header , page header is not complete
      **/
-    public static DataPage createDataPage(List<InnodbUserRecord> recordList, Table table) {
-        DataPage dataPage = new DataPage(table);
+    public static DataPage createDataPage(List<InnodbUserRecord> recordList, Index index) {
+        DataPage dataPage = new DataPage(index);
         FileHeader fileHeader = new FileHeader();
         fileHeader.setPageType(PageType.FIL_PAGE_INDEX.getValue());
         dataPage.setFileHeader(fileHeader);
@@ -96,8 +99,8 @@ public abstract class PageFactory {
     /**
      * swap byte array to page
      **/
-    public static InnoDbPage swap(byte[] bytes, Table table) {
-        InnoDbPage bean = new RootPage(table);
+    public static InnoDbPage swap(byte[] bytes, Index index) {
+        InnoDbPage bean = new RootPage(index);
         ConstantSize.PAGE.checkSize(bytes);
 
         DynamicByteBuffer buffer = DynamicByteBuffer.wrap(bytes);
@@ -137,10 +140,10 @@ public abstract class PageFactory {
         return bean;
     }
 
-    private static RootPage createRoot(Table table) {
-        RootPage root = new RootPage(table);
-        root.setFileHeader(FileHeaderFactory.rootFileHeader());
-        root.setPageHeader(PageHeaderFactory.rootPageHeader());
+    private static RootPage createRoot(Index index) {
+        RootPage root = new RootPage(index);
+        root.setFileHeader(FileHeaderFactory.createFileHeader());
+        root.setPageHeader(PageHeaderFactory.createPageHeader());
         root.setInfimum(new Infimum());
         root.setSupremum(new Supremum());
         root.setUserRecords(new UserRecords());

@@ -34,8 +34,8 @@ public interface InnodbBTree extends Index {
      *
      * @return not null
      **/
-    default RootPage getRoot() {
-        return PageSupport.getRoot(belongTo());
+    default RootPage getIndexRoot() {
+        return PageSupport.getRoot(this);
     }
 
     /**

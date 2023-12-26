@@ -1,17 +1,21 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 import lombok.extern.slf4j.Slf4j;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFactory;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageHeaderFactory;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.IndexRecord;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordType;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.RowComparator;
-import org.gongxuanzhang.sql.insight.core.object.Table;
+import org.gongxuanzhang.sql.insight.core.object.Index;
+import org.gongxuanzhang.sql.insight.core.object.value.Value;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFactory.createDataPage;
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Constant.DIRECTION_COUNT_THRESHOLD;
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Constant.SLOT_MAX_COUNT;
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport.getNextUserRecord;
@@ -28,8 +32,8 @@ import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.Pag
 public class RootPage extends InnoDbPage {
 
 
-    public RootPage(Table table) {
-        super(table);
+    public RootPage(Index index) {
+        super(index);
     }
 
     @Override
@@ -94,21 +98,41 @@ public class RootPage extends InnoDbPage {
         for (int i = 0; i < pageUserRecord.size(); i++) {
             allLength -= pageUserRecord.get(i).length();
             if (allLength <= half) {
-                DataPage first = PageFactory.createDataPage(pageUserRecord.subList(0, i), table);
-                DataPage second = PageFactory.createDataPage(pageUserRecord.subList(i, pageUserRecord.size()), table);
-                FileHeader firstFileHeader = first.getFileHeader();
-                FileHeader secondFileHeader = second.getFileHeader();
+                DataPage firstDataPage = createDataPage(pageUserRecord.subList(0, i), this.belongIndex);
+                DataPage secondDataPage = createDataPage(pageUserRecord.subList(i, pageUserRecord.size()), belongIndex);
+                firstDataPage.getPageHeader().setLevel((short) 1);
+                secondDataPage.getPageHeader().setLevel((short) 1);
+                FileHeader firstFileHeader = firstDataPage.getFileHeader();
+                FileHeader secondFileHeader = secondDataPage.getFileHeader();
                 firstFileHeader.setOffset(2 * ConstantSize.PAGE.size());
                 secondFileHeader.setOffset(3 * ConstantSize.PAGE.size());
-
                 firstFileHeader.setPre(-1);
                 firstFileHeader.setNext(3 * ConstantSize.PAGE.size());
-
                 secondFileHeader.setPre(firstFileHeader.offset);
                 secondFileHeader.setNext(-1);
+
+                //  transfer to index page
+                this.fileHeader.next = firstDataPage.getFileHeader().offset;
+                this.fileHeader.pageType = PageType.FIL_PAGE_INODE.getValue();
+                this.pageHeader = PageHeaderFactory.createPageHeader();
+                //   todo second index
+                String primaryKeyName = this.belongIndex.belongTo().getExt().getPrimaryKeyName();
+
+                Value firstKey = firstDataPage.firstData().getValueByColumnName(primaryKeyName);
+                Value secondKey = secondDataPage.firstData().getValueByColumnName(primaryKeyName);
+                this.insertIndexRecord(new SingleIndexRecord(firstDataPage, firstKey));
+                this.insertIndexRecord(new SingleIndexRecord(secondDataPage, secondKey));
+                PageSupport.flushPages(this, firstDataPage, secondDataPage);
+
+
                 return;
             }
         }
+
+    }
+
+
+    private void insertIndexRecord(IndexRecord indexRecord) {
 
     }
 

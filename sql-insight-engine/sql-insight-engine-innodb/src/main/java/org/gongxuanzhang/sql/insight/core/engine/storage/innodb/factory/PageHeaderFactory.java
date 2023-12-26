@@ -10,17 +10,17 @@ public abstract class PageHeaderFactory {
 
 
     /**
-     * root node file header
+     * create a empty page header
      **/
-    public static PageHeader rootPageHeader() {
+    public static PageHeader createPageHeader() {
         PageHeader pageHeader = new PageHeader();
         pageHeader.setSlotCount((short) 2);
-        pageHeader.setHeapTop(rootHeapTop());
+        pageHeader.setHeapTop(createHeapTop());
         pageHeader.setAbsoluteRecordCount((short) 2);
         pageHeader.setRecordCount((short) 0);
         pageHeader.setFree((short) 0);
         pageHeader.setGarbage((short) 0);
-        pageHeader.setLastInsertOffset(rootHeapTop());
+        pageHeader.setLastInsertOffset(createHeapTop());
         pageHeader.setLevel((short) 0);
         pageHeader.setDirection((short) 0);
         pageHeader.setDirectionCount((short) 0);
@@ -33,9 +33,9 @@ public abstract class PageHeaderFactory {
 
 
     /**
-     * root heap top offset
+     * create heap top offset
      **/
-    private static short rootHeapTop() {
+    private static short createHeapTop() {
         return (short) (ConstantSize.FILE_HEADER.size() +
                 ConstantSize.PAGE_HEADER.size() +
                 ConstantSize.INFIMUM.size() +
