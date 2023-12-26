@@ -75,16 +75,23 @@ public class RowFormatFactory {
     }
 
 
-    public static InnodbUserRecord reaRecordInPage(InnoDbPage page, int offset, Table table) {
-        if (ConstantSize.INFIMUM.offset() == offset) {
+    /**
+     * read page source solve a user record.
+     * the offset is offset in page.
+     * offset is after record header .in other words offset - record header size  means record header offset
+     *
+     **/
+    public static InnodbUserRecord readRecordInPage(InnoDbPage page, int offsetInPage, Table table) {
+        if (ConstantSize.INFIMUM.offset() == offsetInPage) {
             return page.getInfimum();
         }
-        if (ConstantSize.SUPREMUM.offset() == offset) {
+        if (ConstantSize.SUPREMUM.offset() == offsetInPage) {
             return page.getSupremum();
         }
         Compact compact = new Compact();
-        compact.setRecordHeader(readRecordHeader(page, offset));
-        fillNullAndVar(page, offset, compact, table);
+        compact.setOffsetInPage(offsetInPage);
+        compact.setRecordHeader(readRecordHeader(page, offsetInPage));
+        fillNullAndVar(page, offsetInPage, compact, table);
         int variableLength = compact.getVariables().variableLength();
         int fixLength = compactFixLength(compact, table);
         byte[] body = new byte[variableLength + fixLength];
@@ -96,7 +103,7 @@ public class RowFormatFactory {
 
     /**
      * @param page   innodb page
-     * @param offset record header offset
+     * @param offset record offset, the record header offset = offset - record header size
      * @return record
      **/
     public static RecordHeader readRecordHeader(InnoDbPage page, int offset) {
@@ -104,6 +111,7 @@ public class RowFormatFactory {
         ByteBuffer buffer = ByteBuffer.wrap(page.getSource(), offset - recordHeaderSize, recordHeaderSize);
         return new RecordHeader(buffer.array());
     }
+
 
 
     /**

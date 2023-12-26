@@ -3,6 +3,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordType;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.RowComparator;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
@@ -92,7 +93,6 @@ public class RootPage extends InnoDbPage {
         for (int i = 0; i < pageUserRecord.size(); i++) {
             allLength -= pageUserRecord.get(i).length();
             if (allLength <= half) {
-
                 List<InnodbUserRecord> preData = pageUserRecord.subList(0, i);
                 List<InnodbUserRecord> nextData = pageUserRecord.subList(i, pageUserRecord.size());
             }
@@ -103,9 +103,12 @@ public class RootPage extends InnoDbPage {
     private void linkedInsertRow(InnodbUserRecord pre, Compact insertCompact, InnodbUserRecord next) {
         RecordHeader insertHeader = new RecordHeader();
         insertHeader.setHeapNo(this.pageHeader.absoluteRecordCount);
-        insertHeader.setNextRecordOffset(next.offset() + insertCompact.getBody().length);
-        pre.getRecordHeader().setNextRecordOffset(insertCompact.offset() );
+        insertCompact.setOffsetInPage(this.pageHeader.lastInsertOffset + insertCompact.beforeSplitOffset());
+        insertHeader.setNextRecordOffset(next.offset() - insertCompact.offset());
+        pre.getRecordHeader().setNextRecordOffset(insertCompact.offset() - pre.offset());
+        insertHeader.setRecordType(RecordType.NORMAL);
         insertCompact.setRecordHeader(insertHeader);
+
         //  adjust page
         this.userRecords.addRecord(insertCompact);
         this.pageHeader.absoluteRecordCount++;
@@ -114,6 +117,7 @@ public class RootPage extends InnoDbPage {
         this.pageHeader.heapTop += (short) insertCompact.length();
         this.pageHeader.lastInsertOffset += (short) insertCompact.length();
 
+
         //  adjust group
         while (next.getRecordHeader().getNOwned() == 0) {
             next = getNextUserRecord(this, next);
@@ -121,19 +125,20 @@ public class RootPage extends InnoDbPage {
         RecordHeader recordHeader = next.getRecordHeader();
         int groupCount = recordHeader.getNOwned();
         recordHeader.setNOwned(groupCount + 1);
-        if (next.getRecordHeader().getNOwned() > SLOT_MAX_COUNT) {
-            log.info("start group split ...");
-            for (int i = 0; i < this.pageDirectory.slots.length - 1; i++) {
-                if (this.pageDirectory.slots[i] == next.offset()) {
-                    InnodbUserRecord preGroupMax = getUserRecordByOffset(this.pageDirectory.slots[i + 1]);
-                    for (int j = 0; j < SLOT_MAX_COUNT >> 1; j++) {
-                        preGroupMax = getNextUserRecord(this, preGroupMax);
-                    }
-                    this.pageDirectory.split(i, (short) preGroupMax.offset());
-                }
-            }
-            log.info("end group split ...");
+        if (next.getRecordHeader().getNOwned() <= SLOT_MAX_COUNT) {
+            return;
         }
+        log.info("start group split ...");
+        for (int i = 0; i < this.pageDirectory.slots.length - 1; i++) {
+            if (this.pageDirectory.slots[i] == next.offset()) {
+                InnodbUserRecord preGroupMax = getUserRecordByOffset(this.pageDirectory.slots[i + 1]);
+                for (int j = 0; j < SLOT_MAX_COUNT >> 1; j++) {
+                    preGroupMax = getNextUserRecord(this, preGroupMax);
+                }
+                this.pageDirectory.split(i, (short) preGroupMax.offset());
+            }
+        }
+        log.info("end group split ...");
     }
 
 

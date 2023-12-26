@@ -54,7 +54,7 @@ public class PageSupport {
             throw new NullPointerException("supremum is max record in page");
         }
         int nextRecordOffset = userRecord.nextRecordOffset();
-        return RowFormatFactory.reaRecordInPage(page, nextRecordOffset, userRecord.belongTo());
+        return RowFormatFactory.readRecordInPage(page, nextRecordOffset + userRecord.offset(), userRecord.belongTo());
     }
 
 

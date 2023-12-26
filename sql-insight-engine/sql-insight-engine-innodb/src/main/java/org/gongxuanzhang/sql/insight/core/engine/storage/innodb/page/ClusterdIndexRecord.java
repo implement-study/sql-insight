@@ -43,14 +43,14 @@ public class ClusterdIndexRecord implements InnodbUserRecord {
 
     private final Value primaryKeyValue;
 
-    private final int pageOffset;
+    private final int nextIndexOffset;
 
     public ClusterdIndexRecord(InnodbUserRecord dataRecord, InnoDbPage dataPage) {
         table = dataRecord.belongTo();
         List<Column> columnList = table.getColumnList();
         this.primaryKey = columnList.get(table.getExt().getPrimaryKeyIndex());
         this.primaryKeyValue = dataRecord.getValueByColumnName(primaryKey.getName());
-        this.pageOffset = dataPage.fileHeader.offset;
+        this.nextIndexOffset = dataPage.fileHeader.offset;
     }
 
     @Override
@@ -80,14 +80,16 @@ public class ClusterdIndexRecord implements InnodbUserRecord {
     public byte[] rowBytes() {
         DynamicByteBuffer buffer = DynamicByteBuffer.wrap(recordHeader.toBytes());
         buffer.append(this.primaryKeyValue.toBytes());
-        buffer.appendInt(this.pageOffset);
+        buffer.appendInt(this.nextIndexOffset);
         return buffer.toBytes();
     }
 
     @Override
     public int offset() {
-        return this.pageOffset;
+        //   todo
+        return 0;
     }
+
 
     @Override
     public int nextRecordOffset() {

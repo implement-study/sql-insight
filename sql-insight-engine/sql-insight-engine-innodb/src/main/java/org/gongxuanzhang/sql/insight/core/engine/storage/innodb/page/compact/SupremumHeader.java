@@ -14,25 +14,19 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
-
-import org.gongxuanzhang.easybyte.core.ByteWrapper;
-import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
+package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class UserRecords implements ByteWrapper {
+public class SupremumHeader extends RecordHeader {
 
-    byte[] body;
-
-
-    @Override
-    public byte[] toBytes() {
-        return this.body;
+    public SupremumHeader(){
+        this.setRecordType(RecordType.SUPREMUM);
+        this.setHeapNo(1);
+        this.setDelete(false);
+        this.setNOwned(1);
+        this.setNextRecordOffset(0);
     }
 
-    public void addRecord(InnodbUserRecord userRecord) {
-        this.body = DynamicByteBuffer.wrap(body).append(userRecord.toBytes()).toBytes();
-    }
 }

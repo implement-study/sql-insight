@@ -63,10 +63,10 @@ public class RecordHeader implements ByteWrapper, PageObject {
     }
 
     private void initType() {
-        int type = source[2] & 0x07;
-        for (RecordType recordType : RecordType.values()) {
-            if (recordType.value == type) {
-                this.recordType = recordType;
+        int typeValue = source[2] & 0x07;
+        for (RecordType type : RecordType.values()) {
+            if (type.value == typeValue) {
+                this.recordType = type;
                 return;
             }
         }
@@ -125,8 +125,8 @@ public class RecordHeader implements ByteWrapper, PageObject {
             return this;
         }
         //  清零source[0]的后四位
-        this.source[0] &= 0xF0;
-        this.source[0] |= nOwned;
+        this.source[0] &= (byte) 0xF0;
+        this.source[0] |= (byte) nOwned;
         this.nOwned = nOwned;
         return this;
     }
@@ -160,8 +160,8 @@ public class RecordHeader implements ByteWrapper, PageObject {
         }
         this.recordType = recordType;
         // 后三位置0
-        this.source[2] &= 0b11111000;
-        this.source[2] |= recordType.value;
+        this.source[2] &= (byte) 0b11111000;
+        this.source[2] |= (byte) recordType.value;
         return this;
     }
 

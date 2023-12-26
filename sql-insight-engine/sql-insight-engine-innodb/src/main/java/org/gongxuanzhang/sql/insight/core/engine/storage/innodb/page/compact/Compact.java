@@ -73,6 +73,8 @@ public class Compact implements InnodbUserRecord {
 
     Row sourceRow;
 
+    int offsetInPage;
+
 
     @Override
     public byte[] rowBytes() {
@@ -112,9 +114,18 @@ public class Compact implements InnodbUserRecord {
         return variables.length() + nullList.length() + ConstantSize.RECORD_HEADER.size() + body.length;
     }
 
+
+    /**
+     * next record offset is relative offset.
+     * offset is after header.
+     **/
+    public int beforeSplitOffset(){
+        return variables.length() + nullList.length() + ConstantSize.RECORD_HEADER.size();
+    }
+
     @Override
     public int offset() {
-        return variables.length() + nullList.length() + ConstantSize.RECORD_HEADER.size();
+        return offsetInPage;
     }
 
     @Override

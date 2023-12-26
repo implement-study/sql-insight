@@ -34,7 +34,7 @@ public interface UserRecord extends ByteWrapper, Row {
 
 
     /**
-     * absolute offset in page
+     * absolute offset in page， field not in page , application calculate
      **/
     int offset();
 

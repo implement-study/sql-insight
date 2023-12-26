@@ -147,17 +147,17 @@ public abstract class InnoDbPage implements ByteWrapper {
     }
 
     /**
-     * @param offset offset in page
+     * @param offsetInPage offset in page
      * @return user record
      **/
-    protected InnodbUserRecord getUserRecordByOffset(short offset) {
-        if (offset == ConstantSize.INFIMUM.offset()) {
+    protected InnodbUserRecord getUserRecordByOffset(short offsetInPage) {
+        if (offsetInPage == ConstantSize.INFIMUM.offset()) {
             return this.infimum;
         }
-        if (offset == ConstantSize.SUPREMUM.offset()) {
+        if (offsetInPage == ConstantSize.SUPREMUM.offset()) {
             return this.supremum;
         }
-        return RowFormatFactory.reaRecordInPage(this, offset, table);
+        return RowFormatFactory.readRecordInPage(this, offsetInPage, table);
     }
 
 
