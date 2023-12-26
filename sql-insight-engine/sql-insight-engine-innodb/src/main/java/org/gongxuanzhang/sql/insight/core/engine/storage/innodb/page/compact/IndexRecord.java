@@ -60,4 +60,5 @@ public interface IndexRecord extends InnodbUserRecord {
         return this.getRecordHeader().getNextRecordOffset();
     }
 
+
 }

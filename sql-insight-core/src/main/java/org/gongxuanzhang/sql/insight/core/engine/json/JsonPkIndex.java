@@ -24,6 +24,7 @@ import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -71,8 +72,18 @@ public class JsonPkIndex implements Index {
     }
 
     @Override
+    public String getName() {
+        return "json";
+    }
+
+    @Override
     public void insert(InsertRow row) {
         throw new UnsupportedOperationException("json engine index dont support insert");
+    }
+
+    @Override
+    public File getFile() {
+        return this.jsonFilePath.toFile();
     }
 
 

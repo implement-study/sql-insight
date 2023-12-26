@@ -20,8 +20,11 @@ import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.IndexHeader;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.IndexRecord;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
+import org.gongxuanzhang.sql.insight.core.object.Index;
+import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * unique column only one.
@@ -33,7 +36,7 @@ public class SingleIndexRecord implements IndexRecord {
 
     private final RecordHeader recordHeader;
 
-    private final Table table;
+    private final Index index;
 
     private final Value uniqueValue;
 
@@ -46,14 +49,14 @@ public class SingleIndexRecord implements IndexRecord {
 
     public SingleIndexRecord(SingleIndexRecord childIndex) {
         this.recordHeader = new IndexHeader();
-        this.table = childIndex.table;
+        this.index = childIndex.index;
         this.uniqueValue = childIndex.uniqueValue;
         this.pointer = childIndex.offset();
     }
 
     public SingleIndexRecord(InnoDbPage dataPage, Value uniqueValue) {
         this.recordHeader = new IndexHeader();
-        this.table = dataPage.table;
+        this.index = dataPage.belongIndex;
         this.uniqueValue = uniqueValue;
         this.pointer = dataPage.fileHeader.offset;
     }
@@ -61,7 +64,7 @@ public class SingleIndexRecord implements IndexRecord {
 
     @Override
     public Table belongTo() {
-        return this.table;
+        return this.index.belongTo();
     }
 
     @Override
@@ -93,5 +96,16 @@ public class SingleIndexRecord implements IndexRecord {
     @Override
     public int length() {
         return this.recordHeader.length() + uniqueValue.getLength() + Integer.BYTES;
+    }
+
+    @Override
+    public int compareTo(@NotNull Row that) {
+        if (!(that instanceof SingleIndexRecord)) {
+            throw new IllegalArgumentException();
+        }
+        if (((SingleIndexRecord) that).index != this.index) {
+            throw new IllegalArgumentException();
+        }
+        return this.uniqueValue.compareTo(((SingleIndexRecord) that).uniqueValue);
     }
 }

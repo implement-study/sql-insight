@@ -123,8 +123,6 @@ public class RootPage extends InnoDbPage {
                 this.insertIndexRecord(new SingleIndexRecord(firstDataPage, firstKey));
                 this.insertIndexRecord(new SingleIndexRecord(secondDataPage, secondKey));
                 PageSupport.flushPages(this, firstDataPage, secondDataPage);
-
-
                 return;
             }
         }
@@ -133,6 +131,10 @@ public class RootPage extends InnoDbPage {
 
 
     private void insertIndexRecord(IndexRecord indexRecord) {
+        if (this.pageType() != PageType.FIL_PAGE_INODE) {
+            throw new IllegalStateException();
+        }
+
 
     }
 
