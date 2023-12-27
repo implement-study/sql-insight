@@ -18,15 +18,12 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFactory;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.InnodbIndex;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnodbUserRecord;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.RootPage;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Supremum;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RowFormatFactory;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.object.Index;
-import org.gongxuanzhang.sql.insight.core.object.UserRecord;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,14 +49,26 @@ public class PageSupport {
         }
     }
 
-    @Deprecated
-    public static InnodbUserRecord getNextUserRecord(InnoDbPage page, UserRecord userRecord) {
-        if (userRecord instanceof Supremum) {
-            throw new NullPointerException("supremum is max record in page");
+
+    /**
+     * extension index file page count * page size.
+     *
+     * @return offset namely length of file before extension.
+     **/
+    public static int allocatePage(InnodbIndex index, int pageCount) {
+        try (RandomAccessFile randomAccessFile = new RandomAccessFile(index.getFile(), "rw")) {
+            long currentLength = randomAccessFile.length();
+            randomAccessFile.setLength(currentLength + (long) ConstantSize.PAGE_HEADER.size() * pageCount);
+            return (int) currentLength;
+        } catch (IOException e) {
+            throw new RuntimeIoException(e);
         }
-        int nextRecordOffset = userRecord.nextRecordOffset();
-        return RowFormatFactory.readRecordInPage(page, nextRecordOffset + userRecord.offset(), userRecord.belongTo());
     }
+
+    public static int allocatePage(InnodbIndex index) {
+        return allocatePage(index, 1);
+    }
+
 
     public static void flushPage(InnoDbPage page) {
         Index belongIndex = page.getExt().getBelongIndex();

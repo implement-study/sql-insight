@@ -35,16 +35,17 @@ public class IndexNode implements PageObject, ByteWrapper {
 
     private final Value[] key;
 
-    int pointer;
+    private final int pointer;
 
 
-    public IndexNode(Value[] key) {
+    public IndexNode(Value[] key, int pointer) {
         this.key = key;
         int candidate = 0;
         for (Value value : key) {
             candidate += value.getLength();
         }
         this.length = candidate;
+        this.pointer = pointer;
     }
 
     @Override

@@ -22,6 +22,8 @@ import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.InnodbInde
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.IndexRecord;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RowFormatFactory;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.RowComparator;
 import org.gongxuanzhang.sql.insight.core.object.Column;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
 
@@ -83,6 +85,11 @@ public class DataPage extends InnoDbPage {
      * middle split.
      * insert direction unidentified (directionCount less than 5)
      *
+     * if this page is root page.
+     * transfer root page to index page from data page.
+     * create two data page linked.
+     * if this page is normal leaf node,
+     * create a data page append to index file and insert a index record to parent (index page)
      * @param pageUserRecord all user record in page with inserted
      * @param allLength      all user record length
      **/
@@ -108,10 +115,11 @@ public class DataPage extends InnoDbPage {
             secondDataPage.getPageHeader().setLevel((short) 1);
             FileHeader firstFileHeader = firstDataPage.getFileHeader();
             FileHeader secondFileHeader = secondDataPage.getFileHeader();
-            firstFileHeader.setOffset(2 * ConstantSize.PAGE.size());
-            secondFileHeader.setOffset(3 * ConstantSize.PAGE.size());
+            int offset = PageSupport.allocatePage(this.ext.belongIndex, 2);
+            firstFileHeader.setOffset(offset);
+            secondFileHeader.setOffset(offset + ConstantSize.PAGE.size());
             firstFileHeader.setPre(-1);
-            firstFileHeader.setNext(3 * ConstantSize.PAGE.size());
+            firstFileHeader.setNext(secondFileHeader.offset);
             secondFileHeader.setPre(firstFileHeader.offset);
             secondFileHeader.setNext(-1);
             //  transfer to index page
@@ -119,8 +127,14 @@ public class DataPage extends InnoDbPage {
             this.fileHeader.pageType = PageType.FIL_PAGE_INODE.getValue();
             this.pageHeader = PageHeaderFactory.createPageHeader();
             this.pageDirectory = new PageDirectory();
+            //  clear user record
+            this.userRecords = new UserRecords();
             this.insertData(firstDataPage.pageIndex());
             this.insertData(secondDataPage.pageIndex());
+        }else{
+            // normal leaf node
+            firstDataPage.fileHeader.setOffset(this.fileHeader.offset);
+
         }
     }
 
@@ -132,7 +146,11 @@ public class DataPage extends InnoDbPage {
                 .map(Column::getName)
                 .map(firstData::getValueByColumnName)
                 .toArray(Value[]::new);
-        return new IndexRecord(new IndexNode(values), this.ext.belongIndex);
+        return new IndexRecord(new IndexNode(values,this.fileHeader.offset), this.ext.belongIndex);
     }
 
+    @Override
+    public int compare(InnodbUserRecord o1, InnodbUserRecord o2) {
+        return RowComparator.primaryKeyComparator().compare(o1, o2);
+    }
 }

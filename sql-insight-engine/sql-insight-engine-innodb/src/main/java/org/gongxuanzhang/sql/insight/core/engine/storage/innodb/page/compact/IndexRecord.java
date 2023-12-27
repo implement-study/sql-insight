@@ -42,9 +42,13 @@ public class IndexRecord implements InnodbUserRecord {
     private int offsetInPage = -1;
 
     public IndexRecord(IndexNode indexNode, Index index) {
-        this.indexNode = indexNode;
+        this(new IndexHeader(), indexNode, index);
+    }
+
+    public IndexRecord(RecordHeader recordHeader, IndexNode indexNode, Index index) {
+        this.recordHeader = recordHeader;
         this.index = index;
-        this.recordHeader = new IndexHeader();
+        this.indexNode = indexNode;
     }
 
 

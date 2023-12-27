@@ -18,38 +18,54 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.InnodbIndex;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.IndexRecord;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RowFormatFactory;
+import org.gongxuanzhang.sql.insight.core.object.Column;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
+import org.gongxuanzhang.sql.insight.core.object.value.ValueNegotiator;
 
-import java.util.Comparator;
+import java.nio.ByteBuffer;
+import java.util.List;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class IndexPage extends InnoDbPage implements Comparator<IndexRecord> {
+public class IndexPage extends InnoDbPage {
 
     public IndexPage(InnodbIndex index) {
         super(index);
     }
 
-    @Override
-    public void insertData(InnodbUserRecord data) {
-
-    }
 
     @Override
-    protected InnodbUserRecord wrapUserRecord(int offsetInPage) {
-        return null;
+    protected IndexRecord wrapUserRecord(int offsetInPage) {
+        //  todo dynamic primary key
+        List<Column> columns = this.ext.belongIndex.columns();
+        RecordHeader recordHeader = RowFormatFactory.readRecordHeader(this, offsetInPage);
+        Value[] key = new Value[columns.size()];
+        ByteBuffer buffer = ByteBuffer.wrap(this.ext.source, offsetInPage, this.ext.source.length - offsetInPage);
+        for (int i = 0; i < key.length; i++) {
+            Column column = columns.get(i);
+            byte[] valueArr = new byte[column.getDataType().getLength()];
+            buffer.get(valueArr);
+            key[i] = ValueNegotiator.wrapValue(column, valueArr);
+        }
+        return new IndexRecord(recordHeader, new IndexNode(key, buffer.getInt()), this.ext.belongIndex);
     }
 
     @Override
     protected void splitIfNecessary() {
-
+        //  index page split
     }
 
+
     @Override
-    public int compare(IndexRecord o1, IndexRecord o2) {
-        Value[] values1 = o1.indexNode().getKey();
-        Value[] values2 = o2.indexNode().getKey();
+    public int compare(InnodbUserRecord o1, InnodbUserRecord o2) {
+        if (!(o1 instanceof IndexRecord)) {
+            throw new IllegalArgumentException("index page only support compare index record");
+        }
+        Value[] values1 = ((IndexRecord) o1).indexNode().getKey();
+        Value[] values2 = ((IndexRecord) o2).indexNode().getKey();
         for (int i = 0; i < values1.length; i++) {
             int compare = values1[i].compareTo(values2[i]);
             if (compare != 0) {

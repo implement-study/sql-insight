@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author gongxuanzhangmelt@gmail.com
  **/
 @Slf4j
+@Deprecated
 public class RootPage extends InnoDbPage {
 
 
@@ -46,6 +47,11 @@ public class RootPage extends InnoDbPage {
     @Override
     protected void splitIfNecessary() {
 
+    }
+
+    @Override
+    public int compare(InnodbUserRecord o1, InnodbUserRecord o2) {
+        return 0;
     }
 
 //    public void insertData(Compact compact) {

@@ -26,6 +26,8 @@ import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Rec
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordType;
 import org.gongxuanzhang.sql.insight.core.exception.DuplicationPrimaryKeyException;
 
+import java.util.Comparator;
+
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Constant.SLOT_MAX_COUNT;
 
 /**
@@ -37,7 +39,7 @@ import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Cons
 
 @Data
 @Slf4j
-public abstract class InnoDbPage implements ByteWrapper {
+public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRecord> {
 
 
     /**
@@ -116,8 +118,7 @@ public abstract class InnoDbPage implements ByteWrapper {
         int targetSlot = findTargetSlot(data);
         InnodbUserRecord pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot - 1));
         InnodbUserRecord next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset());
-        //   todo comparator
-        while (data.compareTo(next) > 0) {
+        while (this.compare(data,next) > 0) {
             pre = next;
             next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset());
         }
