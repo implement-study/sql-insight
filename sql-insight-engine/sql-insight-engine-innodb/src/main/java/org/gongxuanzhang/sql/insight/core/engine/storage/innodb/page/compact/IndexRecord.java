@@ -16,49 +16,112 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
 
+import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.IndexNode;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnodbUserRecord;
+import org.gongxuanzhang.sql.insight.core.object.Index;
+import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public interface IndexRecord extends InnodbUserRecord {
+public class IndexRecord implements InnodbUserRecord {
 
 
-    @Override
-    default List<Value> getValues() {
-        throw new UnsupportedOperationException("index record not support ");
+    private final RecordHeader recordHeader;
+
+    private final Index index;
+
+    private final IndexNode indexNode;
+
+    private int offsetInPage = -1;
+
+    public IndexRecord(IndexNode indexNode, Index index) {
+        this.indexNode = indexNode;
+        this.index = index;
+        this.recordHeader = new IndexHeader();
+    }
+
+
+    /**
+     * a index record body is a index node
+     **/
+    public IndexNode indexNode() {
+        return this.indexNode;
     }
 
     @Override
-    default long getRowId() {
+    public List<Value> getValues() {
+        return Arrays.asList(indexNode.getKey());
+    }
+
+    @Override
+    public long getRowId() {
         return -1;
     }
 
     @Override
-    default Value getValueByColumnName(String colName) {
-        throw new UnsupportedOperationException("index record not support ");
+    public Value getValueByColumnName(String colName) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Table belongTo() {
+        return this.index.belongTo();
+    }
+
+
+    @NotNull
+    @Override
+    public RecordHeader getRecordHeader() {
+        return this.recordHeader;
+    }
+
+    @Override
+    public int beforeSplitOffset() {
+        return this.recordHeader.length();
     }
 
 
     @Override
-    default int beforeSplitOffset() {
-        return getRecordHeader().length();
+    public boolean deleteSign() {
+        return this.recordHeader.isDelete();
     }
 
 
     @Override
-    default boolean deleteSign() {
-        return false;
+    public byte[] rowBytes() {
+        DynamicByteBuffer buffer = DynamicByteBuffer.wrap(recordHeader.toBytes());
+        buffer.append(this.indexNode.toBytes());
+        return buffer.toBytes();
+    }
+
+    @Override
+    public int offset() {
+        if (offsetInPage == -1) {
+            throw new IllegalArgumentException("unknown offset");
+        }
+        return offsetInPage;
+    }
+
+    @Override
+    public void setOffset(int offset) {
+        this.offsetInPage = offset;
+    }
+
+    @Override
+    public int nextRecordOffset() {
+        return this.recordHeader.getNextRecordOffset();
     }
 
 
     @Override
-    default int nextRecordOffset() {
-        return this.getRecordHeader().getNextRecordOffset();
+    public int length() {
+        return this.recordHeader.length() + indexNode.length();
     }
-
-
 }

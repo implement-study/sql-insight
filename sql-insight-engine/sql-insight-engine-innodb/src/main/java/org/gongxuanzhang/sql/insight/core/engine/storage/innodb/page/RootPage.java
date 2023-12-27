@@ -1,24 +1,6 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 import lombok.extern.slf4j.Slf4j;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageHeaderFactory;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.IndexRecord;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordType;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.RowComparator;
-import org.gongxuanzhang.sql.insight.core.object.Index;
-import org.gongxuanzhang.sql.insight.core.object.value.Value;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
-import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFactory.createDataPage;
-import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Constant.DIRECTION_COUNT_THRESHOLD;
-import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Constant.SLOT_MAX_COUNT;
-import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport.getNextUserRecord;
 
 
 /**
@@ -32,153 +14,60 @@ import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.Pag
 public class RootPage extends InnoDbPage {
 
 
-    public RootPage(Index index) {
-        super(index);
+    private IndexPage indexDelegate;
+
+    private DataPage dataDelegate;
+
+    public RootPage(IndexPage indexDelegate) {
+        super(indexDelegate.ext.belongIndex);
+        this.indexDelegate = indexDelegate;
+    }
+
+    public RootPage(DataPage dataDelegate) {
+        super(dataDelegate.ext.belongIndex);
+        this.dataDelegate = dataDelegate;
+    }
+
+
+    @Override
+    public void insertData(InnodbUserRecord data) {
+        if (this.dataDelegate != null) {
+            this.dataDelegate.insertData(data);
+        } else {
+            this.indexDelegate.insertData(data);
+        }
     }
 
     @Override
-    public void insertData(Compact compact) {
-        if (this.pageType() == PageType.FIL_PAGE_INDEX) {
-            if (this.isEnough(compact.length())) {
-                int targetSlot = findTargetSlot(compact);
-                InnodbUserRecord pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot - 1));
-                InnodbUserRecord next = getNextUserRecord(this, pre);
-                while (compact.compareTo(next) > 0) {
-                    pre = next;
-                    next = getNextUserRecord(this, pre);
-                }
-                linkedInsertRow(pre, compact, next);
-                return;
-            }
-            splitDataToIndexPage(compact);
-        } else if (this.pageType() == PageType.FIL_PAGE_INODE) {
-            //   找到目标位置 然后插入
-        } else {
-            throw new UnsupportedOperationException("error type " + this.pageType());
-        }
+    protected InnodbUserRecord wrapUserRecord(int offsetInPage) {
+        return null;
     }
 
-
-    /**
-     * root page split and type to index from data type.
-     **/
-    private void splitDataToIndexPage(Compact insertCompact) {
-        List<InnodbUserRecord> pageUserRecord = new ArrayList<>(this.pageHeader.recordCount + 1);
-        InnodbUserRecord base = this.infimum;
-        Comparator<InnodbUserRecord> comparator = RowComparator.primaryKeyComparator();
-        boolean inserted = false;
-        int allLength = 0;
-        while (base != this.supremum) {
-            base = getNextUserRecord(this, base);
-            if (!inserted && comparator.compare(insertCompact, base) < 0) {
-                pageUserRecord.add(insertCompact);
-                allLength += insertCompact.length();
-                inserted = true;
-            }
-            pageUserRecord.add(base);
-            allLength += base.length();
-        }
-        //   todo non middle split ?
-        if (this.pageHeader.directionCount < DIRECTION_COUNT_THRESHOLD) {
-            middleSplit(pageUserRecord, allLength);
-        }
+    @Override
+    protected void splitIfNecessary() {
 
     }
 
-
-    /**
-     * middle split.
-     * insert direction unidentified (directionCount less than 5)
-     *
-     * @param pageUserRecord all user record in page with inserted
-     * @param allLength      all user record length
-     **/
-    private void middleSplit(List<InnodbUserRecord> pageUserRecord, int allLength) {
-        int half = allLength / 2;
-        for (int i = 0; i < pageUserRecord.size(); i++) {
-            allLength -= pageUserRecord.get(i).length();
-            if (allLength <= half) {
-                DataPage firstDataPage = createDataPage(pageUserRecord.subList(0, i), this.belongIndex);
-                DataPage secondDataPage = createDataPage(pageUserRecord.subList(i, pageUserRecord.size()), belongIndex);
-                firstDataPage.getPageHeader().setLevel((short) 1);
-                secondDataPage.getPageHeader().setLevel((short) 1);
-                FileHeader firstFileHeader = firstDataPage.getFileHeader();
-                FileHeader secondFileHeader = secondDataPage.getFileHeader();
-                firstFileHeader.setOffset(2 * ConstantSize.PAGE.size());
-                secondFileHeader.setOffset(3 * ConstantSize.PAGE.size());
-                firstFileHeader.setPre(-1);
-                firstFileHeader.setNext(3 * ConstantSize.PAGE.size());
-                secondFileHeader.setPre(firstFileHeader.offset);
-                secondFileHeader.setNext(-1);
-
-                //  transfer to index page
-                this.fileHeader.next = firstDataPage.getFileHeader().offset;
-                this.fileHeader.pageType = PageType.FIL_PAGE_INODE.getValue();
-                this.pageHeader = PageHeaderFactory.createPageHeader();
-                //   todo second index
-                String primaryKeyName = this.belongIndex.belongTo().getExt().getPrimaryKeyName();
-
-                Value firstKey = firstDataPage.firstData().getValueByColumnName(primaryKeyName);
-                Value secondKey = secondDataPage.firstData().getValueByColumnName(primaryKeyName);
-                this.insertIndexRecord(new SingleIndexRecord(firstDataPage, firstKey));
-                this.insertIndexRecord(new SingleIndexRecord(secondDataPage, secondKey));
-                PageSupport.flushPages(this, firstDataPage, secondDataPage);
-                return;
-            }
-        }
-
-    }
-
-
-    private void insertIndexRecord(IndexRecord indexRecord) {
-        if (this.pageType() != PageType.FIL_PAGE_INODE) {
-            throw new IllegalStateException();
-        }
-
-
-    }
-
-
-    private void linkedInsertRow(InnodbUserRecord pre, Compact insertCompact, InnodbUserRecord next) {
-        RecordHeader insertHeader = new RecordHeader();
-        insertHeader.setHeapNo(this.pageHeader.absoluteRecordCount);
-        insertCompact.setOffsetInPage(this.pageHeader.lastInsertOffset + insertCompact.beforeSplitOffset());
-        insertHeader.setNextRecordOffset(next.offset() - insertCompact.offset());
-        pre.getRecordHeader().setNextRecordOffset(insertCompact.offset() - pre.offset());
-        insertHeader.setRecordType(RecordType.NORMAL);
-        insertCompact.setRecordHeader(insertHeader);
-
-        //  adjust page
-        this.userRecords.addRecord(insertCompact);
-        this.pageHeader.absoluteRecordCount++;
-        this.pageHeader.recordCount++;
-        this.freeSpace -= (short) insertCompact.length();
-        this.pageHeader.heapTop += (short) insertCompact.length();
-        this.pageHeader.lastInsertOffset += (short) insertCompact.length();
-
-
-        //  adjust group
-        while (next.getRecordHeader().getNOwned() == 0) {
-            next = getNextUserRecord(this, next);
-        }
-        RecordHeader recordHeader = next.getRecordHeader();
-        int groupCount = recordHeader.getNOwned();
-        recordHeader.setNOwned(groupCount + 1);
-        if (next.getRecordHeader().getNOwned() <= SLOT_MAX_COUNT) {
-            return;
-        }
-        log.info("start group split ...");
-        for (int i = 0; i < this.pageDirectory.slots.length - 1; i++) {
-            if (this.pageDirectory.slots[i] == next.offset()) {
-                InnodbUserRecord preGroupMax = getUserRecordByOffset(this.pageDirectory.slots[i + 1]);
-                for (int j = 0; j < SLOT_MAX_COUNT >> 1; j++) {
-                    preGroupMax = getNextUserRecord(this, preGroupMax);
-                }
-                this.pageDirectory.split(i, (short) preGroupMax.offset());
-            }
-        }
-        log.info("end group split ...");
-    }
+//    public void insertData(Compact compact) {
+//        if (this.pageType() == PageType.FIL_PAGE_INDEX) {
+//            if (this.isEnough(compact.length())) {
+//                int targetSlot = findTargetSlot(compact);
+//                InnodbUserRecord pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot - 1));
+//                InnodbUserRecord next = getNextUserRecord(this, pre);
+//                while (compact.compareTo(next) > 0) {
+//                    pre = next;
+//                    next = getNextUserRecord(this, pre);
+//                }
+//                linkedInsertRow(pre, compact, next);
+//                return;
+//            }
+//            splitDataToIndexPage(compact);
+//        } else if (this.pageType() == PageType.FIL_PAGE_INODE) {
+//            //   找到目标位置 然后插入
+//        } else {
+//            throw new UnsupportedOperationException("error type " + this.pageType());
+//        }
+//    }
 
 
 }

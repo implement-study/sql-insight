@@ -129,6 +129,11 @@ public class Compact implements InnodbUserRecord {
     }
 
     @Override
+    public void setOffset(int offset) {
+        this.offsetInPage = offset;
+    }
+
+    @Override
     public int nextRecordOffset() {
         return this.recordHeader.getNextRecordOffset();
     }

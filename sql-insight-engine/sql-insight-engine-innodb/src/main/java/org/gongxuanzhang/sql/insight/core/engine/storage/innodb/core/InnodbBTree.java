@@ -34,9 +34,11 @@ public interface InnodbBTree extends Index {
      *
      * @return not null
      **/
-    default RootPage getIndexRoot() {
+    default RootPage getRootPage() {
         return PageSupport.getRoot(this);
     }
+
+
 
     /**
      * insert a row.

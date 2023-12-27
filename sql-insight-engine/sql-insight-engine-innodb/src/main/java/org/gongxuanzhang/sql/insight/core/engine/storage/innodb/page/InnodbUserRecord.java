@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.object.UserRecord;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -27,6 +28,7 @@ public interface InnodbUserRecord extends UserRecord, PageObject {
     /**
      * @return record header
      **/
+    @NotNull
     RecordHeader getRecordHeader();
 
 

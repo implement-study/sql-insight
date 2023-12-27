@@ -3,6 +3,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.ClusteredIndex;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.InnodbIndex;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.*;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
@@ -52,7 +53,7 @@ public abstract class PageFactory {
      * @param recordList data in the page that sorted
      * @return the data page but the file header , page header is not complete
      **/
-    public static DataPage createDataPage(List<InnodbUserRecord> recordList, Index index) {
+    public static DataPage createDataPage(List<InnodbUserRecord> recordList, InnodbIndex index) {
         DataPage dataPage = new DataPage(index);
         FileHeader fileHeader = new FileHeader();
         fileHeader.setPageType(PageType.FIL_PAGE_INDEX.getValue());
@@ -100,7 +101,6 @@ public abstract class PageFactory {
      * swap byte array to page
      **/
     public static InnoDbPage swap(byte[] bytes, Index index) {
-        InnoDbPage bean = new RootPage(index);
         ConstantSize.PAGE.checkSize(bytes);
 
         DynamicByteBuffer buffer = DynamicByteBuffer.wrap(bytes);
@@ -137,21 +137,20 @@ public abstract class PageFactory {
 //        FileTrailerFactory trailerFactory = new FileTrailerFactory();
 //        FileTrailer fileTrailer = trailerFactory.swap(candidate);
 //        bean.setFileTrailer(fileTrailer);
-        return bean;
+        return null;
     }
 
-    private static RootPage createRoot(Index index) {
-        RootPage root = new RootPage(index);
+    private static RootPage createRoot(InnodbIndex index) {
+        DataPage root = new DataPage(index);
         root.setFileHeader(FileHeaderFactory.createFileHeader());
         root.setPageHeader(PageHeaderFactory.createPageHeader());
         root.setInfimum(new Infimum());
         root.setSupremum(new Supremum());
         root.setUserRecords(new UserRecords());
         root.setFreeSpace(root.getPageHeader().getHeapTop());
-        //   todo page directory
         root.setPageDirectory(new PageDirectory());
         root.setFileTrailer(new FileTrailer());
-        return root;
+        return new RootPage(root);
     }
 
     public static Supremum swapSupremum(byte[] bytes) {

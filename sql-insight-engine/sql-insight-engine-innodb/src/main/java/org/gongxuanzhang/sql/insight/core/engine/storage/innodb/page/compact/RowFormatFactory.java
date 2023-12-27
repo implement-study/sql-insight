@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
 
+import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnodbUserRecord;
@@ -53,6 +54,8 @@ public class RowFormatFactory {
         compact.variables = new Variables();
         compact.nullList = new CompactNullList(row.getTable());
         compact.sourceRow = row;
+        compact.setRecordHeader(new RecordHeader());
+        DynamicByteBuffer bodyBuffer = DynamicByteBuffer.allocate();
         for (InsertRow.InsertItem insertItem : row) {
             Column column = insertItem.getColumn();
             Value value = insertItem.getValue();
@@ -70,7 +73,9 @@ public class RowFormatFactory {
                 }
                 compact.variables.addVariableLength((byte) value.getLength());
             }
+            bodyBuffer.append(value.toBytes());
         }
+        compact.setBody(bodyBuffer.toBytes());
         return compact;
     }
 
@@ -108,7 +113,7 @@ public class RowFormatFactory {
      **/
     public static RecordHeader readRecordHeader(InnoDbPage page, int offset) {
         int recordHeaderSize = ConstantSize.RECORD_HEADER.size();
-        ByteBuffer buffer = ByteBuffer.wrap(page.getSource(), offset - recordHeaderSize, recordHeaderSize);
+        ByteBuffer buffer = ByteBuffer.wrap(page.getExt().getSource(), offset - recordHeaderSize, recordHeaderSize);
         return new RecordHeader(buffer.array());
     }
 
@@ -120,7 +125,7 @@ public class RowFormatFactory {
      **/
     private static void fillNullAndVar(InnoDbPage page, int offset, Compact compact, Table table) {
         int nullLength = table.getExt().getNullableColCount() / Byte.SIZE;
-        ByteBuffer pageBuffer = ByteBuffer.wrap(page.getSource());
+        ByteBuffer pageBuffer = ByteBuffer.wrap(page.getExt().getSource());
         byte[] nullListByte = new byte[nullLength];
         offset -= ConstantSize.RECORD_HEADER.size() - nullLength;
         pageBuffer.get(nullListByte, offset, nullLength);

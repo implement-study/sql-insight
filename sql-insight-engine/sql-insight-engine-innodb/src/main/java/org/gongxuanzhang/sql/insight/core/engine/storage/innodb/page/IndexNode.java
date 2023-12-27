@@ -16,46 +16,49 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.InnodbIndex;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.IndexRecord;
+import lombok.Data;
+import org.gongxuanzhang.easybyte.core.ByteWrapper;
+import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
 
-import java.util.Comparator;
 
 /**
+ * index page contains some index node.
+ * a index node contains a pointer and index key.
+ *
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class IndexPage extends InnoDbPage implements Comparator<IndexRecord> {
+@Data
+public class IndexNode implements PageObject, ByteWrapper {
 
-    public IndexPage(InnodbIndex index) {
-        super(index);
-    }
+    private final int length;
 
-    @Override
-    public void insertData(InnodbUserRecord data) {
+    private final Value[] key;
 
-    }
+    int pointer;
 
-    @Override
-    protected InnodbUserRecord wrapUserRecord(int offsetInPage) {
-        return null;
-    }
 
-    @Override
-    protected void splitIfNecessary() {
-
-    }
-
-    @Override
-    public int compare(IndexRecord o1, IndexRecord o2) {
-        Value[] values1 = o1.indexNode().getKey();
-        Value[] values2 = o2.indexNode().getKey();
-        for (int i = 0; i < values1.length; i++) {
-            int compare = values1[i].compareTo(values2[i]);
-            if (compare != 0) {
-                return compare;
-            }
+    public IndexNode(Value[] key) {
+        this.key = key;
+        int candidate = 0;
+        for (Value value : key) {
+            candidate += value.getLength();
         }
-        return 0;
+        this.length = candidate;
+    }
+
+    @Override
+    public int length() {
+        return key.length + Integer.BYTES;
+    }
+
+    @Override
+    public byte[] toBytes() {
+        DynamicByteBuffer buffer = DynamicByteBuffer.allocate();
+        for (Value value : this.key) {
+            buffer.append(value.toBytes());
+        }
+        buffer.appendInt(pointer);
+        return buffer.toBytes();
     }
 }

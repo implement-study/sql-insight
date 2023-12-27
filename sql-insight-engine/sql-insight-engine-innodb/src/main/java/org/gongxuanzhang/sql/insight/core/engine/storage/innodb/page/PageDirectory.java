@@ -38,8 +38,11 @@ public class PageDirectory implements PageObject, ByteWrapper {
 
     short[] slots;
 
+    /**
+     * non params constructor create a contains infimum and supremum offset slot.
+     **/
     public PageDirectory() {
-
+        this.slots = new short[]{(short) ConstantSize.SUPREMUM.offset(), (short) ConstantSize.INFIMUM.offset()};
     }
 
     public PageDirectory(short[] slots) {

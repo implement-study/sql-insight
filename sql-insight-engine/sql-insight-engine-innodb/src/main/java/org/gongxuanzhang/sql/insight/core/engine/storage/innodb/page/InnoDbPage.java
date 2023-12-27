@@ -18,13 +18,15 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RowFormatFactory;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.InnodbIndex;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordType;
 import org.gongxuanzhang.sql.insight.core.exception.DuplicationPrimaryKeyException;
-import org.gongxuanzhang.sql.insight.core.object.Index;
-import org.gongxuanzhang.sql.insight.core.object.UserRecord;
+
+import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Constant.SLOT_MAX_COUNT;
 
 /**
  * InnoDb Page
@@ -34,6 +36,7 @@ import org.gongxuanzhang.sql.insight.core.object.UserRecord;
  **/
 
 @Data
+@Slf4j
 public abstract class InnoDbPage implements ByteWrapper {
 
 
@@ -71,19 +74,17 @@ public abstract class InnoDbPage implements ByteWrapper {
      **/
     FileTrailer fileTrailer;
 
-    byte[] source;
+    PageExt ext;
 
-    Index belongIndex;
-
-    protected InnoDbPage(Index index) {
-        this.belongIndex = index;
-
+    protected InnoDbPage(InnodbIndex index) {
+        this.ext = new PageExt();
+        this.ext.belongIndex = index;
     }
 
     @Override
     public byte[] toBytes() {
-        if (source != null) {
-            return source;
+        if (ext.source != null) {
+            return ext.source;
         }
         DynamicByteBuffer buffer = DynamicByteBuffer.allocate();
         buffer.append(fileHeader.toBytes());
@@ -94,8 +95,8 @@ public abstract class InnoDbPage implements ByteWrapper {
         buffer.append(new byte[freeSpace]);
         buffer.append(pageDirectory.toBytes());
         buffer.append(fileTrailer.toBytes());
-        this.source = buffer.toBytes();
-        return this.source;
+        this.ext.source = buffer.toBytes();
+        return this.ext.source;
     }
 
 
@@ -111,7 +112,18 @@ public abstract class InnoDbPage implements ByteWrapper {
      * page is index node will find target leaf node and insert data.
      * may be split page in process
      **/
-    public abstract void insertData(Compact data);
+    public void insertData(InnodbUserRecord data) {
+        int targetSlot = findTargetSlot(data);
+        InnodbUserRecord pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot - 1));
+        InnodbUserRecord next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset());
+        //   todo comparator
+        while (data.compareTo(next) > 0) {
+            pre = next;
+            next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset());
+        }
+        linkedAndAdjust(pre, data, next);
+        splitIfNecessary();
+    }
 
 
     /**
@@ -119,14 +131,14 @@ public abstract class InnoDbPage implements ByteWrapper {
      *
      * @return result must be greater than 0 because 0 only contains infimum, but the slot may be already full
      **/
-    protected int findTargetSlot(Compact insertCompact) {
+    protected int findTargetSlot(InnodbUserRecord userRecord) {
         int left = 0;
         int right = pageDirectory.slotCount() - 1;
         while (left < right - 1) {
             int mid = (right + left) / 2;
             short offset = this.pageDirectory.getSlots()[mid];
-            UserRecord base = getUserRecordByOffset(offset);
-            int compare = Long.compare(insertCompact.getRowId(), base.getRowId());
+            InnodbUserRecord base = getUserRecordByOffset(offset);
+            int compare = userRecord.compareTo(base);
             if (compare == 0) {
                 throw new DuplicationPrimaryKeyException(base.getRowId());
             }
@@ -136,8 +148,8 @@ public abstract class InnoDbPage implements ByteWrapper {
                 left = mid;
             }
         }
-        UserRecord base = getUserRecordByOffset(this.pageDirectory.getSlots()[left]);
-        int compare = Long.compare(insertCompact.getRowId(), base.getRowId());
+        InnodbUserRecord base = getUserRecordByOffset(this.pageDirectory.getSlots()[left]);
+        int compare = userRecord.compareTo(base);
         if (compare == 0) {
             throw new DuplicationPrimaryKeyException(base.getRowId());
         }
@@ -151,15 +163,20 @@ public abstract class InnoDbPage implements ByteWrapper {
      * @param offsetInPage offset in page
      * @return user record
      **/
-    protected InnodbUserRecord getUserRecordByOffset(short offsetInPage) {
+    protected InnodbUserRecord getUserRecordByOffset(int offsetInPage) {
         if (offsetInPage == ConstantSize.INFIMUM.offset()) {
             return this.infimum;
         }
         if (offsetInPage == ConstantSize.SUPREMUM.offset()) {
             return this.supremum;
         }
-        return RowFormatFactory.readRecordInPage(this, offsetInPage, this.belongIndex.belongTo());
+        InnodbUserRecord wrap = wrapUserRecord(offsetInPage);
+        wrap.setOffset(offsetInPage);
+        return wrap;
     }
+
+
+    protected abstract InnodbUserRecord wrapUserRecord(int offsetInPage);
 
 
     /**
@@ -168,116 +185,65 @@ public abstract class InnoDbPage implements ByteWrapper {
      *
      * @param insertLength insert length
      **/
+    @Deprecated
     public boolean isEnough(int insertLength) {
         return this.freeSpace - insertLength >= ConstantSize.PAGE.size() >> 4;
     }
-//
-//
-//
-//    /**
-//     * 组分裂
-//     *
-//     * @param slotIndex 第几个组
-//     **/
-//    private void groupSplit(int slotIndex) {
-//        short rightMaxOffset = this.pageDirectory.getSlots()[slotIndex];
-//        UserRecord rightMax = getUserRecordByOffset(this, rightMaxOffset);
-//        rightMax.getRecordHeader().setnOwned(5);
-//        UserRecord preSlotMax = getUserRecordByOffset(this, pageDirectory.getSlots()[slotIndex - 1]);
-//        UserRecord leftMaxPre = null;
-//        //  找到第四个 变成一组，偏移量需要用第三个
-//        for (int i = 0; i < 3; i++) {
-//            leftMaxPre = getNextUserRecord(this, preSlotMax);
-//        }
-//        int nextRecordOffset = leftMaxPre.getRecordHeader().getNextRecordOffset();
-//        short[] slots = this.pageDirectory.getSlots();
-//        short[] newSlots = ArrayUtils.insert(slots, slotIndex, (short) nextRecordOffset);
-//        this.pageDirectory.setSlots(newSlots);
-//        this.pageHeader.slotCount++;
-//    }
-//
-//
-//    /**
-//     * 按照长度插入链表
-//     *
-//     * @param preGroupMax 插入的当前组的上一组的最大记录。也就是说当前记录一定比这个记录大
-//     **/
-//    private void insertLinkedList(Compact insertCompact, UserRecord preGroupMax) {
-//        UserRecord pre = preGroupMax;
-//        UserRecord next = getNextUserRecord(this, pre);
-//        while (this.compare(insertCompact, next) > 0) {
-//            pre = next;
-//            next = getNextUserRecord(this, pre);
-//        }
-//        RecordHeader insertHeader = nextRecordHeader();
-//        insertHeader.setNextRecordOffset(pre.getRecordHeader().getNextRecordOffset());
-//        pre.getRecordHeader().setNextRecordOffset(this.pageHeader.lastInsertOffset);
-//        short pageOffset = (short) pre.pageOffset();
-//        //  把上一个偏移量写回页
-//        if (pageOffset >= ConstantSize.USER_RECORDS.offset()) {
-//            int bodyOffset = pageOffset - ConstantSize.USER_RECORDS.offset();
-//            byte[] nextOffsetBytes = BitUtils.cutToByteArray(this.pageHeader.lastInsertOffset, 2);
-//            this.userRecords.source[bodyOffset + 3] = nextOffsetBytes[0];
-//            this.userRecords.source[bodyOffset + 4] = nextOffsetBytes[1];
-//        }
-//        insertCompact.setRecordHeader(insertHeader);
-//        this.freeSpace -= insertCompact.length();
-//        this.userRecords.add(insertCompact.toBytes());
-//        this.pageHeader.heapTop += insertCompact.length();
-//        this.pageHeader.lastInsertOffset += insertCompact.length();
-//    }
-//
-//    /**
-//     * 创建下一个插入的数据头
-//     **/
-//    private RecordHeader nextRecordHeader() {
-//        RecordHeader insertHeader = new RecordHeader();
-//        this.pageHeader.absoluteRecordCount++;
-//        insertHeader.setHeapNo(this.pageHeader.absoluteRecordCount);
-//        this.pageHeader.recordCount++;
-//        return insertHeader;
-//    }
-//
-//
 
-//
-//
-//    /**
-//     * 整理记录头
-//     * 调整页目录之类的
-//     **/
-//    @Override
-//    public void refresh() throws MySQLException {
-//        PageWriter.write(this);
-//    }
-//
-//
-//    @Override
-//    public int compare(UserRecord r1, UserRecord r2) {
-//        TableInfo tableInfo = getTableInfo();
-//        PrimaryKey primaryKey1 = r1.getPrimaryKey(tableInfo);
-//        PrimaryKey primaryKey2 = r2.getPrimaryKey(tableInfo);
-//        int compare = primaryKey1.compareTo(primaryKey2);
-//        if (compare == 0) {
-//            throw new RepetitionPrimaryKeyException(primaryKey1 + "已经存在");
-//        }
-//        return compare;
-//    }
-//
-//    @Override
-//    public TableInfo getTableInfo() {
-//        return Context.getTableManager().select(this.fileHeader.spaceId);
-//    }
-//
-//    @Override
-//    public void setTableInfo(TableInfo tableInfo) {
-//        throw new UnsupportedOperationException();
-//    }
-//
-//    @Override
-//    public String toString() {
-//        return new PageShower(this).pageString();
-//    }
+
+    /**
+     * this page should split.
+     * in general after insert row call this method
+     **/
+    protected abstract void splitIfNecessary();
+
+    private void linkedAndAdjust(InnodbUserRecord pre, InnodbUserRecord insertRecord, InnodbUserRecord next) {
+        RecordHeader insertHeader = insertRecord.getRecordHeader();
+        insertHeader.setHeapNo(this.pageHeader.absoluteRecordCount);
+        insertRecord.setOffset(this.pageHeader.lastInsertOffset + insertRecord.beforeSplitOffset());
+        insertHeader.setNextRecordOffset(next.offset() - insertRecord.offset());
+        pre.getRecordHeader().setNextRecordOffset(insertRecord.offset() - pre.offset());
+        insertHeader.setRecordType(RecordType.NORMAL);
+
+        //  adjust page
+        this.userRecords.addRecord(insertRecord);
+        this.pageHeader.absoluteRecordCount++;
+        this.pageHeader.recordCount++;
+        this.freeSpace -= (short) insertRecord.length();
+        this.pageHeader.heapTop += (short) insertRecord.length();
+        this.pageHeader.lastInsertOffset += (short) insertRecord.length();
+
+
+        //  adjust group
+        while (next.getRecordHeader().getNOwned() == 0) {
+            next = getUserRecordByOffset(next.offset() + next.nextRecordOffset());
+        }
+        RecordHeader recordHeader = next.getRecordHeader();
+        int groupCount = recordHeader.getNOwned();
+        recordHeader.setNOwned(groupCount + 1);
+        if (next.getRecordHeader().getNOwned() <= SLOT_MAX_COUNT) {
+            return;
+        }
+        log.info("start group split ...");
+        for (int i = 0; i < this.pageDirectory.slots.length - 1; i++) {
+            if (this.pageDirectory.slots[i] == next.offset()) {
+                InnodbUserRecord preGroupMax = getUserRecordByOffset(this.pageDirectory.slots[i + 1]);
+                for (int j = 0; j < SLOT_MAX_COUNT >> 1; j++) {
+                    preGroupMax = getUserRecordByOffset(preGroupMax.offset() + preGroupMax.nextRecordOffset());
+                }
+                this.pageDirectory.split(i, (short) preGroupMax.offset());
+            }
+        }
+        log.info("end group split ...");
+    }
+
+
+    @Data
+    public static class PageExt {
+        byte[] source;
+        InnodbIndex belongIndex;
+        InnoDbPage parent;
+    }
 
 
 }

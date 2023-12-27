@@ -52,6 +52,7 @@ public class PageSupport {
         }
     }
 
+    @Deprecated
     public static InnodbUserRecord getNextUserRecord(InnoDbPage page, UserRecord userRecord) {
         if (userRecord instanceof Supremum) {
             throw new NullPointerException("supremum is max record in page");
@@ -61,7 +62,7 @@ public class PageSupport {
     }
 
     public static void flushPage(InnoDbPage page) {
-        Index belongIndex = page.getBelongIndex();
+        Index belongIndex = page.getExt().getBelongIndex();
         File indexFile = belongIndex.getFile();
         try (RandomAccessFile randomAccessFile = new RandomAccessFile(indexFile, "rw")) {
             long minLength = page.getFileHeader().getOffset() + ConstantSize.PAGE.size();

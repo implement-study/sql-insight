@@ -16,27 +16,123 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
+import lombok.extern.slf4j.Slf4j;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageHeaderFactory;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.InnodbIndex;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport;
-import org.gongxuanzhang.sql.insight.core.object.Index;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.IndexRecord;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RowFormatFactory;
+import org.gongxuanzhang.sql.insight.core.object.Column;
+import org.gongxuanzhang.sql.insight.core.object.value.Value;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFactory.createDataPage;
+import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Constant.DIRECTION_COUNT_THRESHOLD;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
+@Slf4j
 public class DataPage extends InnoDbPage {
 
-    public DataPage(Index index) {
+    public DataPage(InnodbIndex index) {
         super(index);
     }
 
+    @Override
+    public void insertData(InnodbUserRecord data) {
+        //   todo data only compact row format present
+        if (!(data instanceof Compact)) {
+            throw new IllegalArgumentException("data page can't insert " + data.getClass().getName());
+        }
+        super.insertData(data);
+    }
 
     @Override
-    public void insertData(Compact data) {
-
+    protected InnodbUserRecord wrapUserRecord(int offsetInPage) {
+        return RowFormatFactory.readRecordInPage(this, offsetInPage, this.ext.belongIndex.belongTo());
     }
 
 
-    public InnodbUserRecord firstData() {
-        return PageSupport.getNextUserRecord(this, infimum);
+    /**
+     * data page will split when free space less than one-sixteenth page size
+     **/
+    @Override
+    protected void splitIfNecessary() {
+        if (this.freeSpace > ConstantSize.PAGE.size() >> 4) {
+            return;
+        }
+        List<InnodbUserRecord> pageUserRecord = new ArrayList<>(this.pageHeader.recordCount + 1);
+        InnodbUserRecord base = this.infimum;
+        int allLength = 0;
+        while (base != this.supremum) {
+            base = getUserRecordByOffset(base.offset() + base.nextRecordOffset());
+            pageUserRecord.add(base);
+            allLength += base.length();
+        }
+        //   todo non middle split ?
+        if (this.pageHeader.directionCount < DIRECTION_COUNT_THRESHOLD) {
+            middleSplit(pageUserRecord, allLength);
+        }
     }
+
+
+    /**
+     * middle split.
+     * insert direction unidentified (directionCount less than 5)
+     *
+     * @param pageUserRecord all user record in page with inserted
+     * @param allLength      all user record length
+     **/
+    private void middleSplit(List<InnodbUserRecord> pageUserRecord, int allLength) {
+        int half = allLength / 2;
+        DataPage firstDataPage = null;
+        DataPage secondDataPage = null;
+        for (int i = 0; i < pageUserRecord.size(); i++) {
+            allLength -= pageUserRecord.get(i).length();
+            if (allLength <= half) {
+                InnodbIndex belong = this.ext.belongIndex;
+                firstDataPage = createDataPage(pageUserRecord.subList(0, i), belong);
+                secondDataPage = createDataPage(pageUserRecord.subList(i, pageUserRecord.size()), belong);
+                break;
+            }
+        }
+        if (firstDataPage == null) {
+            throw new NullPointerException("data page error");
+        }
+        //   parent == null means this page is root
+        if (this.ext.parent == null) {
+            firstDataPage.getPageHeader().setLevel((short) 1);
+            secondDataPage.getPageHeader().setLevel((short) 1);
+            FileHeader firstFileHeader = firstDataPage.getFileHeader();
+            FileHeader secondFileHeader = secondDataPage.getFileHeader();
+            firstFileHeader.setOffset(2 * ConstantSize.PAGE.size());
+            secondFileHeader.setOffset(3 * ConstantSize.PAGE.size());
+            firstFileHeader.setPre(-1);
+            firstFileHeader.setNext(3 * ConstantSize.PAGE.size());
+            secondFileHeader.setPre(firstFileHeader.offset);
+            secondFileHeader.setNext(-1);
+            //  transfer to index page
+            this.fileHeader.next = firstDataPage.getFileHeader().offset;
+            this.fileHeader.pageType = PageType.FIL_PAGE_INODE.getValue();
+            this.pageHeader = PageHeaderFactory.createPageHeader();
+            this.pageDirectory = new PageDirectory();
+            this.insertData(firstDataPage.pageIndex());
+            this.insertData(secondDataPage.pageIndex());
+        }
+    }
+
+
+    public IndexRecord pageIndex() {
+        InnodbUserRecord firstData = getUserRecordByOffset(infimum.offset() + infimum.nextRecordOffset());
+        List<Column> columns = this.ext.belongIndex.columns();
+        Value[] values = columns.stream()
+                .map(Column::getName)
+                .map(firstData::getValueByColumnName)
+                .toArray(Value[]::new);
+        return new IndexRecord(new IndexNode(values), this.ext.belongIndex);
+    }
+
 }

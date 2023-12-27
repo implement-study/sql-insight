@@ -39,6 +39,13 @@ public interface UserRecord extends ByteWrapper, Row {
     int offset();
 
     /**
+     * {@link this#offset()}
+     * absolute offset in page don't in source.
+     * require set up
+     **/
+    void setOffset(int offset);
+
+    /**
      * next node relative offset
      **/
     int nextRecordOffset();

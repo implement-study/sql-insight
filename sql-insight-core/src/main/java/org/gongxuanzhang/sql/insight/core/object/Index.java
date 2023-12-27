@@ -19,6 +19,7 @@ package org.gongxuanzhang.sql.insight.core.object;
 import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -65,4 +66,9 @@ public interface Index {
      * Index file
      **/
     File getFile();
+
+    /**
+     * index relative columns
+     **/
+    List<Column> columns();
 }

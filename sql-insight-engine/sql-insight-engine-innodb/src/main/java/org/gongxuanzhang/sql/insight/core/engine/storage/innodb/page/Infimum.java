@@ -75,6 +75,11 @@ public class Infimum implements InnodbUserRecord {
         return ConstantSize.INFIMUM.offset();
     }
 
+    @Override
+    public void setOffset(int offset) {
+        throw new UnsupportedOperationException("infimum can't set offset ");
+    }
+
 
     @Override
     public String toString() {

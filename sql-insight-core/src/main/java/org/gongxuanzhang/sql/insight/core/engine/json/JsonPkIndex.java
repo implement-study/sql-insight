@@ -18,6 +18,7 @@ package org.gongxuanzhang.sql.insight.core.engine.json;
 
 import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
+import org.gongxuanzhang.sql.insight.core.object.Column;
 import org.gongxuanzhang.sql.insight.core.object.Cursor;
 import org.gongxuanzhang.sql.insight.core.object.Index;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
@@ -28,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 
 /**
@@ -84,6 +86,11 @@ public class JsonPkIndex implements Index {
     @Override
     public File getFile() {
         return this.jsonFilePath.toFile();
+    }
+
+    @Override
+    public List<Column> columns() {
+        throw new UnsupportedOperationException("json don't support");
     }
 
 

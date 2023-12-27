@@ -82,6 +82,11 @@ public class Supremum implements InnodbUserRecord {
         return ConstantSize.SUPREMUM.offset();
     }
 
+    @Override
+    public void setOffset(int offset) {
+        throw new UnsupportedOperationException("supremum can't set offset ");
+    }
+
 
     @Override
     public int nextRecordOffset() {

@@ -25,11 +25,13 @@ import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Com
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RowFormatFactory;
 import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
 import org.gongxuanzhang.sql.insight.core.exception.DataTooLongException;
+import org.gongxuanzhang.sql.insight.core.object.Column;
 import org.gongxuanzhang.sql.insight.core.object.Cursor;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
 import java.io.File;
+import java.util.List;
 
 
 /**
@@ -42,6 +44,11 @@ public class ClusteredIndex extends InnodbIndex {
 
     public ClusteredIndex(Table table) {
         super(table);
+    }
+
+    @Override
+    public List<Column> columns() {
+        return null;
     }
 
 
@@ -74,7 +81,7 @@ public class ClusteredIndex extends InnodbIndex {
                     table.getColumnList().get(table.getExt().getAutoColIndex()).getName());
         }
         Compact compact = RowFormatFactory.compactFromInsertRow(row);
-        RootPage root = getIndexRoot();
+        RootPage root = getRootPage();
         if (compact.length() >= Constant.COMPACT_MAX_ROW_LENGTH) {
             throw new DataTooLongException("compact row can't greater than " + Constant.COMPACT_MAX_ROW_LENGTH);
         }
