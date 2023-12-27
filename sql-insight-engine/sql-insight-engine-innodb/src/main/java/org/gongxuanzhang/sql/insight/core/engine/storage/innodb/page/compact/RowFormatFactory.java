@@ -84,7 +84,6 @@ public class RowFormatFactory {
      * read page source solve a user record.
      * the offset is offset in page.
      * offset is after record header .in other words offset - record header size  means record header offset
-     *
      **/
     public static InnodbUserRecord readRecordInPage(InnoDbPage page, int offsetInPage, Table table) {
         if (ConstantSize.INFIMUM.offset() == offsetInPage) {
@@ -116,7 +115,6 @@ public class RowFormatFactory {
         ByteBuffer buffer = ByteBuffer.wrap(page.getExt().getSource(), offset - recordHeaderSize, recordHeaderSize);
         return new RecordHeader(buffer.array());
     }
-
 
 
     /**

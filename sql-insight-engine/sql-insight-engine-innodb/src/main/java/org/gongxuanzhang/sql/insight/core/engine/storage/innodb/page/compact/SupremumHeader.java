@@ -21,7 +21,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
  **/
 public class SupremumHeader extends RecordHeader {
 
-    public SupremumHeader(){
+    public SupremumHeader() {
         this.setRecordType(RecordType.SUPREMUM);
         this.setHeapNo(1);
         this.setDelete(false);

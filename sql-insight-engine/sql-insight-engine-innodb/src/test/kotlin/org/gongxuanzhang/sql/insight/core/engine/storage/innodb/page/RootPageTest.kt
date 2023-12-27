@@ -19,16 +19,16 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page
 import org.junit.jupiter.api.Test
 
 
-class RootPageTest{
+class RootPageTest {
 
     @Test
-    fun subListTest(){
+    fun subListTest() {
         val list = ArrayList<Int>()
         for (i in 0..10) {
             list.add(i)
         }
-        println(list.subList(0,list.size/2))
-        println(list.subList(list.size/2,list.size))
+        println(list.subList(0, list.size / 2))
+        println(list.subList(list.size / 2, list.size))
     }
 
 

@@ -22,11 +22,11 @@ import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
-public class UserRecords implements ByteWrapper ,PageObject{
+public class UserRecords implements ByteWrapper, PageObject {
 
     byte[] body;
 
-    public UserRecords(){
+    public UserRecords() {
         this.body = new byte[0];
     }
 

@@ -35,7 +35,6 @@ public abstract class InnodbIndex implements InnodbBTree {
     }
 
 
-
     @Override
     public Cursor find(SessionContext sessionContext) {
         return null;
