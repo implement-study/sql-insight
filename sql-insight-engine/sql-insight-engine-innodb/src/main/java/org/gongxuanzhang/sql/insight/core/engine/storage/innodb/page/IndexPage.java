@@ -38,6 +38,19 @@ public class IndexPage extends InnoDbPage {
 
 
     @Override
+    public void insertData(InnodbUserRecord data) {
+        int targetSlot = findTargetSlot(data);
+        InnodbUserRecord pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot - 1));
+        InnodbUserRecord next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset());
+        while (this.compare(data, next) > 0) {
+            pre = next;
+            next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset());
+        }
+        linkedAndAdjust(pre, data, next);
+        splitIfNecessary();
+    }
+
+    @Override
     protected IndexRecord wrapUserRecord(int offsetInPage) {
         //  todo dynamic primary key
         List<Column> columns = this.ext.belongIndex.columns();
@@ -53,9 +66,17 @@ public class IndexPage extends InnoDbPage {
         return new IndexRecord(recordHeader, new IndexNode(key, buffer.getInt()), this.ext.belongIndex);
     }
 
+
+    /**
+     *
+     * data page will split when free space less than one in thirty-two page size
+     **/
     @Override
     protected void splitIfNecessary() {
-        //  index page split
+        if(this.freeSpace > ConstantSize.PAGE.size() >> 5){
+            return;
+        }
+
     }
 
 

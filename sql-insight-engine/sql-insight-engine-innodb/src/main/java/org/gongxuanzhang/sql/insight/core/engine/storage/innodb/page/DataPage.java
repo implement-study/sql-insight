@@ -43,13 +43,27 @@ public class DataPage extends InnoDbPage {
         super(index);
     }
 
+
+    /**
+     * if data page is root page.
+     * call insert data by index.
+     * else call this method by parent index page.
+     **/
     @Override
     public void insertData(InnodbUserRecord data) {
         //   todo data only compact row format present
         if (!(data instanceof Compact)) {
             throw new IllegalArgumentException("data page can't insert " + data.getClass().getName());
         }
-        super.insertData(data);
+        int targetSlot = findTargetSlot(data);
+        InnodbUserRecord pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot - 1));
+        InnodbUserRecord next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset());
+        while (this.compare(data, next) > 0) {
+            pre = next;
+            next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset());
+        }
+        linkedAndAdjust(pre, data, next);
+        splitIfNecessary();
     }
 
     @Override
@@ -84,12 +98,13 @@ public class DataPage extends InnoDbPage {
     /**
      * middle split.
      * insert direction unidentified (directionCount less than 5)
-     *
+     * <p>
      * if this page is root page.
      * transfer root page to index page from data page.
      * create two data page linked.
      * if this page is normal leaf node,
      * create a data page append to index file and insert a index record to parent (index page)
+     *
      * @param pageUserRecord all user record in page with inserted
      * @param allLength      all user record length
      **/
@@ -131,10 +146,14 @@ public class DataPage extends InnoDbPage {
             this.userRecords = new UserRecords();
             this.insertData(firstDataPage.pageIndex());
             this.insertData(secondDataPage.pageIndex());
-        }else{
+        } else {
             // normal leaf node
             firstDataPage.fileHeader.setOffset(this.fileHeader.offset);
-
+            int newDataPageOffset = PageSupport.allocatePage(this.ext.belongIndex);
+            secondDataPage.fileHeader.setOffset(newDataPageOffset);
+            InnoDbPage parent = firstDataPage.ext.parent;
+            this.transferFrom(firstDataPage);
+            parent.insertData(secondDataPage.pageIndex());
         }
     }
 
@@ -146,7 +165,7 @@ public class DataPage extends InnoDbPage {
                 .map(Column::getName)
                 .map(firstData::getValueByColumnName)
                 .toArray(Value[]::new);
-        return new IndexRecord(new IndexNode(values,this.fileHeader.offset), this.ext.belongIndex);
+        return new IndexRecord(new IndexNode(values, this.fileHeader.offset), this.ext.belongIndex);
     }
 
     @Override
