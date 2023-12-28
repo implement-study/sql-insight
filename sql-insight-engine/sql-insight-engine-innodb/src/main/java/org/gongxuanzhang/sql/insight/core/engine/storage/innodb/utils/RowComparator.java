@@ -16,7 +16,9 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils;
 
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Infimum;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnodbUserRecord;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Supremum;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
 import java.util.Comparator;
@@ -28,10 +30,30 @@ public abstract class RowComparator {
 
 
     public static Comparator<InnodbUserRecord> primaryKeyComparator() {
-        return Comparator.comparing(innodbUserRecord -> {
+        return baseComparator().thenComparing(innodbUserRecord -> {
             Table table = innodbUserRecord.belongTo();
             String primaryKeyName = table.getExt().getPrimaryKeyName();
             return innodbUserRecord.getValueByColumnName(primaryKeyName);
         });
+
     }
+
+    public static Comparator<InnodbUserRecord> baseComparator() {
+        return (record1, record2) -> {
+            if (record1 instanceof Supremum) {
+                return 1;
+            }
+            if (record2 instanceof Supremum) {
+                return -1;
+            }
+            if (record1 instanceof Infimum) {
+                return -1;
+            }
+            if (record2 instanceof Infimum) {
+                return 1;
+            }
+            return 0;
+        };
+    }
+
 }

@@ -21,7 +21,6 @@ import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFact
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.InnodbIndex;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.RootPage;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.object.Index;
 
@@ -36,14 +35,14 @@ import java.io.RandomAccessFile;
 @Slf4j
 public class PageSupport {
 
-    public static RootPage getRoot(Index index) {
+    public static InnoDbPage getRoot(Index index) {
         File indexFile = index.getFile();
         try (FileInputStream fileInputStream = new FileInputStream(indexFile)) {
             byte[] pageByte = ConstantSize.PAGE.emptyBuff();
             if (fileInputStream.read(pageByte) != pageByte.length) {
                 throw new IllegalArgumentException("idb file error [ " + indexFile.getAbsoluteFile() + " ]");
             }
-            return (RootPage) PageFactory.swap(pageByte, index);
+            return PageFactory.swap(pageByte, index);
         } catch (IOException e) {
             throw new RuntimeIoException(e);
         }

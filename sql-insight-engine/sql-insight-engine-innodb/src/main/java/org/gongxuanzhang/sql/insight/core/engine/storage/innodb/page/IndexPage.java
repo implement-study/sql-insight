@@ -16,6 +16,8 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
+import kotlin.Pair;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFactory;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.InnodbIndex;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.IndexRecord;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
@@ -25,6 +27,7 @@ import org.gongxuanzhang.sql.insight.core.object.value.Value;
 import org.gongxuanzhang.sql.insight.core.object.value.ValueNegotiator;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,15 +42,21 @@ public class IndexPage extends InnoDbPage {
 
     @Override
     public void insertData(InnodbUserRecord data) {
-        int targetSlot = findTargetSlot(data);
-        InnodbUserRecord pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot - 1));
-        InnodbUserRecord next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset());
-        while (this.compare(data, next) > 0) {
-            pre = next;
-            next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset());
+        if (data instanceof IndexRecord) {
+            super.insertData(data);
+            return;
         }
-        linkedAndAdjust(pre, data, next);
-        splitIfNecessary();
+        Pair<InnodbUserRecord, InnodbUserRecord> preAndNext = findPreAndNext(data);
+        InnodbUserRecord pre = preAndNext.getFirst();
+        InnodbUserRecord next = preAndNext.getSecond();
+        IndexRecord hit;
+        if (pre instanceof Infimum) {
+            hit = (IndexRecord) next;
+        } else {
+            hit = (IndexRecord) pre;
+        }
+        InnoDbPage pointPage = PageFactory.findPageByOffset(hit.indexNode().getPointer(), this.ext.belongIndex);
+        pointPage.insertData(data);
     }
 
     @Override
@@ -68,15 +77,34 @@ public class IndexPage extends InnoDbPage {
 
 
     /**
-     *
      * data page will split when free space less than one in thirty-two page size
      **/
     @Override
     protected void splitIfNecessary() {
-        if(this.freeSpace > ConstantSize.PAGE.size() >> 5){
+        if (this.freeSpace > ConstantSize.PAGE.size() >> 5) {
             return;
         }
+        List<InnodbUserRecord> allRecords = new ArrayList<>(this.pageHeader.recordCount + 1);
+        InnodbUserRecord base = this.infimum;
+        while (true) {
+            base = getUserRecordByOffset(base.offset() + base.nextRecordOffset());
+            if (base == this.supremum) {
+                break;
+            }
+            allRecords.add(base);
+        }
+        InnoDbPage pre = PageFactory.createIndexPage(allRecords.subList(0, allRecords.size() / 2), ext.belongIndex);
+        InnoDbPage next = PageFactory.createIndexPage(allRecords.subList(allRecords.size() / 2, allRecords.size()),
+                ext.belongIndex);
+        upgrade(pre, next);
 
+    }
+
+    @Override
+    public IndexRecord pageIndex() {
+        IndexRecord firstData = (IndexRecord) getUserRecordByOffset(infimum.offset() + infimum.nextRecordOffset());
+        IndexNode node = new IndexNode(firstData.indexNode().getKey(), this.fileHeader.offset);
+        return new IndexRecord(node, this.ext.belongIndex);
     }
 
 

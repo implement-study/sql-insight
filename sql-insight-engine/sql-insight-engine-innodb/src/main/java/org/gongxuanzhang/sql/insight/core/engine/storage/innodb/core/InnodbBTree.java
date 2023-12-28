@@ -16,7 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.core;
 
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.RootPage;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport;
 import org.gongxuanzhang.sql.insight.core.object.Index;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
@@ -34,7 +34,7 @@ public interface InnodbBTree extends Index {
      *
      * @return not null
      **/
-    default RootPage getRootPage() {
+    default InnoDbPage getRootPage() {
         return PageSupport.getRoot(this);
     }
 

@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.AutoIncrementKeyCounter;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.core.InnodbIc;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Constant;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.RootPage;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RowFormatFactory;
 import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
@@ -81,7 +81,7 @@ public class ClusteredIndex extends InnodbIndex {
                     table.getColumnList().get(table.getExt().getAutoColIndex()).getName());
         }
         Compact compact = RowFormatFactory.compactFromInsertRow(row);
-        RootPage root = getRootPage();
+        InnoDbPage root = getRootPage();
         if (compact.length() >= Constant.COMPACT_MAX_ROW_LENGTH) {
             throw new DataTooLongException("compact row can't greater than " + Constant.COMPACT_MAX_ROW_LENGTH);
         }

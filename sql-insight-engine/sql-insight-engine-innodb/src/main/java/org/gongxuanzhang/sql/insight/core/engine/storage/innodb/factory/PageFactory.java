@@ -12,6 +12,7 @@ import org.gongxuanzhang.sql.insight.core.object.Table;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.util.List;
 
@@ -55,9 +56,21 @@ public abstract class PageFactory {
      **/
     public static DataPage createDataPage(List<InnodbUserRecord> recordList, InnodbIndex index) {
         DataPage dataPage = new DataPage(index);
+        fillInnodbUserRecords(recordList, dataPage);
+        dataPage.getFileHeader().setPageType(PageType.FIL_PAGE_INDEX.getValue());
+        return dataPage;
+    }
+
+    public static IndexPage createIndexPage(List<InnodbUserRecord> indexRecordList, InnodbIndex index) {
+        IndexPage indexPage = new IndexPage(index);
+        fillInnodbUserRecords(indexRecordList, indexPage);
+        indexPage.getFileHeader().setPageType(PageType.FIL_PAGE_INODE.getValue());
+        return indexPage;
+    }
+
+    private static void fillInnodbUserRecords(List<InnodbUserRecord> recordList, InnoDbPage page) {
         FileHeader fileHeader = new FileHeader();
-        fileHeader.setPageType(PageType.FIL_PAGE_INDEX.getValue());
-        dataPage.setFileHeader(fileHeader);
+        page.setFileHeader(fileHeader);
 
         PageHeader pageHeader = new PageHeader();
         pageHeader.setSlotCount((short) (((recordList.size() + 1) / 8) + 1));
@@ -65,17 +78,16 @@ public abstract class PageFactory {
         pageHeader.setRecordCount((short) recordList.size());
         pageHeader.setLastInsertOffset((short) ConstantSize.USER_RECORDS.offset());
 
-        dataPage.setSupremum(new Supremum());
-        dataPage.setInfimum(new Infimum());
+        page.setSupremum(new Supremum());
+        page.setInfimum(new Infimum());
 
         short[] slots = new short[((recordList.size() + 1) / Constant.SLOT_MAX_COUNT) + 1];
-        dataPage.setPageDirectory(new PageDirectory(slots));
-        dataPage.setFileTrailer(new FileTrailer());
+        page.setPageDirectory(new PageDirectory(slots));
+        page.setFileTrailer(new FileTrailer());
         UserRecords userRecords = new UserRecords();
-        dataPage.setUserRecords(userRecords);
-        //   相对偏移量
+        page.setUserRecords(userRecords);
 
-        InnodbUserRecord pre = dataPage.getInfimum();
+        InnodbUserRecord pre = page.getInfimum();
         short preOffset = (short) SUPREMUM.offset();
         for (int i = 0; i < recordList.size(); i++) {
             InnodbUserRecord current = recordList.get(i);
@@ -88,13 +100,24 @@ public abstract class PageFactory {
             }
         }
         pre.getRecordHeader().setNextRecordOffset(SUPREMUM.offset());
-        dataPage.setPageDirectory(new PageDirectory(slots));
+        page.setPageDirectory(new PageDirectory(slots));
         slots[0] = (short) SUPREMUM.offset();
         slots[slots.length - 1] = (short) INFIMUM.offset();
-        dataPage.setFileTrailer(new FileTrailer());
-        dataPage.setFreeSpace((short) (PAGE.size() - PAGE_HEADER.size() - FILE_HEADER.size() - FILE_TRAILER.size() -
+        page.setFileTrailer(new FileTrailer());
+        page.setFreeSpace((short) (PAGE.size() - PAGE_HEADER.size() - FILE_HEADER.size() - FILE_TRAILER.size() -
                 slots.length * Short.BYTES - userRecords.length()));
-        return dataPage;
+    }
+
+    public static InnoDbPage findPageByOffset(int pageOffset, Index index) {
+        File file = index.getFile();
+        try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw")) {
+            randomAccessFile.seek(pageOffset);
+            byte[] pageArr = PAGE.emptyBuff();
+            randomAccessFile.readFully(pageArr);
+            return swap(pageArr, index);
+        } catch (IOException e) {
+            throw new RuntimeIoException(e);
+        }
     }
 
     /**
@@ -140,7 +163,7 @@ public abstract class PageFactory {
         return null;
     }
 
-    private static RootPage createRoot(InnodbIndex index) {
+    private static InnoDbPage createRoot(InnodbIndex index) {
         DataPage root = new DataPage(index);
         root.setFileHeader(FileHeaderFactory.createFileHeader());
         root.setPageHeader(PageHeaderFactory.createPageHeader());
@@ -150,7 +173,7 @@ public abstract class PageFactory {
         root.setFreeSpace(root.getPageHeader().getHeapTop());
         root.setPageDirectory(new PageDirectory());
         root.setFileTrailer(new FileTrailer());
-        return new RootPage(root);
+        return root;
     }
 
     public static Supremum swapSupremum(byte[] bytes) {

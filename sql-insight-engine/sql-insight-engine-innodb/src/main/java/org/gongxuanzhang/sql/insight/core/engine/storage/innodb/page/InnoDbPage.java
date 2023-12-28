@@ -17,18 +17,20 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 
+import kotlin.Pair;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFactory;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageHeaderFactory;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.InnodbIndex;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.IndexRecord;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordType;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport;
 import org.gongxuanzhang.sql.insight.core.exception.DuplicationPrimaryKeyException;
 
-import java.lang.reflect.Field;
 import java.util.Comparator;
 
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Constant.SLOT_MAX_COUNT;
@@ -117,7 +119,31 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
      * page is index node will find target leaf node and insert data.
      * may be split page in process
      **/
-    public abstract void insertData(InnodbUserRecord data);
+    public void insertData(InnodbUserRecord data) {
+        Pair<InnodbUserRecord, InnodbUserRecord> preAndNext = findPreAndNext(data);
+        InnodbUserRecord pre = preAndNext.getFirst();
+        InnodbUserRecord next = preAndNext.getSecond();
+        linkedAndAdjust(pre, data, next);
+        splitIfNecessary();
+    }
+
+
+    /**
+     * find location where the record linked in page and return pre and next.
+     * search only,don't affect the page .
+     *
+     * @param userRecord target record
+     **/
+    protected Pair<InnodbUserRecord, InnodbUserRecord> findPreAndNext(InnodbUserRecord userRecord) {
+        int targetSlot = findTargetSlot(userRecord);
+        InnodbUserRecord pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot - 1));
+        InnodbUserRecord next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset());
+        while (this.compare(userRecord, next) > 0) {
+            pre = next;
+            next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset());
+        }
+        return new Pair<>(pre, next);
+    }
 
 
     /**
@@ -191,6 +217,58 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
      **/
     protected abstract void splitIfNecessary();
 
+
+    protected void upgrade(InnoDbPage prePage, InnoDbPage nextPage) {
+        //  is root page
+        if (this.ext.parent == null) {
+            rootPageUpgrade(prePage, nextPage);
+        } else {
+            // normal leaf node
+            prePage.fileHeader.setOffset(this.fileHeader.offset);
+            int newDataPageOffset = PageSupport.allocatePage(this.ext.belongIndex);
+            nextPage.fileHeader.setOffset(newDataPageOffset);
+            InnoDbPage parent = this.ext.parent;
+            this.transferFrom(prePage);
+            parent.insertData(nextPage.pageIndex());
+        }
+    }
+
+
+    /**
+     * get the first index node to parent node insert
+     **/
+    public abstract IndexRecord pageIndex();
+
+
+    /**
+     * root page upgrade.
+     * create 2 new page and linked whether upgrading  from index page or data page.
+     **/
+    private void rootPageUpgrade(InnoDbPage preChild, InnoDbPage secondChild) {
+        preChild.pageHeader.level = this.pageHeader.level;
+        secondChild.pageHeader.level = this.pageHeader.level;
+        this.pageHeader.level++;
+        FileHeader firstFileHeader = preChild.getFileHeader();
+        FileHeader secondFileHeader = secondChild.getFileHeader();
+        int offset = PageSupport.allocatePage(this.ext.belongIndex, 2);
+        firstFileHeader.setOffset(offset);
+        secondFileHeader.setOffset(offset + ConstantSize.PAGE.size());
+        firstFileHeader.setPre(-1);
+        firstFileHeader.setNext(secondFileHeader.offset);
+        secondFileHeader.setPre(firstFileHeader.offset);
+        secondFileHeader.setNext(-1);
+        //  transfer to index page
+        this.fileHeader.next = -1;
+        this.fileHeader.pageType = PageType.FIL_PAGE_INODE.getValue();
+        this.pageHeader = PageHeaderFactory.createPageHeader();
+        this.pageDirectory = new PageDirectory();
+        //  clear user record
+        this.userRecords = new UserRecords();
+        this.insertData(preChild.pageIndex());
+        this.insertData(secondChild.pageIndex());
+    }
+
+
     protected void linkedAndAdjust(InnodbUserRecord pre, InnodbUserRecord insertRecord, InnodbUserRecord next) {
         RecordHeader insertHeader = insertRecord.getRecordHeader();
         insertHeader.setHeapNo(this.pageHeader.absoluteRecordCount);
@@ -235,7 +313,7 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
     /**
      * byte array copy from target page
      **/
-    public void transferFrom(InnoDbPage page){
+    public void transferFrom(InnoDbPage page) {
         InnoDbPage snapshot = PageFactory.swap(page.ext.source, this.ext.belongIndex);
         this.fileHeader = snapshot.fileHeader;
         this.pageHeader = snapshot.pageHeader;
@@ -247,7 +325,6 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
         this.fileTrailer = snapshot.fileTrailer;
         this.ext = snapshot.ext;
     }
-
 
 
     @Data

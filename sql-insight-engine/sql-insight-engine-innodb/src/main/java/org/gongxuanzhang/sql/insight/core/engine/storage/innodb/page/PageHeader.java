@@ -82,6 +82,7 @@ public class PageHeader implements PageObject, ByteWrapper {
 
     /**
      * this page in b-tree layer level
+     * leaf node level is 0.
      **/
     short level;
 

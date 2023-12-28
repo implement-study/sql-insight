@@ -17,12 +17,9 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 import lombok.extern.slf4j.Slf4j;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageHeaderFactory;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.InnodbIndex;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Compact;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.IndexRecord;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RowFormatFactory;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.RowComparator;
 import org.gongxuanzhang.sql.insight.core.object.Column;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
@@ -44,33 +41,10 @@ public class DataPage extends InnoDbPage {
     }
 
 
-    /**
-     * if data page is root page.
-     * call insert data by index.
-     * else call this method by parent index page.
-     **/
-    @Override
-    public void insertData(InnodbUserRecord data) {
-        //   todo data only compact row format present
-        if (!(data instanceof Compact)) {
-            throw new IllegalArgumentException("data page can't insert " + data.getClass().getName());
-        }
-        int targetSlot = findTargetSlot(data);
-        InnodbUserRecord pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot - 1));
-        InnodbUserRecord next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset());
-        while (this.compare(data, next) > 0) {
-            pre = next;
-            next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset());
-        }
-        linkedAndAdjust(pre, data, next);
-        splitIfNecessary();
-    }
-
     @Override
     protected InnodbUserRecord wrapUserRecord(int offsetInPage) {
         return RowFormatFactory.readRecordInPage(this, offsetInPage, this.ext.belongIndex.belongTo());
     }
-
 
     /**
      * data page will split when free space less than one-sixteenth page size
@@ -83,8 +57,11 @@ public class DataPage extends InnoDbPage {
         List<InnodbUserRecord> pageUserRecord = new ArrayList<>(this.pageHeader.recordCount + 1);
         InnodbUserRecord base = this.infimum;
         int allLength = 0;
-        while (base != this.supremum) {
+        while (true) {
             base = getUserRecordByOffset(base.offset() + base.nextRecordOffset());
+            if (base == this.supremum) {
+                break;
+            }
             pageUserRecord.add(base);
             allLength += base.length();
         }
@@ -124,40 +101,10 @@ public class DataPage extends InnoDbPage {
         if (firstDataPage == null) {
             throw new NullPointerException("data page error");
         }
-        //   parent == null means this page is root
-        if (this.ext.parent == null) {
-            firstDataPage.getPageHeader().setLevel((short) 1);
-            secondDataPage.getPageHeader().setLevel((short) 1);
-            FileHeader firstFileHeader = firstDataPage.getFileHeader();
-            FileHeader secondFileHeader = secondDataPage.getFileHeader();
-            int offset = PageSupport.allocatePage(this.ext.belongIndex, 2);
-            firstFileHeader.setOffset(offset);
-            secondFileHeader.setOffset(offset + ConstantSize.PAGE.size());
-            firstFileHeader.setPre(-1);
-            firstFileHeader.setNext(secondFileHeader.offset);
-            secondFileHeader.setPre(firstFileHeader.offset);
-            secondFileHeader.setNext(-1);
-            //  transfer to index page
-            this.fileHeader.next = firstDataPage.getFileHeader().offset;
-            this.fileHeader.pageType = PageType.FIL_PAGE_INODE.getValue();
-            this.pageHeader = PageHeaderFactory.createPageHeader();
-            this.pageDirectory = new PageDirectory();
-            //  clear user record
-            this.userRecords = new UserRecords();
-            this.insertData(firstDataPage.pageIndex());
-            this.insertData(secondDataPage.pageIndex());
-        } else {
-            // normal leaf node
-            firstDataPage.fileHeader.setOffset(this.fileHeader.offset);
-            int newDataPageOffset = PageSupport.allocatePage(this.ext.belongIndex);
-            secondDataPage.fileHeader.setOffset(newDataPageOffset);
-            InnoDbPage parent = firstDataPage.ext.parent;
-            this.transferFrom(firstDataPage);
-            parent.insertData(secondDataPage.pageIndex());
-        }
+        upgrade(firstDataPage, secondDataPage);
     }
 
-
+    @Override
     public IndexRecord pageIndex() {
         InnodbUserRecord firstData = getUserRecordByOffset(infimum.offset() + infimum.nextRecordOffset());
         List<Column> columns = this.ext.belongIndex.columns();
