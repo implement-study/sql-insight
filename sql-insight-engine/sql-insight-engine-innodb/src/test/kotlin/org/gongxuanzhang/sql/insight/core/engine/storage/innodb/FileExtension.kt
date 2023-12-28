@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 java-mysql  and the original author or authors <gongxuanzhangmelt@gmail.com>.
+ * Copyright 2023 sql-insight  and the original author or authors <gongxuanzhangmelt@gmail.com>.
  *
  * Licensed under the GNU Affero General Public License v3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight
+package org.gongxuanzhang.sql.insight.core.engine.storage.innodb
 
-import org.junit.jupiter.api.Assertions
+import java.io.File
 
 
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-fun assertFalse(condition: Boolean, message: String? = null) {
-    Assertions.assertTrue(!condition, message)
+
+fun File.forEachLineIndex(action: (Int, String) -> Unit) {
+    var lineNumber = 1
+    this.forEachLine {
+        action.invoke(lineNumber, it)
+        lineNumber++
+    }
 }
+
+
 
 

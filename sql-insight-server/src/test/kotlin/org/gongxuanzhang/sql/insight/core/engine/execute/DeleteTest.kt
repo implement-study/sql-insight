@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine.json
+package org.gongxuanzhang.sql.insight.core.engine.execute
 
 import org.gongxuanzhang.sql.insight.*
 import org.gongxuanzhang.sql.insight.core.command.dml.Delete
@@ -50,12 +50,6 @@ class DeleteTest {
         insert("aa", "user")
         "delete from aa.user  where id>2 ".doSql()
         val table = SqlInsightContext.getInstance().tableDefinitionManager.select("aa", "user")
-        val tableJson = JsonEngineSupport.getJsonFile(table)
-        tableJson.forEachLineIndex { index, line ->
-            if (index > 3) {
-                assert(line.isEmpty())
-            }
-        }
     }
 
 

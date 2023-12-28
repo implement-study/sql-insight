@@ -120,10 +120,6 @@ public class InsertRow implements Row, FillDataVisitor, TableContainer, Iterable
 
     @Override
     public void endVisit(SQLNullExpr x) {
-        Column column = currentColumn();
-        if (column.isNotNull()) {
-            throw new InsertException(this.insertRowId, "column " + column.getName() + " not null");
-        }
         valueList.add(ValueNull.getInstance());
     }
 

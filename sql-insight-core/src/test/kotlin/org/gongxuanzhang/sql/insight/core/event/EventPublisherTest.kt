@@ -30,13 +30,13 @@ class EventPublisherTest {
         val counter3 = AtomicInteger()
         publisher.registerListener(TestEvent1Listener(counter1))
         publisher.registerListener(TestEvent2Listener(counter2))
-        publisher.registerListener(TestMultiEventListener(counter1,counter2,counter3))
+        publisher.registerListener(TestMultiEventListener(counter1, counter2, counter3))
         publisher.publishEvent(TestEvent1(""))
         publisher.publishEvent(TestEvent2(""))
         publisher.publishEvent(TestEvent3(""))
-        assert(counter1.get()==2)
-        assert(counter2.get()==2)
-        assert(counter3.get()==1)
+        assert(counter1.get() == 2)
+        assert(counter2.get() == 2)
+        assert(counter3.get() == 1)
     }
 }
 

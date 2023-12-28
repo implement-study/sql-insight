@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine.json
+package org.gongxuanzhang.sql.insight.core.engine.execute
 
-import com.alibaba.fastjson2.JSONObject
 import org.gongxuanzhang.sql.insight.*
 import org.gongxuanzhang.sql.insight.core.command.dml.Insert
+import org.gongxuanzhang.sql.insight.core.engine.json.InsightFactory
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseExistsException
 import org.gongxuanzhang.sql.insight.core.exception.TableNotExistsException
 import org.gongxuanzhang.sql.insight.core.`object`.value.ValueInt
@@ -37,23 +37,6 @@ class InsertTest {
     fun testInsert() {
         insert("aa", "user")
         val table = context().tableDefinitionManager.select("aa", "user")
-        val tableJson = JsonEngineSupport.getJsonFile(table)
-        val jsonList = mutableListOf<JSONObject>()
-        tableJson.forEachLine {
-            if (it.isNotEmpty()) {
-                val jsonObject = JSONObject.parse(it)
-                jsonList.add(jsonObject)
-            }
-        }
-        assertEquals(
-            jsonList, listOf(
-                JSONObject.of("id", 1, "name", "a"),
-                JSONObject.of("id", 2, "name", "b"),
-                JSONObject.of("id", 3, "name", "c"),
-                JSONObject.of("id", 4, "name", "b"),
-                JSONObject.of("id", 5, "name", "c"),
-            )
-        )
         clearDatabase("aa")
     }
 

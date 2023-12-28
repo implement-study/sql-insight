@@ -17,6 +17,7 @@
 package org.gongxuanzhang.sql.insight.core.engine.execute
 
 import org.gongxuanzhang.sql.insight.clearDatabase
+import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext
 import org.gongxuanzhang.sql.insight.core.exception.TableNotExistsException
 import org.gongxuanzhang.sql.insight.createTable
 import org.gongxuanzhang.sql.insight.doSql
@@ -44,6 +45,7 @@ class DropTableTest {
         val tableName = "test_table"
         createTable(databaseName, tableName)
         dropTableSql(tableName, databaseName, true).doSql()
+        assert(SqlInsightContext.getInstance().tableDefinitionManager.select(databaseName, tableName) == null)
         clearDatabase(databaseName)
     }
 

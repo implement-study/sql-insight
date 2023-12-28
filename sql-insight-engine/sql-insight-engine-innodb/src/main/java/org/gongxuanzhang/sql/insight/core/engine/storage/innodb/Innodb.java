@@ -28,6 +28,7 @@ import org.gongxuanzhang.sql.insight.core.result.MessageResult;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -43,7 +44,7 @@ public class Innodb implements StorageEngine {
 
     @Override
     public List<String> tableExtensions() {
-        return Arrays.asList("ibd");
+        return Collections.singletonList("ibd");
     }
 
     @Override

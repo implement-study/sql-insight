@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.zhonghaiwenda.sql.insight.server;
+package org.gongxuanzhang.sql.insight.core.engine.storage.innodb
 
-import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext;
+import org.junit.jupiter.api.Assertions
+
 
 /**
- * @author gongxuanzhangmelt@gmail.com
+ * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public class SqlInsightServer {
-    public static void main(String[] args) {
-        SqlInsightContext context = SqlInsightContext.getInstance();
-
-    }
+fun assertFalse(condition: Boolean, message: String = "") {
+    Assertions.assertTrue(!condition, message)
 }
+

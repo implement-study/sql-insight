@@ -45,7 +45,7 @@ public class SqlPipeline {
 
         SessionContext.getCurrentSession();
         try {
-            log.info("start execute sql {} ...", sql);
+            log.info("start execute sql \n {}  ...", sql);
             long startTime = System.currentTimeMillis();
 
             Command command = optimizer.analysisSql(sql);
@@ -54,7 +54,7 @@ public class SqlPipeline {
 
             ResultInterface resultInterface = executeEngine.executePlan(plan);
 
-            log.info("end sql {} ...take time {}ms", sql.split("\n")[0], (System.currentTimeMillis() - startTime));
+            log.info("end sql \n {} ...take time {}ms", sql.split("\n")[0], (System.currentTimeMillis() - startTime));
 
             return resultInterface;
         } finally {

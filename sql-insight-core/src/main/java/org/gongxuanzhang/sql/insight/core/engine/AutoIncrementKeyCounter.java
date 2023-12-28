@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.engine;
 
+import org.gongxuanzhang.sql.insight.core.object.Database;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
@@ -42,4 +43,9 @@ public interface AutoIncrementKeyCounter {
      * reset the counter
      **/
     void reset(Table table);
+
+    /**
+     * reset the Database
+     **/
+    void reset(Database database);
 }

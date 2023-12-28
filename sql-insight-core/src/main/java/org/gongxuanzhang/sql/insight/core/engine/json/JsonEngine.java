@@ -20,6 +20,10 @@ import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.command.dml.Update;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
+import org.gongxuanzhang.sql.insight.core.event.DropDatabaseEvent;
+import org.gongxuanzhang.sql.insight.core.event.DropTableEvent;
+import org.gongxuanzhang.sql.insight.core.event.InsightEvent;
+import org.gongxuanzhang.sql.insight.core.event.MultipleEventListener;
 import org.gongxuanzhang.sql.insight.core.exception.CreateTableException;
 import org.gongxuanzhang.sql.insight.core.exception.InsertException;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
@@ -37,6 +41,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,7 +49,7 @@ import java.util.List;
  * @author gongxuanzhangmelt@gmail.com
  **/
 @Slf4j
-public class JsonEngine implements StorageEngine {
+public class JsonEngine implements StorageEngine , MultipleEventListener {
 
     private final JsonIncrementKeyCounter counter = new JsonIncrementKeyCounter();
 
@@ -189,4 +194,17 @@ public class JsonEngine implements StorageEngine {
     }
 
 
+    @Override
+    public void onEvent(InsightEvent event) {
+        if(event instanceof DropTableEvent){
+            this.counter.reset(((DropTableEvent) event).getTable());
+        }else if(event instanceof DropDatabaseEvent){
+            this.counter.reset(((DropDatabaseEvent) event).getDatabase());
+        }
+    }
+
+    @Override
+    public List<Class<? extends InsightEvent>> listenEvent() {
+        return Arrays.asList(DropTableEvent.class, DropDatabaseEvent.class);
+    }
 }

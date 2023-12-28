@@ -17,6 +17,7 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.core;
 
 import org.gongxuanzhang.sql.insight.core.engine.AutoIncrementKeyCounter;
+import org.gongxuanzhang.sql.insight.core.object.Database;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
@@ -60,5 +61,10 @@ public class InnodbIc implements AutoIncrementKeyCounter {
     @Override
     public void reset(Table table) {
         this.counter.set(0);
+    }
+
+    @Override
+    public void reset(Database database) {
+
     }
 }

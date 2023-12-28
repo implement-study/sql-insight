@@ -18,11 +18,13 @@ package org.gongxuanzhang.sql.insight.core.engine.execute
 
 import org.gongxuanzhang.sql.insight.*
 import org.gongxuanzhang.sql.insight.core.command.ddl.CreateTable
+import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseNotExistsException
 import org.gongxuanzhang.sql.insight.core.`object`.Column
 import org.gongxuanzhang.sql.insight.core.`object`.DataType
 import org.gongxuanzhang.sql.insight.core.`object`.value.ValueVarchar
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.io.File
@@ -43,7 +45,7 @@ class CreateTableTest {
                 name varchar not null,
                 gender varchar(20) default '男' not null comment '性别',
                 id_card char UNIQUE
-                ) comment = '用户表', engine = 'innodb'
+                ) comment = '用户表', engine = 'json'
             """.trimIndent()
     }
 
@@ -57,31 +59,34 @@ class CreateTableTest {
         assertEquals(table.name, tableName)
         assertEquals(table.database.name, databaseName)
         assertEquals(table.comment, "用户表")
-        assertEquals(table.columnList[0], run {
+        assertEquals(run {
             val column = Column()
             column.isAutoIncrement = true
             column.isPrimaryKey = true
             column.name = "id"
+            column.isNotNull = true
             val dataType = DataType()
             dataType.type = DataType.Type.INT
-            dataType.length = 8
+            dataType.length = 4
             column.dataType = dataType
             column
-        })
-        assertEquals(table.columnList[1], run {
+        }, table.columnList[0])
+        assertEquals(run {
             val column = Column()
             column.isNotNull = true
             column.name = "name"
+            column.isVariable = true
             val dataType = DataType()
             dataType.type = DataType.Type.VARCHAR
             dataType.length = 255
             column.dataType = dataType
             column
-        })
+        }, table.columnList[1])
         assertEquals(table.columnList[2], run {
             val column = Column()
             column.isNotNull = true
             column.name = "gender"
+            column.isVariable = true
             val dataType = DataType()
             dataType.type = DataType.Type.VARCHAR
             dataType.length = 20
@@ -102,7 +107,6 @@ class CreateTableTest {
         })
     }
 
-
     @Test
     fun testCreateTableDbNotExists() {
         val tableName = "test_tableName"
@@ -119,6 +123,8 @@ class CreateTableTest {
         createDatabase(databaseName)
         createTableSql(tableName, databaseName, true).doSql()
         assert(File(databaseFile(databaseName), "$tableName.frm").exists())
+        val table = SqlInsightContext.getInstance().tableDefinitionManager.select(databaseName, tableName)
+        assertNotNull(table)
         clearDatabase(databaseName)
 
     }

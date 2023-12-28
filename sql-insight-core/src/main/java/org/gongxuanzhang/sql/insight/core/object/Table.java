@@ -52,7 +52,7 @@ public final class Table implements FillDataVisitor, CommentContainer {
 
     //  support operator
 
-    private TableExt ext;
+    private TableExt ext = new TableExt();
 
 
     public Integer getColumnIndexByName(String colName) {

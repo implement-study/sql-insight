@@ -22,6 +22,7 @@ import com.google.common.collect.Tables;
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.AutoIncrementKeyCounter;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
+import org.gongxuanzhang.sql.insight.core.object.Database;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
@@ -31,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -72,6 +74,12 @@ public class JsonIncrementKeyCounter implements AutoIncrementKeyCounter {
             atomicLong.set(insertValue);
         }
         return false;
+    }
+
+    @Override
+    public void reset(Database database) {
+        Map<String, AtomicLong> row = this.keyTable.row(database.getName());
+        row.forEach((tableName,al)->al.set(0));
     }
 
     @Override
