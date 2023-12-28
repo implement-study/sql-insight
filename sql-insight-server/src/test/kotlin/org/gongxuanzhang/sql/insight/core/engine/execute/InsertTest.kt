@@ -19,10 +19,13 @@ package org.gongxuanzhang.sql.insight.core.engine.execute
 import org.gongxuanzhang.sql.insight.*
 import org.gongxuanzhang.sql.insight.core.command.dml.Insert
 import org.gongxuanzhang.sql.insight.core.engine.json.InsightFactory
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFactory
+import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseExistsException
 import org.gongxuanzhang.sql.insight.core.exception.TableNotExistsException
 import org.gongxuanzhang.sql.insight.core.`object`.value.ValueInt
 import org.gongxuanzhang.sql.insight.core.`object`.value.ValueVarchar
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -33,11 +36,22 @@ import org.junit.jupiter.api.assertThrows
  **/
 class InsertTest {
 
+    @AfterEach
+    fun clear(){
+        clearDatabase("aa")
+    }
+
     @Test
     fun testInsert() {
         insert("aa", "user")
         val table = context().tableDefinitionManager.select("aa", "user")
-        clearDatabase("aa")
+        val context = SqlInsightContext.getInstance()
+        val engine = context.selectEngine("innodb")
+        engine.openTable(table)
+        table.indexList
+
+
+//        clearDatabase("aa")
     }
 
 

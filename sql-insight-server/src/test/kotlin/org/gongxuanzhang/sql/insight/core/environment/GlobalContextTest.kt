@@ -28,7 +28,7 @@ class GlobalContextTest {
 
     @Test
     fun testGlobalContext() {
-        System.setProperty("default-file", "/test-mysql.properties")
+        System.setProperty("default-file", "/mysql.properties")
         val instance = GlobalContext.getInstance()
         assertEquals(instance["test"], "ok")
         assertNull(instance["a"])

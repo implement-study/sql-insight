@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core
+package org.gongxuanzhang.sql.insight
 
 import java.io.File
 

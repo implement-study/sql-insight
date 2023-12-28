@@ -31,6 +31,7 @@ import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -48,7 +49,7 @@ public class ClusteredIndex extends InnodbIndex {
 
     @Override
     public List<Column> columns() {
-        return null;
+        return Collections.singletonList(this.table.getColumnList().get(this.table.getExt().getPrimaryKeyIndex()));
     }
 
 

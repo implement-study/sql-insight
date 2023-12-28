@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 sql-insight  and the original author or authors <gongxuanzhangmelt@gmail.com>.
+ * Copyright 2023 java-mysql  and the original author or authors <gongxuanzhangmelt@gmail.com>.
  *
  * Licensed under the GNU Affero General Public License v3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,15 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core
+package org.gongxuanzhang.sql.insight
 
-import org.gongxuanzhang.sql.insight.core.analysis.druid.DruidAnalyzer
-import org.gongxuanzhang.sql.insight.core.command.Command
-import org.gongxuanzhang.sql.insight.core.engine.json.InsightFactory
-import org.gongxuanzhang.sql.insight.core.result.ResultInterface
+import org.junit.jupiter.api.Assertions
 
 
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-
-fun String.doSql(): ResultInterface {
-    val pipeline = InsightFactory.createSqlPipeline()
-    return pipeline.doSql(this)
+fun assertFalse(condition: Boolean, message: String = "") {
+    Assertions.assertTrue(!condition, message)
 }
-
-
-fun String.toCommand(): Command {
-    return DruidAnalyzer().analysisSql(this)
-}
-
 

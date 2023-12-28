@@ -20,6 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.command.dml.Update;
 import org.gongxuanzhang.sql.insight.core.engine.storage.StorageEngine;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFactory;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.ClusteredIndex;
+import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.object.Index;
 import org.gongxuanzhang.sql.insight.core.object.InsertRow;
 import org.gongxuanzhang.sql.insight.core.object.Row;
@@ -27,6 +29,9 @@ import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.result.MessageResult;
 import org.gongxuanzhang.sql.insight.core.result.ResultInterface;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -44,19 +49,37 @@ public class Innodb implements StorageEngine {
 
     @Override
     public List<String> tableExtensions() {
-        return Collections.singletonList("ibd");
+        return Arrays.asList("ibd", "inf");
     }
 
     @Override
     public void openTable(Table table) {
-        List<Index> indexList = table.getIndexList();
-
+        if (table.getIndexList().isEmpty()) {
+            File file = new File(table.getDatabase().getDbFolder(), table.getName() + ".inf");
+            table.getIndexList().add(new ClusteredIndex(table));
+            try {
+                List<String> lines = Files.readAllLines(file.toPath());
+                //  todo load index
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            for (Index index : table.getIndexList()) {
+                index.rndInit();
+            }
+        }
     }
 
     @Override
     public ResultInterface createTable(Table table) {
         PageFactory.initialization(table);
         log.info("create table {} with innodb,create ibd file", table.getName());
+        File dbFolder = table.getDatabase().getDbFolder();
+        File file = new File(dbFolder, table.getName() + ".inf");
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeIoException(e);
+        }
         return new MessageResult(String.format("成功创建%s", table.getName()));
     }
 

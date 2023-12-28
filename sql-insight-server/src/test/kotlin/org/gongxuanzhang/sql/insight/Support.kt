@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core
+package org.gongxuanzhang.sql.insight
 
 import org.gongxuanzhang.sql.insight.core.environment.DefaultProperty
 import org.gongxuanzhang.sql.insight.core.environment.GlobalContext
