@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine.storage.innodb
+package org.gongxuanzhang.sql.insight
 
-import java.io.File
+import org.gongxuanzhang.sql.insight.core.analysis.druid.DruidAnalyzer
+import org.gongxuanzhang.sql.insight.core.command.Command
+import org.gongxuanzhang.sql.insight.core.engine.json.InsightFactory
+import org.gongxuanzhang.sql.insight.core.result.ResultInterface
 
 
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 
-fun File.forEachLineIndex(action: (Int, String) -> Unit) {
-    var lineNumber = 1
-    this.forEachLine {
-        action.invoke(lineNumber, it)
-        lineNumber++
-    }
+fun String.doSql(): ResultInterface {
+    val pipeline = InsightFactory.createSqlPipeline()
+    return pipeline.doSql(this)
 }
 
 
+fun String.toCommand(): Command {
+    return DruidAnalyzer().analysisSql(this)
+}
 
 

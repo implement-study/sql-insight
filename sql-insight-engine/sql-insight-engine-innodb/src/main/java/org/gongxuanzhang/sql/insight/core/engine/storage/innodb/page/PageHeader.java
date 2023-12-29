@@ -89,12 +89,21 @@ public class PageHeader implements PageObject, ByteWrapper {
     /**
      * which index the page belong to
      **/
-    int indexId;
+    long indexId;
+
+    /**
+     * join seg leaf 10 bytes
+     **/
+    short segLeafPre;
     /**
      * 10 bytes.
      * b-tree leaf-node header info . only root page have.
      **/
     long segLeaf;
+    /**
+     * join seg top 10 bytes
+     **/
+    short segTopPre;
     /**
      * 10 bytes.
      * b-tree non-leaf-node header info . only root page have.
@@ -122,7 +131,9 @@ public class PageHeader implements PageObject, ByteWrapper {
         buffer.appendLong(maxTransactionId);
         buffer.appendShort(level);
         buffer.appendLong(indexId);
+        buffer.appendShort(segLeafPre);
         buffer.appendLong(segLeaf);
+        buffer.appendShort(segTopPre);
         buffer.appendLong(segTop);
         return buffer.toBytes();
     }

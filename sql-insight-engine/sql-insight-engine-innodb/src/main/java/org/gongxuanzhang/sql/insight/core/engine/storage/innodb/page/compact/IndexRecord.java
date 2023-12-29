@@ -17,6 +17,7 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
 
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.RecordHeaderFactory;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.IndexNode;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnodbUserRecord;
 import org.gongxuanzhang.sql.insight.core.object.Index;
@@ -42,7 +43,7 @@ public class IndexRecord implements InnodbUserRecord {
     private int offsetInPage = -1;
 
     public IndexRecord(IndexNode indexNode, Index index) {
-        this(new IndexHeader(), indexNode, index);
+        this(RecordHeaderFactory.indexHeader(), indexNode, index);
     }
 
     public IndexRecord(RecordHeader recordHeader, IndexNode indexNode, Index index) {

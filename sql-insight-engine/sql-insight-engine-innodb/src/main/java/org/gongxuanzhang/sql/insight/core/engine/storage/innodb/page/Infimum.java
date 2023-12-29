@@ -18,7 +18,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
 
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.InfimumHeader;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.RecordHeaderFactory;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
@@ -46,7 +46,7 @@ public class Infimum implements InnodbUserRecord {
     final byte[] body;
 
     public Infimum() {
-        this.recordHeader = new InfimumHeader();
+        this.recordHeader = RecordHeaderFactory.infimumHeader();
         this.body = DynamicByteBuffer.wrap(INFIMUM_BODY.getBytes()).append((byte) 0).toBytes();
     }
 
@@ -118,5 +118,10 @@ public class Infimum implements InnodbUserRecord {
     @Override
     public int length() {
         return ConstantSize.INFIMUM.size();
+    }
+
+    public Infimum setRecordHeader(RecordHeader recordHeader) {
+        this.recordHeader = recordHeader;
+        return this;
     }
 }

@@ -65,7 +65,7 @@ public class IndexPage extends InnoDbPage {
         List<Column> columns = this.ext.belongIndex.columns();
         RecordHeader recordHeader = RowFormatFactory.readRecordHeader(this, offsetInPage);
         Value[] key = new Value[columns.size()];
-        ByteBuffer buffer = ByteBuffer.wrap(this.ext.source, offsetInPage, this.ext.source.length - offsetInPage);
+        ByteBuffer buffer = ByteBuffer.wrap(this.toBytes(), offsetInPage, this.length() - offsetInPage);
         for (int i = 0; i < key.length; i++) {
             Column column = columns.get(i);
             byte[] valueArr = new byte[column.getDataType().getLength()];

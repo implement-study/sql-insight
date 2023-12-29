@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
+package org.gongxuanzhang.sql.insight
+
+import org.junit.jupiter.api.Assertions
+
 
 /**
- * @author gongxuanzhangmelt@gmail.com
+ * @author gxz gongxuanzhangmelt@gmail.com
  **/
-public class IndexHeader extends RecordHeader {
-
-    public IndexHeader() {
-        this.setRecordType(RecordType.PAGE);
-        this.setHeapNo(1);
-        this.setDelete(false);
-        this.setNOwned(1);
-        this.setNextRecordOffset(0);
-    }
-
+fun assertFalse(condition: Boolean, message: String = "") {
+    Assertions.assertTrue(!condition, message)
 }
+

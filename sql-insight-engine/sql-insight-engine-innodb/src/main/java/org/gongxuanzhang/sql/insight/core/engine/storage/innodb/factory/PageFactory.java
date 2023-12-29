@@ -29,6 +29,8 @@ import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Cons
 @Slf4j
 public abstract class PageFactory {
 
+    private static final short EMPTY_PAGE_FREE_SPACE =
+            (short) (PAGE.size() - FILE_TRAILER.size() - FILE_HEADER.size() - PAGE_HEADER.size() - Short.BYTES * 2 - INFIMUM.size() - SUPREMUM.size());
 
     /**
      * create idb file and add a root page .
@@ -104,8 +106,7 @@ public abstract class PageFactory {
         slots[0] = (short) SUPREMUM.offset();
         slots[slots.length - 1] = (short) INFIMUM.offset();
         page.setFileTrailer(new FileTrailer());
-        page.setFreeSpace((short) (PAGE.size() - PAGE_HEADER.size() - FILE_HEADER.size() - FILE_TRAILER.size() -
-                slots.length * Short.BYTES - userRecords.length()));
+        page.setFreeSpace((short) (PAGE.size() - PAGE_HEADER.size() - FILE_HEADER.size() - FILE_TRAILER.size() - slots.length * Short.BYTES - userRecords.length()));
     }
 
     public static InnoDbPage findPageByOffset(int pageOffset, Index index) {
@@ -135,6 +136,7 @@ public abstract class PageFactory {
         byte[] infimumBytes = buffer.getLength(INFIMUM.size());
         //  supremum
         byte[] supremumBytes = buffer.getLength(SUPREMUM.size());
+
 
         //  user records 使用
 //        short heapTop = bean.pageHeader.getHeapTop();
@@ -170,18 +172,28 @@ public abstract class PageFactory {
         root.setInfimum(new Infimum());
         root.setSupremum(new Supremum());
         root.setUserRecords(new UserRecords());
-        root.setFreeSpace(root.getPageHeader().getHeapTop());
+        root.setFreeSpace(EMPTY_PAGE_FREE_SPACE);
         root.setPageDirectory(new PageDirectory());
         root.setFileTrailer(new FileTrailer());
         return root;
     }
 
-    public static Supremum swapSupremum(byte[] bytes) {
+    public static Supremum readSupremum(byte[] bytes) {
         Supremum supremum = new Supremum();
         ConstantSize.SUPREMUM.checkSize(bytes);
         DynamicByteBuffer buffer = DynamicByteBuffer.wrap(bytes);
         byte[] headBuffer = buffer.getLength(ConstantSize.RECORD_HEADER.size());
         supremum.setRecordHeader(new RecordHeader(headBuffer));
         return supremum;
+    }
+
+
+    public static Infimum readInfimum(byte[] bytes) {
+        Infimum infimum = new Infimum();
+        INFIMUM.checkSize(bytes);
+        DynamicByteBuffer buffer = DynamicByteBuffer.wrap(bytes);
+        byte[] headBuffer = buffer.getLength(ConstantSize.RECORD_HEADER.size());
+        infimum.setRecordHeader(new RecordHeader(headBuffer));
+        return infimum;
     }
 }

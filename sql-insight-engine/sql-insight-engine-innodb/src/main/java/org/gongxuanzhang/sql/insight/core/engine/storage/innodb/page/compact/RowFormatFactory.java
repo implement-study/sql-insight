@@ -112,7 +112,7 @@ public class RowFormatFactory {
      **/
     public static RecordHeader readRecordHeader(InnoDbPage page, int offset) {
         int recordHeaderSize = ConstantSize.RECORD_HEADER.size();
-        ByteBuffer buffer = ByteBuffer.wrap(page.getExt().getSource(), offset - recordHeaderSize, recordHeaderSize);
+        ByteBuffer buffer = ByteBuffer.wrap(page.toBytes(), offset - recordHeaderSize, recordHeaderSize);
         return new RecordHeader(buffer.array());
     }
 
@@ -123,7 +123,7 @@ public class RowFormatFactory {
      **/
     private static void fillNullAndVar(InnoDbPage page, int offset, Compact compact, Table table) {
         int nullLength = table.getExt().getNullableColCount() / Byte.SIZE;
-        ByteBuffer pageBuffer = ByteBuffer.wrap(page.getExt().getSource());
+        ByteBuffer pageBuffer = ByteBuffer.wrap(page.toBytes());
         byte[] nullListByte = new byte[nullLength];
         offset -= ConstantSize.RECORD_HEADER.size() - nullLength;
         pageBuffer.get(nullListByte, offset, nullLength);

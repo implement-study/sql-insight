@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight.core.engine.storage.innodb
+package org.gongxuanzhang.sql.insight
 
 import org.gongxuanzhang.sql.insight.core.environment.DefaultProperty
 import org.gongxuanzhang.sql.insight.core.environment.GlobalContext
@@ -62,16 +62,16 @@ fun insert(databaseName: String, tableName: String) {
 fun insertLarge(databaseName: String, tableName: String, length: Int) {
     clearDatabase(databaseName)
     createTable(databaseName, tableName)
-    val values = (1..length).map {
+    val values = (1..length).joinToString(",") {
         "(null,'${generatorRandomString(10)}')"
-    }.joinToString(",")
+    }
     """insert into aa.user (id,name) values $values
         """.trimMargin().doSql()
 }
 
 
 fun generatorRandomString(length: Int): String {
-    val charPool = ('a'..'z') + ('A'..'Z') + ('0'..'9') // 可选的字符集
+    val charPool = ('a'..'z') + ('A'..'Z') + ('0'..'9')
     return (1..length)
         .map { Random.nextInt(0, charPool.size) }
         .map(charPool::get)

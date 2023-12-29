@@ -17,6 +17,7 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
 
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
 import org.gongxuanzhang.easybyte.core.tool.BitOperator;
@@ -41,6 +42,7 @@ import java.util.Arrays;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Getter
+@EqualsAndHashCode
 public class RecordHeader implements ByteWrapper, PageObject {
 
     private final byte[] source;
@@ -61,6 +63,7 @@ public class RecordHeader implements ByteWrapper, PageObject {
         this.source = source;
         swapProperties();
     }
+
 
     private void initType() {
         int typeValue = source[2] & 0x07;

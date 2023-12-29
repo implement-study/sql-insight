@@ -44,7 +44,7 @@ import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Cons
 
 @Data
 @Slf4j
-public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRecord> {
+public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRecord>, PageObject {
 
 
     /**
@@ -90,9 +90,6 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
 
     @Override
     public byte[] toBytes() {
-        if (ext.source != null) {
-            return ext.source;
-        }
         DynamicByteBuffer buffer = DynamicByteBuffer.allocate();
         buffer.append(fileHeader.toBytes());
         buffer.append(pageHeader.toBytes());
@@ -102,8 +99,7 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
         buffer.append(new byte[freeSpace]);
         buffer.append(pageDirectory.toBytes());
         buffer.append(fileTrailer.toBytes());
-        this.ext.source = buffer.toBytes();
-        return this.ext.source;
+        return buffer.toBytes();
     }
 
 
@@ -314,7 +310,7 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
      * byte array copy from target page
      **/
     public void transferFrom(InnoDbPage page) {
-        InnoDbPage snapshot = PageFactory.swap(page.ext.source, this.ext.belongIndex);
+        InnoDbPage snapshot = PageFactory.swap(page.toBytes(), this.ext.belongIndex);
         this.fileHeader = snapshot.fileHeader;
         this.pageHeader = snapshot.pageHeader;
         this.infimum = snapshot.infimum;
@@ -326,10 +322,13 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
         this.ext = snapshot.ext;
     }
 
+    @Override
+    public int length() {
+        return ConstantSize.PAGE.size();
+    }
 
     @Data
     public static class PageExt {
-        byte[] source;
         InnodbIndex belongIndex;
         IndexPage parent;
     }
