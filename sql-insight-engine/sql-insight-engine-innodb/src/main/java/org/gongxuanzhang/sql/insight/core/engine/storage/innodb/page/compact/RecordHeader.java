@@ -42,7 +42,6 @@ import java.util.Arrays;
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 @Getter
-@EqualsAndHashCode
 public class RecordHeader implements ByteWrapper, PageObject {
 
     private final byte[] source;

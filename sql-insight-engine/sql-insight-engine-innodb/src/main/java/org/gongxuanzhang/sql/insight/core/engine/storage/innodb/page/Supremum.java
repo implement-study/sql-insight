@@ -16,6 +16,7 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
+import lombok.EqualsAndHashCode;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.RecordHeaderFactory;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
@@ -29,7 +30,7 @@ import java.util.List;
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-
+@EqualsAndHashCode
 public class Supremum implements InnodbUserRecord {
 
     public static final String SUPREMUM_BODY = "supremum";
