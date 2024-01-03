@@ -32,8 +32,15 @@ import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSuppor
 import org.gongxuanzhang.sql.insight.core.exception.DuplicationPrimaryKeyException;
 
 import java.util.Comparator;
+import java.util.Objects;
 
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Constant.SLOT_MAX_COUNT;
+import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.FILE_HEADER;
+import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.FILE_TRAILER;
+import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.INFIMUM;
+import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.PAGE;
+import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.PAGE_HEADER;
+import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.SUPREMUM;
 
 /**
  * InnoDb Page
@@ -71,10 +78,6 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
     /**
      * uncertain bytes.
      **/
-    short freeSpace;
-    /**
-     * uncertain bytes.
-     **/
     PageDirectory pageDirectory;
     /**
      * 8 bytes
@@ -96,7 +99,7 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
         buffer.append(infimum.toBytes());
         buffer.append(supremum.toBytes());
         buffer.append(userRecords.toBytes());
-        buffer.append(new byte[freeSpace]);
+        buffer.append(new byte[getFreeSpace()]);
         buffer.append(pageDirectory.toBytes());
         buffer.append(fileTrailer.toBytes());
         return buffer.toBytes();
@@ -107,6 +110,15 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
         return PageType.valueOf(this.fileHeader.pageType);
     }
 
+    public short getFreeSpace() {
+        return (short) (PAGE.size() -
+                PAGE_HEADER.size() -
+                FILE_HEADER.size() -
+                FILE_TRAILER.size() -
+                SUPREMUM.size() -
+                INFIMUM.size() -
+                this.pageDirectory.length() - userRecords.length());
+    }
 
     /**
      * add a data.
@@ -196,18 +208,6 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
 
 
     /**
-     * free space if enough
-     * default implementation is always retain one-sixteenth page size
-     *
-     * @param insertLength insert length
-     **/
-    @Deprecated
-    public boolean isEnough(int insertLength) {
-        return this.freeSpace - insertLength >= ConstantSize.PAGE.size() >> 4;
-    }
-
-
-    /**
      * this page should split.
      * in general after insert row call this method
      **/
@@ -277,7 +277,6 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
         this.userRecords.addRecord(insertRecord);
         this.pageHeader.absoluteRecordCount++;
         this.pageHeader.recordCount++;
-        this.freeSpace -= (short) insertRecord.length();
         this.pageHeader.heapTop += (short) insertRecord.length();
         this.pageHeader.lastInsertOffset += (short) insertRecord.length();
 
@@ -316,7 +315,6 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
         this.infimum = snapshot.infimum;
         this.supremum = snapshot.supremum;
         this.userRecords = snapshot.userRecords;
-        this.freeSpace = snapshot.freeSpace;
         this.pageDirectory = snapshot.pageDirectory;
         this.fileTrailer = snapshot.fileTrailer;
         this.ext = snapshot.ext;
@@ -332,6 +330,5 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
         InnodbIndex belongIndex;
         IndexPage parent;
     }
-
 
 }

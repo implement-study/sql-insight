@@ -81,7 +81,7 @@ public class IndexPage extends InnoDbPage {
      **/
     @Override
     protected void splitIfNecessary() {
-        if (this.freeSpace > ConstantSize.PAGE.size() >> 5) {
+        if (this.getFreeSpace() > ConstantSize.PAGE.size() >> 5) {
             return;
         }
         List<InnodbUserRecord> allRecords = new ArrayList<>(this.pageHeader.recordCount + 1);

@@ -7,13 +7,15 @@ import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.InnodbInde
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.*;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
-import org.gongxuanzhang.sql.insight.core.object.Index;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.FILE_HEADER;
@@ -22,6 +24,8 @@ import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Cons
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.PAGE;
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.PAGE_HEADER;
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.SUPREMUM;
+import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageType.FIL_PAGE_INDEX;
+import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageType.FIL_PAGE_INODE;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -29,8 +33,6 @@ import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Cons
 @Slf4j
 public abstract class PageFactory {
 
-    private static final short EMPTY_PAGE_FREE_SPACE =
-            (short) (PAGE.size() - FILE_TRAILER.size() - FILE_HEADER.size() - PAGE_HEADER.size() - Short.BYTES * 2 - INFIMUM.size() - SUPREMUM.size());
 
     /**
      * create idb file and add a root page .
@@ -59,14 +61,14 @@ public abstract class PageFactory {
     public static DataPage createDataPage(List<InnodbUserRecord> recordList, InnodbIndex index) {
         DataPage dataPage = new DataPage(index);
         fillInnodbUserRecords(recordList, dataPage);
-        dataPage.getFileHeader().setPageType(PageType.FIL_PAGE_INDEX.getValue());
+        dataPage.getFileHeader().setPageType(FIL_PAGE_INDEX.getValue());
         return dataPage;
     }
 
     public static IndexPage createIndexPage(List<InnodbUserRecord> indexRecordList, InnodbIndex index) {
         IndexPage indexPage = new IndexPage(index);
         fillInnodbUserRecords(indexRecordList, indexPage);
-        indexPage.getFileHeader().setPageType(PageType.FIL_PAGE_INODE.getValue());
+        indexPage.getFileHeader().setPageType(FIL_PAGE_INODE.getValue());
         return indexPage;
     }
 
@@ -106,10 +108,9 @@ public abstract class PageFactory {
         slots[0] = (short) SUPREMUM.offset();
         slots[slots.length - 1] = (short) INFIMUM.offset();
         page.setFileTrailer(new FileTrailer());
-        page.setFreeSpace((short) (PAGE.size() - PAGE_HEADER.size() - FILE_HEADER.size() - FILE_TRAILER.size() - slots.length * Short.BYTES - userRecords.length()));
     }
 
-    public static InnoDbPage findPageByOffset(int pageOffset, Index index) {
+    public static InnoDbPage findPageByOffset(int pageOffset, InnodbIndex index) {
         File file = index.getFile();
         try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw")) {
             randomAccessFile.seek(pageOffset);
@@ -124,45 +125,57 @@ public abstract class PageFactory {
     /**
      * swap byte array to page
      **/
-    public static InnoDbPage swap(byte[] bytes, Index index) {
+    public static InnoDbPage swap(byte[] bytes, InnodbIndex index) {
         ConstantSize.PAGE.checkSize(bytes);
 
         DynamicByteBuffer buffer = DynamicByteBuffer.wrap(bytes);
         //  file header
         byte[] fileHeaderBytes = buffer.getLength(FILE_HEADER.size());
+        FileHeader fileHeader = FileHeaderFactory.readFileHeader(fileHeaderBytes);
         // page header
         byte[] pageHeaderBytes = buffer.getLength(PAGE_HEADER.size());
+        PageHeader pageHeader = PageHeaderFactory.readPageHeader(pageHeaderBytes);
         //  infimum
         byte[] infimumBytes = buffer.getLength(INFIMUM.size());
+        Infimum infimum = readInfimum(infimumBytes);
         //  supremum
         byte[] supremumBytes = buffer.getLength(SUPREMUM.size());
-
-
-        //  user records 使用
-//        short heapTop = bean.pageHeader.getHeapTop();
-//        int userRecordLength = heapTop - buffer.position();
-//        candidate = new byte[userRecordLength];
-//        buffer.get(candidate);
-//        UserRecordsFactory userRecordsFactory = new UserRecordsFactory();
-//        bean.setUserRecords(userRecordsFactory.swap(candidate));
-//
-//        short slotCount = bean.pageHeader.slotCount;
-//        short slotByteLength = (short) (slotCount * 2);
-//
-//        short freeLength = (short) (buffer.remaining() - slotByteLength - ConstantSize.FILE_TRAILER.getSize());
-//        buffer.position(buffer.position() + freeLength);
-//        bean.setFreeSpace(freeLength);
-//        candidate = new byte[slotByteLength];
-//        buffer.get(candidate);
-//        PageDirectory pd = new PageDirectoryFactory().swap(candidate);
-//        bean.setPageDirectory(pd);
-//
-//        candidate = new byte[ConstantSize.FILE_TRAILER.getSize()];
-//        buffer.get(candidate);
-//        FileTrailerFactory trailerFactory = new FileTrailerFactory();
-//        FileTrailer fileTrailer = trailerFactory.swap(candidate);
-//        bean.setFileTrailer(fileTrailer);
-        return null;
+        Supremum supremum = readSupremum(supremumBytes);
+        InnoDbPage result;
+        if (fileHeader.getPageType() == FIL_PAGE_INODE.getValue()) {
+            result = new IndexPage(index);
+        } else {
+            result = new DataPage(index);
+        }
+        result.setFileHeader(fileHeader);
+        result.setPageHeader(pageHeader);
+        result.setInfimum(infimum);
+        result.setSupremum(supremum);
+        //   file trailer
+        byte[] trailerArr = Arrays.copyOfRange(bytes, bytes.length - FILE_TRAILER.size(), bytes.length);
+        result.setFileTrailer(readFileTrailer(trailerArr));
+        //   page directory
+        int dirOffset = bytes.length - FILE_TRAILER.size() - Short.BYTES;
+        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+        List<Short> shortList = new ArrayList<>();
+        short slot = byteBuffer.getShort(dirOffset);
+        while (slot != 0) {
+            shortList.add(slot);
+            dirOffset -= Short.BYTES;
+            slot = byteBuffer.getShort(dirOffset);
+        }
+        short[] slots = new short[shortList.size()];
+        for (int i = 0; i < slots.length; i++) {
+            slots[i] = shortList.get(shortList.size() - 1 - i);
+        }
+        result.setPageDirectory(new PageDirectory(slots));
+        //  user records
+        int bodyLength = pageHeader.getHeapTop() - PageHeaderFactory.EMPTY_PAGE_HEAP_TOP;
+        byte[] body = Arrays.copyOfRange(bytes, PageHeaderFactory.EMPTY_PAGE_HEAP_TOP,
+                PageHeaderFactory.EMPTY_PAGE_HEAP_TOP + bodyLength);
+        UserRecords userRecords = new UserRecords(body);
+        result.setUserRecords(userRecords);
+        return result;
     }
 
     private static InnoDbPage createRoot(InnodbIndex index) {
@@ -172,16 +185,15 @@ public abstract class PageFactory {
         root.setInfimum(new Infimum());
         root.setSupremum(new Supremum());
         root.setUserRecords(new UserRecords());
-        root.setFreeSpace(EMPTY_PAGE_FREE_SPACE);
         root.setPageDirectory(new PageDirectory());
         root.setFileTrailer(new FileTrailer());
         return root;
     }
 
     public static Supremum readSupremum(byte[] bytes) {
-        Supremum supremum = new Supremum();
         ConstantSize.SUPREMUM.checkSize(bytes);
         DynamicByteBuffer buffer = DynamicByteBuffer.wrap(bytes);
+        Supremum supremum = new Supremum();
         byte[] headBuffer = buffer.getLength(ConstantSize.RECORD_HEADER.size());
         supremum.setRecordHeader(new RecordHeader(headBuffer));
         return supremum;
@@ -189,11 +201,20 @@ public abstract class PageFactory {
 
 
     public static Infimum readInfimum(byte[] bytes) {
-        Infimum infimum = new Infimum();
         INFIMUM.checkSize(bytes);
         DynamicByteBuffer buffer = DynamicByteBuffer.wrap(bytes);
         byte[] headBuffer = buffer.getLength(ConstantSize.RECORD_HEADER.size());
+        Infimum infimum = new Infimum();
         infimum.setRecordHeader(new RecordHeader(headBuffer));
         return infimum;
+    }
+
+    public static FileTrailer readFileTrailer(byte[] bytes) {
+        FILE_TRAILER.checkSize(bytes);
+        DynamicByteBuffer buffer = DynamicByteBuffer.wrap(bytes);
+        FileTrailer fileTrailer = new FileTrailer();
+        fileTrailer.setCheckSum(buffer.getInt());
+        fileTrailer.setLsn(buffer.getInt());
+        return fileTrailer;
     }
 }

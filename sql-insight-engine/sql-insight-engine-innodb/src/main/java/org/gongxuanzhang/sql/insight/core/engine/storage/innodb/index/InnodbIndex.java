@@ -17,6 +17,8 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index;
 
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.core.InnodbBTree;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport;
 import org.gongxuanzhang.sql.insight.core.environment.SessionContext;
 import org.gongxuanzhang.sql.insight.core.object.Cursor;
 import org.gongxuanzhang.sql.insight.core.object.Table;
@@ -46,4 +48,13 @@ public abstract class InnodbIndex implements InnodbBTree {
         return this.table;
     }
 
+    /**
+     * get the b+ trees root node.
+     * page is node
+     *
+     * @return not null
+     **/
+    protected InnoDbPage getRootPage() {
+        return PageSupport.getRoot(this);
+    }
 }

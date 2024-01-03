@@ -51,7 +51,7 @@ public class DataPage extends InnoDbPage {
      **/
     @Override
     protected void splitIfNecessary() {
-        if (this.freeSpace > ConstantSize.PAGE.size() >> 4) {
+        if (this.getFreeSpace() > ConstantSize.PAGE.size() >> 4) {
             return;
         }
         List<InnodbUserRecord> pageUserRecord = new ArrayList<>(this.pageHeader.recordCount + 1);

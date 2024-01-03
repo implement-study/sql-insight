@@ -10,6 +10,10 @@ import java.nio.ByteBuffer;
  **/
 public abstract class PageHeaderFactory {
 
+    public static final short EMPTY_PAGE_HEAP_TOP = (short) (ConstantSize.FILE_HEADER.size() +
+            ConstantSize.PAGE_HEADER.size() +
+            ConstantSize.INFIMUM.size() +
+            ConstantSize.SUPREMUM.size());
 
     /**
      * create a empty page header
@@ -17,12 +21,12 @@ public abstract class PageHeaderFactory {
     public static PageHeader createPageHeader() {
         PageHeader pageHeader = new PageHeader();
         pageHeader.setSlotCount((short) 2);
-        pageHeader.setHeapTop(createHeapTop());
+        pageHeader.setHeapTop(EMPTY_PAGE_HEAP_TOP);
         pageHeader.setAbsoluteRecordCount((short) 2);
         pageHeader.setRecordCount((short) 0);
         pageHeader.setFree((short) 0);
         pageHeader.setGarbage((short) 0);
-        pageHeader.setLastInsertOffset(createHeapTop());
+        pageHeader.setLastInsertOffset(EMPTY_PAGE_HEAP_TOP);
         pageHeader.setLevel((short) 0);
         pageHeader.setDirection((short) 0);
         pageHeader.setDirectionCount((short) 0);
@@ -58,15 +62,5 @@ public abstract class PageHeaderFactory {
         return pageHeader;
     }
 
-
-    /**
-     * create heap top offset
-     **/
-    private static short createHeapTop() {
-        return (short) (ConstantSize.FILE_HEADER.size() +
-                ConstantSize.PAGE_HEADER.size() +
-                ConstantSize.INFIMUM.size() +
-                ConstantSize.SUPREMUM.size());
-    }
 
 }

@@ -35,7 +35,7 @@ import java.io.RandomAccessFile;
 @Slf4j
 public class PageSupport {
 
-    public static InnoDbPage getRoot(Index index) {
+    public static InnoDbPage getRoot(InnodbIndex index) {
         File indexFile = index.getFile();
         try (FileInputStream fileInputStream = new FileInputStream(indexFile)) {
             byte[] pageByte = ConstantSize.PAGE.emptyBuff();

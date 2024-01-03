@@ -60,7 +60,7 @@ public enum ConstantSize {
 
     public void checkSize(byte[] bytes) {
         if (bytes.length != this.size()) {
-            throw new IllegalArgumentException(this + "size must " + this.size() + "byte");
+            throw new IllegalArgumentException(this + " size must " + this.size() + "byte");
         }
     }
 

@@ -16,18 +16,25 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page;
 
+import lombok.EqualsAndHashCode;
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  **/
+@EqualsAndHashCode
 public class UserRecords implements ByteWrapper, PageObject {
+
 
     byte[] body;
 
     public UserRecords() {
-        this.body = new byte[0];
+        this(new byte[0]);
+    }
+
+    public UserRecords(byte[] body) {
+        this.body = body;
     }
 
 
@@ -37,11 +44,13 @@ public class UserRecords implements ByteWrapper, PageObject {
     }
 
     public void addRecord(InnodbUserRecord userRecord) {
-        this.body = DynamicByteBuffer.wrap(body).append(userRecord.toBytes()).toBytes();
+        this.body = DynamicByteBuffer.wrap(this.body).append(userRecord.toBytes()).toBytes();
     }
 
     @Override
     public int length() {
         return body.length;
     }
+
+
 }
