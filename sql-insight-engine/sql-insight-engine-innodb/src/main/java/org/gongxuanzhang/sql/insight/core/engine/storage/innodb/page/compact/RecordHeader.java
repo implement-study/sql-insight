@@ -17,14 +17,13 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact;
 
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.gongxuanzhang.easybyte.core.ByteWrapper;
 import org.gongxuanzhang.easybyte.core.tool.BitOperator;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageObject;
-import org.gongxuanzhang.sql.insight.core.tool.BitUtils;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -63,7 +62,6 @@ public class RecordHeader implements ByteWrapper, PageObject {
         swapProperties();
     }
 
-
     private void initType() {
         int typeValue = source[2] & 0x07;
         for (RecordType type : RecordType.values()) {
@@ -89,9 +87,7 @@ public class RecordHeader implements ByteWrapper, PageObject {
         int low = Byte.toUnsignedInt(source[2]);
         this.heapNo = ((high << 8 | low) >> 3);
 
-        high = Byte.toUnsignedInt(source[3]);
-        low = Byte.toUnsignedInt(source[4]);
-        this.nextRecordOffset = (high << 8 | low);
+        this.nextRecordOffset = (short) ((source[3] & 0xFF) << 8 | (source[4] & 0xFF));
 
         initType();
     }
@@ -150,9 +146,9 @@ public class RecordHeader implements ByteWrapper, PageObject {
             return this;
         }
         this.nextRecordOffset = nextRecordOffset;
-        byte[] bytes = BitUtils.cutToByteArray(nextRecordOffset, 2);
-        this.source[3] = bytes[0];
-        this.source[4] = bytes[1];
+        byte[] array = ByteBuffer.allocate(Short.BYTES).putShort((short) nextRecordOffset).array();
+        this.source[3] = array[0];
+        this.source[4] = array[1];
         return this;
     }
 

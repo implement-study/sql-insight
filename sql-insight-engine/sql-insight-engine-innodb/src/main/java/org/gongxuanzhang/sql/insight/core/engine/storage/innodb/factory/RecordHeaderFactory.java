@@ -1,5 +1,6 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory;
 
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordType;
 
@@ -24,7 +25,7 @@ public abstract class RecordHeaderFactory {
         recordHeader.setHeapNo(1);
         recordHeader.setDelete(false);
         recordHeader.setNOwned(1);
-        recordHeader.setNextRecordOffset(0);
+        recordHeader.setNextRecordOffset(ConstantSize.INFIMUM.size());
         return recordHeader;
     }
 

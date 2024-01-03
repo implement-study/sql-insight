@@ -19,7 +19,8 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.execute
 import org.gongxuanzhang.sql.insight.*
 import org.gongxuanzhang.sql.insight.core.command.dml.Insert
 import org.gongxuanzhang.sql.insight.core.engine.json.InsightFactory
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFactory
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.InnodbIndex
+import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport
 import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseExistsException
 import org.gongxuanzhang.sql.insight.core.exception.TableNotExistsException
@@ -37,7 +38,7 @@ import org.junit.jupiter.api.assertThrows
 class InsertTest {
 
     @AfterEach
-    fun clear(){
+    fun clear() {
         clearDatabase("aa")
     }
 
@@ -48,8 +49,13 @@ class InsertTest {
         val context = SqlInsightContext.getInstance()
         val engine = context.selectEngine("innodb")
         engine.openTable(table)
-        table.indexList
-//        clearDatabase("aa")
+        assert(table.indexList.size == 1)
+        val clusterIndex = table.indexList[0]
+        val rootPage = PageSupport.getRoot(clusterIndex as InnodbIndex)
+        rootPage.forEach {
+            println(it)
+        }
+
     }
 
 

@@ -30,9 +30,11 @@ import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.Rec
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordType;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport;
 import org.gongxuanzhang.sql.insight.core.exception.DuplicationPrimaryKeyException;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
-import java.util.Objects;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Constant.SLOT_MAX_COUNT;
 import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.FILE_HEADER;
@@ -51,7 +53,8 @@ import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Cons
 
 @Data
 @Slf4j
-public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRecord>, PageObject {
+public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRecord>, PageObject,
+        Iterable<InnodbUserRecord> {
 
 
     /**
@@ -133,6 +136,7 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
         InnodbUserRecord next = preAndNext.getSecond();
         linkedAndAdjust(pre, data, next);
         splitIfNecessary();
+        PageSupport.flushPage(this);
     }
 
 
@@ -144,7 +148,7 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
      **/
     protected Pair<InnodbUserRecord, InnodbUserRecord> findPreAndNext(InnodbUserRecord userRecord) {
         int targetSlot = findTargetSlot(userRecord);
-        InnodbUserRecord pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot - 1));
+        InnodbUserRecord pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot + 1));
         InnodbUserRecord next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset());
         while (this.compare(userRecord, next) > 0) {
             pre = next;
@@ -156,8 +160,11 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
 
     /**
      * find the slot where the target record is located
+     * <p>
+     * return 0 means supremum
      *
-     * @return result must be greater than 0 because 0 only contains infimum, but the slot may be already full
+     * @return slot index is user record inserted never return {@code slot.length -1 } because slot.length - 1 is the
+     * infimum
      **/
     protected int findTargetSlot(InnodbUserRecord userRecord) {
         int left = 0;
@@ -166,22 +173,22 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
             int mid = (right + left) / 2;
             short offset = this.pageDirectory.getSlots()[mid];
             InnodbUserRecord base = getUserRecordByOffset(offset);
-            int compare = userRecord.compareTo(base);
+            int compare = this.compare(userRecord, base);
             if (compare == 0) {
                 throw new DuplicationPrimaryKeyException(base.getRowId());
             }
             if (compare < 0) {
-                right = mid;
-            } else {
                 left = mid;
+            } else {
+                right = mid;
             }
         }
-        InnodbUserRecord base = getUserRecordByOffset(this.pageDirectory.getSlots()[left]);
-        int compare = userRecord.compareTo(base);
+        InnodbUserRecord base = getUserRecordByOffset(this.pageDirectory.getSlots()[right]);
+        int compare = this.compare(userRecord, base);
         if (compare == 0) {
             throw new DuplicationPrimaryKeyException(base.getRowId());
         }
-        if (compare < 0) {
+        if (compare > 0) {
             return left;
         }
         return right;
@@ -271,6 +278,8 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
         insertRecord.setOffset(this.pageHeader.lastInsertOffset + insertRecord.beforeSplitOffset());
         insertHeader.setNextRecordOffset(next.offset() - insertRecord.offset());
         pre.getRecordHeader().setNextRecordOffset(insertRecord.offset() - pre.offset());
+        refreshRecordHeader(pre);
+
         insertHeader.setRecordType(RecordType.NORMAL);
 
         //  adjust page
@@ -285,9 +294,9 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
         while (next.getRecordHeader().getNOwned() == 0) {
             next = getUserRecordByOffset(next.offset() + next.nextRecordOffset());
         }
-        RecordHeader recordHeader = next.getRecordHeader();
-        int groupCount = recordHeader.getNOwned();
-        recordHeader.setNOwned(groupCount + 1);
+        RecordHeader nextHeader = next.getRecordHeader();
+        int groupCount = nextHeader.getNOwned();
+        nextHeader.setNOwned(groupCount + 1);
         if (next.getRecordHeader().getNOwned() <= SLOT_MAX_COUNT) {
             return;
         }
@@ -320,9 +329,49 @@ public abstract class InnoDbPage implements ByteWrapper, Comparator<InnodbUserRe
         this.ext = snapshot.ext;
     }
 
+    private void refreshRecordHeader(InnodbUserRecord record) {
+        if(record instanceof Infimum){
+            return;
+        }
+        if(record instanceof Supremum){
+            return;
+        }
+        byte[] headerByte = record.getRecordHeader().toBytes();
+        int bodyOffset = record.offset() - ConstantSize.RECORD_HEADER.size() - PAGE_HEADER.size() -
+                FILE_HEADER.size() -
+                SUPREMUM.size() -
+                INFIMUM.size();
+        System.arraycopy(headerByte, 0, this.userRecords.body, bodyOffset, headerByte.length);
+    }
+
     @Override
     public int length() {
         return ConstantSize.PAGE.size();
+    }
+
+    @NotNull
+    @Override
+    public Iterator<InnodbUserRecord> iterator() {
+        return new Itr();
+    }
+
+    public class Itr implements Iterator<InnodbUserRecord> {
+        InnodbUserRecord cursor = getUserRecordByOffset(infimum.nextRecordOffset() + infimum.offset());
+
+        @Override
+        public boolean hasNext() {
+            return cursor != InnoDbPage.this.supremum;
+        }
+
+        @Override
+        public InnodbUserRecord next() {
+            if (cursor == supremum) {
+                throw new NoSuchElementException();
+            }
+            InnodbUserRecord result = cursor;
+            cursor = getUserRecordByOffset(cursor.nextRecordOffset() + cursor.offset());
+            return result;
+        }
     }
 
     @Data

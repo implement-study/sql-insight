@@ -48,7 +48,8 @@ public class InnodbIc implements AutoIncrementKeyCounter {
     public boolean dealAutoIncrement(InsertRow row) {
         Value targetValue = row.getAbsoluteValueList().get(incrementColIndex);
         if (targetValue instanceof ValueNull) {
-            row.getAbsoluteValueList().set(incrementColIndex, new ValueInt((int) this.counter.incrementAndGet()));
+            ValueInt valueInt = new ValueInt((int) this.counter.incrementAndGet());
+            row.getAbsoluteValueList().set(incrementColIndex, valueInt);
             return true;
         }
         Integer source = ((ValueInt) targetValue).getSource();

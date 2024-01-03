@@ -21,8 +21,10 @@ import lombok.EqualsAndHashCode;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.RecordHeaderFactory;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
+import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -105,6 +107,14 @@ public class Infimum implements InnodbUserRecord {
 
     @Override
     public Table belongTo() {
+        return infimumUnsupport();
+    }
+
+    @Override
+    public int compareTo(@NotNull Row that) {
+        if (that instanceof InnodbUserRecord) {
+            return -1;
+        }
         return infimumUnsupport();
     }
 

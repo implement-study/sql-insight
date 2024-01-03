@@ -32,6 +32,7 @@ import org.gongxuanzhang.sql.insight.core.object.value.ValueNull;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -98,7 +99,7 @@ public class RowFormatFactory {
         fillNullAndVar(page, offsetInPage, compact, table);
         int variableLength = compact.getVariables().variableLength();
         int fixLength = compactFixLength(compact, table);
-        byte[] body = new byte[variableLength + fixLength];
+        byte[] body = Arrays.copyOfRange(page.toBytes(), offsetInPage, offsetInPage + variableLength + fixLength);
         compact.setBody(body);
         compact.setSourceRow(compactReadRow(compact, table));
         return compact;
@@ -112,8 +113,8 @@ public class RowFormatFactory {
      **/
     public static RecordHeader readRecordHeader(InnoDbPage page, int offset) {
         int recordHeaderSize = ConstantSize.RECORD_HEADER.size();
-        ByteBuffer buffer = ByteBuffer.wrap(page.toBytes(), offset - recordHeaderSize, recordHeaderSize);
-        return new RecordHeader(buffer.array());
+        byte[] headerArr = Arrays.copyOfRange(page.toBytes(), offset - recordHeaderSize, offset);
+        return new RecordHeader(headerArr);
     }
 
 
@@ -123,18 +124,16 @@ public class RowFormatFactory {
      **/
     private static void fillNullAndVar(InnoDbPage page, int offset, Compact compact, Table table) {
         int nullLength = table.getExt().getNullableColCount() / Byte.SIZE;
-        ByteBuffer pageBuffer = ByteBuffer.wrap(page.toBytes());
-        byte[] nullListByte = new byte[nullLength];
         offset -= ConstantSize.RECORD_HEADER.size() - nullLength;
-        pageBuffer.get(nullListByte, offset, nullLength);
+        byte[] pageArr = page.toBytes();
+        byte[] nullListByte = Arrays.copyOfRange(pageArr, offset, offset + nullLength);
         //   read null list
         CompactNullList compactNullList = new CompactNullList(nullListByte);
         compact.setNullList(compactNullList);
         //   read variable
         int variableCount = variableColumnCount(table, compactNullList);
-        byte[] variableArray = new byte[variableCount];
         offset -= variableCount;
-        pageBuffer.get(variableArray, offset, variableCount);
+        byte[] variableArray = Arrays.copyOfRange(pageArr, offset, offset + variableCount);
         compact.setVariables(new Variables(variableArray));
     }
 

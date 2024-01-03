@@ -20,8 +20,10 @@ import lombok.EqualsAndHashCode;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.RecordHeaderFactory;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
+import org.gongxuanzhang.sql.insight.core.object.Row;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 import org.gongxuanzhang.sql.insight.core.object.value.Value;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -88,6 +90,14 @@ public class Supremum implements InnodbUserRecord {
         throw new UnsupportedOperationException("supremum can't set offset ");
     }
 
+
+    @Override
+    public int compareTo(@NotNull Row that) {
+        if (that instanceof InnodbUserRecord) {
+            return 1;
+        }
+        return supremumUnsupport();
+    }
 
     @Override
     public int nextRecordOffset() {

@@ -143,4 +143,10 @@ public class Compact implements InnodbUserRecord {
         return this.recordHeader.isDelete();
     }
 
+    @Override
+    public String toString() {
+        return "Compact{" +
+                "sourceRow=" + sourceRow +
+                '}';
+    }
 }
