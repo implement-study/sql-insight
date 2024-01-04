@@ -35,7 +35,7 @@ import org.junit.jupiter.api.assertThrows
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-class InsertTest {
+class InnoDbInsertTest {
 
     @AfterEach
     fun clear() {

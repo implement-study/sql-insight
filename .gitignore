@@ -12,3 +12,6 @@ target/
 node_modules/
 *.log
 db/
+*.tiled-session
+*.tiled-project
+kotlin-js-store/

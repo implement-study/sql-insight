@@ -1,59 +1,103 @@
-<script setup>
-import {reactive, ref} from 'vue';
+<script setup lang="ts">
+import { ref } from "vue";
+import { ElMessage } from "element-plus";
 
-let name = ref("张三")
-let job = reactive({
-  name: "张三",
-  age: 15
-})
-let hobby = ['抽烟', '喝酒', '烫头']
+defineProps<{ msg: string }>();
 
-function changeInfo() {
-  name.value = "嘎嘎暴力"
+const count = ref(0);
+const input = ref("element-plus");
 
-  job.name = "张三2"
-  job.age = 176
-  hobby[0] = '嘎嘎暴力'
-}
+const curDate = ref("");
+
+const toast = () => {
+  ElMessage.success("Hello");
+};
+
+const value1 = ref(true);
 </script>
 
 <template>
-  <div class="greetings">
-    <h1 class="green">{{ msg }}</h1>
-    <h1 class="green">{{ job.name }}</h1>
-    <h1 class="green">{{ job.age }}</h1>
-    <h1 v-for="i in hobby" class="green">{{ i }}</h1>
-    <h3>
-      You’ve successfully created a project with
-      <a href="https://vitejs.dev/" target="_blank" rel="noopener">Vite</a> +
-      <a href="https://vuejs.org/" target="_blank" rel="noopener">Vue 3</a>.
-    </h3>
+  <h1 color="$ep-color-primary">{{ msg }}</h1>
+
+  <p>
+    See
+    <a href="https://element-plus.org" target="_blank">element-plus</a> for more
+    information.
+  </p>
+
+  <!-- example components -->
+  <div class="mb-4">
+    <el-button size="large" @click="toast">El Message</el-button>
   </div>
-  {{ name }}
-  <button @click="changeInfo">修改了</button>
+
+  <div class="my-2 text-center flex flex-wrap justify-center items-center">
+    <el-button @click="count++">count is: {{ count }}</el-button>
+    <el-button type="primary" @click="count++">count is: {{ count }}</el-button>
+    <el-button type="success" @click="count++">count is: {{ count }}</el-button>
+    <el-button type="warning" @click="count++">count is: {{ count }}</el-button>
+    <el-button type="danger" @click="count++">count is: {{ count }}</el-button>
+    <el-button type="info" @click="count++">count is: {{ count }}</el-button>
+  </div>
+
+  <div>
+    <el-tag type="success" class="m-1">Tag 1</el-tag>
+    <el-tag type="warning" class="m-1">Tag 1</el-tag>
+    <el-tag type="danger" class="m-1">Tag 1</el-tag>
+    <el-tag type="info" class="m-1">Tag 1</el-tag>
+  </div>
+
+  <div>
+    <el-switch v-model="value1" />
+    <el-switch
+      v-model="value1"
+      class="m-2"
+      style="--ep-switch-on-color: black; --ep-switch-off-color: gray;"
+    />
+  </div>
+
+  <div class="my-2">
+    <el-input class="m-2" v-model="input" style="width: 200px" />
+    <el-date-picker
+      class="m-2"
+      v-model="curDate"
+      type="date"
+      placeholder="Pick a day"
+    ></el-date-picker>
+  </div>
+
+  <p>For example, we can custom primary color to 'green'.</p>
+
+  <p>
+    Edit
+    <code>components/HelloWorld.vue</code> to test components.
+  </p>
+  <p>
+    Edit
+    <code>styles/element/var.scss</code> to test scss variables.
+  </p>
+
+  <p>
+    Full Example:
+    <a
+      href="https://github.com/element-plus/element-plus-vite-starter"
+      target="_blank"
+      >element-plus-vite-starter</a
+    >
+    | On demand Example:
+    <a
+      href="https://github.com/element-plus/unplugin-element-plus"
+      target="_blank"
+      >unplugin-element-plus/examples/vite</a
+    >
+  </p>
 </template>
 
-<style scoped>
-h1 {
-  font-weight: 500;
-  font-size: 2.6rem;
-  position: relative;
-  top: -10px;
+<style>
+.ep-button {
+  margin: 4px;
 }
-
-h3 {
-  font-size: 1.2rem;
-}
-
-.greetings h1,
-.greetings h3 {
-  text-align: center;
-}
-
-@media (min-width: 1024px) {
-  .greetings h1,
-  .greetings h3 {
-    text-align: left;
-  }
+.ep-button + .ep-button {
+  margin-left: 0;
+  margin: 4px;
 }
 </style>
