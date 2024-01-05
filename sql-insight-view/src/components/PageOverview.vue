@@ -1,0 +1,171 @@
+<template>
+  <div class="innodb-page">
+    <FixPageItem :fix="fileHeader" @routeDialog="routeDialog"></FixPageItem>
+    <FixPageItem :fix="pageHeader" @routeDialog="routeDialog"></FixPageItem>
+    <FixPageItem :fix="infimum" @routeDialog="routeDialog"></FixPageItem>
+    <FixPageItem :fix="supremum" @routeDialog="routeDialog"></FixPageItem>
+    <div class="user-record">
+      <div class="arrow-container">
+        <div class="line"></div>
+        <div class="arrow-down"></div>
+      </div>
+      <div class="right-section">
+        <div class="object_desc">用户记录 User Records</div>
+      </div>
+    </div>
+    <FixPageItem :fix="freeSpace" @routeDialog="routeDialog"></FixPageItem>
+    <div class="page-directory">
+      <div class="arrow-container">
+        <div class="arrow-top"></div>
+        <div class="line"></div>
+      </div>
+      <div class="right-section">
+        <div class="object_desc">页目录 Page Directory</div>
+      </div>
+    </div>
+    <FixPageItem :fix="fileTrailer" @routeDialog="routeDialog"></FixPageItem>
+  </div>
+
+
+  <el-dialog
+      v-model="dialogVisible"
+      :title="dialogTitle"
+      width="95%"
+      :before-close="handleClose">
+    <component :is="dialogComponent"></component>
+  </el-dialog>
+</template>
+
+<script lang="ts" setup>
+import {type FixItem} from "~/types";
+import {ref,markRaw} from 'vue'
+import FileHeader from "~/components/page/detail/FileHeader.vue";
+
+let dialogVisible = ref(false)
+let dialogTitle = ref("")
+let dialogComponent = ref({})
+
+const routeDialog = (fixItem: FixItem) => {
+  dialogTitle.value = fixItem.name
+  dialogComponent.value = fixItem.dialogComponent
+  dialogVisible.value = true
+}
+
+const handleClose = (done: () => void) => {
+  done()
+}
+
+
+const fileHeader: FixItem = {
+  name: "文件头 File Header",
+  topOffset: 0,
+  bottomOffset: 38,
+  length: 38,
+  dialogComponent: markRaw(FileHeader)
+}
+
+const pageHeader: FixItem = {
+  name: "页头 Page Header",
+  bottomOffset: 38 + 56,
+  length: 56,
+  dialogComponent: 'GaGa'
+}
+
+const infimum: FixItem = {
+  name: "下确界 Infimum",
+  bottomOffset: pageHeader.bottomOffset + 13,
+  length: 13,
+  dialogComponent: 'GaGa'
+}
+
+const supremum: FixItem = {
+  name: "上确界 Supremum",
+  bottomOffset: infimum.bottomOffset + 13,
+  length: 13,
+  dialogComponent: 'GaGa'
+}
+
+const freeSpace: FixItem = {
+  name: "空闲空间 free Space",
+  topOffset: 'heap top',
+  effect: 2
+}
+
+const fileTrailer: FixItem = {
+  name: "文件尾 File Trailer",
+  topOffset: 1024 * 16 - 8,
+  length: 8,
+  bottomOffset: 1024 * 16,
+  dialogComponent: 'GaGa'
+}
+
+</script>
+
+<style scoped>
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+.innodb-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 2px solid #ccc;
+  padding: 10px 5% 0 10px;
+  box-shadow: 2px 2px 5px rgba(128, 128, 128, 0.5);
+}
+
+.user-record {
+  display: flex;
+  height: 24%;
+}
+
+.page-directory {
+  display: flex;
+  height: 24%;
+}
+
+.arrow-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-right: 10px;
+}
+
+.line {
+  width: 2px;
+  height: 100%;
+  background-color: #ccc; /* 箭头的线条颜色 */
+}
+
+.arrow-down {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-top: 10px solid #ccc;
+}
+
+
+.arrow-top {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-bottom: 10px solid #ccc;
+}
+
+
+.right-section {
+  border: 1px solid #ccc;
+  flex: 9;
+  padding: 10px;
+}
+
+.object_desc {
+  font-weight: bold;
+}
+
+</style>
