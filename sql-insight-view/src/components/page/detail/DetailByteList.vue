@@ -1,7 +1,7 @@
 <template>
   <div v-for="(item,itemIndex) in group"
        :key="item.name">
-    <detail-byte-item :ref="'gaga'+itemIndex" :item="item" :start="calcStart(itemIndex)"
+    <detail-byte-item  :item="item" :start="calcStart(itemIndex)"
                       :color="color[itemIndex]"></detail-byte-item>
   </div>
 </template>

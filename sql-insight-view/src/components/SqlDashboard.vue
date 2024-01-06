@@ -19,7 +19,6 @@
     </el-col>
     <el-col :span="12" >
       <n-config-provider :theme="darkTheme">
-        <ButtonMenu></ButtonMenu>
       </n-config-provider>
 
     </el-col>
