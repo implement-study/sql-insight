@@ -35,6 +35,7 @@ declare module 'vue' {
     Infimum: typeof import('./components/page/detail/Infimum.vue')['default']
     InnodbPage: typeof import('./components/InnodbPage.vue')['default']
     Logos: typeof import('./components/Logos.vue')['default']
+    PageDirectory: typeof import('./components/page/detail/PageDirectory.vue')['default']
     PageHeader: typeof import('./components/page/detail/PageHeader.vue')['default']
     PageOverview: typeof import('./components/PageOverview.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
@@ -42,5 +43,6 @@ declare module 'vue' {
     SqlDashboard: typeof import('./components/SqlDashboard.vue')['default']
     Supremum: typeof import('./components/page/detail/Supremum.vue')['default']
     Test: typeof import('./components/Test.vue')['default']
+    UserRecord: typeof import('./components/page/detail/UserRecord.vue')['default']
   }
 }

@@ -1,29 +1,6 @@
 <template>
   <div class="innodb-page">
-    <FixPageItem :fix="fileHeader" @routeDialog="routeDialog"></FixPageItem>
-    <FixPageItem :fix="pageHeader" @routeDialog="routeDialog"></FixPageItem>
-    <FixPageItem :fix="infimum" @routeDialog="routeDialog"></FixPageItem>
-    <FixPageItem :fix="supremum" @routeDialog="routeDialog"></FixPageItem>
-    <div class="user-record">
-      <div class="arrow-container">
-        <div class="line"></div>
-        <div class="arrow-down"></div>
-      </div>
-      <div class="right-section">
-        <div class="object_desc">用户记录 User Records</div>
-      </div>
-    </div>
-    <FixPageItem :fix="freeSpace" @routeDialog="routeDialog"></FixPageItem>
-    <div class="page-directory">
-      <div class="arrow-container">
-        <div class="arrow-top"></div>
-        <div class="line"></div>
-      </div>
-      <div class="right-section">
-        <div class="object_desc">页目录 Page Directory</div>
-      </div>
-    </div>
-    <FixPageItem :fix="fileTrailer" @routeDialog="routeDialog"></FixPageItem>
+    <FixPageItem v-for="(item,index) in pageItems" :key="index" :fix=item @route-dialog="routeDialog"></FixPageItem>
   </div>
 
 
@@ -38,12 +15,15 @@
 
 <script lang="ts" setup>
 import {type FixItem} from "~/types";
-import {ref,markRaw} from 'vue'
+import {ref, markRaw} from 'vue'
 import FileHeader from "~/components/page/detail/FileHeader.vue";
 import PageHeader from "~/components/page/detail/PageHeader.vue";
 import FileTrailer from "~/components/page/detail/FileTrailer.vue";
 import Infimum from "~/components/page/detail/Infimum.vue";
 import Supremum from "~/components/page/detail/Supremum.vue";
+import PageDirectory from "~/components/page/detail/PageDirectory.vue";
+import UserRecord from "~/components/page/detail/UserRecord.vue";
+import FixPageItem from "~/components/FixPageItem.vue";
 
 let dialogVisible = ref(false)
 let dialogTitle = ref("")
@@ -89,6 +69,20 @@ const supremum: FixItem = {
   dialogComponent: markRaw(Supremum)
 }
 
+const userRecord: FixItem = {
+  name: "用户记录 User Records",
+  effect: 3,
+  downArrow: true,
+  dialogComponent: markRaw(UserRecord)
+}
+
+const pageDirectory: FixItem = {
+  name: "页目录 Page Directory",
+  effect: 3,
+  upArrow: true,
+  dialogComponent: markRaw(PageDirectory)
+}
+
 const freeSpace: FixItem = {
   name: "空闲空间 free Space",
   topOffset: 'heap top',
@@ -101,9 +95,12 @@ const fileTrailer: FixItem = {
   topOffset: 1024 * 16 - 8,
   length: 8,
   bottomOffset: 1024 * 16,
-  dialogComponent:markRaw(FileTrailer)
+  dialogComponent: markRaw(FileTrailer)
 }
 
+const pageItems: Array<FixItem> = [
+  fileHeader, pageHeader, infimum, supremum, userRecord, freeSpace, pageDirectory, fileHeader
+]
 </script>
 
 <style scoped>

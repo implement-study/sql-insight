@@ -2,6 +2,14 @@
   <div class="page-section" :style="{height:fix?.effect?8*fix.effect+'%':'8%'}"
        @mouseenter="highLight = true" @mouseleave="highLight = false" @click="showDialog">
     <div class="left-section">
+      <div v-if="fix.downArrow" class="arrow-container">
+        <div class="line"></div>
+        <div class="arrow-down"></div>
+      </div>
+      <div v-if="fix.upArrow" class="arrow-container">
+        <div class="arrow-top"></div>
+        <div class="line"></div>
+      </div>
       <div class="top-number">{{ fix.topOffset }}</div>
       <div class="top-number">{{ fix.bottomOffset }}</div>
     </div>
@@ -59,5 +67,46 @@ const showDialog = () => {
 
 .top-number {
   font-size: 15px;
+}
+
+.arrow-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-right: 10px;
+}
+
+.line {
+  width: 2px;
+  height: 100%;
+  background-color: #ccc; /* 箭头的线条颜色 */
+}
+
+.arrow-down {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-top: 10px solid #ccc;
+}
+
+
+.arrow-top {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-bottom: 10px solid #ccc;
+}
+
+
+.right-section {
+  border: 1px solid #ccc;
+  flex: 9;
+  padding: 10px;
+}
+
+.object_desc {
+  font-weight: bold;
 }
 </style>
