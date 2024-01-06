@@ -1,45 +1,28 @@
 <template>
-  <div class="container">
-    <template v-for="(item,itemIndex) in group"
-              :key="item.name">
-      <div v-for="(index,innerIndex) in item.length" :key="innerIndex"
-           class="rectangle"
-           :class="{ active: itemIndex === activeGroup }"
-           :style="{ width: `${100 / 50}%`,background:color[itemIndex]}"
-           @mouseover="onMouseOver(itemIndex)"
-           @mouseleave="onMouseLeave">
-        {{ calculateIndex(itemIndex, innerIndex) }}
-      </div>
-    </template>
+  <div v-for="(item,itemIndex) in group"
+       :key="item.name">
+    <detail-byte-item :ref="'gaga'+itemIndex" :item="item" :start="calcStart(itemIndex)"
+                      :color="color[itemIndex]"></detail-byte-item>
   </div>
 </template>
 
 <script lang="ts" setup>
 import {type InnodbPageItem} from '~/types'
 import {ref} from 'vue'
+import DetailByteItem from "~/components/page/detail/DetailByteItem.vue";
 
 let props = defineProps<{ group: Array<InnodbPageItem> }>()
 
-const activeGroup = ref(-1);
-
 const group = props.group
 
-const calculateIndex = (itemIndex: number, index: number) => {
+const calcStart = (index: number) => {
   let total = 0;
-  for (let i = 0; i < itemIndex; i++) {
+  for (let i = 0; i < index; i++) {
     total += group[i].length;
   }
-  return total + index;
-};
+  return total
 
-const onMouseOver = (itemIndex: number) => {
-  activeGroup.value = itemIndex;
-};
-
-const onMouseLeave = () => {
-  activeGroup.value = -1;
-};
-
+}
 
 const color = [
   "#FFFFFF",
@@ -63,26 +46,4 @@ const color = [
 </script>
 
 <style>
-.container {
-  width: 100%;
-  height: 100px;
-  display: flex;
-  flex-wrap: nowrap;
-  overflow: hidden;
-}
-
-.rectangle {
-  height: 100%;
-  border: 1px solid #cccccc;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: transform 0.3s ease;
-  color: black;
-}
-
-.active {
-  transform: scale(1.5);
-}
 </style>

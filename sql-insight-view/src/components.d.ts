@@ -9,6 +9,8 @@ declare module 'vue' {
   export interface GlobalComponents {
     BaseHeader: typeof import('./components/layouts/BaseHeader.vue')['default']
     BaseSide: typeof import('./components/layouts/BaseSide.vue')['default']
+    ButtonMenu: typeof import('./components/ButtonMenu.vue')['default']
+    DetailByteItem: typeof import('./components/page/detail/DetailByteItem.vue')['default']
     DetailByteList: typeof import('./components/page/detail/DetailByteList.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCol: typeof import('element-plus/es')['ElCol']
@@ -37,7 +39,7 @@ declare module 'vue' {
     Logos: typeof import('./components/Logos.vue')['default']
     PageDirectory: typeof import('./components/page/detail/PageDirectory.vue')['default']
     PageHeader: typeof import('./components/page/detail/PageHeader.vue')['default']
-    PageOverview: typeof import('./components/PageOverview.vue')['default']
+    PageOverview: typeof import('./views/PageOverview.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SqlDashboard: typeof import('./components/SqlDashboard.vue')['default']

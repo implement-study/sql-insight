@@ -7,7 +7,7 @@
   <el-dialog
       v-model="dialogVisible"
       :title="dialogTitle"
-      width="95%"
+      width="60%"
       :before-close="handleClose">
     <component :is="dialogComponent"></component>
   </el-dialog>
@@ -99,7 +99,7 @@ const fileTrailer: FixItem = {
 }
 
 const pageItems: Array<FixItem> = [
-  fileHeader, pageHeader, infimum, supremum, userRecord, freeSpace, pageDirectory, fileHeader
+  fileHeader, pageHeader, infimum, supremum, userRecord, freeSpace, pageDirectory, fileTrailer
 ]
 </script>
 

@@ -18,13 +18,20 @@
       />
     </el-col>
     <el-col :span="12" >
-      <InnodbPage/>
+      <n-config-provider :theme="darkTheme">
+        <ButtonMenu></ButtonMenu>
+      </n-config-provider>
+
     </el-col>
   </el-row>
 </template>
 
 <script lang="ts" setup>
 import {ref} from 'vue'
+import { defineComponent } from 'vue'
+import { darkTheme } from 'naive-ui'
+defineComponent([darkTheme])
+
 
 const textarea = ref('')
 

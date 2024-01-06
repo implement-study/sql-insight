@@ -21,6 +21,7 @@
     "@iconify-json/ep": "^1.1.12",
     "@types/node": "^20.6.0",
     "@vitejs/plugin-vue": "^4.3.4",
+    "naive-ui": "^2.36.0",
     "sass": "^1.66.1",
     "typescript": "^5.2.2",
     "unocss": "^0.55.7",

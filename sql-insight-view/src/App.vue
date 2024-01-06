@@ -1,13 +1,15 @@
 <template>
-  <el-config-provider namespace="ep">
-    <BaseHeader/>
-    <div class="flex main-container">
-      <BaseSide/>
-      <div w="full" py="4">
-        <RouterView></RouterView>
+  <n-config-provider :theme="darkTheme">
+    <el-config-provider namespace="ep">
+      <BaseHeader/>
+      <div class="flex main-container">
+        <BaseSide/>
+        <div w="full" py="4">
+          <RouterView></RouterView>
+        </div>
       </div>
-    </div>
-  </el-config-provider>
+    </el-config-provider>
+  </n-config-provider>
 </template>
 
 
@@ -21,6 +23,17 @@
   height: calc(100vh - var(--ep-menu-item-height) - 3px);
 }
 </style>
-<script setup lang="ts">
+
+<script>
+import {defineComponent} from 'vue'
+import {darkTheme} from 'naive-ui'
 import {RouterView} from 'vue-router'
+
+export default defineComponent({
+  setup() {
+    return {
+      darkTheme, RouterView
+    }
+  }
+})
 </script>
