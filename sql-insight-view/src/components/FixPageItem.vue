@@ -18,7 +18,7 @@ import {ref} from 'vue'
 
 let highLight = ref(false);
 
-let props = defineProps<{ fix?: FixItem }>()
+let props = defineProps<{ fix: FixItem }>()
 
 const emit = defineEmits(["routeDialog"]);
 

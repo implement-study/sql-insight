@@ -40,6 +40,10 @@
 import {type FixItem} from "~/types";
 import {ref,markRaw} from 'vue'
 import FileHeader from "~/components/page/detail/FileHeader.vue";
+import PageHeader from "~/components/page/detail/PageHeader.vue";
+import FileTrailer from "~/components/page/detail/FileTrailer.vue";
+import Infimum from "~/components/page/detail/Infimum.vue";
+import Supremum from "~/components/page/detail/Supremum.vue";
 
 let dialogVisible = ref(false)
 let dialogTitle = ref("")
@@ -68,27 +72,28 @@ const pageHeader: FixItem = {
   name: "页头 Page Header",
   bottomOffset: 38 + 56,
   length: 56,
-  dialogComponent: 'GaGa'
+  dialogComponent: markRaw(PageHeader)
 }
 
 const infimum: FixItem = {
   name: "下确界 Infimum",
   bottomOffset: pageHeader.bottomOffset + 13,
   length: 13,
-  dialogComponent: 'GaGa'
+  dialogComponent: markRaw(Infimum)
 }
 
 const supremum: FixItem = {
   name: "上确界 Supremum",
   bottomOffset: infimum.bottomOffset + 13,
   length: 13,
-  dialogComponent: 'GaGa'
+  dialogComponent: markRaw(Supremum)
 }
 
 const freeSpace: FixItem = {
   name: "空闲空间 free Space",
   topOffset: 'heap top',
-  effect: 2
+  effect: 2,
+
 }
 
 const fileTrailer: FixItem = {
@@ -96,7 +101,7 @@ const fileTrailer: FixItem = {
   topOffset: 1024 * 16 - 8,
   length: 8,
   bottomOffset: 1024 * 16,
-  dialogComponent: 'GaGa'
+  dialogComponent:markRaw(FileTrailer)
 }
 
 </script>

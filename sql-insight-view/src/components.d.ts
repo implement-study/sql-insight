@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     BaseHeader: typeof import('./components/layouts/BaseHeader.vue')['default']
     BaseSide: typeof import('./components/layouts/BaseSide.vue')['default']
+    DetailByteList: typeof import('./components/page/detail/DetailByteList.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
@@ -27,15 +28,19 @@ declare module 'vue' {
     ElTag: typeof import('element-plus/es')['ElTag']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     FileHeader: typeof import('./components/page/detail/FileHeader.vue')['default']
+    FileTrailer: typeof import('./components/page/detail/FileTrailer.vue')['default']
     FixPageItem: typeof import('./components/FixPageItem.vue')['default']
     GaGa: typeof import('./components/GaGa.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
+    Infimum: typeof import('./components/page/detail/Infimum.vue')['default']
     InnodbPage: typeof import('./components/InnodbPage.vue')['default']
     Logos: typeof import('./components/Logos.vue')['default']
+    PageHeader: typeof import('./components/page/detail/PageHeader.vue')['default']
     PageOverview: typeof import('./components/PageOverview.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SqlDashboard: typeof import('./components/SqlDashboard.vue')['default']
+    Supremum: typeof import('./components/page/detail/Supremum.vue')['default']
     Test: typeof import('./components/Test.vue')['default']
   }
 }

@@ -1,10 +1,10 @@
 export interface FixItem {
     name: string,
     length?: number,
-    topOffset?: string,
-    bottomOffset?: string,
+    topOffset?: string|number,
+    bottomOffset?: string|number,
     effect?: number,
-    dialogComponent: object
+    dialogComponent?: object
 }
 
 
