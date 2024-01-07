@@ -2,12 +2,10 @@
   <div class="innodb-page">
     <FixPageItem v-for="(item,index) in pageItems" :key="index" :fix=item @route-dialog="routeDialog"></FixPageItem>
   </div>
-
-
   <el-dialog
       v-model="dialogVisible"
       :title="dialogTitle"
-      width="60%"
+      width="70%"
       :before-close="handleClose">
     <component :is="dialogComponent"></component>
   </el-dialog>

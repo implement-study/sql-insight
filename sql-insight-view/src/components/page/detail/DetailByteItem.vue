@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div v-for="(index,innerIndex) in item.length" :key="innerIndex"
+    <div  v-for="(index,innerIndex) in item.length" :key="innerIndex"
          class="rectangle"
          :class="{ active: active }"
          :style="{ width: `5%`,background:color}"
@@ -11,10 +11,10 @@
     <n-tag type="success">
       <template #default>
             <span class="tag-font">
-              从第{{ start + 1 }}个字节 到 第 {{ start + item.length }}个字节是
+              从第{{ start + 1 }} {{ unit }} 到 第 {{ start + item.length }}{{ unit }}是
               <n-button type="warning" size="tiny"
                         @click="buttonShowDetail">
-                {{ item.desc }}
+                {{ item.name }}
               </n-button>
             </span>
       </template>
@@ -32,7 +32,7 @@
 import {type InnodbPageItem} from '~/types'
 import {ref} from 'vue'
 
-let props = defineProps<{ item: InnodbPageItem, start: number, color: string, groupIndex: number }>()
+let props = defineProps<{ item: InnodbPageItem, start: number, color: string, groupIndex: number, unit: string }>()
 
 const emit = defineEmits(["descClick"]);
 
@@ -43,6 +43,7 @@ const active = ref(false)
 const buttonShowDetail = () => {
   emit("descClick", groupIndex);
 }
+
 
 
 </script>

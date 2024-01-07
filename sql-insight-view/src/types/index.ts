@@ -13,9 +13,8 @@ export interface FixItem {
 export interface InnodbPageItem {
     length: number,
     name: string,
-    desc: string,
     detailComponent?: object,
-    detailString?: string
+    detailString?: string,
 
 }
 
