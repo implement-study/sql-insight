@@ -1,5 +1,5 @@
 <template>
-  <DetailByteList :group="group" unit="位"></DetailByteList>
+  <DetailByteList :group="group" unit="位" :overview="overview"></DetailByteList>
 
 </template>
 
@@ -15,8 +15,9 @@ const group: Array<InnodbPageItem> = [
   {name: "heap_no", length: 13, detailString: "记录在当前页中的序号，Infimum是0,supremum是1，用户记录从2开始"},
   {name: "record_type", length: 3, detailString: "节点类型，普通节点是0，非叶子节点是1,Infimum 是2，Supremum是3"},
   {name: "next_record", length: 16, detailString: "下一条记录的偏移量，可以通过这个字段找到页内下一条用户记录"},
-
 ]
+
+const overview = "记录用户记录的元信息"
 
 </script>
 

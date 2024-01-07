@@ -1,5 +1,5 @@
 <template>
-  <DetailByteList :group="group"></DetailByteList>
+  <DetailByteList :group="group" :overview="overview"></DetailByteList>
 </template>
 
 <script lang="ts" setup>
@@ -13,6 +13,8 @@ const group: Array<InnodbPageItem> = [
   {name: "body", length: 8, detailString: "内容,Supremum字符串的二进制数组，占8字节"}
 ]
 
+
+const overview = "页中最大的数据，属于系统记录，格式和用户记录类似"
 
 </script>
 

@@ -22,6 +22,7 @@ import Supremum from "~/components/page/detail/Supremum.vue";
 import PageDirectory from "~/components/page/detail/PageDirectory.vue";
 import UserRecord from "~/components/page/detail/UserRecord.vue";
 import FixPageItem from "~/components/FixPageItem.vue";
+import FreeSpace from "~/components/page/detail/FreeSpace.vue";
 
 let dialogVisible = ref(false)
 let dialogTitle = ref("")
@@ -55,14 +56,14 @@ const pageHeader: FixItem = {
 
 const infimum: FixItem = {
   name: "下确界 Infimum",
-  bottomOffset: pageHeader.bottomOffset + 13,
+  bottomOffset: 38 + 56 + 13,
   length: 13,
   dialogComponent: markRaw(Infimum)
 }
 
 const supremum: FixItem = {
   name: "上确界 Supremum",
-  bottomOffset: infimum.bottomOffset + 13,
+  bottomOffset: 38 + 56 + 13 + 13,
   length: 13,
   dialogComponent: markRaw(Supremum)
 }
@@ -85,7 +86,7 @@ const freeSpace: FixItem = {
   name: "空闲空间 free Space",
   topOffset: 'heap top',
   effect: 2,
-
+  dialogComponent: markRaw(FreeSpace)
 }
 
 const fileTrailer: FixItem = {

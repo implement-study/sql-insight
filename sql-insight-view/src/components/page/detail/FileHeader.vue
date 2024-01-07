@@ -1,5 +1,5 @@
 <template>
-  <DetailByteList :group="group"></DetailByteList>
+  <DetailByteList :group="group" :overview="overview"></DetailByteList>
 </template>
 
 <script lang="ts" setup>
@@ -18,6 +18,8 @@ const group: Array<InnodbPageItem> = [
   {name: "flushLsn", length: 8, detailString: "已经刷到磁盘上的事务序列号"},
   {name: "spaceId", length: 4, detailString: "所属表空间,高版本MySQl已经没有这个字段了"}
 ]
+
+const overview = "记录着一些一般不会改变的页信息"
 
 
 </script>

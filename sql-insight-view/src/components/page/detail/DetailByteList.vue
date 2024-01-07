@@ -1,5 +1,12 @@
 <template>
   <el-row>
+      <el-descriptions v-if="overview" border size="large" >
+        <el-descriptions-item label="概述" align="center" label-align="center">
+          {{ overview }}
+        </el-descriptions-item>
+      </el-descriptions>
+  </el-row>
+  <el-row>
     <el-col :span="16">
       <div v-for="(item,itemIndex) in group"
            :key="item.name">
@@ -37,9 +44,9 @@ import {type InnodbPageItem} from '~/types'
 import DetailByteItem from "~/components/page/detail/DetailByteItem.vue";
 import {ref} from "vue";
 
-let props = defineProps<{ group: Array<InnodbPageItem>, unit?: string }>()
+let props = defineProps<{ group: Array<InnodbPageItem>, unit?: string, overview?: string }>()
 
-const group = props.group
+const {group, overview} = props
 
 const detailIndex = ref(-1)
 

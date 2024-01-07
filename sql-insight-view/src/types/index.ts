@@ -4,7 +4,7 @@ export interface FixItem {
     topOffset?: string | number,
     bottomOffset?: string | number,
     effect?: number,
-    dialogComponent?: object,
+    dialogComponent: object,
     downArrow?: boolean,
     upArrow?: boolean,
 }
