@@ -1,23 +1,33 @@
 <template>
-<!--  <DetailByteList :group="group" :overview="overview"></DetailByteList>-->
-  <div class="container">
-    <div class="left-rectangle">
-      <div v-for="i in 5" class="square"></div>
-    </div>
-    <div class="right-rectangle">
-      <div class="infimum-group"></div>
-      <div class="group"></div>
-      <div class="group"></div>
-      <div class="group"></div>
-      <div class="group"></div>
-  </div>
-  </div>
+  <el-row>
+    <el-col :span="2" :offset="4">
+      <div class="slot-rectangle">
+        <div class="slot">
+          <div class="slot-circle"></div>
+        </div>
+      </div>
+    </el-col>
+    <el-col :span="12" :offset="2">
+      <div class="record-rectangle">
+        <div class="infimum_group group_item" style="flex-grow: 1;">
+
+        </div>
+        <div class="user_record_group group_item" v-for="index in 3" :key="index">
+
+        </div>
+        <div class="supremum_group group_item">
+
+        </div>
+      </div>
+    </el-col>
+  </el-row>
+
+
 
 </template>
-
 <script lang="ts" setup>
 import {type InnodbPageItem} from '~/types'
-import DetailByteList from "~/components/page/detail/DetailByteList.vue";
+
 
 
 const group: Array<InnodbPageItem> = [
@@ -35,66 +45,54 @@ const overview = `一个页中的所有记录是逻辑连续的，如果需要�
 </script>
 
 <style scoped>
-/* 设置整体容器为左右布局 */
-.container {
-  display: flex;
-  height: 100vh; /* 占满整个视窗高度 */
+.slot-rectangle {
+  width: 100px;
+  height: 600px;
+  position: relative;
+  border-radius: 5px;
+  border: 2px solid white;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  display: flex; /* 使用 Flexbox 布局 */
 }
 
-.left-rectangle {
-  width: 10%; /* 宽度为父元素宽度的80% */
-  height: 50%; /* 高度为父元素高度的20% */
-  border: 1px solid white; /* 边框为1像素实线黑色 */
-  border-radius: 10px; /* 圆角半径为10像素，使边框圆角化 */
-  margin-left: 10%;
+.record-rectangle {
+  width: 600px;
+  height: 600px;
+  position: relative;
+  display: grid;
+  grid-template-rows: auto;
 }
 
-.right-rectangle {
-  width: 40%; /* 宽度为父元素宽度的80% */
-  height: 50%; /* 高度为父元素高度的20% */
-  border: 1px solid white; /* 边框为1像素实线黑色 */
-  border-radius: 10px; /* 圆角半径为10像素，使边框圆角化 */
-  margin-left: 10%;
-  display: flex;
-  flex-direction: column;
-  padding: 5%;
-  align-items: center; /* 水平居中 */
+.infimum_group{
+  flex-grow: 1
+}
+.user_record_group{
+  flex-grow: 2
 }
 
-.square {
-  width: 50px; /* 宽度为50像素 */
-  height: 50px; /* 高度为50像素 */
-  background-color: #cccccc; /* 正方形颜色为黑色 */
-  position: relative; /* 相对定位 */
+.group_item{
+  border-radius: 5px;
+  border: 2px solid white;
+  margin: 10px;
 }
 
-/* 用伪元素在正方形中心生成一个圆点 */
-.square::before {
-  content: '';
-  width: 10px; /* 圆点宽度 */
-  height: 10px; /* 圆点高度 */
-  border-radius: 50%; /* 将元素设为圆形 */
-  background-color: white; /* 圆点颜色为红色 */
-  position: absolute; /* 绝对定位 */
-  top: 50%; /* 纵向居中 */
-  left: 50%; /* 横向居中 */
-  transform: translate(-50%, -50%); /* 居中定位 */
+
+.slot {
+  width: 50px; /* 设置正方形的宽度 */
+  height: 50px; /* 设置正方形的高度 */
+  background-color: teal; /* 设置正方形的背景颜色 */
+  position: relative; /* 设置为相对定位，以便内部元素可以使用绝对定位 */
 }
 
-.infimum-group {
-  width: 100%; /* 宽度为30像素 */
-  height: 10%; /* 高度为10像素 */
-  background-color: #fad0c4; /* 矩形颜色为黑色 */
-  border-radius: 10px; /* 圆角半径为10像素，使边框圆角化 */
-  margin-bottom: 5%; /* 设置矩形之间的间距为5像素 */
+.slot-circle {
+  width: 5px; /* 设置圆形的直径 */
+  height: 5px; /* 设置圆形的直径 */
+  background-color: yellow; /* 设置圆形的背景颜色 */
+  border-radius: 50%; /* 将正方形的边框半径设置为50%，使其变成圆形 */
+  position: absolute; /* 设置为绝对定位，相对于父元素进行定位 */
+  top: 50%; /* 将圆形定位到父元素的中间位置 */
+  left: 50%; /* 将圆形定位到父元素的中间位置 */
+  transform: translate(-50%, -50%); /* 通过平移变换将圆形的中心放置在正方形的中心 */
 }
-
-.group {
-  width: 100%; /* 宽度为30像素 */
-  height: 20%; /* 高度为10像素 */
-  border-radius: 10px; /* 圆角半径为10像素，使边框圆角化 */
-  background-color: #fad0c4; /* 矩形颜色为黑色 */
-  margin-bottom: 5%; /* 设置矩形之间的间距为5像素 */
-}
-
 </style>
