@@ -37,11 +37,13 @@ declare module 'vue' {
     PageDirectory: typeof import('./components/page/detail/PageDirectory.vue')['default']
     PageHeader: typeof import('./components/page/detail/PageHeader.vue')['default']
     PageOverview: typeof import('./views/PageOverview.vue')['default']
+    RecordHeader: typeof import('./components/page/detail/RecordHeader.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SqlDashboard: typeof import('./components/SqlDashboard.vue')['default']
     Supremum: typeof import('./components/page/detail/Supremum.vue')['default']
     Test: typeof import('./components/Test.vue')['default']
+    UserHeader: typeof import('./components/page/detail/RecordHeader.vue')['default']
     UserRecord: typeof import('./components/page/detail/UserRecord.vue')['default']
   }
 }

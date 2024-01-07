@@ -1,18 +1,21 @@
 export interface FixItem {
     name: string,
     length?: number,
-    topOffset?: string|number,
-    bottomOffset?: string|number,
+    topOffset?: string | number,
+    bottomOffset?: string | number,
     effect?: number,
     dialogComponent?: object,
-    downArrow?:boolean,
-    upArrow?:boolean,
+    downArrow?: boolean,
+    upArrow?: boolean,
 }
 
 
 export interface InnodbPageItem {
     length: number,
     name: string,
-    desc: string
+    desc: string,
+    detailComponent?: object,
+    detailString?: string
+
 }
 

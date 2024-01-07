@@ -14,11 +14,11 @@ import "uno.css";
 import {
     create,
     NButton,
-    NList, NListItem, NConfigProvider, NTag, NSpace, NThing, NPopover
+    NList, NListItem, NConfigProvider, NTag, NSpace, NThing, NPopover,NCard
 } from 'naive-ui'
 
 const naive = create({
-    components: [NButton, NList, NListItem, NConfigProvider, NTag, NSpace, NThing, NPopover]
+    components: [NButton, NList, NListItem, NConfigProvider, NTag, NSpace, NThing, NPopover,NCard]
 })
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 

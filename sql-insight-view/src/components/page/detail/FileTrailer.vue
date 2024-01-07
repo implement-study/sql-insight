@@ -9,8 +9,8 @@ import DetailByteList from "~/components/page/detail/DetailByteList.vue";
 
 
 const group: Array<InnodbPageItem> = [
-  {name: "checkSum", length: 4, desc: ""},
-  {name: "lsn", length: 4, desc: ""}
+  {name: "checkSum", length: 4, desc: "校验和"},
+  {name: "lsn", length: 4, desc: "校验和"}
 ]
 
 

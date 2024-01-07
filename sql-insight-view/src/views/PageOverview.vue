@@ -119,55 +119,5 @@ html, body {
   box-shadow: 2px 2px 5px rgba(128, 128, 128, 0.5);
 }
 
-.user-record {
-  display: flex;
-  height: 24%;
-}
-
-.page-directory {
-  display: flex;
-  height: 24%;
-}
-
-.arrow-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-end;
-  padding-right: 10px;
-}
-
-.line {
-  width: 2px;
-  height: 100%;
-  background-color: #ccc; /* 箭头的线条颜色 */
-}
-
-.arrow-down {
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-top: 10px solid #ccc;
-}
-
-
-.arrow-top {
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-bottom: 10px solid #ccc;
-}
-
-
-.right-section {
-  border: 1px solid #ccc;
-  flex: 9;
-  padding: 10px;
-}
-
-.object_desc {
-  font-weight: bold;
-}
 
 </style>

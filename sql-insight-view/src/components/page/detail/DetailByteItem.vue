@@ -1,50 +1,49 @@
 <template>
-  <div ref="buttonRef" v-click-outside="onClickOutside" class="container">
+  <div class="container">
     <div v-for="(index,innerIndex) in item.length" :key="innerIndex"
          class="rectangle"
          :class="{ active: active }"
-         :style="{ width: `${100 / 50}%`,background:color}"
-         @mouseover="onMouseOver"
-         @mouseleave="onMouseLeave">
+         :style="{ width: `5%`,background:color}"
+         @mouseover="active = true"
+         @mouseleave="active = false">
       {{ start + innerIndex }}
     </div>
     <n-tag type="success">
       <template #default>
-        <p class="tag-font">
-          从第{{ start + 1 }}个字节 到 第 {{ start + item.length }}个字节 是{{ item.desc }}
-        </p>
+            <span class="tag-font">
+              从第{{ start + 1 }}个字节 到 第 {{ start + item.length }}个字节是
+              <n-button type="warning" size="tiny"
+                        @click="buttonShowDetail">
+                {{ item.desc }}
+              </n-button>
+            </span>
       </template>
       <template #icon>
-        <el-icon><Right /></el-icon>
+        <el-icon>
+          <Right/>
+        </el-icon>
       </template>
     </n-tag>
   </div>
+
 </template>
 
 <script lang="ts" setup>
 import {type InnodbPageItem} from '~/types'
-import {ref, unref} from 'vue'
-import {ClickOutside as vClickOutside} from 'element-plus'
+import {ref} from 'vue'
 
+let props = defineProps<{ item: InnodbPageItem, start: number, color: string, groupIndex: number }>()
 
-let props = defineProps<{ item: InnodbPageItem, start: number, color: string }>()
+const emit = defineEmits(["descClick"]);
 
-const {item, start, color} = props
-
+const {item, start, color, groupIndex} = props
 
 const active = ref(false)
 
-const onMouseOver = () => {
-  active.value = true
-};
-
-const onMouseLeave = () => {
-  active.value = false
-};
-
-const buttonRef = ref()
-const onClickOutside = () => {
+const buttonShowDetail = () => {
+  emit("descClick", groupIndex);
 }
+
 
 </script>
 

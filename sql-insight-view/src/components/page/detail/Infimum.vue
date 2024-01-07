@@ -4,13 +4,13 @@
 
 <script lang="ts" setup>
 import {type InnodbPageItem} from '~/types'
-import {ref} from 'vue'
 import DetailByteList from "~/components/page/detail/DetailByteList.vue";
+import RecordHeader from "~/components/page/detail/RecordHeader.vue";
 
 
 const group: Array<InnodbPageItem> = [
-  {name: "checkSum", length: 4, desc: ""},
-  {name: "lsn", length: 4, desc: ""}
+  {name: "userRecord", length: 5, desc: "记录头", detailComponent: RecordHeader},
+  {name: "body", length: 8, desc: "内容",detailString:"Infimum字符串的二进制数组，占8字节，但是Infimum只有7字节，会补位"}
 ]
 
 
