@@ -15,3 +15,9 @@ db/
 *.tiled-session
 *.tiled-project
 kotlin-js-store/
+
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
