@@ -15,6 +15,8 @@
  */
 package tech.insight.core.bean
 
+import com.alibaba.druid.sql.visitor.SQLASTVisitor
+
 /**
  * subclass can fill info via visit statement
  *

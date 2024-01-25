@@ -15,30 +15,31 @@
  */
 package tech.insight.core.bean.value
 
+
 /**
  * base value
- *
+ * [T] is value type.
  * @author gongxuanzhangmelt@gmail.com
  */
-interface Value : Comparable<Value?> {
+interface Value<T> : Comparable<Value<T>> {
     /**
      * length for value
      *
      * @return byte array length
      */
     val length: Int
-    val isDynamic: Boolean
-        /**
-         * the value is dynamic
-         *
-         * @return true is dynamic
-         */
-        get() = false
 
     /**
-     * @return content
+     * the value is dynamic
+     *
+     * @return true is dynamic
      */
-    val source: Any?
+    val isDynamic: Boolean
+
+    /**
+     * value source
+     */
+    val source: T
 
     /**
      * to byte array
@@ -46,4 +47,43 @@ interface Value : Comparable<Value?> {
      * @return byte array equals getLength()
      */
     fun toBytes(): ByteArray
+}
+
+class ValueChar(value: String, length: Int) : Value<String> {
+    override val length: Int
+    override val isDynamic = false
+    override val source: String
+
+    init {
+        check(value.length <= length) { "$value length more than $length" }
+        this.source = value.padEnd(length, ' ')
+        this.length = length
+    }
+
+
+    override fun toBytes(): ByteArray {
+        return source.toByteArray()
+    }
+
+    override fun compareTo(other: Value<String>): Int {
+        return this.source.compareTo(other.source)
+    }
+
+}
+
+class ValueVarchar(override val source: String) : Value<String> {
+    override val length: Int
+        get() {
+            return toBytes().size
+        }
+    override val isDynamic = true
+
+
+    override fun toBytes(): ByteArray {
+        return source.toByteArray()
+    }
+
+    override fun compareTo(other: Value<String>): Int {
+        return this.source.compareTo(other.source)
+    }
 }
