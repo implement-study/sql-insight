@@ -29,7 +29,7 @@ object SqlPipeline {
     fun doSql(sql: String): ResultInterface {
         val startTime = System.currentTimeMillis()
         log.info("start analysis sql \n {}  ...", sql)
-        var command = analyzer.analysisSql(sql)
+        val command = analyzer.analysisSql(sql)
         log.info("start optimize command {}", command)
         val plan = optimizer.assign(command)
         val resultInterface = executeEngine!!.executePlan(plan)

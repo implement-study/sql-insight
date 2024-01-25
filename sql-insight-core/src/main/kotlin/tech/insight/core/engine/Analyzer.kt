@@ -5,6 +5,7 @@ import com.alibaba.druid.sql.ast.statement.SQLCreateDatabaseStatement
 import com.alibaba.druid.sql.visitor.SQLASTVisitor
 import tech.insight.core.command.Command
 import tech.insight.core.command.CreateDatabase
+import tech.insight.core.engine.filler.DispatcherFiller
 
 
 /**
@@ -45,7 +46,7 @@ class CommandTypeVisitor(private val sql: String) : SQLASTVisitor {
 
     override fun visit(x: SQLCreateDatabaseStatement): Boolean {
         this.command = CreateDatabase(sql, x)
-        return false;
+        return false
     }
 
 //    override fun endVisit(x: SQLDropDatabaseStatement): Boolean {

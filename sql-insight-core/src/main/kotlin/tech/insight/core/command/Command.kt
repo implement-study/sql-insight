@@ -33,5 +33,11 @@ class CreateDatabase(sql: String, statement: SQLCreateDatabaseStatement) : Creat
     lateinit var dbName: String
 }
 
+class CreateTable(sql: String, statement: SQLCreateDatabaseStatement) : CreateCommand(sql, statement) {
+    var ifNotExists = false
+    lateinit var dbName: String
+}
+
+
 
 
