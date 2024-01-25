@@ -1,15 +1,10 @@
 package tech.insight.core.engine
 
 import com.alibaba.druid.sql.SQLUtils
-import com.alibaba.druid.sql.ast.statement.*
+import com.alibaba.druid.sql.ast.statement.SQLCreateDatabaseStatement
 import com.alibaba.druid.sql.visitor.SQLASTVisitor
 import tech.insight.core.command.Command
 import tech.insight.core.command.CreateDatabase
-import tech.insight.core.command.command.ddl.CreateTable
-import tech.insight.core.command.command.ddl.DropDatabase
-import tech.insight.core.command.command.ddl.DropTable
-import tech.insight.core.command.command.dml.Delete
-import tech.insight.core.command.command.dml.Update
 
 
 /**
