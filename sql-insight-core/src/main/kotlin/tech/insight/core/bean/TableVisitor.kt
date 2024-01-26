@@ -18,6 +18,7 @@ package tech.insight.core.bean
 import com.alibaba.druid.sql.ast.SQLObject
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr
 import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr
+import com.alibaba.druid.sql.visitor.SQLASTVisitor
 import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext
 
 /**

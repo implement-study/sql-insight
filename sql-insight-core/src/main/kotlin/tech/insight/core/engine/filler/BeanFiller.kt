@@ -40,7 +40,7 @@ class TableFiller(val table: Table) : BeanFiller<Table> {
             column.nullListIndex = ext.nullableColCount
             ext.nullableColCount++
         }
-        if (column.getDataType().getType() === DataType.Type.VARCHAR) {
+        if (column.dataType.type === DataType.Type.VARCHAR) {
             ext.variableIndex.add(table.columnList.size - 1)
         }
         ext.columnIndex[column.name] = table.columnList.size - 1
@@ -83,8 +83,8 @@ class ColumnFiller(val col: Column) : BeanFiller<Column> {
         col.name = x.columnName
         col.autoIncrement = x.isAutoIncrement
         col.dataType = DataType()
-        x.accept(dataType)
-        if (dataType.getType() === DataType.Type.VARCHAR) {
+        x.accept(col.dataType)
+        if (col.dataType.type === DataType.Type.VARCHAR) {
             col.variable = true
         }
         x.accept(ColConstraintVisitor())

@@ -1,7 +1,7 @@
 package tech.insight.core.engine
 
 import tech.insight.core.result.ResultInterface
-import tech.insight.core.slf4j
+import tech.insight.core.extension.slf4j
 
 
 /**

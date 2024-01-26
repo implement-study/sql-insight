@@ -15,7 +15,8 @@
  */
 package tech.insight.core.bean
 
-import org.gongxuanzhang.sql.insight.core.`object`.value.Value
+import tech.insight.core.bean.value.Value
+
 
 /**
  * base row
@@ -41,7 +42,7 @@ interface Row : Comparable<Row> {
      * @param colName column name
      * @return value or error
      */
-    fun getValueByColumnName(colName: String?): Value
+    fun getValueByColumnName(colName: String): Value<*>
 
     /**
      * the row related table

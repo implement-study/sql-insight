@@ -15,7 +15,9 @@
  */
 package tech.insight.core.bean.value
 
-import java.util.function.Consumer
+import com.alibaba.druid.sql.ast.expr.SQLCharExpr
+import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr
+import com.alibaba.druid.sql.visitor.SQLASTVisitor
 
 /**
  * visitor a value expr ,work up a [Value],
@@ -23,13 +25,12 @@ import java.util.function.Consumer
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-class ValueVisitor(private val afterVisit: Consumer<Value>) : SQLASTVisitor {
+class ValueVisitor(private val valueAction: (Value<*>) -> Unit) : SQLASTVisitor {
     override fun endVisit(x: SQLCharExpr) {
-        val text: String = x.getText()
-        afterVisit.accept(ValueVarchar(text))
+        valueAction.invoke(ValueVarchar(x.text))
     }
 
     override fun endVisit(x: SQLIntegerExpr) {
-        afterVisit.accept(ValueInt(x.getNumber().toInt()))
+        valueAction.invoke(ValueInt(x.number.toInt()))
     }
 }

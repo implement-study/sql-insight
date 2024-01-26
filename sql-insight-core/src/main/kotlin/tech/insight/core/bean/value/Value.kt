@@ -15,13 +15,15 @@
  */
 package tech.insight.core.bean.value
 
+import tech.insight.core.extension.toByteArray
+
 
 /**
  * base value
  * [T] is value type.
  * @author gongxuanzhangmelt@gmail.com
  */
-interface Value<T> : Comparable<Value<T>> {
+sealed interface Value<T> : Comparable<Value<T>> {
     /**
      * length for value
      *
@@ -87,3 +89,49 @@ class ValueVarchar(override val source: String) : Value<String> {
         return this.source.compareTo(other.source)
     }
 }
+
+class ValueInt(override val source: Int) : Value<Int> {
+    override val length = Int.SIZE_BYTES
+    override val isDynamic = false
+
+
+    override fun toBytes(): ByteArray {
+        return source.toByteArray()
+    }
+
+    override fun compareTo(other: Value<Int>): Int {
+        return this.source.compareTo(other.source)
+    }
+}
+
+class ValueBoolean(override val source: Boolean) : Value<Boolean> {
+    override val length = Byte.SIZE_BYTES
+    override val isDynamic = false
+
+
+    override fun toBytes(): ByteArray {
+        return source.toByteArray()
+    }
+
+    override fun compareTo(other: Value<Boolean>): Int {
+        return this.source.compareTo(other.source)
+    }
+}
+
+
+class ValueNull : Value<Unit> {
+    override val source: Unit = Unit
+    override val length = 0
+    override val isDynamic = false
+
+
+    override fun toBytes(): ByteArray {
+        return ByteArray(0)
+    }
+
+    override fun compareTo(other: Value<Unit>): Int {
+        return -1
+    }
+}
+
+

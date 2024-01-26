@@ -17,22 +17,21 @@ package tech.insight.core.bean
 
 import com.alibaba.druid.sql.ast.SQLDataType
 import com.alibaba.druid.sql.ast.statement.SQLCharacterDataType
-import lombok.Data
+import java.util.*
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-@Data
 class DataType : FillDataVisitor {
-    private var type: Type? = null
-    private var length = 0
+    var type: Type? = null
+    var length = 0
     override fun endVisit(x: SQLDataType) {
-        type = Type.valueOf(x.getName().uppercase(Locale.getDefault()))
+        type = Type.valueOf(x.name.uppercase(Locale.getDefault()))
         length = type!!.defaultLength
     }
 
     override fun endVisit(x: SQLCharacterDataType) {
-        type = Type.valueOf(x.getName().uppercase(Locale.getDefault()))
+        type = Type.valueOf(x.name.uppercase(Locale.getDefault()))
         length = x.getLength()
         if (length < 0) {
             length = type!!.defaultLength

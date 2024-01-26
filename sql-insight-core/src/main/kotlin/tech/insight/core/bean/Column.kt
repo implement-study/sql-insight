@@ -15,18 +15,21 @@
  */
 package tech.insight.core.bean
 
+import tech.insight.core.bean.value.Value
+import tech.insight.core.bean.value.ValueNull
+
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
 class Column : SQLBean {
-    var name: String? = null
-    var dataType: DataType? = null
+    lateinit var name: String
+    lateinit var dataType: DataType
     var autoIncrement = false
     var notNull = false
     var primaryKey = false
     var unique = false
-    val defaultValue: Value? = null
+    var defaultValue: Value<*> = ValueNull()
     var comment: String? = null
     var variable = false
     var nullListIndex = 0
