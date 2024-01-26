@@ -15,24 +15,17 @@
  */
 package tech.insight.core.bean
 
-import org.gongxuanzhang.sql.insight.core.`object`.condition.AlwaysCondition
+import tech.insight.core.bean.condition.AlwaysCondition
+import tech.insight.core.bean.condition.BooleanExpression
+import tech.insight.core.bean.value.ValueBoolean
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class Where : TableContainer, BooleanExpression {
-    override var table: Table? = null
-    private val condition: BooleanExpression
+class Where(private val condition: BooleanExpression = AlwaysCondition.getInstance(true)) : BooleanExpression {
+    lateinit var table: Table
 
-    constructor(always: Boolean) {
-        condition = AlwaysCondition.getInstance(always)
-    }
-
-    constructor(condition: BooleanExpression) {
-        this.condition = condition
-    }
-
-    fun getExpressionValue(row: Row?): ValueBoolean {
+    override fun getExpressionValue(row: Row?): ValueBoolean {
         return ValueBoolean(condition.getBooleanValue(row))
     }
 }

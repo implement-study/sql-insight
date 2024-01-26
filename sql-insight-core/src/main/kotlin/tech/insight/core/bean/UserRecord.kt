@@ -15,7 +15,6 @@
  */
 package tech.insight.core.bean
 
-import org.gongxuanzhang.easybyte.core.ByteWrapper
 
 /**
  * user record represents a physics row in disk.
@@ -35,7 +34,7 @@ interface UserRecord : ByteWrapper, Row {
     fun offset(): Int
 
     /**
-     * [this.offset]
+     * [offset]
      * absolute offset in page don't in source.
      * require set up
      */
