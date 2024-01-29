@@ -15,7 +15,9 @@
  */
 package tech.insight.core.bean.condition
 
-import org.gongxuanzhang.sql.insight.core.exception.DateTypeCastException
+import tech.insight.core.bean.Row
+import tech.insight.core.bean.value.*
+
 
 /**
  * you can calculate the result with row
@@ -28,24 +30,18 @@ interface Expression {
      *
      * @return value
      */
-    fun getExpressionValue(row: Row?): Value?
+    fun getExpressionValue(row: Row): Value<*>
 
     /**
      * value to boolean support expression
      */
-    fun getBooleanValue(row: Row?): Boolean {
-        val expressionValue: Value? = getExpressionValue(row)
-        if (expressionValue is ValueBoolean) {
-            return (expressionValue as ValueBoolean?).getSource()
+    fun getBooleanValue(row: Row): Boolean {
+        return when (val value = getExpressionValue(row)) {
+            is ValueBoolean -> value.source
+            is ValueChar -> value.source.isNotEmpty()
+            is ValueInt -> value.source >= 1
+            is ValueNull -> false
+            is ValueVarchar -> value.source.isNotEmpty()
         }
-        if (expressionValue is ValueInt) {
-            val value: Int = (expressionValue as ValueInt?).getSource()
-            return value != 0
-        }
-        if (expressionValue is ValueVarchar) {
-            val string: String = expressionValue.getSource().toString()
-            return !string.isEmpty()
-        }
-        throw DateTypeCastException("boolean", expressionValue.getSource().getClass().getName())
     }
 }

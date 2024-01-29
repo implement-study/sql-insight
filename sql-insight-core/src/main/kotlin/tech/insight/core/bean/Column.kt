@@ -35,4 +35,10 @@ class Column : SQLBean {
     var nullListIndex = 0
 
 
+
+    override fun checkMyself() {
+        TODO("Not yet implemented")
+    }
+
+
 }

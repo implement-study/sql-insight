@@ -39,4 +39,8 @@ package tech.insight.core.bean
     }
 
 
+    override fun checkMyself() {
+        TODO("Not yet implemented")
+    }
+
 }

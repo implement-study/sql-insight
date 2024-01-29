@@ -15,6 +15,7 @@
  */
 package tech.insight.core.bean
 
+import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr
 import com.alibaba.druid.sql.ast.expr.SQLNullExpr
 import lombok.Data
 import tech.insight.core.bean.value.ValueChar

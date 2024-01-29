@@ -26,6 +26,7 @@ import com.alibaba.druid.sql.visitor.SQLASTVisitor
  * @author gongxuanzhangmelt@gmail.com
  */
 class ValueVisitor(private val valueAction: (Value<*>) -> Unit) : SQLASTVisitor {
+
     override fun endVisit(x: SQLCharExpr) {
         valueAction.invoke(ValueVarchar(x.text))
     }

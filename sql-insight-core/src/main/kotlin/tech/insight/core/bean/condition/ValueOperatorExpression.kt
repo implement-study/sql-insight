@@ -15,7 +15,10 @@
  */
 package tech.insight.core.bean.condition
 
-import org.gongxuanzhang.sql.insight.core.`object`.Row
+import tech.insight.core.bean.Row
+import tech.insight.core.bean.value.Value
+import tech.insight.core.bean.value.ValueBoolean
+
 
 /**
  * calc two value to one value.
@@ -23,17 +26,75 @@ import org.gongxuanzhang.sql.insight.core.`object`.Row
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-abstract class ValueOperatorExpression protected constructor(
-    protected val left: Expression,
-    protected val right: Expression
-) : Expression {
+sealed class ValueOperatorExpression(private val left: Expression, private val right: Expression) : Expression {
     /**
      * calculate a result from left and right value
      *
      * @return the function
      */
-    protected abstract fun operator(): ValueOperatorFunction
-    override fun getExpressionValue(row: Row?): Value? {
-        return operator().apply(left.getExpressionValue(row), right.getExpressionValue(row))
+    protected abstract fun operator(left: Value<*>, right: Value<*>): Value<*>
+
+    override fun getExpressionValue(row: Row): Value<*> {
+        return operator(left.getExpressionValue(row), right.getExpressionValue(row))
     }
 }
+
+class AddExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+    override fun operator(left: Value<*>, right: Value<*>): Value<*> {
+        return left + right
+    }
+}
+
+class DivideExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+    override fun operator(left: Value<*>, right: Value<*>): Value<*> {
+        return left / right
+    }
+}
+
+class PlusExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+    override fun operator(left: Value<*>, right: Value<*>): Value<*> {
+        return left * right
+    }
+}
+
+class SubtractExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+    override fun operator(left: Value<*>, right: Value<*>): Value<*> {
+        return left - right
+    }
+}
+
+class GreatExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+    override fun operator(left: Value<*>, right: Value<*>): Value<*> {
+        return ValueBoolean(left > right)
+    }
+}
+
+class GreatEqualsExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+    override fun operator(left: Value<*>, right: Value<*>): Value<*> {
+        return ValueBoolean(left >= right)
+    }
+}
+
+class LessExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+    override fun operator(left: Value<*>, right: Value<*>): Value<*> {
+        return ValueBoolean(left < right)
+    }
+}
+
+class LessEqualsExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+    override fun operator(left: Value<*>, right: Value<*>): Value<*> {
+        return ValueBoolean(left <= right)
+    }
+}
+
+
+class EqualsExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+    override fun operator(left: Value<*>, right: Value<*>): Value<*> {
+        return ValueBoolean(left == right)
+    }
+}
+
+
+
+
+

@@ -23,7 +23,7 @@ import tech.insight.core.extension.toByteArray
  * [T] is value type.
  * @author gongxuanzhangmelt@gmail.com
  */
-sealed interface Value<T> : Comparable<Value<T>> {
+sealed interface Value<T> : Comparable<Value<*>> {
     /**
      * length for value
      *
@@ -49,6 +49,22 @@ sealed interface Value<T> : Comparable<Value<T>> {
      * @return byte array equals getLength()
      */
     fun toBytes(): ByteArray
+
+    operator fun plus(other: Value<*>): Value<T> {
+        throw UnsupportedOperationException("${javaClass.name} not support plus")
+    }
+
+    operator fun minus(other: Value<*>): Value<T> {
+        throw UnsupportedOperationException("${javaClass.name} not support minus")
+    }
+
+    operator fun times(other: Value<*>): Value<T> {
+        throw UnsupportedOperationException("${javaClass.name} not support times")
+    }
+
+    operator fun div(other: Value<*>): Value<T> {
+        throw UnsupportedOperationException("${javaClass.name} not support div")
+    }
 }
 
 class ValueChar(value: String, length: Int) : Value<String> {
@@ -67,8 +83,16 @@ class ValueChar(value: String, length: Int) : Value<String> {
         return source.toByteArray()
     }
 
-    override fun compareTo(other: Value<String>): Int {
-        return this.source.compareTo(other.source)
+    override fun plus(other: Value<*>): Value<String> {
+        return ValueVarchar("$source${other.source}")
+    }
+
+    override fun compareTo(other: Value<*>): Int {
+        return when (other) {
+            is ValueBoolean -> this.source.compareTo(if (other.source) "1" else "0")
+            is ValueNull -> 1
+            else -> this.source.compareTo(other.source.toString())
+        }
     }
 
 }
@@ -85,8 +109,16 @@ class ValueVarchar(override val source: String) : Value<String> {
         return source.toByteArray()
     }
 
-    override fun compareTo(other: Value<String>): Int {
-        return this.source.compareTo(other.source)
+    override fun compareTo(other: Value<*>): Int {
+        return when (other) {
+            is ValueBoolean -> this.source.compareTo(if (other.source) "1" else "0")
+            is ValueNull -> 1
+            else -> this.source.compareTo(other.source.toString())
+        }
+    }
+
+    override fun plus(other: Value<*>): Value<String> {
+        return ValueVarchar("$source${other.source}")
     }
 }
 
@@ -99,8 +131,34 @@ class ValueInt(override val source: Int) : Value<Int> {
         return source.toByteArray()
     }
 
-    override fun compareTo(other: Value<Int>): Int {
-        return this.source.compareTo(other.source)
+    override fun compareTo(other: Value<*>): Int {
+        return when (other) {
+            is ValueBoolean -> this.source.compareTo(if (other.source) 1 else 0)
+            is ValueNull -> 1
+            is ValueInt -> this.source.compareTo(other.source)
+            is ValueChar -> this.source.toString().compareTo(other.source)
+            is ValueVarchar -> this.source.toString().compareTo(other.source)
+        }
+    }
+
+    override operator fun plus(other: Value<*>): Value<Int> {
+        require(other is ValueInt) { "number can't plus a ${other.javaClass}" }
+        return ValueInt(this.source + other.source)
+    }
+
+    override operator fun minus(other: Value<*>): Value<Int> {
+        require(other is ValueInt) { "number can't plus a ${other.javaClass}" }
+        return ValueInt(this.source - other.source)
+    }
+
+    override operator fun times(other: Value<*>): Value<Int> {
+        require(other is ValueInt) { "number can't plus a ${other.javaClass}" }
+        return ValueInt(this.source * other.source)
+    }
+
+    override operator fun div(other: Value<*>): Value<Int> {
+        require(other is ValueInt) { "number can't plus a ${other.javaClass}" }
+        return ValueInt(this.source / other.source)
     }
 }
 
@@ -113,8 +171,14 @@ class ValueBoolean(override val source: Boolean) : Value<Boolean> {
         return source.toByteArray()
     }
 
-    override fun compareTo(other: Value<Boolean>): Int {
-        return this.source.compareTo(other.source)
+    override fun compareTo(other: Value<*>): Int {
+        return when (other) {
+            is ValueBoolean -> this.source.compareTo(other.source)
+            is ValueNull -> 1
+            is ValueInt -> if (this.source) 1 else 0.compareTo(other.source)
+            is ValueChar -> this.source.toString().compareTo(other.source)
+            is ValueVarchar -> this.source.toString().compareTo(other.source)
+        }
     }
 }
 
@@ -129,7 +193,7 @@ class ValueNull : Value<Unit> {
         return ByteArray(0)
     }
 
-    override fun compareTo(other: Value<Unit>): Int {
+    override fun compareTo(other: Value<*>): Int {
         return -1
     }
 }

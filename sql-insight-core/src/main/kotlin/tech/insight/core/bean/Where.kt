@@ -22,10 +22,20 @@ import tech.insight.core.bean.value.ValueBoolean
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class Where(private val condition: BooleanExpression = AlwaysCondition.getInstance(true)) : BooleanExpression {
+open class Where(private val condition: BooleanExpression = AlwaysCondition.getInstance(true)) : BooleanExpression {
+
+    companion object : Where()
+
     lateinit var table: Table
 
     override fun getExpressionValue(row: Row?): ValueBoolean {
         return ValueBoolean(condition.getBooleanValue(row))
     }
+
+
 }
+
+typealias Always = Where
+
+
+
