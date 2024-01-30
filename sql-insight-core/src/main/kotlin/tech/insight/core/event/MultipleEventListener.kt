@@ -13,36 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tech.insight.core.bean.condition
-
-import tech.insight.core.bean.Row
-import tech.insight.core.bean.SQLBean
-import tech.insight.core.bean.value.*
-
+package tech.insight.core.event
 
 /**
- * you can calculate the result with row
+ * listen multiple event listener
+ * if a listener implementation both [MultipleEventListener] and [EventListener]
+ * only [MultipleEventListener] can take effect
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-interface Expression : SQLBean {
+interface MultipleEventListener {
     /**
-     * expression and row  calculate
+     * call back method for event
      *
-     * @return value
+     * @param event [listenEvent] class event
      */
-    fun getExpressionValue(row: Row): Value<*>
+    fun onEvent(event: InsightEvent)
 
     /**
-     * value to boolean support expression
+     * @return not null
      */
-    fun getBooleanValue(row: Row): Boolean {
-        return when (val value = getExpressionValue(row)) {
-            is ValueBoolean -> value.source
-            is ValueChar -> value.source.isNotEmpty()
-            is ValueInt -> value.source >= 1
-            is ValueNull -> false
-            is ValueVarchar -> value.source.isNotEmpty()
-        }
-    }
+    fun listenEvent(): List<Class<out InsightEvent>>
 }

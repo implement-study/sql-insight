@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tech.insight.core.bean.condition
-
-import org.gongxuanzhang.sql.insight.core.`object`.Row
+package tech.insight.core.exception
 
 /**
- * there are two ways to result values.
- * fixed value or get column value
+ * like [java.io.FileNotFoundException]
+ *
+ *
+ * the only difference is this class is a runtime exception
  *
  * @author gongxuanzhangmelt@gmail.com
+ * @see java.io.FileNotFoundException
  */
-class IntExpression(private val value: Int) : Expression {
-    override fun getExpressionValue(row: Row?): ValueInt? {
-        return ValueInt(value)
-    }
+class RuntimeFileNotFoundException : SqlInsightException {
+    constructor()
+    constructor(message: String?) : super(message)
 }

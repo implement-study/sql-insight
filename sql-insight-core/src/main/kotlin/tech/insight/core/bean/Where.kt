@@ -15,27 +15,35 @@
  */
 package tech.insight.core.bean
 
-import tech.insight.core.bean.condition.AlwaysCondition
 import tech.insight.core.bean.condition.BooleanExpression
+import tech.insight.core.bean.value.Value
 import tech.insight.core.bean.value.ValueBoolean
+import tech.insight.core.bean.value.ValueFalse
+import tech.insight.core.bean.value.ValueTrue
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-open class Where(private val condition: BooleanExpression = AlwaysCondition.getInstance(true)) : BooleanExpression {
+open class Where(private val condition: BooleanExpression) : BooleanExpression {
 
-    companion object : Where()
+    private lateinit var table: Table
 
-    lateinit var table: Table
-
-    override fun getExpressionValue(row: Row?): ValueBoolean {
+    override fun getExpressionValue(row: Row): ValueBoolean {
         return ValueBoolean(condition.getBooleanValue(row))
     }
 
-
 }
 
-typealias Always = Where
+object Always : Where(object : BooleanExpression {
+    override fun getExpressionValue(row: Row): Value<Boolean> {
+        return ValueTrue
+    }
+})
 
+object Never : Where(object : BooleanExpression {
+    override fun getExpressionValue(row: Row): Value<Boolean> {
+        return ValueFalse
+    }
+})
 
 

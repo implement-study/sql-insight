@@ -13,36 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tech.insight.core.bean.condition
-
-import tech.insight.core.bean.Row
-import tech.insight.core.bean.SQLBean
-import tech.insight.core.bean.value.*
-
+package tech.insight.core.event
 
 /**
- * you can calculate the result with row
- *
  * @author gongxuanzhangmelt@gmail.com
  */
-interface Expression : SQLBean {
+fun interface EventListener<E : InsightEvent> {
     /**
-     * expression and row  calculate
+     * call back method for event
      *
-     * @return value
+     * @param event listening event
      */
-    fun getExpressionValue(row: Row): Value<*>
-
-    /**
-     * value to boolean support expression
-     */
-    fun getBooleanValue(row: Row): Boolean {
-        return when (val value = getExpressionValue(row)) {
-            is ValueBoolean -> value.source
-            is ValueChar -> value.source.isNotEmpty()
-            is ValueInt -> value.source >= 1
-            is ValueNull -> false
-            is ValueVarchar -> value.source.isNotEmpty()
-        }
-    }
+    fun onEvent(event: E)
 }
+
+

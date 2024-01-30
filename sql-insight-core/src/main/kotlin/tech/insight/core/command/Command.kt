@@ -4,9 +4,7 @@ import com.alibaba.druid.sql.ast.SQLStatement
 import com.alibaba.druid.sql.ast.statement.SQLCreateDatabaseStatement
 import com.alibaba.druid.sql.ast.statement.SQLDropDatabaseStatement
 import com.alibaba.druid.sql.ast.statement.SQLDropTableStatement
-import tech.insight.core.bean.Always
-import tech.insight.core.bean.Table
-import tech.insight.core.bean.Where
+import tech.insight.core.bean.*
 import tech.insight.core.bean.condition.Expression
 
 
@@ -55,8 +53,25 @@ class DeleteCommand(sql: String, statement: SQLStatement) : DMLCommand(sql, stat
     var where: Where = Always
 }
 
-class InsertCommand(sql: String, statement: SQLStatement) : DMLCommand(sql, statement)
-class SelectCommand(sql: String, statement: SQLStatement) : DMLCommand(sql, statement)
+class InsertCommand(sql: String, statement: SQLStatement) : DMLCommand(sql, statement) {
+    lateinit var table: Table
+
+    val insertColumns: MutableList<Column> = ArrayList()
+
+    val insertRows: MutableList<InsertRow> = ArrayList()
+}
+
+class SelectCommand(sql: String, statement: SQLStatement) : DMLCommand(sql, statement){
+     val tableList: MutableList<Table> = ArrayList()
+
+     val where: Where = Always
+
+    lateinit var orderBy: OrderBy
+
+     lateinit var limit: Limit
+
+}
+
 
 class UpdateCommand(sql: String, statement: SQLStatement) : DMLCommand(sql, statement) {
     lateinit var table: Table

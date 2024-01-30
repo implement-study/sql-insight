@@ -13,33 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tech.insight.core.bean
-
-import tech.insight.core.bean.value.Value
-import tech.insight.core.bean.value.ValueNull
-
+package tech.insight.core.annotation
 
 /**
+ * temporary  solution, will be replaced in the future
+ *
  * @author gongxuanzhangmelt@gmail.com
  */
-class Column : SQLBean {
-    lateinit var name: String
-    lateinit var dataType: DataType
-    var length: Int = -1
-    var autoIncrement = false
-    var notNull = false
-    var primaryKey = false
-    var unique = false
-    var defaultValue: Value<*> = ValueNull
-    var comment: String? = null
-    var variable = false
-    var nullListIndex = 0
-
-
-    override fun checkMyself() {
-        check(length != -1)
-        TODO("Not yet implemented")
-    }
-
-
-}
+@Retention(AnnotationRetention.SOURCE)
+@Target(
+    AnnotationTarget.CONSTRUCTOR,
+    AnnotationTarget.CLASS,
+    AnnotationTarget.ANNOTATION_CLASS,
+    AnnotationTarget.FUNCTION,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.PROPERTY_SETTER,
+    AnnotationTarget.FIELD
+)
+annotation class Temporary(val detail: String = "")

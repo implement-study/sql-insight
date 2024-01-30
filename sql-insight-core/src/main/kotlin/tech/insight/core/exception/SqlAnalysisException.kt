@@ -13,34 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tech.insight.core.bean
-
-import com.alibaba.druid.sql.ast.SQLDataType
-import com.alibaba.druid.sql.ast.statement.SQLCharacterDataType
-import java.util.*
+package tech.insight.core.exception
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class DataType : FillDataVisitor {
-    var type: Type? = null
-    var length = 0
-    override fun endVisit(x: SQLDataType) {
-        type = Type.valueOf(x.name.uppercase(Locale.getDefault()))
-        length = type!!.defaultLength
-    }
-
-    override fun endVisit(x: SQLCharacterDataType) {
-        type = Type.valueOf(x.name.uppercase(Locale.getDefault()))
-        length = x.getLength()
-        if (length < 0) {
-            length = type!!.defaultLength
-        }
-    }
-
-    enum class Type(val defaultLength: Int) {
-        INT(4),
-        VARCHAR(255),
-        CHAR(255)
-    }
-}
+open class SqlAnalysisException(val sql: String?, message: String?) : SqlInsightException(message)

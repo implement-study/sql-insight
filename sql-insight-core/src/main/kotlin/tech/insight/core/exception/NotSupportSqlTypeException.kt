@@ -13,17 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tech.insight.core.bean.condition
+package tech.insight.core.exception
+
+import com.alibaba.druid.sql.ast.SQLStatement
 
 /**
+ * a sql after analysis
+ * non implementation for sql type
+ *
  * @author gongxuanzhangmelt@gmail.com
  */
-class AndExpression(left: Expression?, right: Expression?) : BooleanBinaryOperatorExpression(left, right) {
-    override fun operator(): BooleanOperatorFunction {
-        return BooleanOperatorFunction { left: Expression?, right: Expression?, row: Row? ->
-            left!!.getBooleanValue(row) && right!!.getBooleanValue(
-                row
-            )
-        }
-    }
-}
+class NotSupportSqlTypeException(sql: String?, val sqlType: Class<out SQLStatement?>) :
+    SqlAnalysisException(sql, sqlType.getName() + " don't have analyzer")

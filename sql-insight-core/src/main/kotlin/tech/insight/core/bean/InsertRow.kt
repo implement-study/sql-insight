@@ -15,79 +15,38 @@
  */
 package tech.insight.core.bean
 
+import com.alibaba.druid.sql.ast.expr.SQLCharExpr
 import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr
 import com.alibaba.druid.sql.ast.expr.SQLNullExpr
 import lombok.Data
-import tech.insight.core.bean.value.ValueChar
-import tech.insight.core.bean.value.ValueVarchar
+import tech.insight.core.bean.value.*
+import tech.insight.core.exception.InsertException
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class InsertRow(val insertColumns: List<Column>, override val rowId: Long) : Row, FillDataVisitor, TableContainer,
+class InsertRow(val insertColumns: List<Column>, override val rowId: Long) : Row,  SQLBean,
     Iterable<InsertItem?> {
-    override var table: Table? = null
-    private val valueList: MutableList<Value> = ArrayList<Value>()
+    lateinit var table: Table
+     val valueList: MutableList<Value<*>> = ArrayList()
 
     /**
      * all table column value
      */
-    private val absoluteValueList: MutableList<Value> = ArrayList<Value>()
+    private val absoluteValueList: MutableList<Value<*>> = ArrayList()
 
     override val values: List<Any>
         get() = valueList
 
-    override fun getValueByColumnName(colName: String?): Value {
-        val index = table!!.getColumnIndexByName(colName)
-        return getAbsoluteValueList()[index!!]
+    override fun getValueByColumnName(colName: String): Value<*> {
+        val index = table.getColumnIndexByName(colName)
+        return getAbsoluteValueList()[index]
     }
 
-    override fun belongTo(): Table? {
+    override fun belongTo(): Table {
         return table
     }
 
-    override fun endVisit(x: SQLIntegerExpr) {
-        val value: Int = x.getNumber().toInt()
-        val currentType: DataType.Type = currentColumn().getDataType().getType()
-        if (currentType != DataType.Type.INT) {
-            throw InsertException(rowId, "number $value can't cast to $currentType")
-        }
-        valueList.add(ValueInt(value))
-    }
-
-    @Temporary(detail = "instead to negotiate")
-    override fun endVisit(x: SQLCharExpr) {
-        val text: String = x.getText()
-        val column = currentColumn()
-        val dataType: DataType = column.getDataType()
-        when (dataType.getType()) {
-            VARCHAR -> valueList.add(wrapVarchar(text))
-            CHAR -> valueList.add(wrapChar(text))
-            else -> throw InsertException(rowId, text + " can't cast to " + dataType.getType())
-        }
-    }
-
-    override fun endVisit(x: SQLNullExpr) {
-        valueList.add(ValueNull.getInstance())
-    }
-
-    private fun wrapVarchar(text: String): ValueVarchar {
-        val column = currentColumn()
-        val length: Int = column.getDataType().getLength()
-        if (text.length > length) {
-            throw InsertException(rowId, "Data too long for column " + column.getName())
-        }
-        return ValueVarchar(text)
-    }
-
-    private fun wrapChar(text: String): ValueChar {
-        val column = currentColumn()
-        val length: Int = column.getDataType().getLength()
-        if (text.toByteArray().size > length) {
-            throw InsertException(rowId, "Data too long for column " + column.getName())
-        }
-        return ValueChar(text, length)
-    }
 
     /**
      * return current visit values target column.
@@ -97,15 +56,15 @@ class InsertRow(val insertColumns: List<Column>, override val rowId: Long) : Row
         return insertColumns[valueList.size]
     }
 
-    fun getAbsoluteValueList(): List<Value> {
+    fun getAbsoluteValueList(): List<Value<*>> {
         if (absoluteValueList.isEmpty()) {
             for (i in 0 until table.getColumnList().size()) {
                 absoluteValueList.add(ValueNull.getInstance())
             }
             for (i in insertColumns.indices) {
                 val current = insertColumns[i]
-                val columnIndexByName = table!!.getColumnIndexByName(current.getName())
-                absoluteValueList[columnIndexByName!!] = valueList[i]
+                val columnIndexByName = table.getColumnIndexByName(current.getName())
+                absoluteValueList[columnIndexByName] = valueList[i]
             }
         }
         return absoluteValueList

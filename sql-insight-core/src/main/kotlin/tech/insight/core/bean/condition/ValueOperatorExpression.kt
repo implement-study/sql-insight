@@ -94,6 +94,11 @@ class EqualsExpression(left: Expression, right: Expression) : ValueOperatorExpre
     }
 }
 
+class NotEqualsExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+    override fun operator(left: Value<*>, right: Value<*>): Value<*> {
+        return ValueBoolean(left != right)
+    }
+}
 
 
 

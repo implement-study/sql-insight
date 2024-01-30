@@ -13,30 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tech.insight.core.bean.condition
+package tech.insight.core.environment
 
-import org.gongxuanzhang.sql.insight.core.`object`.Row
-import tech.insight.core.bean.value.ValueBoolean
+import org.gongxuanzhang.sql.insight.core.exception.RuntimeFileNotFoundException
+import java.util.*
 
 /**
+ * like my.cnf
+ * default file path classpath:mysql.properties
+ *
  * @author gongxuanzhangmelt@gmail.com
  */
-class AlwaysCondition private constructor(private val bool: Boolean) : BooleanExpression {
-    override fun getExpressionValue(row: Row?): ValueBoolean? {
-        return if (bool) {
-            TRUE_VALUE
-        } else FALSE_VALUE
+class SqlInsightProperties : Properties() {
+    init {
+        val inputStream = javaClass.getResourceAsStream(CONFIG_FILE_NAME)
+            ?: throw RuntimeFileNotFoundException()
+        try {
+            load(inputStream)
+        } catch (e: IOException) {
+            throw RuntimeIoException(e)
+        }
     }
 
     companion object {
-        private val TURE_INSTANCE = AlwaysCondition(true)
-        private val FALSE_INSTANCE = AlwaysCondition(false)
-        private val TRUE_VALUE: ValueBoolean = ValueBoolean(true)
-        private val FALSE_VALUE: ValueBoolean = ValueBoolean(false)
-        fun getInstance(bool: Boolean): AlwaysCondition {
-            return if (bool) {
-                TURE_INSTANCE
-            } else FALSE_INSTANCE
+        private val CONFIG_FILE_NAME: String? = null
+
+        init {
+            CONFIG_FILE_NAME = System.getProperty("defaults-file", "/mysql.properties")
         }
     }
 }

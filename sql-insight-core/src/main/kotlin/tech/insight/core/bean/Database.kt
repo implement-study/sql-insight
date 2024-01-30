@@ -15,7 +15,8 @@
  */
 package tech.insight.core.bean
 
-import org.gongxuanzhang.sql.insight.core.environment.DefaultProperty
+import tech.insight.core.environment.DefaultProperty
+import tech.insight.core.environment.GlobalContext
 import java.io.File
 
 /**
@@ -25,8 +26,7 @@ class Database(val name: String) {
 
     val dbFolder: File
         get() {
-            val context: GlobalContext = GlobalContext.getInstance()
-            return File(context.get(DefaultProperty.DATA_DIR.getKey()), name)
+            return File(GlobalContext[DefaultProperty.DATA_DIR], name)
         }
 
     override fun toString(): String {

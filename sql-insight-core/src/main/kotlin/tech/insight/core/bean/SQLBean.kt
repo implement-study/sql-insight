@@ -9,5 +9,7 @@ interface SQLBean {
      * after fill field by filler.
      * if SqlBean is illegal
      */
-    fun checkMyself()
+    fun checkMyself(){
+        // check your self if necessary
+    }
 }

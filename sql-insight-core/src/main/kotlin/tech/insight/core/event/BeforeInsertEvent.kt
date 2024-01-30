@@ -13,33 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tech.insight.core.bean
+package tech.insight.core.event
 
-import tech.insight.core.bean.value.Value
-import tech.insight.core.bean.value.ValueNull
-
+import tech.insight.core.bean.InsertRow
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class Column : SQLBean {
-    lateinit var name: String
-    lateinit var dataType: DataType
-    var length: Int = -1
-    var autoIncrement = false
-    var notNull = false
-    var primaryKey = false
-    var unique = false
-    var defaultValue: Value<*> = ValueNull
-    var comment: String? = null
-    var variable = false
-    var nullListIndex = 0
+class BeforeInsertEvent(row: InsertRow) : InsightEvent(row) {
+    val row: InsertRow
+        get() = source as InsertRow
 
-
-    override fun checkMyself() {
-        check(length != -1)
-        TODO("Not yet implemented")
+    fun databaseName(): String {
+        return row.table.databaseName
     }
 
-
+    fun tableName(): String {
+        return row.table.name
+    }
 }

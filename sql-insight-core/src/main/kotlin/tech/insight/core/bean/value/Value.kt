@@ -65,6 +65,7 @@ sealed interface Value<T> : Comparable<Value<*>> {
     operator fun div(other: Value<*>): Value<T> {
         throw UnsupportedOperationException("${javaClass.name} not support div")
     }
+
 }
 
 class ValueChar(value: String, length: Int) : Value<String> {
@@ -162,7 +163,7 @@ class ValueInt(override val source: Int) : Value<Int> {
     }
 }
 
-class ValueBoolean(override val source: Boolean) : Value<Boolean> {
+open class ValueBoolean(override val source: Boolean) : Value<Boolean> {
     override val length = Byte.SIZE_BYTES
     override val isDynamic = false
 
@@ -182,8 +183,11 @@ class ValueBoolean(override val source: Boolean) : Value<Boolean> {
     }
 }
 
+object ValueTrue : ValueBoolean(true)
+object ValueFalse : ValueBoolean(false)
 
-class ValueNull : Value<Unit> {
+
+data object ValueNull : Value<Unit> {
     override val source: Unit = Unit
     override val length = 0
     override val isDynamic = false

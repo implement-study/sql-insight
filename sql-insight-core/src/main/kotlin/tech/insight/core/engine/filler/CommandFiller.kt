@@ -1,11 +1,13 @@
 package tech.insight.core.engine.filler
 
-import com.alibaba.druid.sql.ast.statement.SQLCreateDatabaseStatement
-import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement
-import com.alibaba.druid.sql.ast.statement.SQLDeleteStatement
-import com.alibaba.druid.sql.ast.statement.SQLDropDatabaseStatement
+import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr
+import com.alibaba.druid.sql.ast.statement.*
+import com.alibaba.druid.sql.ast.statement.SQLInsertStatement.ValuesClause
+import com.alibaba.druid.sql.visitor.SQLASTVisitor
+import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Table
 import tech.insight.core.command.*
+import tech.insight.core.exception.InsertException
 
 
 interface CommandFiller<in C : Command> : Filler<C> {
@@ -91,16 +93,14 @@ class CreateDatabaseFiller : BaseFiller<CreateDatabase>() {
 }
 
 class CreateTableFiller : BaseFiller<CreateTable>() {
-    val table = Table()
-
     override fun fill(command: CreateTable) {
         super.fill(command)
-        command.table = this.table
+        command.table = Table()
     }
 
     override fun endVisit(x: SQLCreateTableStatement) {
         command.ifNotExists = x.isIfNotExists
-        x.accept(TableFiller(table))
+        x.accept(TableFiller(command.table))
     }
 }
 
@@ -126,14 +126,62 @@ class DeleteFiller : BaseFiller<DeleteCommand>() {
     }
 }
 
-class InsertFiller : CommandFiller<InsertCommand> {
+class InsertFiller : BaseFiller<InsertCommand>() {
+
+    lateinit var table: Table
+
+    override fun fill(command: InsertCommand) {
+        super.fill(command)
+        this.table = command.table
+    }
+
+    override fun visit(x: SQLInsertStatement): Boolean {
+//        x.tableSource.accept(TableFiller(command.table))
+        val columnVisitor = ColumnVisitor()
+        x.columns.forEach { it.accept(columnVisitor) }
+        val valueVisitor = ValuesClauseVisitor()
+        x.valuesList.forEach { it.accept(valueVisitor) }
+        TODO("select the table")
+        return true
+    }
+
+
+    /**
+     * visit values clause must after visit table because insert row should have complete table info before visit
+     * values clause
+     */
+    inner class ValuesClauseVisitor : SQLASTVisitor {
+        private var rowIndex = 1L
+        override fun endVisit(x: ValuesClause) {
+            if (x.values.size != command.insertColumns.size) {
+                throw InsertException(rowIndex, "Column count doesn't match value count")
+            }
+            val row = InsertRow(command.insertColumns, rowIndex++)
+            row.table = table
+            command.insertRows.add(row)
+            x.accept(InsertRowFiller(row))
+        }
+    }
+
+
+    inner class ColumnVisitor : SQLASTVisitor {
+        private val rowNameSet: MutableSet<String> = HashSet()
+        override fun endVisit(x: SQLIdentifierExpr) {
+            val colName = x.name
+            if (!rowNameSet.add(colName)) {
+                throw InsertException("Column $colName specified twice")
+            }
+            command.insertColumns.add(table.getColumnByName(colName))
+        }
+    }
 
 }
 
-class SelectFiller : CommandFiller<SelectCommand> {
+
+class SelectFiller : BaseFiller<SelectCommand>() {
 
 }
 
-class UpdateFiller : CommandFiller<UpdateCommand> {
+class UpdateFiller : BaseFiller<UpdateCommand>() {
 
 }

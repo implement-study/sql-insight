@@ -8,6 +8,7 @@ import tech.insight.core.bean.SQLBean
 interface BeanFiller<in B : SQLBean> : SQLASTVisitor
 
 
+
 class CommentVisitor(private val commentAction: (String) -> Unit) : SQLASTVisitor {
     override fun endVisit(x: SQLCharExpr) {
         commentAction.invoke(x.text)

@@ -7,7 +7,7 @@ import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource
 import com.alibaba.druid.sql.visitor.SQLASTVisitor
 import tech.insight.core.bean.Column
-import tech.insight.core.bean.DataType
+import tech.insight.core.bean.ColType
 import tech.insight.core.bean.Database
 import tech.insight.core.bean.Table
 
@@ -42,7 +42,7 @@ class TableFiller(val table: Table) : BeanFiller<Table> {
             column.nullListIndex = ext.nullableColCount
             ext.nullableColCount++
         }
-        if (column.dataType.type === DataType.Type.VARCHAR) {
+        if (column.colType.dataType === ColType.Type.VARCHAR) {
             ext.variableIndex.add(table.columnList.size - 1)
         }
         ext.columnIndex[column.name] = table.columnList.size - 1

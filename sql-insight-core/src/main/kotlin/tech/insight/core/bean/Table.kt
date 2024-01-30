@@ -15,26 +15,31 @@
  */
 package tech.insight.core.bean
 
+import tech.insight.core.exception.UnknownColumnException
 
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
- class Table :SQLBean {
+class Table : SQLBean {
     lateinit var database: Database
     lateinit var name: String
     lateinit var columnList: MutableList<Column>
     lateinit var indexList: MutableList<Index>
     lateinit var engine: String
     var comment: String = ""
+    val databaseName: String
+        get() {
+            return database.name
+        }
 
     //  support operator
-     val ext = TableExt()
-    fun getColumnIndexByName(colName: String?): Int {
+    val ext = TableExt()
+    fun getColumnIndexByName(colName: String): Int {
         return ext.columnIndex[colName] ?: throw UnknownColumnException(colName)
     }
 
-    fun getColumnByName(name: String?): Column {
+    fun getColumnByName(name: String): Column {
         return ext.columnMap[name] ?: throw UnknownColumnException(name)
     }
 

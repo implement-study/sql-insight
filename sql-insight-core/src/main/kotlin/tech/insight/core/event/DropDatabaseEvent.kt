@@ -13,33 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tech.insight.core.bean
+package tech.insight.core.event
 
-import tech.insight.core.bean.value.Value
-import tech.insight.core.bean.value.ValueNull
-
+import tech.insight.core.bean.Database
+import tech.insight.core.bean.Table
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class Column : SQLBean {
-    lateinit var name: String
-    lateinit var dataType: DataType
-    var length: Int = -1
-    var autoIncrement = false
-    var notNull = false
-    var primaryKey = false
-    var unique = false
-    var defaultValue: Value<*> = ValueNull
-    var comment: String? = null
-    var variable = false
-    var nullListIndex = 0
+class DropDatabaseEvent(database: Database) : InsightEvent(database) {
+    val database: Database
+        get() = source as Database
+}
 
-
-    override fun checkMyself() {
-        check(length != -1)
-        TODO("Not yet implemented")
-    }
-
-
+class DropTableEvent(table: Table) : InsightEvent(table) {
+    val table: Table
+        get() = source as Table
+    val databaseName: String
+        get() = table.databaseName
+    val tableName: String
+        get() = table.name
 }

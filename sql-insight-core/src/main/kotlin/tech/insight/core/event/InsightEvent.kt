@@ -13,13 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tech.insight.core.bean.condition
+package tech.insight.core.event
 
-import org.gongxuanzhang.sql.insight.core.`object`.Row
+import java.util.*
+
 
 /**
+ * sql-insight event super class
+ *
  * @author gongxuanzhangmelt@gmail.com
  */
-interface BooleanExpression : Expression {
-    override fun getExpressionValue(row: Row?): Value?
-}
+abstract class InsightEvent
+/**
+ * Constructs a prototypical Event.
+ *
+ * @param source The object on which the Event initially occurred.
+ * @throws IllegalArgumentException if source is null.
+ */
+protected constructor(source: Any) : EventObject(source)

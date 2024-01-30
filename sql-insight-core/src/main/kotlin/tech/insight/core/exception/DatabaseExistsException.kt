@@ -13,17 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tech.insight.core.bean.condition
+package tech.insight.core.exception
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class OrExpression(left: Expression?, right: Expression?) : BooleanBinaryOperatorExpression(left, right) {
-    override fun operator(): BooleanOperatorFunction {
-        return BooleanOperatorFunction { left: Expression?, right: Expression?, row: Row? ->
-            left!!.getBooleanValue(row) || right!!.getBooleanValue(
-                row
-            )
-        }
-    }
-}
+class DatabaseExistsException(dbName: String) : SqlInsightException("database $dbName already exists")

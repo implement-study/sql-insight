@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tech.insight.core.bean.condition
+package tech.insight.core.event
 
-import org.gongxuanzhang.sql.insight.core.`object`.Row
+import org.gongxuanzhang.sql.insight.core.`object`.Table
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class IdentifierExpression(private val name: String) : Expression {
-    override fun getExpressionValue(row: Row?): Value? {
-        return row.getValueByColumnName(name)
-    }
+class UploadTableEvent
+/**
+ * @param table after update table
+ */
+protected constructor(table: Table?) : InsightEvent(table) {
+    val table: Table
+        get() = source as Table
 }

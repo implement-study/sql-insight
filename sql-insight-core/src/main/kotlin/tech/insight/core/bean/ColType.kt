@@ -15,31 +15,8 @@
  */
 package tech.insight.core.bean
 
-import tech.insight.core.bean.value.Value
-import tech.insight.core.bean.value.ValueNull
-
-
-/**
- * @author gongxuanzhangmelt@gmail.com
- */
-class Column : SQLBean {
-    lateinit var name: String
-    lateinit var dataType: DataType
-    var length: Int = -1
-    var autoIncrement = false
-    var notNull = false
-    var primaryKey = false
-    var unique = false
-    var defaultValue: Value<*> = ValueNull
-    var comment: String? = null
-    var variable = false
-    var nullListIndex = 0
-
-
-    override fun checkMyself() {
-        check(length != -1)
-        TODO("Not yet implemented")
-    }
-
-
+enum class DataType(val defaultLength: Int) {
+    INT(4),
+    VARCHAR(255),
+    CHAR(255)
 }

@@ -13,33 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tech.insight.core.bean
-
-import tech.insight.core.bean.value.Value
-import tech.insight.core.bean.value.ValueNull
-
+package tech.insight.core.exception
 
 /**
+ * in spi loading engine throws
+ *
  * @author gongxuanzhangmelt@gmail.com
  */
-class Column : SQLBean {
-    lateinit var name: String
-    lateinit var dataType: DataType
-    var length: Int = -1
-    var autoIncrement = false
-    var notNull = false
-    var primaryKey = false
-    var unique = false
-    var defaultValue: Value<*> = ValueNull
-    var comment: String? = null
-    var variable = false
-    var nullListIndex = 0
+class EngineLoadException : SqlInsightException {
+    constructor(e: ClassNotFoundException?, className: String) : super("can't found class $className")
+    constructor(
+        e: NoSuchMethodException?,
+        className: String
+    ) : super("$className must have a not param constructor method")
 
-
-    override fun checkMyself() {
-        check(length != -1)
-        TODO("Not yet implemented")
-    }
-
-
+    constructor(e: ReflectiveOperationException?) : super(e)
 }

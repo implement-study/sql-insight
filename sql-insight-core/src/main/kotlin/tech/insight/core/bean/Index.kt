@@ -16,6 +16,7 @@
 package tech.insight.core.bean
 
 import org.gongxuanzhang.sql.insight.core.environment.SessionContext
+import tech.insight.core.environment.SessionContext
 import java.io.File
 
 /**

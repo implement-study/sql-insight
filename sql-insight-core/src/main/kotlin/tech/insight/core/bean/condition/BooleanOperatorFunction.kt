@@ -15,14 +15,27 @@
  */
 package tech.insight.core.bean.condition
 
-import org.gongxuanzhang.sql.insight.core.`object`.Row
+import tech.insight.core.bean.Row
+import tech.insight.core.bean.value.Value
+import tech.insight.core.bean.value.ValueBoolean
+
 
 /**
  * operator expression function
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-fun interface BooleanOperatorFunction {
+
+interface BooleanExpression : Expression {
+    /**
+     *
+     * return boolean from a row
+     * @param row
+     */
+    override fun getExpressionValue(row: Row): Value<Boolean>
+}
+
+interface BooleanOperatorFunction : BooleanExpression {
     /**
      * a operator
      *
@@ -31,5 +44,35 @@ fun interface BooleanOperatorFunction {
      * @param row   a row
      * @return result value
      */
-    fun apply(left: Expression?, right: Expression?, row: Row?): Boolean?
+    fun process(left: Expression, right: Expression, row: Row): Boolean
 }
+
+
+
+sealed class BaseBooleanExpression(private val left: Expression, private val right: Expression) : BooleanOperatorFunction {
+
+    override fun getExpressionValue(row: Row): Value<Boolean> {
+        val result = process(left, right, row)
+        return ValueBoolean(result)
+    }
+
+    abstract override fun process(left: Expression, right: Expression, row: Row): Boolean
+}
+
+
+class AndExpression(left: Expression, right: Expression) : BaseBooleanExpression(left, right) {
+
+    override fun process(left: Expression, right: Expression, row: Row): Boolean {
+        return left.getBooleanValue(row) && right.getBooleanValue(row)
+    }
+
+}
+class OrExpression(left: Expression, right: Expression) : BaseBooleanExpression(left, right) {
+
+    override fun process(left: Expression, right: Expression, row: Row): Boolean {
+        return left.getBooleanValue(row) || right.getBooleanValue(row)
+    }
+
+}
+
+

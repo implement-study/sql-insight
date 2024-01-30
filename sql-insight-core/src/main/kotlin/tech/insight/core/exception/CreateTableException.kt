@@ -13,22 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tech.insight.core.bean.condition
-
-import org.gongxuanzhang.sql.insight.core.`object`.value.ValueInt
+package tech.insight.core.exception
 
 /**
- * operator expression function
- *
  * @author gongxuanzhangmelt@gmail.com
  */
-fun interface NumberValueOperatorFunction {
-    /**
-     * a operator
-     *
-     * @param leftValue  left expression
-     * @param rightValue right expression
-     * @return result value
-     */
-    fun apply(leftValue: ValueInt?, rightValue: ValueInt?): ValueInt?
-}
+class CreateTableException(message: String?) : SqlInsightException(message)

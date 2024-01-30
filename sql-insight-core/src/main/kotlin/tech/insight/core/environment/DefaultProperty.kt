@@ -13,18 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tech.insight.core.bean.condition
-
-import org.gongxuanzhang.sql.insight.core.`object`.Row
+package tech.insight.core.environment
 
 /**
- * there are two ways to result values.
- * fixed value or get column value
- *
- * @author gongxuanzhangmelt@gmail.com
+ * @author gongxuanzhang
  */
-class StringExpression(private val value: String) : Expression {
-    override fun getExpressionValue(row: Row?): ValueVarchar? {
-        return ValueVarchar(value)
-    }
+enum class DefaultProperty(val key: String, val value: String) {
+    DATA_DIR("datadir", "./db"),
+    DEFAULT_ENGINE("default-storage-engine", "InnoDB")
+
 }
