@@ -74,8 +74,8 @@ abstract class AbstractMapContext(private val container: MutableMap<String, Stri
         return container.remove(key)
     }
 
-    override fun get(property: DefaultProperty): String? {
-        return get(property.key)
+    override fun get(property: DefaultProperty): String {
+        return get(property.key)!!
     }
 }
 

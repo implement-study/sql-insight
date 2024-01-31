@@ -22,11 +22,11 @@ package tech.insight.core.bean
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-interface UserRecord : ByteWrapper, Row {
+interface UserRecord :  Row {
     /**
      * the record to byte array.
      */
-    fun rowBytes(): ByteArray?
+    fun rowBytes(): ByteArray
 
     /**
      * absolute offset in page， field not in page , application calculate
@@ -49,7 +49,7 @@ interface UserRecord : ByteWrapper, Row {
      * @return user record delete sign
      */
     fun deleteSign(): Boolean
-    fun toBytes(): ByteArray? {
+    fun toBytes(): ByteArray {
         return rowBytes()
     }
 }

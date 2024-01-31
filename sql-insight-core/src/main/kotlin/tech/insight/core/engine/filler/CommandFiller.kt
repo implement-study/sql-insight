@@ -7,6 +7,8 @@ import com.alibaba.druid.sql.visitor.SQLASTVisitor
 import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Table
 import tech.insight.core.command.*
+import tech.insight.core.environment.DatabaseManager
+import tech.insight.core.environment.TableDefinitionManager
 import tech.insight.core.exception.InsertException
 
 
@@ -108,21 +110,30 @@ class DropDatabaseFiller : BaseFiller<DropDatabase>() {
 
     override fun endVisit(x: SQLDropDatabaseStatement) {
         command.ifIsExists = x.isIfExists
-        TODO("select the database")
+        command.database = DatabaseManager.select(x.databaseName)!!
     }
 }
 
 class DropTableFiller : BaseFiller<DropTable>() {
 
-    override fun endVisit(x: SQLDropDatabaseStatement) {
+    override fun endVisit(x: SQLDropTableStatement) {
         command.ifExists = x.isIfExists
-        TODO("select the table")
+        with(command.dropTables) {
+            x.tableSources.forEach {
+                it.accept(TableSelectVisitor(true) { table ->
+                    this.add(table!!)
+                })
+            }
+        }
     }
 }
 
 class DeleteFiller : BaseFiller<DeleteCommand>() {
     override fun visit(x: SQLDeleteStatement): Boolean {
-        TODO("select the table fill the where")
+        x.tableSource.accept(TableSelectVisitor(true) {
+            command.table = it!!
+        })
+        TODO("fill the where")
     }
 }
 
@@ -130,18 +141,15 @@ class InsertFiller : BaseFiller<InsertCommand>() {
 
     lateinit var table: Table
 
-    override fun fill(command: InsertCommand) {
-        super.fill(command)
-        this.table = command.table
-    }
-
     override fun visit(x: SQLInsertStatement): Boolean {
-//        x.tableSource.accept(TableFiller(command.table))
         val columnVisitor = ColumnVisitor()
         x.columns.forEach { it.accept(columnVisitor) }
         val valueVisitor = ValuesClauseVisitor()
         x.valuesList.forEach { it.accept(valueVisitor) }
-        TODO("select the table")
+        x.tableSource.accept(TableNameVisitor { databaseName, tableName ->
+            command.table = TableDefinitionManager.select(databaseName, tableName)!!
+            this.table = command.table
+        })
         return true
     }
 

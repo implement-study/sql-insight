@@ -23,5 +23,5 @@ import com.alibaba.druid.sql.ast.SQLStatement
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-class NotSupportSqlTypeException(sql: String?, val sqlType: Class<out SQLStatement?>) :
+class NotSupportSqlTypeException(sql: String, val sqlType: Class<out SQLStatement?>) :
     SqlAnalysisException(sql, sqlType.getName() + " don't have analyzer")

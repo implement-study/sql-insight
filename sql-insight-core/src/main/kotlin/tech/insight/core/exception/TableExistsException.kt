@@ -15,12 +15,12 @@
  */
 package tech.insight.core.exception
 
-import org.gongxuanzhang.sql.insight.core.`object`.Table
+import tech.insight.core.bean.Table
+
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
 class TableExistsException(table: Table) : SqlInsightException(
-    (("databaseName " + table.getDatabase()
-        .getName()).toString() + " table " + table.getName()).toString() + " already exists"
+    "database[${table.databaseName}] table[${table.name}] already exists"
 )

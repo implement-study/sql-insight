@@ -18,4 +18,4 @@ package tech.insight.core.exception
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-open class SqlAnalysisException(val sql: String?, message: String?) : SqlInsightException(message)
+open class SqlAnalysisException(val sql: String, message: String) : SqlInsightException(message)

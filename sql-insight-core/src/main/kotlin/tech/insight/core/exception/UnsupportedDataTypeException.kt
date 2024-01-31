@@ -15,11 +15,12 @@
  */
 package tech.insight.core.exception
 
-import tech.insight.core.bean.ColType
+import tech.insight.core.bean.DataType
+
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
 class UnsupportedDataTypeException(type: String) : SqlInsightException("sql-insight unsupported data type $type") {
-    constructor(type: ColType) : this(type.toString())
+    constructor(type: DataType) : this(type.toString())
 }

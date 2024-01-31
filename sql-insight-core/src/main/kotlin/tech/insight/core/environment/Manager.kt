@@ -5,7 +5,7 @@ import tech.insight.core.bean.Database
 import tech.insight.core.bean.Table
 import tech.insight.core.event.*
 import tech.insight.core.extension.GuavaTable
-import kotlin.collections.ArrayList
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * delegate to guava [com.google.common.collect.Table]
@@ -15,17 +15,17 @@ import kotlin.collections.ArrayList
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-class TableDefinitionManager : MultipleEventListener {
+object TableDefinitionManager : MultipleEventListener {
     private val tableInfoCache: GuavaTable<String, String, Table> = HashBasedTable.create()
-    fun load(table: Table) {
+    private fun load(table: Table) {
         tableInfoCache.put(table.databaseName, table.name, table)
     }
 
-    fun unload(table: Table) {
+    private fun unload(table: Table) {
         tableInfoCache.remove(table.databaseName, table.name)
     }
 
-    fun unload(database: Database) {
+    private fun unload(database: Database) {
         tableInfoCache.row(database.name).clear()
     }
 
@@ -55,3 +55,38 @@ class TableDefinitionManager : MultipleEventListener {
         return listOf(DropDatabaseEvent::class.java, CreateTableEvent::class.java, DropTableEvent::class.java)
     }
 }
+
+/**
+ * database manager
+ */
+object DatabaseManager : MultipleEventListener {
+    private val databaseCache: MutableMap<String, Database> = ConcurrentHashMap()
+    private fun load(database: Database) {
+        databaseCache[database.name] = database
+    }
+
+    private fun unload(database: Database) {
+        databaseCache.remove(database.name)
+    }
+
+    fun select(databaseName: String): Database? {
+        return databaseCache[databaseName]
+    }
+
+
+    override fun onEvent(event: InsightEvent) {
+        if (event is DropDatabaseEvent) {
+            this.unload(event.database)
+            return
+        }
+        if (event is CreateDatabaseEvent) {
+            load(event.database)
+            return
+        }
+    }
+
+    override fun listenEvent(): List<Class<out InsightEvent>> {
+        return listOf(DropDatabaseEvent::class.java, CreateDatabaseEvent::class.java)
+    }
+}
+

@@ -13,18 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tech.insight.core.event
+package tech.insight.core.environment
 
-import org.gongxuanzhang.sql.insight.core.`object`.Table
+import tech.insight.core.engine.storage.StorageEngine
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class UploadTableEvent
-/**
- * @param table after update table
- */
-protected constructor(table: Table?) : InsightEvent(table) {
-    val table: Table
-        get() = source as Table
+interface StorageEngineManager : StorageEngineSelector {
+    /**
+     * get all engine
+     */
+    fun allEngine(): List<StorageEngine>
+
+    /**
+     * register with the manager
+     */
+    fun registerEngine(engine: StorageEngine)
+
+    /**
+     * select engine from engine name
+     *
+     * @param engineName [StorageEngineSelector.selectEngine]
+     * @return [StorageEngineSelector.selectEngine] maybe null
+     */
+    override fun selectEngine(engineName: String?): StorageEngine
 }

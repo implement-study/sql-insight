@@ -15,10 +15,12 @@
  */
 package tech.insight.core.exception
 
-import org.gongxuanzhang.sql.insight.core.`object`.Table
+import tech.insight.core.bean.Table
+
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class TableNotExistsException(table: Table) :
-    SqlInsightException(if (table.getDatabase() == null) "" else (table.getDatabase() + " table[" + table.getName()).toString() + "] not exists")
+class TableNotExistsException(message: String) : SqlInsightException(message) {
+    constructor(table: Table) : this("${table.databaseName}.${table.name}] not exists")
+}

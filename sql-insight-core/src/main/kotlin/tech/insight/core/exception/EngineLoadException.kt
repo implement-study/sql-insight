@@ -21,11 +21,11 @@ package tech.insight.core.exception
  * @author gongxuanzhangmelt@gmail.com
  */
 class EngineLoadException : SqlInsightException {
-    constructor(e: ClassNotFoundException?, className: String) : super("can't found class $className")
+    constructor(e: ClassNotFoundException, className: String) : super("can't found class $className")
     constructor(
-        e: NoSuchMethodException?,
+        e: NoSuchMethodException,
         className: String
     ) : super("$className must have a not param constructor method")
 
-    constructor(e: ReflectiveOperationException?) : super(e)
+    constructor(e: ReflectiveOperationException) : super(e)
 }

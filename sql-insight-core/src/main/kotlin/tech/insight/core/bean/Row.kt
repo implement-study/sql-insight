@@ -49,8 +49,13 @@ interface Row : Comparable<Row> {
      *
      * @return table
      */
-    fun belongTo(): Table?
-    override fun compareTo(that: Row): Int {
-        return java.lang.Long.compare(rowId, that.rowId)
+    fun belongTo(): Table
+
+
+    /**
+     * default implement is compare id of the both
+     */
+    override fun compareTo(other: Row): Int {
+        return rowId.compareTo(other.rowId)
     }
 }

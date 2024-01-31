@@ -15,15 +15,15 @@
  */
 package tech.insight.core.bean
 
-import org.gongxuanzhang.sql.insight.core.`object`.value.Value
+import tech.insight.core.bean.value.Value
 import java.util.*
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class ReadRow(valueList: List<Value>, override val rowId: Long) : Row, TableContainer {
-    private override var table: Table? = null
-    private val valueList: List<Value>
+class ReadRow(valueList: List<Value<*>>, override val rowId: Long) : Row {
+    lateinit var table: Table
+    private val valueList: List<Value<*>>
 
     init {
         this.valueList = valueList
@@ -32,22 +32,15 @@ class ReadRow(valueList: List<Value>, override val rowId: Long) : Row, TableCont
     override val values: List<Any>
         get() = valueList
 
-    override fun getValueByColumnName(colName: String?): Value {
-        val columnIndexByName = table!!.getColumnIndexByName(colName)
-        return valueList[columnIndexByName!!]
+    override fun getValueByColumnName(colName: String): Value<*> {
+        val columnIndexByName = table.getColumnIndexByName(colName)
+        return valueList[columnIndexByName]
     }
 
-    override fun belongTo(): Table? {
+    override fun belongTo(): Table {
         return table
     }
 
-    override fun getTable(): Table? {
-        return belongTo()
-    }
-
-    override fun setTable(table: Table?) {
-        this.table = table
-    }
 
     override fun toString(): String {
         val stringJoiner = StringJoiner("|", "|", "|")

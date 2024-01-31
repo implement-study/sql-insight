@@ -7,9 +7,12 @@ import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource
 import com.alibaba.druid.sql.visitor.SQLASTVisitor
 import tech.insight.core.bean.Column
-import tech.insight.core.bean.ColType
-import tech.insight.core.bean.Database
+import tech.insight.core.bean.DataType
 import tech.insight.core.bean.Table
+import tech.insight.core.environment.DatabaseManager
+import tech.insight.core.environment.SessionManager
+import tech.insight.core.environment.TableDefinitionManager
+import tech.insight.core.exception.TableNotExistsException
 
 /**
  * Table filler
@@ -42,7 +45,7 @@ class TableFiller(val table: Table) : BeanFiller<Table> {
             column.nullListIndex = ext.nullableColCount
             ext.nullableColCount++
         }
-        if (column.colType.dataType === ColType.Type.VARCHAR) {
+        if (column.dataType == DataType.VARCHAR) {
             ext.variableIndex.add(table.columnList.size - 1)
         }
         ext.columnIndex[column.name] = table.columnList.size - 1
@@ -57,22 +60,49 @@ class TableFiller(val table: Table) : BeanFiller<Table> {
     }
 
     override fun visit(x: SQLExprTableSource): Boolean {
-        x.accept(TableNameVisitor())
+        x.accept(TableNameVisitor { databaseName, tableName ->
+            DatabaseManager.select(databaseName)
+            table.name = tableName
+        })
         return true
     }
 
+}
 
-    inner class TableNameVisitor : SQLASTVisitor {
-        override fun visit(x: SQLPropertyExpr): Boolean {
-            table.database = Database(x.getOwnerName())
-            table.name = x.name
-            return false
-        }
 
-        override fun visit(x: SQLIdentifierExpr): Boolean {
-            table.name = x.name
-            return false
-        }
+class TableNameVisitor(private val action: (databaseName: String, tableName: String) -> Unit) : SQLASTVisitor {
+    override fun visit(x: SQLPropertyExpr): Boolean {
+        action.invoke(x.ownerName, x.name)
+        return false
     }
 
+    override fun visit(x: SQLIdentifierExpr): Boolean {
+        action.invoke(SessionManager.currentSession().database.name, x.name)
+        return false
+    }
+}
+
+/**
+ * @param must must is true that table can't find throw [TableNotExistsException]
+ */
+class TableSelectVisitor(private val must: Boolean = false, private val action: (table: Table?) -> Unit) :
+    SQLASTVisitor {
+    override fun visit(x: SQLPropertyExpr): Boolean {
+        action.invoke(selectTable(x.ownerName, x.name))
+        return false
+    }
+
+    override fun visit(x: SQLIdentifierExpr): Boolean {
+        val table = selectTable(SessionManager.currentSession().database.name, x.name)
+        action.invoke(table)
+        return false
+    }
+
+    private fun selectTable(databaseName: String, tableName: String): Table? {
+        val table = TableDefinitionManager.select(databaseName, tableName)
+        if (table == null && must) {
+            throw TableNotExistsException("${databaseName}.${tableName} not exists")
+        }
+        return table
+    }
 }

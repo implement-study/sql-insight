@@ -38,7 +38,7 @@ class CreateTable(sql: String, statement: SQLCreateDatabaseStatement) : CreateCo
 
 class DropDatabase(sql: String, statement: SQLDropDatabaseStatement) : DropCommand(sql, statement) {
     var ifIsExists = false
-    lateinit var dbName: String
+    lateinit var database: Database
 }
 
 class DropTable(sql: String, statement: SQLDropTableStatement) : DropCommand(sql, statement) {
@@ -61,14 +61,14 @@ class InsertCommand(sql: String, statement: SQLStatement) : DMLCommand(sql, stat
     val insertRows: MutableList<InsertRow> = ArrayList()
 }
 
-class SelectCommand(sql: String, statement: SQLStatement) : DMLCommand(sql, statement){
-     val tableList: MutableList<Table> = ArrayList()
+class SelectCommand(sql: String, statement: SQLStatement) : DMLCommand(sql, statement) {
+    val tableList: MutableList<Table> = ArrayList()
 
-     val where: Where = Always
+    val where: Where = Always
 
     lateinit var orderBy: OrderBy
 
-     lateinit var limit: Limit
+    lateinit var limit: Limit
 
 }
 

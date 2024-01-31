@@ -15,20 +15,16 @@
  */
 package tech.insight.core.bean
 
-import com.alibaba.druid.sql.ast.expr.SQLCharExpr
-import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr
-import com.alibaba.druid.sql.ast.expr.SQLNullExpr
-import lombok.Data
-import tech.insight.core.bean.value.*
-import tech.insight.core.exception.InsertException
+import tech.insight.core.bean.value.Value
+import tech.insight.core.bean.value.ValueNull
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class InsertRow(val insertColumns: List<Column>, override val rowId: Long) : Row,  SQLBean,
-    Iterable<InsertItem?> {
+class InsertRow(val insertColumns: List<Column>, override val rowId: Long) : Row, SQLBean,
+    Iterable<InsertItem> {
     lateinit var table: Table
-     val valueList: MutableList<Value<*>> = ArrayList()
+    val valueList: MutableList<Value<*>> = ArrayList()
 
     /**
      * all table column value
@@ -56,25 +52,25 @@ class InsertRow(val insertColumns: List<Column>, override val rowId: Long) : Row
         return insertColumns[valueList.size]
     }
 
-    fun getAbsoluteValueList(): List<Value<*>> {
+    private fun getAbsoluteValueList(): List<Value<*>> {
         if (absoluteValueList.isEmpty()) {
-            for (i in 0 until table.getColumnList().size()) {
-                absoluteValueList.add(ValueNull.getInstance())
+            for (i in 0 until table.columnList.size) {
+                absoluteValueList.add(ValueNull)
             }
             for (i in insertColumns.indices) {
                 val current = insertColumns[i]
-                val columnIndexByName = table.getColumnIndexByName(current.getName())
+                val columnIndexByName = table.getColumnIndexByName(current.name)
                 absoluteValueList[columnIndexByName] = valueList[i]
             }
         }
         return absoluteValueList
     }
 
-    override fun iterator(): MutableIterator<InsertItem> {
+    override fun iterator(): Iterator<InsertItem> {
         return Iter()
     }
 
-    private inner class Iter : MutableIterator<InsertItem> {
+    private inner class Iter : Iterator<InsertItem> {
         var cursor = 0
         override fun hasNext(): Boolean {
             return cursor != absoluteValueList.size
@@ -86,16 +82,10 @@ class InsertRow(val insertColumns: List<Column>, override val rowId: Long) : Row
                 throw NoSuchElementException()
             }
             cursor = i + 1
-            val insertItem = InsertItem()
-            insertItem.column = table.getColumnList().get(i)
-            insertItem.value = absoluteValueList[i]
-            return insertItem
+            return InsertItem(table.columnList[i], absoluteValueList[i])
         }
     }
 
-    @Data
-    class InsertItem {
-        var column: Column? = null
-        var value: Value? = null
-    }
 }
+
+data class InsertItem(val column: Column, val value: Value<*>)

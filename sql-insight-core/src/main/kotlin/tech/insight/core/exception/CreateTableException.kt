@@ -18,4 +18,4 @@ package tech.insight.core.exception
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class CreateTableException(message: String?) : SqlInsightException(message)
+class CreateTableException(message: String) : SqlInsightException(message)

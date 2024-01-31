@@ -22,4 +22,4 @@ import java.io.IOException
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-class RuntimeIoException(e: IOException) : SqlInsightException(e.message)
+class RuntimeIoException(e: IOException) : SqlInsightException(e.message!!)

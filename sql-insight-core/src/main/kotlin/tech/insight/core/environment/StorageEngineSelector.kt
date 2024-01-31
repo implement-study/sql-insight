@@ -15,31 +15,15 @@
  */
 package tech.insight.core.environment
 
-import org.gongxuanzhang.sql.insight.core.exception.RuntimeFileNotFoundException
-import java.util.*
+import tech.insight.core.engine.storage.StorageEngine
 
 /**
- * like my.cnf
- * default file path classpath:mysql.properties
- *
  * @author gongxuanzhangmelt@gmail.com
  */
-class SqlInsightProperties : Properties() {
-    init {
-        val inputStream = javaClass.getResourceAsStream(CONFIG_FILE_NAME)
-            ?: throw RuntimeFileNotFoundException()
-        try {
-            load(inputStream)
-        } catch (e: IOException) {
-            throw RuntimeIoException(e)
-        }
-    }
-
-    companion object {
-        private val CONFIG_FILE_NAME: String? = null
-
-        init {
-            CONFIG_FILE_NAME = System.getProperty("defaults-file", "/mysql.properties")
-        }
-    }
+interface StorageEngineSelector {
+    /**
+     * @param engineName name
+     * @return storage engine
+     */
+    fun selectEngine(engineName: String?): StorageEngine
 }

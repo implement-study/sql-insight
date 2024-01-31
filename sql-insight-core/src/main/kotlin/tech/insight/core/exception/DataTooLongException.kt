@@ -15,13 +15,13 @@
  */
 package tech.insight.core.exception
 
-import org.gongxuanzhang.sql.insight.core.`object`.Column
+import tech.insight.core.bean.Column
+
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class DataTooLongException : SqlInsightException {
+class DataTooLongException(override val message: String) : SqlInsightException(message) {
     //  todo at row 1
-    constructor(col: Column) : super(("Data too long for column '" + col.getName()).toString() + "'")
-    constructor(message: String?) : super(message)
+    constructor(col: Column) : this("Data too long for column '${col.name}'")
 }

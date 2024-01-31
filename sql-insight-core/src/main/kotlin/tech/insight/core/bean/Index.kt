@@ -15,8 +15,7 @@
  */
 package tech.insight.core.bean
 
-import org.gongxuanzhang.sql.insight.core.environment.SessionContext
-import tech.insight.core.environment.SessionContext
+import tech.insight.core.environment.Session
 import java.io.File
 
 /**
@@ -37,34 +36,34 @@ interface Index {
     /**
      * which table index belong to
      */
-    fun belongTo(): Table?
+    fun belongTo(): Table
 
     /**
      * find a cursor from session
      *
      * @return cursor
      */
-    fun find(sessionContext: SessionContext?): Cursor?
+    fun find(currentSession: Session): Cursor
 
     /**
      * index name
      */
-    val name: String?
+    val name: String
 
     /**
      * insert row to index
      *
      * @param row row
      */
-    fun insert(row: InsertRow?)
+    fun insert(row: InsertRow)
 
     /**
      * Index file
      */
-    val file: File?
+    val file: File
 
     /**
      * index relative columns
      */
-    fun columns(): List<Column?>?
+    fun columns(): List<Column>
 }

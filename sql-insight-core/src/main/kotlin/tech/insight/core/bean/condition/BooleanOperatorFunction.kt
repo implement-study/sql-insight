@@ -48,8 +48,8 @@ interface BooleanOperatorFunction : BooleanExpression {
 }
 
 
-
-sealed class BaseBooleanExpression(private val left: Expression, private val right: Expression) : BooleanOperatorFunction {
+sealed class BaseBooleanExpression(private val left: Expression, private val right: Expression) :
+    BooleanOperatorFunction {
 
     override fun getExpressionValue(row: Row): Value<Boolean> {
         val result = process(left, right, row)
@@ -67,6 +67,7 @@ class AndExpression(left: Expression, right: Expression) : BaseBooleanExpression
     }
 
 }
+
 class OrExpression(left: Expression, right: Expression) : BaseBooleanExpression(left, right) {
 
     override fun process(left: Expression, right: Expression, row: Row): Boolean {

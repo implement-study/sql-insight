@@ -26,5 +26,5 @@ package tech.insight.core.exception
  */
 class RuntimeFileNotFoundException : SqlInsightException {
     constructor()
-    constructor(message: String?) : super(message)
+    constructor(message: String) : super(message)
 }

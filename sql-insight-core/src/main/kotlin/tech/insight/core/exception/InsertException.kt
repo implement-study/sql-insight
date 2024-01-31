@@ -21,5 +21,5 @@ package tech.insight.core.exception
  */
 class InsertException : SqlInsightException {
     constructor(rowId: Long, message: String) : super("$message at row $rowId")
-    constructor(message: String?) : super(message)
+    constructor(message: String) : super(message)
 }
