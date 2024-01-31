@@ -4,6 +4,7 @@ import com.google.common.collect.HashBasedTable
 import tech.insight.core.bean.Database
 import tech.insight.core.bean.Table
 import tech.insight.core.event.*
+import tech.insight.core.exception.DatabaseNotExistsException
 import tech.insight.core.extension.GuavaTable
 import java.util.concurrent.ConcurrentHashMap
 
@@ -69,8 +70,8 @@ object DatabaseManager : MultipleEventListener {
         databaseCache.remove(database.name)
     }
 
-    fun select(databaseName: String): Database? {
-        return databaseCache[databaseName]
+    fun select(databaseName: String): Database {
+        return databaseCache[databaseName] ?: throw DatabaseNotExistsException(databaseName)
     }
 
 

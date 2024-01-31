@@ -24,8 +24,8 @@ import tech.insight.core.exception.UnknownColumnException
 class Table : SQLBean {
     lateinit var database: Database
     lateinit var name: String
-    lateinit var columnList: MutableList<Column>
-    lateinit var indexList: MutableList<Index>
+    var columnList: MutableList<Column> = mutableListOf()
+    var indexList: MutableList<Index> = mutableListOf()
     lateinit var engine: String
     var comment: String = ""
     val databaseName: String

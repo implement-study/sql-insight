@@ -22,7 +22,7 @@ package tech.insight.core.bean
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-interface UserRecord :  Row {
+interface UserRecord : Row {
     /**
      * the record to byte array.
      */
@@ -49,6 +49,10 @@ interface UserRecord :  Row {
      * @return user record delete sign
      */
     fun deleteSign(): Boolean
+
+    /**
+     * [rowBytes]
+     */
     fun toBytes(): ByteArray {
         return rowBytes()
     }

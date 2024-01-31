@@ -61,7 +61,7 @@ class TableFiller(val table: Table) : BeanFiller<Table> {
 
     override fun visit(x: SQLExprTableSource): Boolean {
         x.accept(TableNameVisitor { databaseName, tableName ->
-            DatabaseManager.select(databaseName)
+            table.database = DatabaseManager.select(databaseName)
             table.name = tableName
         })
         return true

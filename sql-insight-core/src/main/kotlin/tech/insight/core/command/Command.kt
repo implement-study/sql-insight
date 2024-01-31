@@ -1,9 +1,8 @@
 package tech.insight.core.command
 
+import com.alibaba.druid.sql.ast.SQLObject
 import com.alibaba.druid.sql.ast.SQLStatement
-import com.alibaba.druid.sql.ast.statement.SQLCreateDatabaseStatement
-import com.alibaba.druid.sql.ast.statement.SQLDropDatabaseStatement
-import com.alibaba.druid.sql.ast.statement.SQLDropTableStatement
+import com.alibaba.druid.sql.ast.statement.*
 import tech.insight.core.bean.*
 import tech.insight.core.bean.condition.Expression
 
@@ -13,14 +12,14 @@ import tech.insight.core.bean.condition.Expression
  * @author gongxuanzhangmelt@gmail.com
  */
 sealed interface Command {
-    val statement: SQLStatement
+    val statement: SQLObject
     val sql: String
 }
 
 
 sealed class DDLCommand(override val sql: String, override val statement: SQLStatement) : Command
 
-sealed class DMLCommand(override val sql: String, override val statement: SQLStatement) : Command
+sealed class DMLCommand(override val sql: String, override val statement: SQLObject) : Command
 
 sealed class CreateCommand(sql: String, statement: SQLStatement) : DDLCommand(sql, statement)
 sealed class DropCommand(sql: String, statement: SQLStatement) : DDLCommand(sql, statement)
@@ -31,7 +30,7 @@ class CreateDatabase(sql: String, statement: SQLCreateDatabaseStatement) : Creat
     lateinit var dbName: String
 }
 
-class CreateTable(sql: String, statement: SQLCreateDatabaseStatement) : CreateCommand(sql, statement) {
+class CreateTable(sql: String, statement: SQLCreateTableStatement) : CreateCommand(sql, statement) {
     var ifNotExists = false
     lateinit var table: Table
 }
@@ -61,7 +60,7 @@ class InsertCommand(sql: String, statement: SQLStatement) : DMLCommand(sql, stat
     val insertRows: MutableList<InsertRow> = ArrayList()
 }
 
-class SelectCommand(sql: String, statement: SQLStatement) : DMLCommand(sql, statement) {
+class SelectCommand(sql: String, statement: SQLSelectQueryBlock) : DMLCommand(sql, statement) {
     val tableList: MutableList<Table> = ArrayList()
 
     val where: Where = Always

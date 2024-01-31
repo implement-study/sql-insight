@@ -96,8 +96,8 @@ class CreateDatabaseFiller : BaseFiller<CreateDatabase>() {
 
 class CreateTableFiller : BaseFiller<CreateTable>() {
     override fun fill(command: CreateTable) {
-        super.fill(command)
         command.table = Table()
+        super.fill(command)
     }
 
     override fun endVisit(x: SQLCreateTableStatement) {

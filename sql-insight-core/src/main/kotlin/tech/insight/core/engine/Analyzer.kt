@@ -1,10 +1,9 @@
 package tech.insight.core.engine
 
 import com.alibaba.druid.sql.SQLUtils
-import com.alibaba.druid.sql.ast.statement.SQLCreateDatabaseStatement
+import com.alibaba.druid.sql.ast.statement.*
 import com.alibaba.druid.sql.visitor.SQLASTVisitor
-import tech.insight.core.command.Command
-import tech.insight.core.command.CreateDatabase
+import tech.insight.core.command.*
 import tech.insight.core.engine.filler.DispatcherFiller
 
 
@@ -49,47 +48,40 @@ class CommandTypeVisitor(private val sql: String) : SQLASTVisitor {
         return false
     }
 
-//    override fun endVisit(x: SQLDropDatabaseStatement): Boolean {
-//        command = DropDatabase(sql)
-//        x.accept(command)
-//        return false
-//    }
-//
-//    override fun endVisit(x: SQLDeleteStatement): Boolean {
-//        command = Delete(sql)
-//        x.accept(command)
-//        return false
-//    }
-//
-//    override fun endVisit(x: SQLDropTableStatement): Boolean {
-//        command = DropTable(sql)
-//        x.accept(command)
-//        return false
-//    }
-//
-//    override fun endVisit(x: SQLCreateTableStatement): Boolean {
-//        command = CreateTable(sql)
-//        x.accept(command)
-//        return false
-//    }
-//
-//    override fun endVisit(x: SQLInsertStatement): Boolean {
-//        command = Insert(sql,x)
-//        x.accept(command)
-//        return false
-//    }
-//
-//    override fun endVisit(x: SQLUpdateStatement): Boolean {
-//        command = Update(sql)
-//        x.accept(command)
-//        return false
-//    }
-//
-//    override fun endVisit(x: SQLSelectQueryBlock): Boolean {
-//        command = Select(sql)
-//        x.accept(command)
-//        return false
-//    }
+    override fun visit(x: SQLDropDatabaseStatement): Boolean {
+        command = DropDatabase(sql,x)
+        return false
+    }
+
+    override fun visit(x: SQLDeleteStatement): Boolean {
+        command = DeleteCommand(sql,x)
+        return false
+    }
+
+    override fun visit(x: SQLDropTableStatement): Boolean {
+        command = DropTable(sql,x)
+        return false
+    }
+
+    override fun visit(x: SQLCreateTableStatement): Boolean {
+        command = CreateTable(sql,x)
+        return false
+    }
+
+    override fun visit(x: SQLInsertStatement): Boolean {
+        command = InsertCommand(sql,x)
+        return false
+    }
+
+    override fun visit(x: SQLUpdateStatement): Boolean {
+        command = UpdateCommand(sql,x)
+        return false
+    }
+
+    override fun visit(x: SQLSelectQueryBlock): Boolean {
+        command = SelectCommand(sql,x)
+        return false
+    }
 }
 
 
