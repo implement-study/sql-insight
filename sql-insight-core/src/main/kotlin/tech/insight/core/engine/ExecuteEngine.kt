@@ -1,6 +1,7 @@
 package tech.insight.core.engine
 
 import tech.insight.core.optimizer.ExecutionPlan
+import tech.insight.core.result.ExceptionResultInterface
 import tech.insight.core.result.ResultInterface
 
 
@@ -20,4 +21,16 @@ interface ExecuteEngine {
      * process
      */
     fun executePlan(plan: ExecutionPlan): ResultInterface
+}
+
+
+object ExecuteEngineImpl : ExecuteEngine {
+    override fun executePlan(plan: ExecutionPlan): ResultInterface {
+        return try {
+            return plan.run()
+        } catch (e: Exception) {
+            return ExceptionResultInterface(e)
+        }
+    }
+
 }

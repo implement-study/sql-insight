@@ -18,7 +18,7 @@ package tech.insight.core.bean
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-interface Cursor : MutableIterator<Row?> {
+interface Cursor : MutableIterator<Row> {
     /**
      * close the cursor
      */

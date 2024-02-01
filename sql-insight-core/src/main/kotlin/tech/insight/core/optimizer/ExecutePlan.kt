@@ -1,5 +1,8 @@
 package tech.insight.core.optimizer
 
+import tech.insight.core.command.DDLCommand
+import tech.insight.core.result.ResultInterface
+
 
 /**
  * hand out to [StorageEngine] from [ExecuteEngine]
@@ -9,4 +12,12 @@ package tech.insight.core.optimizer
  */
 interface ExecutionPlan {
     val originalSql: String
+
+    /**
+     * execution
+     */
+    fun run(): ResultInterface
 }
+
+
+abstract class DDLExecutionPlan(val ddlCommand: DDLCommand) : ExecutionPlan

@@ -15,6 +15,7 @@
  */
 package tech.insight.core.bean
 
+import tech.insight.core.engine.storage.StorageEngine
 import tech.insight.core.exception.UnknownColumnException
 
 
@@ -26,7 +27,7 @@ class Table : SQLBean {
     lateinit var name: String
     var columnList: MutableList<Column> = mutableListOf()
     var indexList: MutableList<Index> = mutableListOf()
-    lateinit var engine: String
+    lateinit var engine: StorageEngine
     var comment: String = ""
     val databaseName: String
         get() {

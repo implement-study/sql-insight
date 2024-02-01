@@ -1,6 +1,8 @@
 package tech.insight.core.engine
 
-import tech.insight.core.command.Command
+import tech.insight.core.command.*
+import tech.insight.core.optimizer.CreateDatabasePlan
+import tech.insight.core.optimizer.CreateTablePlan
 import tech.insight.core.optimizer.ExecutionPlan
 
 
@@ -29,13 +31,18 @@ interface Optimizer {
 object OptimizerImpl : Optimizer {
 
     override fun assign(command: Command): ExecutionPlan {
-//        if (command.directly()) {
-//            return DirectlyExecutionPlan(command)
-//        }
-//        if (command is DmlCommand) {
-//            return command.plan()
-//        }
-        throw UnsupportedOperationException("dont support explain " + command.sql)
+        return when (command) {
+            is CreateDatabase -> CreateDatabasePlan(command)
+            is CreateTable -> CreateTablePlan(command)
+            is DropDatabase -> TODO()
+            is DropTable -> TODO()
+            is DeleteCommand -> TODO()
+            is InsertCommand -> TODO()
+            is SelectCommand -> TODO()
+            is UpdateCommand -> TODO()
+            else -> throw UnsupportedOperationException("dont support explain " + command.sql)
+        }
+
     }
 
 }

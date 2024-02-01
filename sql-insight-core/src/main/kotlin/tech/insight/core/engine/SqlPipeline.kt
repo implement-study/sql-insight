@@ -23,7 +23,7 @@ object SqlPipeline {
     private val log = slf4j<SqlPipeline>()
     private val optimizer: Optimizer = OptimizerImpl
     private val analyzer: Analyzer = DruidAnalyzer
-    private var executeEngine: ExecuteEngine? = null
+    private val executeEngine: ExecuteEngine = ExecuteEngineImpl
 
 
     fun doSql(sql: String): ResultInterface {
@@ -32,7 +32,7 @@ object SqlPipeline {
         val command = analyzer.analysisSql(sql)
         log.info("start optimize command {}", command)
         val plan = optimizer.assign(command)
-        val resultInterface = executeEngine!!.executePlan(plan)
+        val resultInterface = executeEngine.executePlan(plan)
         log.info(
             "end sql \n {} ...take time {}ms",
             sql.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0],

@@ -27,7 +27,8 @@ object EventPublisher {
     private val log = slf4j<EventPublisher>()
     private val listenerMap: MutableMap<Class<out InsightEvent>, MutableList<EventListener<InsightEvent>>> = HashMap()
 
-    fun publishEvent(event: InsightEvent) {
+    fun publishEvent(eventSupplier: () -> InsightEvent) {
+        val event = eventSupplier.invoke()
         listenerMap[event.javaClass]?.forEach { it.onEvent(event) }
     }
 
