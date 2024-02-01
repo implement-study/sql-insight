@@ -7,8 +7,7 @@ import com.alibaba.druid.sql.visitor.SQLASTVisitor
 import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Table
 import tech.insight.core.command.*
-import tech.insight.core.environment.DatabaseManager
-import tech.insight.core.environment.TableDefinitionManager
+import tech.insight.core.environment.TableManager
 import tech.insight.core.exception.InsertException
 
 
@@ -110,7 +109,7 @@ class DropDatabaseFiller : BaseFiller<DropDatabase>() {
 
     override fun endVisit(x: SQLDropDatabaseStatement) {
         command.ifIsExists = x.isIfExists
-        command.database = DatabaseManager.select(x.databaseName)!!
+        command.databaseName = x.databaseName
     }
 }
 
@@ -147,7 +146,7 @@ class InsertFiller : BaseFiller<InsertCommand>() {
         val valueVisitor = ValuesClauseVisitor()
         x.valuesList.forEach { it.accept(valueVisitor) }
         x.tableSource.accept(TableNameVisitor { databaseName, tableName ->
-            command.table = TableDefinitionManager.select(databaseName, tableName)!!
+            command.table = TableManager.select(databaseName, tableName)!!
             this.table = command.table
         })
         return true

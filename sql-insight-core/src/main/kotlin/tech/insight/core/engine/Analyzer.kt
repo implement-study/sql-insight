@@ -12,7 +12,7 @@ import tech.insight.core.engine.filler.DispatcherFiller
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-interface Analyzer {
+fun interface Analyzer {
     /**
      * analysis sql to a wrapped sql
      *

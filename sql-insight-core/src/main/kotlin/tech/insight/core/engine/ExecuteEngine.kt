@@ -1,5 +1,6 @@
 package tech.insight.core.engine
 
+import tech.insight.core.extension.slf4j
 import tech.insight.core.optimizer.ExecutionPlan
 import tech.insight.core.result.ExceptionResultInterface
 import tech.insight.core.result.ResultInterface
@@ -10,7 +11,7 @@ import tech.insight.core.result.ResultInterface
  *
  * @author gongxuanzhangmelt@gmail.com
  **/
-interface ExecuteEngine {
+fun interface ExecuteEngine {
 
     /**
      * execute plan
@@ -25,11 +26,15 @@ interface ExecuteEngine {
 
 
 object ExecuteEngineImpl : ExecuteEngine {
+
+    private val log = slf4j<ExecuteEngine>()
+
     override fun executePlan(plan: ExecutionPlan): ResultInterface {
         return try {
-            return plan.run()
+            plan.run()
         } catch (e: Exception) {
-            return ExceptionResultInterface(e)
+            log.error("execute error", e)
+            ExceptionResultInterface(e)
         }
     }
 

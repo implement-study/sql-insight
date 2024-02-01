@@ -17,6 +17,8 @@
 
 package tech.insight.core.event
 
+import tech.insight.core.environment.DatabaseManager
+import tech.insight.core.environment.TableManager
 import tech.insight.core.extension.slf4j
 import java.lang.reflect.ParameterizedType
 
@@ -27,21 +29,27 @@ object EventPublisher {
     private val log = slf4j<EventPublisher>()
     private val listenerMap: MutableMap<Class<out InsightEvent>, MutableList<EventListener<InsightEvent>>> = HashMap()
 
+    init {
+        this.registerMultipleListener(DatabaseManager)
+        this.registerMultipleListener(TableManager)
+    }
+
     fun publishEvent(eventSupplier: () -> InsightEvent) {
         val event = eventSupplier.invoke()
         listenerMap[event.javaClass]?.forEach { it.onEvent(event) }
     }
 
     fun registerMultipleListener(listener: MultipleEventListener) {
+        log.info("register MultipleEventListener ${listener.javaClass.name}")
         for (type in listener.listenEvent()) {
-            registerListener(type) { e -> listener.onEvent(e) }
+            registerListener(type, true) { e -> listener.onEvent(e) }
         }
     }
 
 
     fun registerListener(listener: EventListener<in InsightEvent>) {
         val eventType = getEventType(listener)
-        registerListener(eventType, listener)
+        registerListener(eventType, listener = listener)
     }
 
     private fun <E : InsightEvent> getEventType(listener: EventListener<E>): Class<out InsightEvent> {
@@ -53,8 +61,14 @@ object EventPublisher {
         }
     }
 
-    private fun registerListener(type: Class<out InsightEvent>, listener: EventListener<InsightEvent>) {
-        log.info("register listener {} listen {}", listener.javaClass.getName(), type.getName())
+    private fun registerListener(
+        type: Class<out InsightEvent>,
+        suppress: Boolean = false,
+        listener: EventListener<InsightEvent>
+    ) {
+        if (!suppress) {
+            log.info("register listener {} listen {}", listener.javaClass.getName(), type.getName())
+        }
         listenerMap.computeIfAbsent(type) { ArrayList() }.add(listener)
     }
 

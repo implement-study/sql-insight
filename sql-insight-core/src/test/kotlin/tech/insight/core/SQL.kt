@@ -1,5 +1,7 @@
 package tech.insight.core
 
+import tech.insight.core.engine.SqlPipeline
+
 
 const val testDb = "test_db"
 const val test_table = "test_table"
@@ -23,3 +25,16 @@ const val dropDatabaseIe = "drop database if exists $testDb"
 const val dropTableDine = "drop table $testDb.$test_table"
 
 const val dropTableIe = "drop table if exists $testDb.$test_table"
+
+
+fun prepareDatabase(){
+    SqlPipeline.doSql(createDatabase)
+}
+
+fun clearDatabase(){
+    SqlPipeline.doSql(dropDatabaseIe)
+}
+
+fun prepareTable(){
+
+}

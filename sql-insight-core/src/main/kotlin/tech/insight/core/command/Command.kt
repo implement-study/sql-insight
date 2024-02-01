@@ -37,7 +37,7 @@ class CreateTable(sql: String, statement: SQLCreateTableStatement) : CreateComma
 
 class DropDatabase(sql: String, statement: SQLDropDatabaseStatement) : DropCommand(sql, statement) {
     var ifIsExists = false
-    lateinit var database: Database
+    lateinit var databaseName: String
 }
 
 class DropTable(sql: String, statement: SQLDropTableStatement) : DropCommand(sql, statement) {

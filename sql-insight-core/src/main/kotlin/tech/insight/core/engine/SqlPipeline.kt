@@ -1,5 +1,6 @@
 package tech.insight.core.engine
 
+import tech.insight.core.environment.GlobalContext
 import tech.insight.core.extension.slf4j
 import tech.insight.core.result.ResultInterface
 
@@ -20,6 +21,10 @@ import tech.insight.core.result.ResultInterface
  * sql lifecycle container
  */
 object SqlPipeline {
+    init {
+        //  static init context
+        GlobalContext
+    }
     private val log = slf4j<SqlPipeline>()
     private val optimizer: Optimizer = OptimizerImpl
     private val analyzer: Analyzer = DruidAnalyzer

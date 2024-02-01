@@ -1,6 +1,7 @@
 package tech.insight.core.environment
 
 import tech.insight.core.annotation.Temporary
+import tech.insight.core.bean.Database
 import tech.insight.core.bean.Table
 import tech.insight.core.engine.storage.StorageEngine
 import tech.insight.core.extension.toObject
@@ -12,12 +13,14 @@ import java.util.*
 
 
 /**
+ *
+ * [TableLoader.loadTable]  must after [DatabaseLoader.loadDatabase]
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 object TableLoader {
     private const val TABLE_SUFFIX = ".frm"
     fun loadTable(): List<Table> {
-        val home = GlobalContext[DefaultProperty.DATA_DIR.key] ?: throw IllegalArgumentException()
+        val home = GlobalContext[DefaultProperty.DATA_DIR]
         val dbArray = File(home).listFiles { obj: File -> obj.isDirectory() } ?: return emptyList()
         val tableList: MutableList<Table> = ArrayList()
         for (dbFile in dbArray) {
@@ -34,6 +37,20 @@ object TableLoader {
         FileInputStream(frmFile).use { fileInputStream ->
             return fileInputStream.toObject<Table>()
         }
+    }
+}
+
+
+object DatabaseLoader {
+    fun loadDatabase(): List<Database> {
+        val home = GlobalContext[DefaultProperty.DATA_DIR]
+        val dbArray = File(home).listFiles { obj: File -> obj.isDirectory() } ?: return emptyList()
+        return dbArray.map { analysisDatabase(it) }.toList()
+    }
+
+    @Temporary("database meta info?")
+    private fun analysisDatabase(databaseDir: File): Database {
+        return Database(databaseDir.name)
     }
 }
 
@@ -57,6 +74,10 @@ object EngineLoader {
             val engineNames = engine.getProperty("engine")
             val engineNameArray = engineNames.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             for (name in engineNameArray) {
+                if (name.isEmpty()) {
+                    //  todo
+                    return engineList
+                }
                 engineList.add(reflectEngine(name))
             }
         }

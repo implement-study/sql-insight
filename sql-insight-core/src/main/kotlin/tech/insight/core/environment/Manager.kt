@@ -1,11 +1,21 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package tech.insight.core.environment
 
 import com.google.common.collect.HashBasedTable
 import tech.insight.core.bean.Database
 import tech.insight.core.bean.Table
+import tech.insight.core.engine.storage.StorageEngine
 import tech.insight.core.event.*
+import tech.insight.core.event.EventListener
 import tech.insight.core.exception.DatabaseNotExistsException
+import tech.insight.core.exception.DuplicationEngineNameException
+import tech.insight.core.exception.EngineNotFoundException
+import tech.insight.core.exception.TableNotExistsException
 import tech.insight.core.extension.GuavaTable
+import tech.insight.core.extension.slf4j
+import tech.insight.core.extension.timeReport
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -16,8 +26,16 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-object TableDefinitionManager : MultipleEventListener {
+object TableManager : MultipleEventListener {
+
     private val tableInfoCache: GuavaTable<String, String, Table> = HashBasedTable.create()
+
+    init {
+        timeReport("init table manager") {
+            TableLoader.loadTable().forEach { this.load(it) }
+        }
+    }
+
     private fun load(table: Table) {
         tableInfoCache.put(table.databaseName, table.name, table)
     }
@@ -31,8 +49,13 @@ object TableDefinitionManager : MultipleEventListener {
     }
 
     fun select(database: String, tableName: String): Table? {
-        return tableInfoCache.get(database, tableName)
+        return tableInfoCache[database, tableName]
     }
+
+    fun require(database: String, tableName: String): Table {
+        return tableInfoCache[database, tableName] ?: throw TableNotExistsException("$database $tableName")
+    }
+
 
     fun select(database: String): List<Table> {
         return ArrayList(tableInfoCache.row(database).values)
@@ -62,6 +85,13 @@ object TableDefinitionManager : MultipleEventListener {
  */
 object DatabaseManager : MultipleEventListener {
     private val databaseCache: MutableMap<String, Database> = ConcurrentHashMap()
+
+    init {
+        timeReport("init database Manager") {
+            DatabaseLoader.loadDatabase().forEach { this.load(it) }
+        }
+    }
+
     private fun load(database: Database) {
         databaseCache[database.name] = database
     }
@@ -70,8 +100,15 @@ object DatabaseManager : MultipleEventListener {
         databaseCache.remove(database.name)
     }
 
-    fun select(databaseName: String): Database {
-        return databaseCache[databaseName] ?: throw DatabaseNotExistsException(databaseName)
+    /**
+     * select maybe return null
+     */
+    fun select(databaseName: String): Database? {
+        return databaseCache[databaseName]
+    }
+
+    fun require(databaseName: String): Database {
+        return select(databaseName) ?: throw DatabaseNotExistsException(databaseName)
     }
 
 
@@ -90,4 +127,39 @@ object DatabaseManager : MultipleEventListener {
         return listOf(DropDatabaseEvent::class.java, CreateDatabaseEvent::class.java)
     }
 }
+
+
+object EngineManager : StorageEngineManager {
+    private val storageEngineMap: MutableMap<String, StorageEngine> = ConcurrentHashMap()
+    private val log = slf4j<EngineManager>()
+
+    init {
+        EngineLoader.loadEngine().forEach { registerEngine(it) }
+    }
+
+    override fun allEngine(): List<StorageEngine> {
+        return ArrayList(storageEngineMap.values)
+    }
+
+    override fun registerEngine(engine: StorageEngine) {
+        log.info("register engine [{}], class {}", engine.name, engine.javaClass.getName())
+        if (storageEngineMap.putIfAbsent(engine.name.uppercase(Locale.getDefault()), engine) != null) {
+            throw DuplicationEngineNameException("engine ${engine.name} already register ")
+        }
+        if (engine is MultipleEventListener) {
+            EventPublisher.registerMultipleListener(engine)
+        } else if (engine is EventListener<*>) {
+            EventPublisher.registerListener(engine as EventListener<in InsightEvent>)
+        }
+    }
+
+
+    override fun selectEngine(engineName: String?): StorageEngine {
+        val finalEngineName = engineName ?: GlobalContext[DefaultProperty.DEFAULT_ENGINE]
+        return storageEngineMap[finalEngineName.uppercase(Locale.getDefault())] ?: throw EngineNotFoundException(
+            finalEngineName
+        )
+    }
+}
+
 

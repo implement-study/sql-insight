@@ -15,6 +15,8 @@
  */
 package tech.insight.core.environment
 
+import tech.insight.core.extension.slf4j
+import tech.insight.core.extension.timeReport
 import java.io.FileNotFoundException
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -60,7 +62,7 @@ interface Context {
 /**
  * delegate a map implement [Context]
  */
-abstract class AbstractMapContext(private val container: MutableMap<String, String> = ConcurrentHashMap()) : Context {
+abstract class AbstractMapContext(protected val container: MutableMap<String, String> = ConcurrentHashMap()) : Context {
     override fun set(key: String, value: String) {
         container[key] = value
     }
@@ -75,22 +77,29 @@ abstract class AbstractMapContext(private val container: MutableMap<String, Stri
     }
 
     override fun get(property: DefaultProperty): String {
-        return get(property.key)!!
+        return get(property.key) ?: throw IllegalArgumentException("default property $property don't have value")
     }
 }
 
 object GlobalContext : AbstractMapContext() {
+    private val log = slf4j<GlobalContext>()
+
     init {
+        log.info("init the GlobalContext")
         DefaultProperty.entries.forEach {
             this[it.key] = it.value
         }
 
         val configFileName = System.getProperty("default-file", "/mysql.properties")
-        val inputStream = GlobalContext::class.java.getResourceAsStream(configFileName)
+        val inputStream = javaClass.getResourceAsStream(configFileName)
             ?: throw FileNotFoundException("check your default-file property $configFileName")
         val userProperties = Properties().also { it.load(inputStream) }
         userProperties.forEach {
             this[it.key.toString()] = it.value.toString()
+        }
+        log.info("init the ${container.size} properties,include ${userProperties.size} custom properties")
+        timeReport("init engine manager") {
+            EngineManager
         }
     }
 }

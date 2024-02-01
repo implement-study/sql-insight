@@ -20,7 +20,7 @@ import tech.insight.core.engine.storage.StorageEngine
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-interface StorageEngineSelector {
+fun interface StorageEngineSelector {
     /**
      * @param engineName name
      * @return storage engine

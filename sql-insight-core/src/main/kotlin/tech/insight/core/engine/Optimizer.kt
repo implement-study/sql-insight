@@ -1,9 +1,7 @@
 package tech.insight.core.engine
 
 import tech.insight.core.command.*
-import tech.insight.core.optimizer.CreateDatabasePlan
-import tech.insight.core.optimizer.CreateTablePlan
-import tech.insight.core.optimizer.ExecutionPlan
+import tech.insight.core.optimizer.*
 
 
 /**
@@ -13,7 +11,7 @@ import tech.insight.core.optimizer.ExecutionPlan
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-interface Optimizer {
+fun interface Optimizer {
 
     /**
      * make a plan
@@ -34,8 +32,8 @@ object OptimizerImpl : Optimizer {
         return when (command) {
             is CreateDatabase -> CreateDatabasePlan(command)
             is CreateTable -> CreateTablePlan(command)
-            is DropDatabase -> TODO()
-            is DropTable -> TODO()
+            is DropDatabase -> DropDatabasePlan(command)
+            is DropTable -> DropTablePlan(command)
             is DeleteCommand -> TODO()
             is InsertCommand -> TODO()
             is SelectCommand -> TODO()

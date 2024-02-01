@@ -29,7 +29,7 @@ interface Row : Comparable<Row> {
      *
      * @return row list
      */
-    val values: List<Any>
+    val values: List<Value<*>>
 
     /**
      * row id

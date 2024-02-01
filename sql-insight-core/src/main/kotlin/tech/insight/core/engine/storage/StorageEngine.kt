@@ -20,6 +20,7 @@ import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
 import tech.insight.core.command.UpdateCommand
 import tech.insight.core.result.ResultInterface
+import tech.insight.core.exception.DuplicationEngineNameException
 
 /**
  * storage engine , executor select the engine
@@ -31,7 +32,7 @@ interface StorageEngine {
      * engine name,sole
      *
      * @return engine name, may be throw
-     * [org.gongxuanzhang.sql.insight.core.exception.DuplicationEngineNameException]
+     * @throws [DuplicationEngineNameException]
      */
     val name: String
 
@@ -44,7 +45,8 @@ interface StorageEngine {
     fun tableExtensions(): List<String>
 
     /**
-     * open the table and index
+     * open the table and index.
+     * It is usually the session that initializes the index
      */
     fun openTable(table: Table)
 

@@ -11,7 +11,7 @@ import tech.insight.core.bean.DataType
 import tech.insight.core.bean.Table
 import tech.insight.core.environment.DatabaseManager
 import tech.insight.core.environment.SessionManager
-import tech.insight.core.environment.TableDefinitionManager
+import tech.insight.core.environment.TableManager
 import tech.insight.core.exception.TableNotExistsException
 
 /**
@@ -61,7 +61,7 @@ class TableFiller(val table: Table) : BeanFiller<Table> {
 
     override fun visit(x: SQLExprTableSource): Boolean {
         x.accept(TableNameVisitor { databaseName, tableName ->
-            table.database = DatabaseManager.select(databaseName)
+            table.database = DatabaseManager.require(databaseName)
             table.name = tableName
         })
         return true
@@ -99,7 +99,7 @@ class TableSelectVisitor(private val must: Boolean = false, private val action: 
     }
 
     private fun selectTable(databaseName: String, tableName: String): Table? {
-        val table = TableDefinitionManager.select(databaseName, tableName)
+        val table = TableManager.select(databaseName, tableName)
         if (table == null && must) {
             throw TableNotExistsException("${databaseName}.${tableName} not exists")
         }

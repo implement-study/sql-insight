@@ -38,7 +38,6 @@ class CreateDatabasePlan(private val command: CreateDatabase) : DDLExecutionPlan
             return MessageResultInterface("create database [${command.dbName}]")
         }
         return MessageResultInterface("skip the create because database ${command.dbName} exists")
-
     }
 }
 

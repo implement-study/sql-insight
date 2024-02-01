@@ -1,15 +1,24 @@
 package tech.insight.core.engine
 
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import tech.insight.core.*
 import tech.insight.core.command.CreateDatabase
 import tech.insight.core.command.CreateTable
 import tech.insight.core.command.DropDatabase
 import tech.insight.core.command.DropTable
+import tech.insight.core.environment.DefaultProperty
+import tech.insight.core.environment.GlobalContext
+import tech.insight.core.optimizer.ExecutePlanTest
+import java.io.File
 
 
 class DruidAnalyzerTest {
 
+    @BeforeEach
+    fun prepare(){
+        prepareDatabase()
+    }
 
     @Test
     fun createDatabaseTest() {
@@ -23,7 +32,6 @@ class DruidAnalyzerTest {
 
     @Test
     fun createTableTest() {
-        TODO("create database before create table")
         var createTable = DruidAnalyzer.analysisSql(createTableDine) as CreateTable
         assert(!createTable.ifNotExists)
         assert(DruidAnalyzer.analysisSql(createTableDine) is CreateTable)
@@ -35,16 +43,15 @@ class DruidAnalyzerTest {
 
     @Test
     fun dropDatabaseTest() {
-        TODO("create database before drop database")
         val command = DruidAnalyzer.analysisSql(dropDatabaseIe)
         check(command is DropDatabase)
         assert(command.ifIsExists)
-        assert(command.database.name == testDb)
+        assert(command.databaseName == testDb)
+        assert(!File(GlobalContext[DefaultProperty.DATA_DIR], testDb).exists())
     }
 
     @Test
     fun dropTableTest() {
-        TODO("create database before drop database")
         val command = DruidAnalyzer.analysisSql(dropTableIe)
         check(command is DropTable)
         assert(command.ifExists)
