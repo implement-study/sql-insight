@@ -98,7 +98,7 @@ class ValueChar(value: String, length: Int) : Value<String> {
 
 }
 
-class ValueVarchar(override val source: String) : Value<String> {
+data class ValueVarchar(override val source: String) : Value<String> {
     override val length: Int
         get() {
             return toBytes().size
@@ -123,7 +123,7 @@ class ValueVarchar(override val source: String) : Value<String> {
     }
 }
 
-class ValueInt(override val source: Int) : Value<Int> {
+data class ValueInt(override val source: Int) : Value<Int> {
     override val length = Int.SIZE_BYTES
     override val isDynamic = false
 
@@ -172,6 +172,7 @@ open class ValueBoolean(override val source: Boolean) : Value<Boolean> {
         return source.toByteArray()
     }
 
+
     override fun compareTo(other: Value<*>): Int {
         return when (other) {
             is ValueBoolean -> this.source.compareTo(other.source)
@@ -181,6 +182,24 @@ open class ValueBoolean(override val source: Boolean) : Value<Boolean> {
             is ValueVarchar -> this.source.toString().compareTo(other.source)
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ValueBoolean
+
+        return source == other.source
+    }
+
+    override fun hashCode(): Int {
+        var result = source.hashCode()
+        result = 31 * result + length
+        result = 31 * result + isDynamic.hashCode()
+        return result
+    }
+
+
 }
 
 object ValueTrue : ValueBoolean(true)

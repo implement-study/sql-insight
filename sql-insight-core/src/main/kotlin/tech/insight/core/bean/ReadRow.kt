@@ -29,7 +29,7 @@ class ReadRow(valueList: List<Value<*>>, override val rowId: Long) : Row {
         this.valueList = valueList
     }
 
-    override val values: List<Any>
+    override val values: List<Value<*>>
         get() = valueList
 
     override fun getValueByColumnName(colName: String): Value<*> {

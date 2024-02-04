@@ -50,45 +50,33 @@ class ExecutePlanTest {
         assertEquals(table.name, test_table)
         assertEquals(table.database, DatabaseManager.select(testDb))
         assertEquals(table.comment, "用户表")
-        assertEquals(run {
-            val column = Column()
-            column.name = "id"
-            column.dataType = DataType.INT
-            column.length = DataType.INT.defaultLength
-            column.autoIncrement = true
-            column.notNull = true
-            column.primaryKey = true
-            column.unique = true
-            column.defaultValue = ValueNull
-            column
-        }, table.columnList[0])
-        assertEquals(run {
-            val column = Column()
-            column.notNull = true
-            column.name = "name"
-            column.variable = true
-            column.dataType = DataType.VARCHAR
-            column.length = DataType.VARCHAR.defaultLength
-            column
-        }, table.columnList[1])
-        assertEquals(table.columnList[2], run {
-            val column = Column()
-            column.notNull = true
-            column.name = "gender"
-            column.variable = true
-            column.dataType = DataType.VARCHAR
-            column.length = 20
-            column.defaultValue = ValueVarchar("男")
-            column.comment = "性别"
-            column
-        })
-        assertEquals(table.columnList[3], run {
-            val column = Column()
-            column.name = "id_card"
-            column.dataType =  DataType.CHAR
-            column.length = DataType.CHAR.defaultLength
-            column.unique = true
-            column
-        })
+        val idCol = table.columnList[0]
+        assertEquals("id", idCol.name)
+        assertEquals(DataType.INT, idCol.dataType)
+        assertEquals(DataType.INT.defaultLength, idCol.length)
+        assert(idCol.autoIncrement)
+        assert(idCol.notNull)
+        assert(idCol.primaryKey)
+        assert(idCol.unique)
+        assertEquals(ValueNull, idCol.defaultValue)
+        val nameCol = table.columnList[1]
+        assertEquals("name", nameCol.name)
+        assertEquals(DataType.VARCHAR, nameCol.dataType)
+        assertEquals(DataType.VARCHAR.defaultLength, nameCol.length)
+        assert(nameCol.variable)
+        assert(nameCol.notNull)
+        val genderCol = table.columnList[2]
+        assertEquals("gender", genderCol.name)
+        assertEquals(DataType.VARCHAR, genderCol.dataType)
+        assertEquals(20, genderCol.length)
+        assert(genderCol.variable)
+        assert(genderCol.notNull)
+        assertEquals(ValueVarchar("男"), genderCol.defaultValue)
+        assertEquals("性别", genderCol.comment)
+        val idCardCol = table.columnList[3]
+        assertEquals(DataType.CHAR, idCardCol.dataType)
+        assertEquals("id_card",idCardCol.name)
+        assertEquals(DataType.CHAR.defaultLength, idCardCol.length)
+        assert(idCardCol.unique)
     }
 }

@@ -10,6 +10,7 @@ import tech.insight.core.bean.Column
 import tech.insight.core.bean.DataType
 import tech.insight.core.bean.Table
 import tech.insight.core.environment.DatabaseManager
+import tech.insight.core.environment.EngineManager
 import tech.insight.core.environment.SessionManager
 import tech.insight.core.environment.TableManager
 import tech.insight.core.exception.TableNotExistsException
@@ -55,7 +56,11 @@ class TableFiller(val table: Table) : BeanFiller<Table> {
 
     override fun visit(x: SQLCreateTableStatement): Boolean {
         x.comment?.accept(CommentVisitor { table.comment = it })
-        x.engine?.accept(EngineVisitor { table.engine = it })
+        if(x.engine == null){
+            table.engine = EngineManager.selectEngine(null)
+            return true
+        }
+        x.engine.accept(EngineVisitor { table.engine = it })
         return true
     }
 

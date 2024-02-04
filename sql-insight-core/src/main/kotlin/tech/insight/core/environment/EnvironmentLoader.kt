@@ -75,8 +75,7 @@ object EngineLoader {
             val engineNameArray = engineNames.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             for (name in engineNameArray) {
                 if (name.isEmpty()) {
-                    //  todo
-                    return engineList
+                   continue
                 }
                 engineList.add(reflectEngine(name))
             }

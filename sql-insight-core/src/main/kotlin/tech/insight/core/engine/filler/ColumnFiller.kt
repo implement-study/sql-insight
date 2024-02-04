@@ -54,6 +54,8 @@ class ColumnFiller(val col: Column) : BeanFiller<Column> {
 
         override fun endVisit(x: SQLColumnPrimaryKey) {
             col.primaryKey = true
+            col.unique = true
+            col.notNull = true
         }
     }
 
