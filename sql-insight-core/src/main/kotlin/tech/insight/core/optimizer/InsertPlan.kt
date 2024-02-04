@@ -15,6 +15,7 @@ class InsertPlan(private val command: InsertCommand) : DMLExecutionPlan(command)
         get() = command.sql
 
     override fun run(): ResultInterface {
+        TODO("index open the table and init auto increment count ")
         command.insertRows.forEach { engine.insertRow(it) }
         return MessageResult("insert ${command.insertRows.size} rows")
     }

@@ -9,7 +9,7 @@ fun Long.toByteArray(): ByteArray {
 
 fun Int.toByteArray(): ByteArray {
     return ByteArray(4) { i ->
-        ((this shr (i * 8)) and 0xFF).toByte()
+        ((this shr ((3-i) * 8)) and 0xFF).toByte()
     }
 }
 
