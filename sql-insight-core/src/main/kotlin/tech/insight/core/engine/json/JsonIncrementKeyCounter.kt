@@ -15,22 +15,24 @@
  */
 package tech.insight.core.engine.json
 
-import com.alibaba.fastjson2.JSONObject
-import com.google.common.collect.HashBasedTable
-import com.google.common.collect.Tables
 import tech.insight.core.bean.Database
+import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Table
-import java.io.IOException
+import tech.insight.core.bean.value.ValueInt
+import tech.insight.core.bean.value.ValueNull
+import tech.insight.core.engine.AutoIncrementKeyCounter
+import tech.insight.core.extension.slf4j
+import tech.insight.core.extension.tree
 import java.nio.file.Files
-import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-@Slf4j
-class JsonIncrementKeyCounter : AutoIncrementKeyCounter {
-    private val keyTable = Tables.synchronizedTable(HashBasedTable.create<String, String, AtomicLong?>())
+object JsonIncrementKeyCounter : AutoIncrementKeyCounter {
+    private val keyTable: MutableMap<String, MutableMap<String, AtomicLong>> = ConcurrentHashMap()
+    private val log = slf4j<JsonIncrementKeyCounter>()
 
     /**
      * if auto increment column have value,fresh cache value.
@@ -38,24 +40,24 @@ class JsonIncrementKeyCounter : AutoIncrementKeyCounter {
      *
      * @param row insert row
      */
-    fun dealAutoIncrement(row: InsertRow): Boolean {
-        val autoColIndex: Int = row.getTable().getExt().getAutoColIndex()
+    override fun dealAutoIncrement(row: InsertRow): Boolean {
+        val autoColIndex: Int = row.table.ext.autoColIndex
         if (autoColIndex < 0) {
             return false
         }
-        val databaseName: String = row.getTable().getDatabase().getName()
-        val atomicLong = loadMaxAutoIncrementKey(row.getTable())
-        val autoIncrementValue: Value = row.getValues().get(autoColIndex)
-        if (autoIncrementValue.getSource() == null) {
-            row.getValues().set(autoColIndex, ValueInt(atomicLong!!.incrementAndGet().toInt()))
+        val databaseName = row.table.databaseName
+        val atomicLong = loadMaxAutoIncrementKey(row.table)
+        val autoIncrementValue = row.values[autoColIndex]
+        if (autoIncrementValue is ValueNull) {
+            row.values[autoColIndex] = ValueInt(atomicLong.incrementAndGet().toInt())
             return true
         }
-        val insertValue = autoIncrementValue.getSource() as Int
-        if (insertValue > atomicLong!!.get()) {
+        val insertValue = autoIncrementValue.source as Int
+        if (insertValue > atomicLong.get()) {
             log.info(
                 "database[{}],table[{}],auto increment col value set {}",
                 databaseName,
-                row.getTable().getName(),
+                row.table.name,
                 insertValue
             )
             atomicLong.set(insertValue.toLong())
@@ -63,44 +65,31 @@ class JsonIncrementKeyCounter : AutoIncrementKeyCounter {
         return false
     }
 
-    fun reset(database: Database) {
-        val row = keyTable.row(database.getName())
-        row.forEach { (tableName: String?, al: AtomicLong?) -> al!!.set(0) }
+    override fun reset(database: Database) {
+        keyTable.computeIfAbsent(database.name) { ConcurrentHashMap() }.forEach { (_, al: AtomicLong) -> al.set(0) }
     }
 
-    fun reset(table: Table) {
+    override fun reset(table: Table) {
         val atomicLong = loadMaxAutoIncrementKey(table)
-        atomicLong!!.set(0)
+        atomicLong.set(0)
     }
 
-    private fun loadMaxAutoIncrementKey(table: Table): AtomicLong? {
-        val database: String = table.getDatabase().getName()
-        val tableName: String = table.getName()
-        var atomicLong = keyTable[database, tableName]
-        if (atomicLong == null) {
-            synchronized(keyTable) {
-                if (keyTable[database, tableName] == null) {
-                    atomicLong = loadFromDisk(table)
-                    keyTable.put(database, tableName, atomicLong)
-                }
-            }
-        }
-        return Objects.requireNonNull(atomicLong)
+    private fun loadMaxAutoIncrementKey(table: Table): AtomicLong {
+        val database: String = table.databaseName
+        val tableName: String = table.name
+        return keyTable.computeIfAbsent(database) { ConcurrentHashMap() }
+            .computeIfAbsent(tableName) { loadFromDisk(table) }
     }
 
     private fun loadFromDisk(table: Table): AtomicLong {
         val jsonFile = JsonEngineSupport.getJsonFile(table)
-        return try {
-            val allLines = Files.readAllLines(jsonFile!!.toPath())
-            for (i in allLines.indices.reversed()) {
-                if (!allLines[i].isEmpty()) {
-                    val key = JsonEngineSupport.getJsonInsertRowPrimaryKey(table, JSONObject.parse(allLines[i]))
-                    return AtomicLong(key.toLong())
-                }
+        val allLines = Files.readAllLines(jsonFile.toPath())
+        for (i in allLines.indices.reversed()) {
+            if (allLines[i].isNotEmpty()) {
+                val key = JsonEngineSupport.getJsonInsertRowPrimaryKey(table, allLines[i].tree())
+                return AtomicLong(key.toLong())
             }
-            AtomicLong()
-        } catch (e: IOException) {
-            throw RuntimeIoException(e)
         }
+        return AtomicLong()
     }
 }

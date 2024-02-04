@@ -31,7 +31,7 @@ class InsertRow(val insertColumns: List<Column>, override val rowId: Long) : Row
      */
     private val absoluteValueList: MutableList<Value<*>> = ArrayList()
 
-    override val values: List<Value<*>>
+    override val values: MutableList<Value<*>>
         get() = valueList
 
     override fun getValueByColumnName(colName: String): Value<*> {

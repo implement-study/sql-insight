@@ -11,7 +11,7 @@ import tech.insight.core.event.DropTableEvent
 import tech.insight.core.event.EventPublisher
 import tech.insight.core.exception.DatabaseNotExistsException
 import tech.insight.core.exception.TableNotExistsException
-import tech.insight.core.result.MessageResultInterface
+import tech.insight.core.result.MessageResult
 import tech.insight.core.result.ResultInterface
 import java.io.File
 import java.nio.file.Files
@@ -40,7 +40,7 @@ class DropDatabasePlan(private val command: DropDatabase) : DDLExecutionPlan(com
         if (!command.ifIsExists) {
             throw DatabaseNotExistsException(this.command.databaseName)
         }
-        return MessageResultInterface("delete ${command.databaseName}")
+        return MessageResult("delete ${command.databaseName}")
     }
 
 }
@@ -70,7 +70,7 @@ class DropTablePlan(private val command: DropTable) : DDLExecutionPlan(command) 
                 throw TableNotExistsException(table)
             }
         }
-        return MessageResultInterface("finish drop ${dropTableNames.size} tables $dropTableNames,skip ${skipTableNames.size} tables $skipTableNames")
+        return MessageResult("finish drop ${dropTableNames.size} tables $dropTableNames,skip ${skipTableNames.size} tables $skipTableNames")
 
     }
 

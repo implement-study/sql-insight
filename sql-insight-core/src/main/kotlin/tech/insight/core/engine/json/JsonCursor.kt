@@ -19,13 +19,15 @@ import tech.insight.core.bean.Cursor
 import tech.insight.core.bean.Row
 import tech.insight.core.environment.Session
 import tech.insight.core.exception.RuntimeIoException
+import tech.insight.core.extension.tree
 import java.io.BufferedReader
 import java.io.IOException
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class JsonCursor(private val reader: BufferedReader, private val session: Session, index: JsonPkIndex) : Cursor {
+class JsonCursor(private val reader: BufferedReader, private val session: Session, private val index: JsonPkIndex) :
+    Cursor {
     private var current: Row? = null
 
 
@@ -39,7 +41,7 @@ class JsonCursor(private val reader: BufferedReader, private val session: Sessio
                 if (line.isEmpty()) {
                     continue
                 }
-                current = JsonEngineSupport.getPhysicRowFromJson(JSONObject.parseObject(line), index.belongTo())
+                current = JsonEngineSupport.getPhysicRowFromJson(line.tree(), index.belongTo())
                 return true
             }
         } catch (e: IOException) {
@@ -51,7 +53,7 @@ class JsonCursor(private val reader: BufferedReader, private val session: Sessio
         if (current == null) {
             throw NoSuchElementException()
         }
-        val result: Row = current
+        val result: Row = current!!
         current = null
         return result
     }

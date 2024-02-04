@@ -1,8 +1,8 @@
 package tech.insight.core.extension
 
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -19,12 +19,16 @@ fun Any.json(): String {
     return mapper.writeValueAsString(this)
 }
 
-fun Any.tree(): JsonNode {
+fun Any.tree(): ObjectNode {
     return mapper.valueToTree(this)
 }
 
 inline fun <reified T> String.toObject(): T {
     return mapper.readValue(this, T::class.java)
+}
+
+fun String.toTree(): ObjectNode {
+    return mapper.readValue(this, ObjectNode::class.java)
 }
 
 inline fun <reified T> FileInputStream.toObject(): T {

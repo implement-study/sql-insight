@@ -15,14 +15,13 @@
  */
 package tech.insight.core.engine.json
 
-import com.alibaba.fastjson2.JSONObject
 import com.fasterxml.jackson.databind.JsonNode
 import tech.insight.core.bean.Column
 import tech.insight.core.bean.DataType
 import tech.insight.core.bean.ReadRow
 import tech.insight.core.bean.Table
+import tech.insight.core.bean.value.Value
 import tech.insight.core.bean.value.ValueInt
-import tech.insight.core.bean.value.ValueNull
 import tech.insight.core.bean.value.ValueVarchar
 import tech.insight.core.exception.DateTypeCastException
 import java.io.File
@@ -41,10 +40,10 @@ object JsonEngineSupport {
      * @param json  insert row
      * @return perhaps null
      */
-    fun getJsonInsertRowPrimaryKey(table: Table, json: JSONObject): Int {
+    fun getJsonInsertRowPrimaryKey(table: Table, json: JsonNode): Int {
         val columnList: List<Column> = table.columnList
         val column: Column = columnList[table.ext.primaryKeyIndex]
-        return json.getInteger(column.name)
+        return json[column.name].intValue()
     }
 
     /**
@@ -57,29 +56,26 @@ object JsonEngineSupport {
         return File(table.database.dbFolder, "${table.name}.json")
     }
 
-    fun getPhysicRowFromJson(jsonObject: JsonNode, table: Table): ReadRow {
+    fun getPhysicRowFromJson(jsonNode: JsonNode, table: Table): ReadRow {
         val primaryKey: Column = table.columnList[table.ext.primaryKeyIndex]
-        val id: Long = jsonObject.longValue(primaryKey.name)
-        val valueList: MutableList<Value> = ArrayList<Any?>(table.getColumnList().size())
-        for (column in table.columnList) {
-            valueList.add(wrapValue(column, jsonObject.get(column.name)))
-        }
+        val id: Long = jsonNode[primaryKey.name].longValue()
+        val valueList = table.columnList.map { wrapValue(it, jsonNode[it.name]) }.toList()
         val readRow = ReadRow(valueList, id)
-        readRow.setTable(table)
+        readRow.table = table
         return readRow
     }
 
-    private fun wrapValue(column: Column, o: Any): Value {
-        val type: DataType.Type = column.getDataType().getType()
-        if (type === DataType.Type.INT) {
-            return ValueInt(o as Int)
+    private fun wrapValue(column: Column, o: JsonNode): Value<*> {
+        val type = column.dataType
+        if (type === DataType.INT) {
+            return ValueInt(o.intValue())
         }
-        if (type === DataType.Type.VARCHAR || type === DataType.Type.CHAR) {
+        if (type == DataType.VARCHAR || type == DataType.CHAR) {
             return ValueVarchar(o.toString())
         }
-        if (o == null) {
-            return if (column.getDefaultValue() == null) ValueNull.getInstance() else column.getDefaultValue()
+        if (o.isNull) {
+            return column.defaultValue
         }
-        throw DateTypeCastException(column.getDataType().toString(), o.toString())
+        throw DateTypeCastException(column.dataType.toString(), o.toString())
     }
 }

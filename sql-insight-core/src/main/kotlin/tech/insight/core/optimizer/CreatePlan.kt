@@ -14,7 +14,7 @@ import tech.insight.core.exception.DatabaseExistsException
 import tech.insight.core.exception.DatabaseNotExistsException
 import tech.insight.core.exception.TableExistsException
 import tech.insight.core.extension.json
-import tech.insight.core.result.MessageResultInterface
+import tech.insight.core.result.MessageResult
 import tech.insight.core.result.ResultInterface
 import java.io.File
 import java.nio.file.Files
@@ -35,9 +35,9 @@ class CreateDatabasePlan(private val command: CreateDatabase) : DDLExecutionPlan
         }
         if (dbFold.mkdirs()) {
             EventPublisher.publishEvent { CreateDatabaseEvent(Database(command.dbName)) }
-            return MessageResultInterface("create database [${command.dbName}]")
+            return MessageResult("create database [${command.dbName}]")
         }
-        return MessageResultInterface("skip the create because database ${command.dbName} exists")
+        return MessageResult("skip the create because database ${command.dbName} exists")
     }
 }
 
@@ -56,12 +56,12 @@ class CreateTablePlan(private val command: CreateTable) : DDLExecutionPlan(comma
             Files.write(frmFile.toPath(), tableFrmByteArray())
             table.engine.createTable(table)
             EventPublisher.publishEvent { CreateTableEvent(table) }
-            return MessageResultInterface("success create table ${table.name}")
+            return MessageResult("success create table ${table.name}")
         }
         if (!command.ifNotExists) {
             throw TableExistsException(table)
         }
-        return MessageResultInterface("skip the create because table ${table.name} exists")
+        return MessageResult("skip the create because table ${table.name} exists")
     }
 
     @Temporary(detail = "use json temp")

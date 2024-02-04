@@ -15,7 +15,7 @@
  */
 package tech.insight.core.engine.json
 
-import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import tech.insight.core.bean.DataType
 import tech.insight.core.bean.InsertRow
@@ -30,12 +30,14 @@ import tech.insight.core.event.MultipleEventListener
 import tech.insight.core.exception.CreateTableException
 import tech.insight.core.exception.InsertException
 import tech.insight.core.exception.RuntimeIoException
+import tech.insight.core.extension.json
 import tech.insight.core.extension.slf4j
+import tech.insight.core.extension.tree
+import tech.insight.core.result.MessageResult
 import tech.insight.core.result.ResultInterface
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
-import java.util.*
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -48,7 +50,7 @@ class JsonEngine : StorageEngine, MultipleEventListener {
         const val MAX_PRIMARY_KEY = 10000
     }
 
-    private val counter = JsonIncrementKeyCounter()
+    private val counter = JsonIncrementKeyCounter
     override val name: String
         get() = "json"
 
@@ -82,7 +84,7 @@ class JsonEngine : StorageEngine, MultipleEventListener {
         }
         Files.write(jsonFile.toPath(), initContent)
         log.info("write {} json to {}", initContent.size, jsonFile.toPath().toAbsolutePath())
-        return MessageResult(java.lang.String.format("成功创建%s", table.getName()))
+        return MessageResult("success create table ${table.name}")
     }
 
     override fun truncateTable(table: Table): ResultInterface {
@@ -91,22 +93,18 @@ class JsonEngine : StorageEngine, MultipleEventListener {
         for (i in 0 until MAX_PRIMARY_KEY) {
             initContent.add("")
         }
-        return try {
-            Files.write(jsonFile!!.toPath(), initContent)
-            counter.reset(table)
-            MessageResult()
-        } catch (e: IOException) {
-            ExceptionResult(e)
-        }
+        Files.write(jsonFile.toPath(), initContent)
+        counter.reset(table)
+        return MessageResult("success truncate table ${table.name}")
     }
 
     override fun insertRow(row: InsertRow) {
         counter.dealAutoIncrement(row)
-        val jsonObject: JSONObject = fullAllColumnRow(row)
+        val jsonObject = fullAllColumnRow(row)
         val jsonFile = JsonEngineSupport.getJsonFile(row.belongTo())
         val insertPrimaryKey = JsonEngineSupport.getJsonInsertRowPrimaryKey(row.belongTo(), jsonObject)
-        if (Companion.MAX_PRIMARY_KEY < insertPrimaryKey || insertPrimaryKey < Companion.MIN_PRIMARY_KEY) {
-            throw InsertException("engine json primary key must between " + Companion.MIN_PRIMARY_KEY + " and " + Companion.MAX_PRIMARY_KEY)
+        if (MAX_PRIMARY_KEY < insertPrimaryKey || insertPrimaryKey < MIN_PRIMARY_KEY) {
+            throw InsertException("engine json primary key must between $MIN_PRIMARY_KEY and $MAX_PRIMARY_KEY")
         }
         try {
             val lines = Files.readAllLines(jsonFile.toPath())
@@ -124,15 +122,15 @@ class JsonEngine : StorageEngine, MultipleEventListener {
 
     override fun update(oldRow: Row, update: UpdateCommand) {
         val jsonFile = JsonEngineSupport.getJsonFile(update.table)
-        val rowId = oldRow.getRowId() as Int
+        val rowId = oldRow.rowId.toInt()
         try {
-            val lines = Files.readAllLines(jsonFile!!.toPath())
+            val lines = Files.readAllLines(jsonFile.toPath())
             val line = lines[rowId]
-            val jsonObject: JSONObject = JSONObject.parseObject(line)
-            update.updateField.forEach { colName, expression ->
+            val jsonNode = line.tree()
+            update.updateField.forEach { (colName, expression) ->
                 val expressionValue = expression.getExpressionValue(oldRow)
-                jsonObject.put(colName, expressionValue.source)
-                val newLine: String = jsonObject.toString()
+                jsonNode.put(colName, expressionValue.source)
+                val newLine = jsonNode.json()
                 lines[rowId] = newLine
                 log.info("update {} to {} ", line, newLine)
             }
@@ -146,7 +144,7 @@ class JsonEngine : StorageEngine, MultipleEventListener {
         val rowId: Long = deletedRow.rowId
         val jsonFile = JsonEngineSupport.getJsonFile(deletedRow.belongTo())
         try {
-            val lines = Files.readAllLines(jsonFile!!.toPath())
+            val lines = Files.readAllLines(jsonFile.toPath())
             lines[rowId.toInt()] = ""
             Files.write(jsonFile.toPath(), lines)
         } catch (e: IOException) {
@@ -154,18 +152,18 @@ class JsonEngine : StorageEngine, MultipleEventListener {
         }
     }
 
-    fun refresh(table: Table?) {
+    override fun refresh(table: Table) {
         log.warn("The json engine dose not refresh manually because in update or delete already refresh")
     }
 
-    private fun fullAllColumnRow(row: InsertRow): JsonNode {
+    private fun fullAllColumnRow(row: InsertRow): ObjectNode {
         val table: Table = row.table
         val jsonObject = jacksonObjectMapper().createObjectNode()
         table.columnList.forEach { col -> jsonObject.putNull(col.name) }
         val insertColumns = row.insertColumns
         val values = row.values
         for (i in values.indices) {
-            jsonObject.putRawValue(insertColumns[i].name, values[i].source)
+            jsonObject.put(insertColumns[i].name, values[i].source)
         }
         return jsonObject
     }
@@ -180,6 +178,25 @@ class JsonEngine : StorageEngine, MultipleEventListener {
 
     override fun listenEvent(): List<Class<out InsightEvent?>> {
         return listOf(DropTableEvent::class.java, DropDatabaseEvent::class.java)
+    }
+
+
+    /**
+     * support put object
+     */
+    private fun ObjectNode.put(key: String, any: Any?) {
+        if (any == null) {
+            this.putNull(key)
+            return
+        }
+        if (any is String) {
+            this.put(key, any)
+            return
+        }
+        if (any is Int) {
+            this.put(key, any)
+            return
+        }
     }
 
 

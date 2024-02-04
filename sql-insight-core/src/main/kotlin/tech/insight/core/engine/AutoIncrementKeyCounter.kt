@@ -13,57 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tech.insight.core.bean
+package tech.insight.core.engine
 
-import tech.insight.core.environment.Session
-import java.io.File
+import tech.insight.core.bean.Database
+import tech.insight.core.bean.InsertRow
+import tech.insight.core.bean.Table
+
 
 /**
+ * every engine that support auto increment should have a counter.
+ * engine allow not support auto increment col.
+ *
  * @author gongxuanzhangmelt@gmail.com
  */
-interface Index {
+interface AutoIncrementKeyCounter {
     /**
-     * before search init method
-     */
-    fun rndInit()
-
-    /**
-     * index id in table.
-     * primary key index always 1.
-     */
-    val id: Int
-
-    /**
-     * which table index belong to
-     */
-    fun belongTo(): Table
-
-    /**
-     * find a cursor from session
+     * before insert row. check data auto increment column value is empty.
+     * if not empty the counter should refresh perhaps.
+     * if value is empty the counter should set a increment value
      *
-     * @return cursor
+     * @param row insert row
+     * @return increment succeed
      */
-    fun find(session: Session): Cursor
+    fun dealAutoIncrement(row: InsertRow): Boolean
 
     /**
-     * index name
+     * reset the counter
      */
-    val name: String
+    fun reset(table: Table)
 
     /**
-     * insert row to index
-     *
-     * @param row row
+     * reset the Database
      */
-    fun insert(row: InsertRow)
-
-    /**
-     * Index file
-     */
-    val file: File
-
-    /**
-     * index relative columns
-     */
-    fun columns(): List<Column>
+    fun reset(database: Database)
 }
