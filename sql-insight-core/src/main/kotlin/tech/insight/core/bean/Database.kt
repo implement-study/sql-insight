@@ -15,6 +15,7 @@
  */
 package tech.insight.core.bean
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import tech.insight.core.environment.DefaultProperty
 import tech.insight.core.environment.GlobalContext
 import java.io.File
@@ -25,6 +26,7 @@ import java.io.File
 class Database(val name: String) {
 
     val dbFolder: File
+        @JsonIgnore
         get() {
             return File(GlobalContext[DefaultProperty.DATA_DIR], name)
         }

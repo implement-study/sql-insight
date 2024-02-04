@@ -27,14 +27,17 @@ const val dropTableDine = "drop table $testDb.$test_table"
 const val dropTableIe = "drop table if exists $testDb.$test_table"
 
 
-fun prepareDatabase(){
+const val insert = "insert into $testDb.$test_table (id,name) values(1,'a'),(2,'b'),(null,'c'),(null,'b'),(null,'c')"
+
+
+fun prepareDatabase() {
     SqlPipeline.doSql(createDatabase)
 }
 
-fun clearDatabase(){
+fun clearDatabase() {
     SqlPipeline.doSql(dropDatabaseIe)
 }
 
-fun prepareTable(){
+fun prepareTable() {
 
 }

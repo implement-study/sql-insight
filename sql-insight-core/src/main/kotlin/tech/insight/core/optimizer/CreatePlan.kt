@@ -1,23 +1,21 @@
 package tech.insight.core.optimizer
 
-import tech.insight.core.annotation.Temporary
 import tech.insight.core.bean.Database
 import tech.insight.core.bean.Table
 import tech.insight.core.command.CreateDatabase
 import tech.insight.core.command.CreateTable
 import tech.insight.core.environment.DefaultProperty
 import tech.insight.core.environment.GlobalContext
+import tech.insight.core.environment.TableLoader
 import tech.insight.core.event.CreateDatabaseEvent
 import tech.insight.core.event.CreateTableEvent
 import tech.insight.core.event.EventPublisher
 import tech.insight.core.exception.DatabaseExistsException
 import tech.insight.core.exception.DatabaseNotExistsException
 import tech.insight.core.exception.TableExistsException
-import tech.insight.core.extension.json
 import tech.insight.core.result.MessageResult
 import tech.insight.core.result.ResultInterface
 import java.io.File
-import java.nio.file.Files
 
 
 /**
@@ -53,8 +51,8 @@ class CreateTablePlan(private val command: CreateTable) : DDLExecutionPlan(comma
         }
         val frmFile = File(dbFolder, "${table.name}.frm")
         if (frmFile.createNewFile()) {
-            Files.write(frmFile.toPath(), tableFrmByteArray())
             table.engine.createTable(table)
+            TableLoader.writeTableMeta(table)
             EventPublisher.publishEvent { CreateTableEvent(table) }
             return MessageResult("success create table ${table.name}")
         }
@@ -64,8 +62,5 @@ class CreateTablePlan(private val command: CreateTable) : DDLExecutionPlan(comma
         return MessageResult("skip the create because table ${table.name} exists")
     }
 
-    @Temporary(detail = "use json temp")
-    private fun tableFrmByteArray(): ByteArray {
-        return table.json().toByteArray()
-    }
+
 }

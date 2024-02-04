@@ -1,10 +1,11 @@
 package tech.insight.core.environment
 
+import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.annotation.Temporary
 import tech.insight.core.bean.Database
 import tech.insight.core.bean.Table
 import tech.insight.core.engine.storage.StorageEngine
-import tech.insight.core.extension.toObject
+import tech.insight.core.extension.SqlInsightConfig
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -32,12 +33,19 @@ object TableLoader {
         return tableList
     }
 
-    @Temporary(detail = "temp use json parse")
-    private fun loadTableMeta(frmFile: File): Table {
-        FileInputStream(frmFile).use { fileInputStream ->
-            return fileInputStream.toObject<Table>()
-        }
+    public fun loadTableMeta(frmFile: File): Table {
+        val frmBytes = FileInputStream(frmFile).readAllBytes()
+        val buffer = DynamicByteBuffer.wrap(frmBytes, SqlInsightConfig)
+        return buffer.getObject(Table::class.java)
     }
+
+    fun writeTableMeta(table: Table) {
+        val frm = File(table.database.dbFolder, "${table.name}.frm")
+        val buffer = DynamicByteBuffer.allocate(SqlInsightConfig)
+        buffer.appendObject(table)
+        frm.writeBytes(buffer.toBytes())
+    }
+
 }
 
 
@@ -75,7 +83,7 @@ object EngineLoader {
             val engineNameArray = engineNames.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             for (name in engineNameArray) {
                 if (name.isEmpty()) {
-                   continue
+                    continue
                 }
                 engineList.add(reflectEngine(name))
             }

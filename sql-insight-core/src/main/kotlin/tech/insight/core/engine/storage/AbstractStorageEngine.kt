@@ -32,7 +32,7 @@ abstract class AbstractStorageEngine : StorageEngine {
     }
 
     override fun openTable(table: Table) {
-
+        //   open table default nothing
     }
 
     override fun createTable(table: Table): ResultInterface {
@@ -55,5 +55,7 @@ abstract class AbstractStorageEngine : StorageEngine {
         throw UnsupportedOperationException()
     }
 
-    override fun refresh(table: Table) {}
+    override fun refresh(table: Table) {
+        //  refresh default nothing
+    }
 }

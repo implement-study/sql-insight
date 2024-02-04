@@ -1,6 +1,7 @@
 package tech.insight.core.optimizer
 
 import tech.insight.core.command.DDLCommand
+import tech.insight.core.command.DMLCommand
 import tech.insight.core.result.ResultInterface
 
 
@@ -21,3 +22,6 @@ interface ExecutionPlan {
 
 
 abstract class DDLExecutionPlan(val ddlCommand: DDLCommand) : ExecutionPlan
+
+
+abstract class DMLExecutionPlan(val dmlCommand: DMLCommand) : ExecutionPlan

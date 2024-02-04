@@ -138,17 +138,16 @@ class DeleteFiller : BaseFiller<DeleteCommand>() {
 
 class InsertFiller : BaseFiller<InsertCommand>() {
 
-    lateinit var table: Table
 
     override fun visit(x: SQLInsertStatement): Boolean {
         val columnVisitor = ColumnVisitor()
+        //  table source accept must before column accept
+        x.tableSource.accept(TableNameVisitor { databaseName, tableName ->
+            command.table = TableManager.require(databaseName, tableName)
+        })
         x.columns.forEach { it.accept(columnVisitor) }
         val valueVisitor = ValuesClauseVisitor()
         x.valuesList.forEach { it.accept(valueVisitor) }
-        x.tableSource.accept(TableNameVisitor { databaseName, tableName ->
-            command.table = TableManager.select(databaseName, tableName)!!
-            this.table = command.table
-        })
         return true
     }
 
@@ -164,7 +163,7 @@ class InsertFiller : BaseFiller<InsertCommand>() {
                 throw InsertException(rowIndex, "Column count doesn't match value count")
             }
             val row = InsertRow(command.insertColumns, rowIndex++)
-            row.table = table
+            row.table = command.table
             command.insertRows.add(row)
             x.accept(InsertRowFiller(row))
         }
@@ -178,7 +177,7 @@ class InsertFiller : BaseFiller<InsertCommand>() {
             if (!rowNameSet.add(colName)) {
                 throw InsertException("Column $colName specified twice")
             }
-            command.insertColumns.add(table.getColumnByName(colName))
+            command.insertColumns.add(command.table.getColumnByName(colName))
         }
     }
 

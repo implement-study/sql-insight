@@ -15,6 +15,7 @@
  */
 package tech.insight.core.bean
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import tech.insight.core.engine.storage.StorageEngine
 import tech.insight.core.exception.UnknownColumnException
 
@@ -30,6 +31,7 @@ class Table : SQLBean {
     lateinit var engine: StorageEngine
     var comment: String = ""
     val databaseName: String
+        @JsonIgnore
         get() {
             return database.name
         }

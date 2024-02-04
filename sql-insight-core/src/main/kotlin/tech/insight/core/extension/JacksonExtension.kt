@@ -1,6 +1,7 @@
 package tech.insight.core.extension
 
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
@@ -27,7 +28,7 @@ inline fun <reified T> String.toObject(): T {
     return mapper.readValue(this, T::class.java)
 }
 
-fun String.toTree(): ObjectNode {
+fun String.tree(): ObjectNode {
     return mapper.readValue(this, ObjectNode::class.java)
 }
 

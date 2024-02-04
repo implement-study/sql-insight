@@ -22,6 +22,5 @@ import tech.insight.core.bean.Column
  * @author gongxuanzhangmelt@gmail.com
  */
 class DataTooLongException(override val message: String) : SqlInsightException(message) {
-    //  todo at row 1
     constructor(col: Column) : this("Data too long for column '${col.name}'")
 }
