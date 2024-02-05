@@ -1,6 +1,7 @@
 package tech.insight.core
 
 import tech.insight.core.engine.SqlPipeline
+import kotlin.random.Random
 
 
 const val testDb = "test_db"
@@ -29,6 +30,9 @@ const val dropTableIe = "drop table if exists $testDb.$test_table"
 
 const val insert = "insert into $testDb.$test_table (id,name) values(1,'a'),(2,'b'),(null,'c'),(null,'b'),(null,'c')"
 
+val largeValue = (1..1000).joinToString(",") { "('${StringGenerator.generatorRandomString(10)}')" }
+
+val largeInsert = "insert into $testDb.$test_table (name) values $largeValue"
 
 fun prepareDatabase() {
     SqlPipeline.doSql(createDatabase)
@@ -40,4 +44,15 @@ fun clearDatabase() {
 
 fun prepareTable() {
 
+}
+
+
+object StringGenerator {
+    fun generatorRandomString(length: Int): String {
+        val charPool = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+        return (1..length)
+            .map { Random.nextInt(0, charPool.size) }
+            .map(charPool::get)
+            .joinToString("")
+    }
 }

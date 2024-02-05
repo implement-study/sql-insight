@@ -7,9 +7,11 @@ package tech.insight.core.bean
 interface SQLBean {
     /**
      * after fill field by filler.
+     *
      * if SqlBean is illegal
+     *
      */
     fun checkMyself() {
-        // check your self if necessary
+        // check or adjust field your self if necessary
     }
 }

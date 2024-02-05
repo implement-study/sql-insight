@@ -1,5 +1,6 @@
 package tech.insight.core.engine.filler
 
+import com.alibaba.druid.sql.ast.SQLObject
 import com.alibaba.druid.sql.ast.expr.SQLCharExpr
 import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr
 import com.alibaba.druid.sql.ast.expr.SQLNullExpr
@@ -16,33 +17,50 @@ import tech.insight.core.exception.InsertException
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-class InsertRowFiller(private var row: InsertRow) : BeanFiller<InsertRow> {
+class InsertRowFiller(private val insertColumn: List<Column>, private val row: InsertRow) : BeanFiller<InsertRow> {
+    private var currentIndex = 0
 
-    override fun endVisit(x: SQLIntegerExpr) {
+    init {
+        val columnList = row.belongTo().columnList
+        columnList.map { it.defaultValue }.forEach { row.valueList.add(it) }
+    }
+
+    override fun visit(x: SQLIntegerExpr): Boolean {
         val value = x.number.toInt()
         val currentType = currentColumn().dataType
         if (currentType != DataType.INT) {
             throw InsertException(row.rowId, "number $value can't cast to $currentType")
         }
-        row.valueList.add(ValueInt(value))
+        row.valueList[currentColumnIndex()] = ValueInt(value)
+        return true
     }
 
-    override fun endVisit(x: SQLCharExpr) {
+    override fun visit(x: SQLCharExpr): Boolean {
         val text = x.text
         val column = currentColumn()
         when (val colType = column.dataType) {
-            DataType.VARCHAR -> row.valueList.add(wrapVarchar(text))
-            DataType.CHAR -> row.valueList.add(wrapChar(text))
+            DataType.VARCHAR -> row.valueList[currentColumnIndex()] =wrapVarchar(text)
+            DataType.CHAR -> row.valueList[currentColumnIndex()] = wrapChar(text)
             else -> throw InsertException(row.rowId, "$text can't cast to $colType")
         }
+        return true
     }
 
-    override fun endVisit(x: SQLNullExpr) {
-        row.valueList.add(ValueNull)
+    override fun visit(x: SQLNullExpr): Boolean {
+        row.valueList[currentColumnIndex()] = ValueNull
+        return true
+    }
+
+    override fun postVisit(x: SQLObject?) {
+        currentIndex++
     }
 
     private fun currentColumn(): Column {
-        return row.insertColumns[row.valueList.size]
+        return insertColumn[currentIndex]
+    }
+
+    private fun currentColumnIndex(): Int {
+        return row.belongTo().getColumnIndexByName(currentColumn().name)
     }
 
 

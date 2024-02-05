@@ -36,7 +36,9 @@ class Table : SQLBean {
             return database.name
         }
 
-    //  support operator
+    /**
+     * support operator
+     */
     val ext = TableExt()
     fun getColumnIndexByName(colName: String): Int {
         return ext.columnIndex[colName] ?: throw UnknownColumnException(colName)
@@ -48,7 +50,43 @@ class Table : SQLBean {
 
 
     override fun checkMyself() {
-        TODO("Not yet implemented")
+        this.columnList.forEachIndexed { index, col ->
+            col.checkMyself()
+            ext.columnMap[col.name] = col
+            ext.columnIndex[col.name] = index
+            if (col.primaryKey) {
+                this.ext.primaryKeyIndex = index
+                this.ext.primaryKeyName = col.name
+            }
+            if (col.autoIncrement) {
+                require(ext.autoColIndex == -1) { "auto increment column can have at most one" }
+                ext.autoColIndex = index
+            }
+            if (col.notNull) {
+                ext.notNullIndex.add(index)
+            } else {
+                ext.nullableColCount++
+            }
+            if (col.variable) {
+                ext.variableIndex.add(index)
+            }
+        }
     }
 
+}
+
+
+class TableExt {
+    val columnMap: MutableMap<String, Column> = HashMap()
+    val columnIndex: MutableMap<String, Int> = HashMap()
+
+    /**
+     * not null column index list
+     */
+    val notNullIndex: MutableList<Int> = ArrayList()
+    val variableIndex: MutableList<Int> = ArrayList()
+    var autoColIndex = -1
+    var primaryKeyIndex = -1
+    var nullableColCount = 0
+    var primaryKeyName: String? = null
 }

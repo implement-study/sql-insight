@@ -157,14 +157,9 @@ class JsonEngine : StorageEngine, MultipleEventListener {
     }
 
     private fun fullAllColumnRow(row: InsertRow): ObjectNode {
-        val table: Table = row.table
         val jsonObject = jacksonObjectMapper().createObjectNode()
-        table.columnList.forEach { col -> jsonObject.putNull(col.name) }
-        val insertColumns = row.insertColumns
         val values = row.values
-        for (i in values.indices) {
-            jsonObject.put(insertColumns[i].name, values[i].source)
-        }
+        row.table.columnList.forEachIndexed { index, column -> jsonObject.put(column.name, values[index].source) }
         return jsonObject
     }
 

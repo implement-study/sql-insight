@@ -1,5 +1,6 @@
 package tech.insight.core.optimizer
 
+import tech.insight.core.bean.Table
 import tech.insight.core.command.InsertCommand
 import tech.insight.core.engine.storage.StorageEngine
 import tech.insight.core.result.MessageResult
@@ -11,11 +12,12 @@ import tech.insight.core.result.ResultInterface
  **/
 class InsertPlan(private val command: InsertCommand) : DMLExecutionPlan(command) {
     private val engine: StorageEngine = command.table.engine
+    private val table: Table = command.table
     override val originalSql: String
         get() = command.sql
 
     override fun run(): ResultInterface {
-        TODO("index open the table and init auto increment count ")
+        engine.openTable(table)
         command.insertRows.forEach { engine.insertRow(it) }
         return MessageResult("insert ${command.insertRows.size} rows")
     }

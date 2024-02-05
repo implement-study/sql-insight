@@ -14,12 +14,21 @@ import tech.insight.core.bean.condition.Expression
 sealed interface Command {
     val statement: SQLObject
     val sql: String
+
 }
 
 
-sealed class DDLCommand(override val sql: String, override val statement: SQLStatement) : Command
+sealed class DDLCommand(override val sql: String, override val statement: SQLStatement) : Command {
+    override fun toString(): String {
+        return sql
+    }
+}
 
-sealed class DMLCommand(override val sql: String, override val statement: SQLObject) : Command
+sealed class DMLCommand(override val sql: String, override val statement: SQLObject) : Command {
+    override fun toString(): String {
+        return sql
+    }
+}
 
 sealed class CreateCommand(sql: String, statement: SQLStatement) : DDLCommand(sql, statement)
 sealed class DropCommand(sql: String, statement: SQLStatement) : DDLCommand(sql, statement)
@@ -28,6 +37,7 @@ sealed class AlterCommand(sql: String, statement: SQLStatement) : DDLCommand(sql
 class CreateDatabase(sql: String, statement: SQLCreateDatabaseStatement) : CreateCommand(sql, statement) {
     var ifNotExists = false
     lateinit var dbName: String
+
 }
 
 class CreateTable(sql: String, statement: SQLCreateTableStatement) : CreateCommand(sql, statement) {

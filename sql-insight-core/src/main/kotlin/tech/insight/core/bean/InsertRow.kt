@@ -21,49 +21,23 @@ import tech.insight.core.bean.value.ValueNull
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class InsertRow(val insertColumns: List<Column>, override val rowId: Long) : Row, SQLBean,
-    Iterable<InsertItem> {
+class InsertRow(override val rowId: Long) : Row, SQLBean, Iterable<InsertItem> {
     lateinit var table: Table
-    val valueList: MutableList<Value<*>> = ArrayList()
-
     /**
-     * all table column value
+     * all table column value，not just columns in SQL
      */
-    private val absoluteValueList: MutableList<Value<*>> = ArrayList()
+    val valueList: MutableList<Value<*>> = ArrayList()
 
     override val values: MutableList<Value<*>>
         get() = valueList
 
     override fun getValueByColumnName(colName: String): Value<*> {
         val index = table.getColumnIndexByName(colName)
-        return getAbsoluteValueList()[index]
+        return valueList[index]
     }
 
     override fun belongTo(): Table {
         return table
-    }
-
-
-    /**
-     * return current visit values target column.
-     * use before current add.
-     */
-    private fun currentColumn(): Column {
-        return insertColumns[valueList.size]
-    }
-
-    private fun getAbsoluteValueList(): List<Value<*>> {
-        if (absoluteValueList.isEmpty()) {
-            for (i in 0 until table.columnList.size) {
-                absoluteValueList.add(ValueNull)
-            }
-            for (i in insertColumns.indices) {
-                val current = insertColumns[i]
-                val columnIndexByName = table.getColumnIndexByName(current.name)
-                absoluteValueList[columnIndexByName] = valueList[i]
-            }
-        }
-        return absoluteValueList
     }
 
     override fun iterator(): Iterator<InsertItem> {
@@ -73,16 +47,16 @@ class InsertRow(val insertColumns: List<Column>, override val rowId: Long) : Row
     private inner class Iter : Iterator<InsertItem> {
         var cursor = 0
         override fun hasNext(): Boolean {
-            return cursor != absoluteValueList.size
+            return cursor != valueList.size
         }
 
         override fun next(): InsertItem {
             val i = cursor
-            if (i >= absoluteValueList.size) {
+            if (i >= valueList.size) {
                 throw NoSuchElementException()
             }
             cursor = i + 1
-            return InsertItem(table.columnList[i], absoluteValueList[i])
+            return InsertItem(table.columnList[i], valueList[i])
         }
     }
 
