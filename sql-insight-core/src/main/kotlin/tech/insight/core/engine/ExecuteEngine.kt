@@ -1,7 +1,7 @@
 package tech.insight.core.engine
 
 import tech.insight.core.extension.slf4j
-import tech.insight.core.optimizer.ExecutionPlan
+import tech.insight.core.plan.ExecutionPlan
 import tech.insight.core.result.ExceptionResult
 import tech.insight.core.result.ResultInterface
 

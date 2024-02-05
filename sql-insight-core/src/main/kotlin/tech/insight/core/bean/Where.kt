@@ -16,6 +16,7 @@
 package tech.insight.core.bean
 
 import tech.insight.core.bean.condition.BooleanExpression
+import tech.insight.core.bean.condition.Expression
 import tech.insight.core.bean.value.Value
 import tech.insight.core.bean.value.ValueBoolean
 import tech.insight.core.bean.value.ValueFalse
@@ -24,9 +25,9 @@ import tech.insight.core.bean.value.ValueTrue
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-open class Where(private val condition: BooleanExpression) : BooleanExpression {
+open class Where(private val condition: Expression) : BooleanExpression {
 
-    private lateinit var table: Table
+     lateinit var table: Table
 
     override fun getExpressionValue(row: Row): ValueBoolean {
         return ValueBoolean(condition.getBooleanValue(row))

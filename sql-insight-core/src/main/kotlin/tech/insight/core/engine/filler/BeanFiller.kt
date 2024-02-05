@@ -1,10 +1,14 @@
 package tech.insight.core.engine.filler
 
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr
+import com.alibaba.druid.sql.ast.expr.SQLBooleanExpr
 import com.alibaba.druid.sql.ast.expr.SQLCharExpr
+import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr
 import com.alibaba.druid.sql.visitor.SQLASTVisitor
-import tech.insight.core.bean.SQLBean
-import tech.insight.core.environment.EngineManager
+import tech.insight.core.bean.*
+import tech.insight.core.bean.condition.BooleanExpression
 import tech.insight.core.engine.storage.StorageEngine
+import tech.insight.core.environment.EngineManager
 
 
 interface BeanFiller<in B : SQLBean> : SQLASTVisitor
@@ -20,6 +24,28 @@ class EngineVisitor(private val engineAction: (StorageEngine) -> Unit) : SQLASTV
     override fun endVisit(x: SQLCharExpr) {
         val engine = EngineManager.selectEngine(x.text)
         engineAction.invoke(engine)
+    }
+}
+
+
+class WhereVisitor(private val whereAction: (Where) -> Unit) : SQLASTVisitor {
+    override fun visit(x: SQLBinaryOpExpr): Boolean {
+        val visitor = ExpressionVisitor()
+        x.accept(visitor)
+        whereAction.invoke(Where(visitor.expression))
+        return false
+    }
+
+    override fun visit(x: SQLBooleanExpr): Boolean {
+        val where = if (x.booleanValue) Always else Never
+        whereAction.invoke(where)
+        return false
+    }
+
+    override fun visit(x: SQLIntegerExpr): Boolean {
+        val where = if (x.number.toInt() != 0) Always else Never
+        whereAction.invoke(where)
+        return false
     }
 }
 

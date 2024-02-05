@@ -34,6 +34,12 @@ val largeValue = (1..1000).joinToString(",") { "('${StringGenerator.generatorRan
 
 val largeInsert = "insert into $testDb.$test_table (name) values $largeValue"
 
+
+const val deleteRemain1 = "delete from $testDb.$test_table where id>1"
+
+const val deleteRemain100 = "delete from $testDb.$test_table where id>100"
+
+
 fun prepareDatabase() {
     SqlPipeline.doSql(createDatabase)
 }

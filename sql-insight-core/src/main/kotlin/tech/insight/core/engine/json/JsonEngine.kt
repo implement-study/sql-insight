@@ -29,15 +29,15 @@ import tech.insight.core.event.InsightEvent
 import tech.insight.core.event.MultipleEventListener
 import tech.insight.core.exception.CreateTableException
 import tech.insight.core.exception.InsertException
-import tech.insight.core.exception.RuntimeIoException
+import tech.insight.core.exception.TableDontOpenException
 import tech.insight.core.extension.json
 import tech.insight.core.extension.slf4j
 import tech.insight.core.extension.tree
 import tech.insight.core.result.MessageResult
 import tech.insight.core.result.ResultInterface
 import java.io.File
-import java.io.IOException
 import java.nio.file.Files
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -48,6 +48,7 @@ class JsonEngine : StorageEngine, MultipleEventListener {
     companion object {
         const val MIN_PRIMARY_KEY = 1
         const val MAX_PRIMARY_KEY = 10000
+        val tableCache: MutableMap<String, MutableList<String>> = ConcurrentHashMap()
     }
 
     private val counter = JsonIncrementKeyCounter
@@ -64,6 +65,11 @@ class JsonEngine : StorageEngine, MultipleEventListener {
         }
         val jsonPkIndex = JsonPkIndex(table)
         table.indexList.add(jsonPkIndex)
+        tableCache.computeIfAbsent(table.name){
+            val jsonFile = JsonEngineSupport.getJsonFile(table)
+            jsonFile.readLines().toMutableList()
+        }
+
     }
 
     override fun createTable(table: Table): ResultInterface {
@@ -106,60 +112,51 @@ class JsonEngine : StorageEngine, MultipleEventListener {
         if (MAX_PRIMARY_KEY < insertPrimaryKey || insertPrimaryKey < MIN_PRIMARY_KEY) {
             throw InsertException("engine json primary key must between $MIN_PRIMARY_KEY and $MAX_PRIMARY_KEY")
         }
-        try {
-            val lines = Files.readAllLines(jsonFile.toPath())
-            val currentLine = lines[insertPrimaryKey]
-            if (currentLine.isNotEmpty()) {
-                throw InsertException(String.format("Duplicate entry '%s' for key 'PRIMARY'", insertPrimaryKey))
-            }
-            lines[insertPrimaryKey] = jsonObject.toString()
-            log.info("insert {} to table [{}] ", jsonObject, row.table.name)
-            Files.write(jsonFile.toPath(), lines)
-        } catch (e: IOException) {
-            throw RuntimeIoException(e)
+        val lines = getLinesCache(row.belongTo())
+        val currentLine = lines[insertPrimaryKey]
+        if (currentLine.isNotEmpty()) {
+            throw InsertException(String.format("Duplicate entry '%s' for key 'PRIMARY'", insertPrimaryKey))
         }
+        lines[insertPrimaryKey] = jsonObject.toString()
+        log.info("insert {} to table [{}] ", jsonObject, row.table.name)
+        Files.write(jsonFile.toPath(), lines)
     }
 
     override fun update(oldRow: Row, update: UpdateCommand) {
-        val jsonFile = JsonEngineSupport.getJsonFile(update.table)
+        val lines = getLinesCache(update.table)
         val rowId = oldRow.rowId.toInt()
-        try {
-            val lines = Files.readAllLines(jsonFile.toPath())
-            val line = lines[rowId]
-            val jsonNode = line.tree()
-            update.updateField.forEach { (colName, expression) ->
-                val expressionValue = expression.getExpressionValue(oldRow)
-                jsonNode.put(colName, expressionValue.source)
-                val newLine = jsonNode.json()
-                lines[rowId] = newLine
-                log.info("update {} to {} ", line, newLine)
-            }
-            Files.write(jsonFile.toPath(), lines)
-        } catch (e: IOException) {
-            throw RuntimeIoException(e)
+        val line = lines[rowId]
+        val jsonNode = line.tree()
+        update.updateField.forEach { (colName, expression) ->
+            val expressionValue = expression.getExpressionValue(oldRow)
+            jsonNode.put(colName, expressionValue.source)
+            val newLine = jsonNode.json()
+            lines[rowId] = newLine
+            log.info("update {} to {} ", line, newLine)
         }
     }
 
     override fun delete(deletedRow: Row) {
         val rowId: Long = deletedRow.rowId
-        val jsonFile = JsonEngineSupport.getJsonFile(deletedRow.belongTo())
-        try {
-            val lines = Files.readAllLines(jsonFile.toPath())
-            lines[rowId.toInt()] = ""
-            Files.write(jsonFile.toPath(), lines)
-        } catch (e: IOException) {
-            throw RuntimeIoException(e)
-        }
+        val lines = getLinesCache(deletedRow.belongTo())
+        lines[rowId.toInt()] = ""
     }
 
     override fun refresh(table: Table) {
-        log.warn("The json engine dose not refresh manually because in update or delete already refresh")
+        val lines = tableCache[table.name]
+        Files.write(JsonEngineSupport.getJsonFile(table).toPath(), lines)
+    }
+
+    private fun getLinesCache(table: Table): MutableList<String> {
+        return tableCache[table.name] ?: throw TableDontOpenException(table)
     }
 
     private fun fullAllColumnRow(row: InsertRow): ObjectNode {
         val jsonObject = jacksonObjectMapper().createObjectNode()
         val values = row.values
-        row.table.columnList.forEachIndexed { index, column -> jsonObject.put(column.name, values[index].source) }
+        row.table.columnList.forEachIndexed { index, column ->
+            jsonObject.put(column.name, values[index].source)
+        }
         return jsonObject
     }
 
@@ -180,7 +177,7 @@ class JsonEngine : StorageEngine, MultipleEventListener {
      * support put object
      */
     private fun ObjectNode.put(key: String, any: Any?) {
-        if (any == null) {
+        if (any == null || any is Unit) {
             this.putNull(key)
             return
         }

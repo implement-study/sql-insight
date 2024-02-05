@@ -17,9 +17,7 @@ package tech.insight.core.engine.json
 
 import tech.insight.core.bean.*
 import tech.insight.core.environment.Session
-import tech.insight.core.exception.RuntimeIoException
 import java.io.File
-import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -28,7 +26,7 @@ import java.nio.file.Path
  */
 class JsonPkIndex(private val table: Table) : Index {
 
-    private var jsonFilePath: Path? = null
+    private lateinit var jsonFilePath: Path
 
 
     override fun rndInit() {
@@ -43,12 +41,8 @@ class JsonPkIndex(private val table: Table) : Index {
     }
 
     override fun find(session: Session): Cursor {
-        return try {
-            val reader = Files.newBufferedReader(jsonFilePath)
-            JsonCursor(reader, session, this)
-        } catch (e: IOException) {
-            throw RuntimeIoException(e)
-        }
+        val reader = Files.newBufferedReader(jsonFilePath)
+        return JsonCursor(reader, session, this)
     }
 
     override val name: String

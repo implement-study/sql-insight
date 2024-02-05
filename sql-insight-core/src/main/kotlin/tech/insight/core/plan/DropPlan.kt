@@ -1,4 +1,4 @@
-package tech.insight.core.optimizer
+package tech.insight.core.plan
 
 import tech.insight.core.bean.Table
 import tech.insight.core.command.DropDatabase

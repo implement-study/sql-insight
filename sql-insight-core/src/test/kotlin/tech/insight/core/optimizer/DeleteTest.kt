@@ -13,7 +13,7 @@ import tech.insight.core.environment.TableManager
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-class InsertTest {
+class DeleteTest {
 
 
     @BeforeEach
@@ -23,29 +23,38 @@ class InsertTest {
     }
 
     @Test
-    fun deleteRow() {
+    fun insertRow() {
         ExecutePlanTest().createTableTest()
         SqlPipeline.doSql(insert)
-        SqlPipeline.doSql(deleteRemain1)
         val table = TableManager.require(testDb, test_table)
         val jsonFile = JsonEngineSupport.getJsonFile(table)
         jsonFile.useLines {
-            assertEquals(1, it.filter { line -> line.isNotEmpty() }.count())
+            assertEquals(5, it.filter { line -> line.isNotEmpty() }.count())
         }
     }
 
 
     @Test
-    fun deleteLargeInsertTest() {
+    fun largeInsertTest() {
         ExecutePlanTest().createTableTest()
         SqlPipeline.doSql(largeInsert)
-        SqlPipeline.doSql(deleteRemain100)
         val table = TableManager.require(testDb, test_table)
         val jsonFile = JsonEngineSupport.getJsonFile(table)
         jsonFile.useLines {
-            assertEquals(100, it.filter { line -> line.isNotEmpty() }.count())
+            assertEquals(1000, it.filter { line -> line.isNotEmpty() }.count())
         }
     }
 
+    @Test
+    fun twoTimeInsertTest() {
+        ExecutePlanTest().createTableTest()
+        SqlPipeline.doSql(largeInsert)
+        SqlPipeline.doSql(largeInsert)
+        val table = TableManager.require(testDb, test_table)
+        val jsonFile = JsonEngineSupport.getJsonFile(table)
+        jsonFile.useLines {
+            assertEquals(2000, it.filter { line -> line.isNotEmpty() }.count())
+        }
+    }
 
 }

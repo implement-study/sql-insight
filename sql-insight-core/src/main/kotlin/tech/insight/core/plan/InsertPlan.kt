@@ -1,4 +1,4 @@
-package tech.insight.core.optimizer
+package tech.insight.core.plan
 
 import tech.insight.core.bean.Table
 import tech.insight.core.command.InsertCommand
@@ -19,6 +19,7 @@ class InsertPlan(private val command: InsertCommand) : DMLExecutionPlan(command)
     override fun run(): ResultInterface {
         engine.openTable(table)
         command.insertRows.forEach { engine.insertRow(it) }
+        engine.refresh(table)
         return MessageResult("insert ${command.insertRows.size} rows")
     }
 

@@ -18,10 +18,9 @@ package tech.insight.core.engine.json
 import tech.insight.core.bean.Cursor
 import tech.insight.core.bean.Row
 import tech.insight.core.environment.Session
-import tech.insight.core.exception.RuntimeIoException
 import tech.insight.core.extension.tree
 import java.io.BufferedReader
-import java.io.IOException
+import java.io.File
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -29,25 +28,27 @@ import java.io.IOException
 class JsonCursor(private val reader: BufferedReader, private val session: Session, private val index: JsonPkIndex) :
     Cursor {
     private var current: Row? = null
-
+    private var count = 0
 
     override fun hasNext(): Boolean {
         if (current != null) {
             return true
         }
-        try {
-            while (true) {
+        while (true) {
+            try {
+                println(count++)
                 val line = reader.readLine() ?: return false
                 if (line.isEmpty()) {
                     continue
                 }
                 current = JsonEngineSupport.getPhysicRowFromJson(line.tree(), index.belongTo())
                 return true
+            } catch (e: Exception) {
+                throw e
             }
-        } catch (e: IOException) {
-            throw RuntimeIoException(e)
         }
     }
+
 
     override fun next(): Row {
         if (current == null) {

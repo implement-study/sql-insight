@@ -1,7 +1,7 @@
 package tech.insight.core.engine
 
 import tech.insight.core.command.*
-import tech.insight.core.optimizer.*
+import tech.insight.core.plan.*
 
 
 /**
@@ -34,7 +34,7 @@ object OptimizerImpl : Optimizer {
             is CreateTable -> CreateTablePlan(command)
             is DropDatabase -> DropDatabasePlan(command)
             is DropTable -> DropTablePlan(command)
-            is DeleteCommand -> TODO()
+            is DeleteCommand -> DeletePlan(command)
             is InsertCommand -> InsertPlan(command)
             is SelectCommand -> TODO()
             is UpdateCommand -> TODO()

@@ -18,6 +18,7 @@ import tech.insight.core.exception.InsertException
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 class InsertRowFiller(private val insertColumn: List<Column>, private val row: InsertRow) : BeanFiller<InsertRow> {
+
     private var currentIndex = 0
 
     init {
@@ -39,7 +40,7 @@ class InsertRowFiller(private val insertColumn: List<Column>, private val row: I
         val text = x.text
         val column = currentColumn()
         when (val colType = column.dataType) {
-            DataType.VARCHAR -> row.valueList[currentColumnIndex()] =wrapVarchar(text)
+            DataType.VARCHAR -> row.valueList[currentColumnIndex()] = wrapVarchar(text)
             DataType.CHAR -> row.valueList[currentColumnIndex()] = wrapChar(text)
             else -> throw InsertException(row.rowId, "$text can't cast to $colType")
         }

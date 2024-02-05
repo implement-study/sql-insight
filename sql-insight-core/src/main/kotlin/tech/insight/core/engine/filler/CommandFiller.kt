@@ -130,10 +130,14 @@ class DropTableFiller : BaseFiller<DropTable>() {
 
 class DeleteFiller : BaseFiller<DeleteCommand>() {
     override fun visit(x: SQLDeleteStatement): Boolean {
+        x.where.accept(WhereVisitor {
+            command.where = it
+        })
         x.tableSource.accept(TableSelectVisitor(true) {
             command.table = it!!
+            command.where.table = it
         })
-        TODO("fill the where")
+        return false
     }
 }
 
@@ -166,7 +170,7 @@ class InsertFiller : BaseFiller<InsertCommand>() {
             val row = InsertRow(rowIndex++)
             row.table = command.table
             command.insertRows.add(row)
-            x.accept(InsertRowFiller(command.insertColumns,row))
+            x.accept(InsertRowFiller(command.insertColumns, row))
             row.checkMyself()
         }
     }
