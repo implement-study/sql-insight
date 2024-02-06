@@ -37,7 +37,7 @@ object OptimizerImpl : Optimizer {
             is DeleteCommand -> DeletePlan(command)
             is InsertCommand -> InsertPlan(command)
             is SelectCommand -> TODO()
-            is UpdateCommand -> TODO()
+            is UpdateCommand -> UpdatePlan(command)
             else -> throw UnsupportedOperationException("dont support explain " + command.sql)
         }
 

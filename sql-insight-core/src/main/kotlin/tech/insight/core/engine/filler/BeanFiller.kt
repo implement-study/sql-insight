@@ -6,7 +6,6 @@ import com.alibaba.druid.sql.ast.expr.SQLCharExpr
 import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr
 import com.alibaba.druid.sql.visitor.SQLASTVisitor
 import tech.insight.core.bean.*
-import tech.insight.core.bean.condition.BooleanExpression
 import tech.insight.core.engine.storage.StorageEngine
 import tech.insight.core.environment.EngineManager
 
@@ -30,9 +29,8 @@ class EngineVisitor(private val engineAction: (StorageEngine) -> Unit) : SQLASTV
 
 class WhereVisitor(private val whereAction: (Where) -> Unit) : SQLASTVisitor {
     override fun visit(x: SQLBinaryOpExpr): Boolean {
-        val visitor = ExpressionVisitor()
+        val visitor = ExpressionVisitor { whereAction.invoke(Where(it)) }
         x.accept(visitor)
-        whereAction.invoke(Where(visitor.expression))
         return false
     }
 

@@ -25,9 +25,9 @@ import tech.insight.core.bean.condition.*
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-class ExpressionVisitor : SQLASTVisitor {
+class ExpressionVisitor(private val expressionAction: (Expression) -> Unit = {}) : SQLASTVisitor {
 
-    lateinit var expression: Expression
+    private lateinit var expression: Expression
 
 
     override fun visit(x: SQLBinaryOpExpr): Boolean {
@@ -52,26 +52,31 @@ class ExpressionVisitor : SQLASTVisitor {
             Divide -> DivideExpression(left, right)
             else -> throw UnsupportedOperationException("operator [" + x.operator + "] not support")
         }
+        expressionAction.invoke(expression)
         return false
     }
 
     override fun visit(x: SQLIntegerExpr): Boolean {
         expression = IntExpression(x.number.toInt())
+        expressionAction.invoke(expression)
         return false
     }
 
     override fun visit(x: SQLIdentifierExpr): Boolean {
         expression = IdentifierExpression(x.name)
+        expressionAction.invoke(expression)
         return false
     }
 
     override fun visit(x: SQLCharExpr): Boolean {
         expression = StringExpression(x.text)
+        expressionAction.invoke(expression)
         return false
     }
 
     override fun visit(x: SQLPropertyExpr): Boolean {
         expression = IdentifierExpression(x.toString())
+        expressionAction.invoke(expression)
         return false
     }
 

@@ -4,9 +4,13 @@ import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr
 import com.alibaba.druid.sql.ast.statement.*
 import com.alibaba.druid.sql.ast.statement.SQLInsertStatement.ValuesClause
 import com.alibaba.druid.sql.visitor.SQLASTVisitor
+import tech.insight.core.bean.Column
+import tech.insight.core.bean.ExpressionVisitor
 import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Table
 import tech.insight.core.command.*
+import tech.insight.core.environment.DatabaseManager
+import tech.insight.core.environment.EngineManager
 import tech.insight.core.environment.TableManager
 import tech.insight.core.exception.InsertException
 
@@ -101,8 +105,43 @@ class CreateTableFiller : BaseFiller<CreateTable>() {
 
     override fun endVisit(x: SQLCreateTableStatement) {
         command.ifNotExists = x.isIfNotExists
-        x.accept(TableFiller(command.table))
-        command.table.checkMyself()
+        x.accept(TableCreateFiller { command.table = it })
+    }
+
+    inner class TableCreateFiller(private val tableAction: (Table) -> Unit) : BeanFiller<Table> {
+        val table: Table = Table()
+
+        override fun visit(x: SQLColumnDefinition): Boolean {
+            val column = Column()
+            x.accept(ColumnFiller(column))
+            table.columnList.add(column)
+            return true
+        }
+
+
+        override fun visit(x: SQLCreateTableStatement): Boolean {
+            x.comment?.accept(CommentVisitor { table.comment = it })
+            if (x.engine == null) {
+                table.engine = EngineManager.selectEngine(null)
+                return true
+            }
+            x.engine.accept(EngineVisitor { table.engine = it })
+            return true
+        }
+
+        override fun endVisit(x: SQLCreateTableStatement?) {
+            table.checkMyself()
+            tableAction.invoke(table)
+        }
+
+        override fun visit(x: SQLExprTableSource): Boolean {
+            x.accept(TableNameVisitor { databaseName, tableName ->
+                table.database = DatabaseManager.require(databaseName)
+                table.name = tableName
+            })
+            return true
+        }
+
     }
 }
 
@@ -196,4 +235,26 @@ class SelectFiller : BaseFiller<SelectCommand>() {
 
 class UpdateFiller : BaseFiller<UpdateCommand>() {
 
+    override fun fill(command: UpdateCommand) {
+        command.table = Table()
+        super.fill(command)
+    }
+
+    override fun visit(x: SQLUpdateStatement): Boolean {
+        x.tableSource.accept(TableSelectVisitor(true) { command.table = it!! })
+        x.where?.accept(WhereVisitor {
+            command.where = it
+        })
+        x.items.forEach { it.accept(this) }
+        return false
+    }
+
+
+    override fun visit(x: SQLUpdateSetItem): Boolean {
+        val column = x.column.toString()
+        //  check column name
+        command.table.getColumnByName(column)
+        x.value.accept(ExpressionVisitor { command.updateField[column] = it })
+        return false
+    }
 }

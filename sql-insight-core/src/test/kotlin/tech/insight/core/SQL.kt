@@ -34,6 +34,9 @@ val largeValue = (1..1000).joinToString(",") { "('${StringGenerator.generatorRan
 
 val largeInsert = "insert into $testDb.$test_table (name) values $largeValue"
 
+const val update = "update $testDb.$test_table set name = name + 'new name'"
+
+const val updateWhere = "$update where id > 10"
 
 const val deleteRemain1 = "delete from $testDb.$test_table where id>1"
 

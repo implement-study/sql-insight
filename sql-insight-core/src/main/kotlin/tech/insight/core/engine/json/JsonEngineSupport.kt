@@ -66,15 +66,15 @@ object JsonEngineSupport {
     }
 
     private fun wrapValue(column: Column, o: JsonNode): Value<*> {
+        if (o.isNull) {
+            return column.defaultValue
+        }
         val type = column.dataType
         if (type === DataType.INT) {
             return ValueInt(o.intValue())
         }
         if (type == DataType.VARCHAR || type == DataType.CHAR) {
-            return ValueVarchar(o.toString())
-        }
-        if (o.isNull) {
-            return column.defaultValue
+            return ValueVarchar(o.textValue())
         }
         throw DateTypeCastException(column.dataType.toString(), o.toString())
     }

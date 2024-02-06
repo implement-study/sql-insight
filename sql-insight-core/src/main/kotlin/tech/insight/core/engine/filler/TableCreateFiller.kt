@@ -7,7 +7,6 @@ import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource
 import com.alibaba.druid.sql.visitor.SQLASTVisitor
 import tech.insight.core.bean.Column
-import tech.insight.core.bean.DataType
 import tech.insight.core.bean.Table
 import tech.insight.core.environment.DatabaseManager
 import tech.insight.core.environment.EngineManager
@@ -16,37 +15,9 @@ import tech.insight.core.environment.TableManager
 import tech.insight.core.exception.TableNotExistsException
 
 /**
- * Table filler
+ * table create filler
  * @author gongxuanzhangmelt@gmail.com
  */
-class TableFiller(val table: Table) : BeanFiller<Table> {
-    override fun endVisit(x: SQLColumnDefinition) {
-        val column = Column()
-        x.accept(ColumnFiller(column))
-        table.columnList.add(column)
-    }
-
-
-    override fun visit(x: SQLCreateTableStatement): Boolean {
-        x.comment?.accept(CommentVisitor { table.comment = it })
-        if (x.engine == null) {
-            table.engine = EngineManager.selectEngine(null)
-            return true
-        }
-        x.engine.accept(EngineVisitor { table.engine = it })
-        return true
-    }
-
-    override fun visit(x: SQLExprTableSource): Boolean {
-        x.accept(TableNameVisitor { databaseName, tableName ->
-            table.database = DatabaseManager.require(databaseName)
-            table.name = tableName
-        })
-        return true
-    }
-
-}
-
 
 class TableNameVisitor(private val action: (databaseName: String, tableName: String) -> Unit) : SQLASTVisitor {
     override fun visit(x: SQLPropertyExpr): Boolean {

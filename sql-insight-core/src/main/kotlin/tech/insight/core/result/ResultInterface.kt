@@ -18,6 +18,12 @@ class DeleteResult(private val count: Int, val table: Table) : ResultInterface {
     }
 }
 
+class UpdateResult(private val count: Int, val table: Table) : ResultInterface {
+    override fun toString(): String {
+        return "result : update ${table.name} $count rows"
+    }
+}
+
 class ExceptionResult(val e: Exception) : ResultInterface
 
 
