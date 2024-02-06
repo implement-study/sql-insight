@@ -36,7 +36,6 @@ class JsonCursor(private val reader: BufferedReader, private val session: Sessio
         }
         while (true) {
             try {
-                println(count++)
                 val line = reader.readLine() ?: return false
                 if (line.isEmpty()) {
                     continue

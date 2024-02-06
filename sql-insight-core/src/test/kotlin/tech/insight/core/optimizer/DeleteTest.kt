@@ -23,38 +23,29 @@ class DeleteTest {
     }
 
     @Test
-    fun insertRow() {
+    fun deleteRow() {
         ExecutePlanTest().createTableTest()
         SqlPipeline.doSql(insert)
+        SqlPipeline.doSql(deleteRemain1)
         val table = TableManager.require(testDb, test_table)
         val jsonFile = JsonEngineSupport.getJsonFile(table)
         jsonFile.useLines {
-            assertEquals(5, it.filter { line -> line.isNotEmpty() }.count())
+            assertEquals(1, it.filter { line -> line.isNotEmpty() }.count())
         }
     }
 
 
     @Test
-    fun largeInsertTest() {
+    fun deleteLargeInsertTest() {
         ExecutePlanTest().createTableTest()
         SqlPipeline.doSql(largeInsert)
+        SqlPipeline.doSql(deleteRemain100)
         val table = TableManager.require(testDb, test_table)
         val jsonFile = JsonEngineSupport.getJsonFile(table)
         jsonFile.useLines {
-            assertEquals(1000, it.filter { line -> line.isNotEmpty() }.count())
+            assertEquals(100, it.filter { line -> line.isNotEmpty() }.count())
         }
     }
 
-    @Test
-    fun twoTimeInsertTest() {
-        ExecutePlanTest().createTableTest()
-        SqlPipeline.doSql(largeInsert)
-        SqlPipeline.doSql(largeInsert)
-        val table = TableManager.require(testDb, test_table)
-        val jsonFile = JsonEngineSupport.getJsonFile(table)
-        jsonFile.useLines {
-            assertEquals(2000, it.filter { line -> line.isNotEmpty() }.count())
-        }
-    }
 
 }

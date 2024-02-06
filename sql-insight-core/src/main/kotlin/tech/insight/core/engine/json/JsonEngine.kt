@@ -48,7 +48,7 @@ class JsonEngine : StorageEngine, MultipleEventListener {
     companion object {
         const val MIN_PRIMARY_KEY = 1
         const val MAX_PRIMARY_KEY = 10000
-        val tableCache: MutableMap<String, MutableList<String>> = ConcurrentHashMap()
+        val tableCache: MutableMap<Table, MutableList<String>> = ConcurrentHashMap()
     }
 
     private val counter = JsonIncrementKeyCounter
@@ -65,7 +65,7 @@ class JsonEngine : StorageEngine, MultipleEventListener {
         }
         val jsonPkIndex = JsonPkIndex(table)
         table.indexList.add(jsonPkIndex)
-        tableCache.computeIfAbsent(table.name){
+        tableCache.computeIfAbsent(table) {
             val jsonFile = JsonEngineSupport.getJsonFile(table)
             jsonFile.readLines().toMutableList()
         }
@@ -99,6 +99,7 @@ class JsonEngine : StorageEngine, MultipleEventListener {
         for (i in 0 until MAX_PRIMARY_KEY) {
             initContent.add("")
         }
+        tableCache.remove(table)
         Files.write(jsonFile.toPath(), initContent)
         counter.reset(table)
         return MessageResult("success truncate table ${table.name}")
@@ -107,19 +108,17 @@ class JsonEngine : StorageEngine, MultipleEventListener {
     override fun insertRow(row: InsertRow) {
         counter.dealAutoIncrement(row)
         val jsonObject = fullAllColumnRow(row)
-        val jsonFile = JsonEngineSupport.getJsonFile(row.belongTo())
         val insertPrimaryKey = JsonEngineSupport.getJsonInsertRowPrimaryKey(row.belongTo(), jsonObject)
-        if (MAX_PRIMARY_KEY < insertPrimaryKey || insertPrimaryKey < MIN_PRIMARY_KEY) {
-            throw InsertException("engine json primary key must between $MIN_PRIMARY_KEY and $MAX_PRIMARY_KEY")
+        check(insertPrimaryKey in MIN_PRIMARY_KEY..MAX_PRIMARY_KEY) {
+            InsertException("engine json primary key must between $MIN_PRIMARY_KEY and $MAX_PRIMARY_KEY")
         }
         val lines = getLinesCache(row.belongTo())
         val currentLine = lines[insertPrimaryKey]
-        if (currentLine.isNotEmpty()) {
-            throw InsertException(String.format("Duplicate entry '%s' for key 'PRIMARY'", insertPrimaryKey))
+        check(currentLine.isEmpty()) {
+            InsertException("Duplicate entry $insertPrimaryKey for key 'PRIMARY'")
         }
         lines[insertPrimaryKey] = jsonObject.toString()
         log.info("insert {} to table [{}] ", jsonObject, row.table.name)
-        Files.write(jsonFile.toPath(), lines)
     }
 
     override fun update(oldRow: Row, update: UpdateCommand) {
@@ -143,12 +142,12 @@ class JsonEngine : StorageEngine, MultipleEventListener {
     }
 
     override fun refresh(table: Table) {
-        val lines = tableCache[table.name]
+        val lines = tableCache[table]
         Files.write(JsonEngineSupport.getJsonFile(table).toPath(), lines)
     }
 
     private fun getLinesCache(table: Table): MutableList<String> {
-        return tableCache[table.name] ?: throw TableDontOpenException(table)
+        return tableCache[table] ?: throw TableDontOpenException(table)
     }
 
     private fun fullAllColumnRow(row: InsertRow): ObjectNode {
@@ -163,8 +162,10 @@ class JsonEngine : StorageEngine, MultipleEventListener {
     override fun onEvent(event: InsightEvent) {
         if (event is DropTableEvent) {
             counter.reset(event.table)
+            tableCache.remove(event.table)
         } else if (event is DropDatabaseEvent) {
             counter.reset(event.database)
+            tableCache.keys.filter { it.database == event.database }.forEach { tableCache.remove(it) }
         }
     }
 
