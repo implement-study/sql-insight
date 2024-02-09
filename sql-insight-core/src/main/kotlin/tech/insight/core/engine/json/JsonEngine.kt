@@ -30,6 +30,7 @@ import tech.insight.core.event.MultipleEventListener
 import tech.insight.core.exception.CreateTableException
 import tech.insight.core.exception.InsertException
 import tech.insight.core.exception.TableDontOpenException
+import tech.insight.core.extension.debugIfNecessary
 import tech.insight.core.extension.json
 import tech.insight.core.extension.slf4j
 import tech.insight.core.extension.tree
@@ -118,7 +119,7 @@ class JsonEngine : StorageEngine, MultipleEventListener {
             InsertException("Duplicate entry $insertPrimaryKey for key 'PRIMARY'")
         }
         lines[insertPrimaryKey] = jsonObject.toString()
-        log.info("insert {} to table [{}] ", jsonObject, row.table.name)
+        log.debugIfNecessary { "insert $jsonObject to table [${row.table.name}] " }
     }
 
     override fun update(oldRow: Row, update: UpdateCommand) {
@@ -131,7 +132,7 @@ class JsonEngine : StorageEngine, MultipleEventListener {
             jsonNode.put(colName, expressionValue.source)
             val newLine = jsonNode.json()
             lines[rowId] = newLine
-            log.info("update {} to {} ", line, newLine)
+            log.debugIfNecessary { "update $line to $newLine" }
         }
     }
 

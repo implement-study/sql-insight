@@ -16,6 +16,11 @@ import org.slf4j.LoggerFactory
  */
 inline fun <reified C> slf4j(): Logger = LoggerFactory.getLogger(C::class.java)
 
+fun Logger.debugIfNecessary(messageSupplier: () -> String) {
+    if (this.isDebugEnabled) {
+        this.debug(messageSupplier.invoke())
+    }
+}
 
 object TimeReport
 

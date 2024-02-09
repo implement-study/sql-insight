@@ -26,7 +26,7 @@ class UpdateTest {
     }
 
     @Test
-    fun updateRow() {
+    fun updateTest() {
         ExecutePlanTest().createTableTest()
         SqlPipeline.doSql(largeInsert)
         val table = TableManager.require(testDb, test_table)
@@ -37,6 +37,27 @@ class UpdateTest {
         old.forEach { entry ->
             val newJsonNode = new[entry.key]!!
             assertEquals("${entry.value["name"].textValue()}new name", newJsonNode["name"].textValue())
+        }
+    }
+
+
+    @Test
+    fun updateWhereTest() {
+        ExecutePlanTest().createTableTest()
+        SqlPipeline.doSql(largeInsert)
+        val table = TableManager.require(testDb, test_table)
+        val old = associateJson(table)
+        SqlPipeline.doSql(updateWhere)
+        val new = associateJson(table)
+        assertEquals(old.size, new.size)
+        old.forEach { entry ->
+            val newJsonNode = new[entry.key]!!
+            if(entry.key >10){
+                assertEquals("${entry.value["name"].textValue()}new name", newJsonNode["name"].textValue())
+            }else{
+                assertEquals(entry.value["name"].textValue(), newJsonNode["name"].textValue())
+            }
+
         }
     }
 

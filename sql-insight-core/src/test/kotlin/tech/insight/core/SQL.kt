@@ -42,6 +42,7 @@ const val deleteRemain1 = "delete from $testDb.$test_table where id>1"
 
 const val deleteRemain100 = "delete from $testDb.$test_table where id>100"
 
+const val select = "select * from $testDb.$test_table where id > 10 limit 4,10 order by id desc"
 
 fun prepareDatabase() {
     SqlPipeline.doSql(createDatabase)
