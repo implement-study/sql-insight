@@ -2,14 +2,8 @@ package tech.insight.core.engine.filler
 
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr
 import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr
-import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition
-import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement
-import com.alibaba.druid.sql.ast.statement.SQLExprTableSource
 import com.alibaba.druid.sql.visitor.SQLASTVisitor
-import tech.insight.core.bean.Column
 import tech.insight.core.bean.Table
-import tech.insight.core.environment.DatabaseManager
-import tech.insight.core.environment.EngineManager
 import tech.insight.core.environment.SessionManager
 import tech.insight.core.environment.TableManager
 import tech.insight.core.exception.TableNotExistsException

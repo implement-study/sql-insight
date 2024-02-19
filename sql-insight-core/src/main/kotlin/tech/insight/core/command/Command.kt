@@ -71,13 +71,13 @@ class InsertCommand(sql: String, statement: SQLStatement) : DMLCommand(sql, stat
 }
 
 class SelectCommand(sql: String, statement: SQLSelectQueryBlock) : DMLCommand(sql, statement) {
-    val tableList: MutableList<Table> = ArrayList()
+    lateinit var table: Table
 
-    val where: Where = Always
+    var where: Where = Always
 
     lateinit var orderBy: OrderBy
 
-    lateinit var limit: Limit
+    var limit: Limit = Limit()
 
 }
 
