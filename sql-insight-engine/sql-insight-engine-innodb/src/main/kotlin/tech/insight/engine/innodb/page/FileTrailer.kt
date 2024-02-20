@@ -16,6 +16,7 @@
 package tech.insight.engine.innodb.page
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper
+import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import java.nio.ByteBuffer
 
 /**
@@ -24,7 +25,7 @@ import java.nio.ByteBuffer
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class FileTrailer : ByteWrapper, PageObject {
+class FileTrailer private constructor() : ByteWrapper, PageObject {
     /**
      * use it with [FileHeader.checkSum]
      */
@@ -34,6 +35,7 @@ class FileTrailer : ByteWrapper, PageObject {
      * use it with [FileHeader.lsn]
      */
     var lsn = 0
+
     override fun length(): Int {
         return ConstantSize.FILE_TRAILER.size()
     }
@@ -43,5 +45,18 @@ class FileTrailer : ByteWrapper, PageObject {
         buffer.putInt(checkSum)
         buffer.putInt(lsn)
         return buffer.array()
+    }
+
+    companion object {
+        fun create() = FileTrailer()
+
+        fun wrap(bytes: ByteArray) = run {
+            ConstantSize.FILE_TRAILER.checkSize(bytes)
+            FileTrailer()
+        }.apply {
+            val buffer: DynamicByteBuffer = DynamicByteBuffer.wrap(bytes)
+            this.checkSum = buffer.int
+            this.lsn = buffer.int
+        }
     }
 }

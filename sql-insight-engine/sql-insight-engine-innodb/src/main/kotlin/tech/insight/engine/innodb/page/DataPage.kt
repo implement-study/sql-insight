@@ -57,13 +57,13 @@ class DataPage(index: InnodbIndex) : InnoDbPage(index) {
      * @param allLength      all user record length
      */
     private fun middleSplit(pageUserRecord: List<InnodbUserRecord>, allLength: Int) {
-        var allLength = allLength
-        val half = allLength / 2
+        var lengthCandidate = allLength
+        val half = lengthCandidate / 2
         var firstDataPage: DataPage? = null
         var secondDataPage: DataPage? = null
         for (i in pageUserRecord.indices) {
-            allLength -= pageUserRecord[i].length()
-            if (allLength <= half) {
+            lengthCandidate -= pageUserRecord[i].length()
+            if (lengthCandidate <= half) {
                 val belong = ext.belongIndex
                 firstDataPage = PageFactory.createDataPage(pageUserRecord.subList(0, i), belong)
                 secondDataPage = PageFactory.createDataPage(pageUserRecord.subList(i, pageUserRecord.size), belong)

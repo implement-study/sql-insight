@@ -20,7 +20,6 @@ import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.exception.DuplicationPrimaryKeyException
 import tech.insight.core.extension.slf4j
 import tech.insight.engine.innodb.factory.PageFactory
-import tech.insight.engine.innodb.factory.PageHeaderFactory
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.compact.IndexRecord
 import tech.insight.engine.innodb.page.compact.RecordHeader
@@ -239,7 +238,7 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
         //  transfer to index page
         fileHeader.next = -1
         fileHeader.pageType = PageType.FIL_PAGE_INODE.value
-        pageHeader = PageHeaderFactory.createPageHeader()
+        pageHeader = PageHeader.create()
         pageDirectory = PageDirectory()
         //  clear user record
         userRecords = UserRecords()

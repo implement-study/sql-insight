@@ -17,6 +17,7 @@ package tech.insight.engine.innodb.page
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
+import java.nio.ByteBuffer
 
 /**
  * 56 bytes.
@@ -24,7 +25,7 @@ import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class PageHeader : PageObject, ByteWrapper {
+class PageHeader private constructor() : PageObject, ByteWrapper {
     /**
      * page slot count
      */
@@ -132,5 +133,56 @@ class PageHeader : PageObject, ByteWrapper {
         buffer.appendShort(segTopPre)
         buffer.appendLong(segTop)
         return buffer.toBytes()
+    }
+
+    companion object PageHeaderFactory {
+
+        val EMPTY_PAGE_HEAP_TOP = (ConstantSize.FILE_HEADER.size() +
+                ConstantSize.PAGE_HEADER.size() +
+                ConstantSize.INFIMUM.size() +
+                ConstantSize.SUPREMUM.size()).toShort()
+
+        /**
+         * create a empty page header
+         */
+        fun create() = PageHeader().apply {
+            this.slotCount = 2.toShort()
+            this.heapTop = EMPTY_PAGE_HEAP_TOP
+            this.absoluteRecordCount = 2.toShort()
+            this.recordCount = 0.toShort()
+            this.free = 0.toShort()
+            this.garbage = 0.toShort()
+            this.lastInsertOffset = EMPTY_PAGE_HEAP_TOP
+            this.level = 0.toShort()
+            this.direction = 0.toShort()
+            this.directionCount = 0.toShort()
+            this.maxTransactionId = 0L
+            this.indexId = 0
+            this.segLeafPre = 0.toShort()
+            this.segLeaf = 0L
+            this.segTopPre = 0.toShort()
+            this.segTop = 0L
+        }
+
+        fun wrap(pageHeaderArr: ByteArray) = PageHeader().apply {
+            ConstantSize.PAGE_HEADER.checkSize(pageHeaderArr)
+            val buffer = ByteBuffer.wrap(pageHeaderArr)
+            this.slotCount = buffer.getShort()
+            this.heapTop = buffer.getShort()
+            this.absoluteRecordCount = buffer.getShort()
+            this.recordCount = buffer.getShort()
+            this.free = buffer.getShort()
+            this.garbage = buffer.getShort()
+            this.lastInsertOffset = buffer.getShort()
+            this.direction = buffer.getShort()
+            this.directionCount = buffer.getShort()
+            this.maxTransactionId = buffer.getLong()
+            this.level = buffer.getShort()
+            this.indexId = buffer.getLong()
+            this.segLeafPre = buffer.getShort()
+            this.segLeaf = buffer.getLong()
+            this.segTopPre = buffer.getShort()
+            this.segTop = buffer.getLong()
+        }
     }
 }

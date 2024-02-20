@@ -23,7 +23,7 @@ import tech.insight.engine.innodb.page.PageObject
  *
  * @author gongxuanzhang
  */
-class Variables : ByteWrapper, PageObject, Iterable<Byte?> {
+class Variables : ByteWrapper, PageObject, Iterable<Byte> {
     var varBytes: ByteArray
 
     constructor() {

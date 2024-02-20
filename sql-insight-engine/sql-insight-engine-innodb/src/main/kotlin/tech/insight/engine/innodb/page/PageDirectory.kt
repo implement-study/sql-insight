@@ -30,6 +30,7 @@ import java.nio.ByteBuffer
  * @author gxz gongxuanzhangmelt@gmail.com
  */
 class PageDirectory : PageObject, ByteWrapper {
+
     var slots: ShortArray
 
     /**
@@ -56,7 +57,7 @@ class PageDirectory : PageObject, ByteWrapper {
     }
 
     override fun length(): Int {
-        return slots.size * java.lang.Short.BYTES
+        return slots.size * Short.SIZE_BYTES
     }
 
     override fun toBytes(): ByteArray {

@@ -21,24 +21,17 @@ import java.nio.ByteBuffer
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class RecordHeader : ByteWrapper, PageObject {
-    private val source: ByteArray
+class RecordHeader private constructor() : ByteWrapper, PageObject {
+
+
+    private val source: ByteArray = ByteArray(5)
     var delete = false
     private var minRec = false
     var nOwned = 0
-    private var heapNo = 0
+    private var heapNo: UInt = 0U
     var nextRecordOffset = 0
     lateinit var recordType: RecordType
 
-    constructor() {
-        source = ByteArray(5)
-    }
-
-    constructor(source: ByteArray) {
-        ConstantSize.RECORD_HEADER.checkSize(source)
-        this.source = source
-        swapProperties()
-    }
 
     private fun initType() {
         val typeValue = source[2].toInt() and 0x07
@@ -58,9 +51,10 @@ class RecordHeader : ByteWrapper, PageObject {
         minRec = source[0].toInt() and minRecMask == minRecMask
         val nOwnedBase = 0x0F
         nOwned = source[0].toInt() and nOwnedBase
-        val high = java.lang.Byte.toUnsignedInt(source[1])
-        val low = java.lang.Byte.toUnsignedInt(source[2])
-        heapNo = high shl 8 or low shr 3
+
+        val high = source[1].toUInt()
+        val low = source[2].toUInt()
+        heapNo = (high shl 8 or low shr 3)
         nextRecordOffset = (source[3].toInt() and 0xFF shl 8 or (source[4].toInt() and 0xFF)).toShort().toInt()
         initType()
     }
@@ -102,7 +96,7 @@ class RecordHeader : ByteWrapper, PageObject {
         return this
     }
 
-    fun setHeapNo(heapNo: Int): RecordHeader {
+    fun setHeapNo(heapNo: UInt): RecordHeader {
         if (this.heapNo == heapNo) {
             return this
         }
@@ -118,7 +112,7 @@ class RecordHeader : ByteWrapper, PageObject {
             return this
         }
         this.nextRecordOffset = nextRecordOffset
-        val array = ByteBuffer.allocate(java.lang.Short.BYTES).putShort(nextRecordOffset.toShort()).array()
+        val array = ByteBuffer.allocate(Short.SIZE_BYTES).putShort(nextRecordOffset.toShort()).array()
         source[3] = array[0]
         source[4] = array[1]
         return this
@@ -139,14 +133,14 @@ class RecordHeader : ByteWrapper, PageObject {
         return source
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
             return true
         }
-        if (o == null || javaClass != o.javaClass) {
+        if (other == null || javaClass != other.javaClass) {
             return false
         }
-        val that = o as RecordHeader
+        val that = other as RecordHeader
         return source.contentEquals(that.source)
     }
 
@@ -156,5 +150,47 @@ class RecordHeader : ByteWrapper, PageObject {
 
     override fun length(): Int {
         return source.size
+    }
+
+    companion object {
+
+        fun create(type: RecordType) = RecordHeader().apply {
+            when (type) {
+                RecordType.PAGE -> indexHeader(this)
+                RecordType.INFIMUM -> infimumHeader(this)
+                RecordType.SUPREMUM -> supremumHeader(this)
+                RecordType.NORMAL -> throw IllegalArgumentException()
+            }
+        }
+
+        fun wrap(source: ByteArray) = RecordHeader().apply {
+            ConstantSize.RECORD_HEADER.checkSize(source)
+            source.copyInto(this.source)
+            swapProperties()
+        }
+
+        private fun indexHeader(recordHeader: RecordHeader) {
+            recordHeader.setRecordType(RecordType.PAGE)
+            recordHeader.setHeapNo(1U)
+            recordHeader.setDelete(false)
+            recordHeader.setNOwned(1)
+            recordHeader.setNextRecordOffset(0)
+        }
+
+        private fun infimumHeader(recordHeader: RecordHeader) {
+            recordHeader.setRecordType(RecordType.INFIMUM)
+            recordHeader.setHeapNo(1U)
+            recordHeader.setDelete(false)
+            recordHeader.setNOwned(1)
+            recordHeader.setNextRecordOffset(ConstantSize.INFIMUM.size())
+        }
+
+        private fun supremumHeader(recordHeader: RecordHeader) {
+            recordHeader.setRecordType(RecordType.SUPREMUM)
+            recordHeader.setHeapNo(1U)
+            recordHeader.setDelete(false)
+            recordHeader.setNOwned(1)
+            recordHeader.setNextRecordOffset(0)
+        }
     }
 }

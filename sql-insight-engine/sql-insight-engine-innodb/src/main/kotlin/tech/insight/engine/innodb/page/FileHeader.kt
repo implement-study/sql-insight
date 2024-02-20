@@ -17,6 +17,7 @@ package tech.insight.engine.innodb.page
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
+import java.nio.ByteBuffer
 
 
 /**
@@ -25,11 +26,13 @@ import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class FileHeader : ByteWrapper, PageObject {
+class FileHeader private constructor() : ByteWrapper, PageObject {
+
+
     /**
      * use it with [FileTrailer.checkSum]
      */
-    var checkSum = 0
+    var checkSum: Int = 0
 
     /**
      * page offset
@@ -67,6 +70,8 @@ class FileHeader : ByteWrapper, PageObject {
      * table space id
      */
     var spaceId = 0
+
+
     override fun length(): Int {
         return ConstantSize.FILE_HEADER.size()
     }
@@ -82,5 +87,32 @@ class FileHeader : ByteWrapper, PageObject {
         buffer.appendLong(flushLsn)
         buffer.appendInt(spaceId)
         return buffer.toBytes()
+    }
+
+
+    companion object FileHeaderFactory {
+
+        fun wrap(arr: ByteArray) = FileHeader().apply {
+            ConstantSize.FILE_HEADER.checkSize(arr)
+            val buffer = ByteBuffer.wrap(arr)
+            this.checkSum = buffer.getInt()
+            this.offset = buffer.getInt()
+            this.pageType = buffer.getShort()
+            this.pre = buffer.getInt()
+            this.next = buffer.getInt()
+            this.lsn = buffer.getLong()
+            this.flushLsn = buffer.getLong()
+            this.spaceId = buffer.getInt()
+        }
+
+        /**
+         * create a empty file header
+         */
+        fun create() = FileHeader().apply {
+            this.next = 0
+            this.pre = 0
+            this.offset = 0
+            this.pageType = PageType.FIL_PAGE_INDEX.value
+        }
     }
 }
