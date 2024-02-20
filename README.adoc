@@ -3,7 +3,8 @@
 
 == 正在开发中..
 
-[.line-through]#最近在把java代码移植到kotlin#
+
++++<del>+++正在将java移植到kotlin+++</del>+++
 
 已经完成
 
