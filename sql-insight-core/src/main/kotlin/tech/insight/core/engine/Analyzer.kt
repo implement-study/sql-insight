@@ -49,37 +49,37 @@ class CommandTypeVisitor(private val sql: String) : SQLASTVisitor {
     }
 
     override fun visit(x: SQLDropDatabaseStatement): Boolean {
-        command = DropDatabase(sql,x)
+        command = DropDatabase(sql, x)
         return false
     }
 
     override fun visit(x: SQLDeleteStatement): Boolean {
-        command = DeleteCommand(sql,x)
+        command = DeleteCommand(sql, x)
         return false
     }
 
     override fun visit(x: SQLDropTableStatement): Boolean {
-        command = DropTable(sql,x)
+        command = DropTable(sql, x)
         return false
     }
 
     override fun visit(x: SQLCreateTableStatement): Boolean {
-        command = CreateTable(sql,x)
+        command = CreateTable(sql, x)
         return false
     }
 
     override fun visit(x: SQLInsertStatement): Boolean {
-        command = InsertCommand(sql,x)
+        command = InsertCommand(sql, x)
         return false
     }
 
     override fun visit(x: SQLUpdateStatement): Boolean {
-        command = UpdateCommand(sql,x)
+        command = UpdateCommand(sql, x)
         return false
     }
 
     override fun visit(x: SQLSelectQueryBlock): Boolean {
-        command = SelectCommand(sql,x)
+        command = SelectCommand(sql, x)
         return false
     }
 }

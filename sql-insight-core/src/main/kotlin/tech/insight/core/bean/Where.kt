@@ -27,7 +27,7 @@ import tech.insight.core.bean.value.ValueTrue
  */
 open class Where(private val condition: Expression) : BooleanExpression {
 
-     lateinit var table: Table
+    lateinit var table: Table
 
     override fun getExpressionValue(row: Row): ValueBoolean {
         return ValueBoolean(condition.getBooleanValue(row))

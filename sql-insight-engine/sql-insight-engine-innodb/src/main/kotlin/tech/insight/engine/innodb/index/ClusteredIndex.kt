@@ -15,9 +15,6 @@
  */
 package tech.insight.engine.innodb.index
 
-import tech.insight.engine.innodb.page.Constant
-import tech.insight.engine.innodb.page.compact.Compact
-import tech.insight.engine.innodb.page.compact.RowFormatFactory
 import tech.insight.core.bean.Column
 import tech.insight.core.bean.Cursor
 import tech.insight.core.bean.InsertRow
@@ -27,6 +24,9 @@ import tech.insight.core.environment.Session
 import tech.insight.core.exception.DataTooLongException
 import tech.insight.core.extension.slf4j
 import tech.insight.engine.innodb.core.InnodbIc
+import tech.insight.engine.innodb.page.Constant
+import tech.insight.engine.innodb.page.compact.Compact
+import tech.insight.engine.innodb.page.compact.RowFormatFactory
 import java.io.File
 
 /**

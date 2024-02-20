@@ -15,8 +15,11 @@
  */
 package tech.insight.engine.innodb.utils
 
-import org.gongxuanzhang.sql.insight.core.`object`.Table
+import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.Value
+import tech.insight.engine.innodb.page.Infimum
+import tech.insight.engine.innodb.page.InnodbUserRecord
+import tech.insight.engine.innodb.page.Supremum
 import java.util.function.Function
 
 /**
@@ -24,9 +27,9 @@ import java.util.function.Function
  */
 object RowComparator {
     fun primaryKeyComparator(): Comparator<InnodbUserRecord> {
-        return baseComparator().thenComparing(Function<InnodbUserRecord, Value<Any>> { innodbUserRecord: InnodbUserRecord ->
+        return baseComparator().thenComparing(Function<InnodbUserRecord, Value<*>> { innodbUserRecord: InnodbUserRecord ->
             val table: Table = innodbUserRecord.belongTo()
-            val primaryKeyName: String = table.getExt().getPrimaryKeyName()
+            val primaryKeyName: String = table.ext.primaryKeyName!!
             innodbUserRecord.getValueByColumnName(primaryKeyName)
         })
     }

@@ -52,9 +52,9 @@ class UpdateTest {
         assertEquals(old.size, new.size)
         old.forEach { entry ->
             val newJsonNode = new[entry.key]!!
-            if(entry.key >10){
+            if (entry.key > 10) {
                 assertEquals("${entry.value["name"].textValue()}new name", newJsonNode["name"].textValue())
-            }else{
+            } else {
                 assertEquals(entry.value["name"].textValue(), newJsonNode["name"].textValue())
             }
 

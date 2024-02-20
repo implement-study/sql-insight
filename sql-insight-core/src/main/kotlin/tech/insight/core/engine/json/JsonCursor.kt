@@ -20,7 +20,6 @@ import tech.insight.core.bean.Row
 import tech.insight.core.environment.Session
 import tech.insight.core.extension.tree
 import java.io.BufferedReader
-import java.io.File
 
 /**
  * @author gongxuanzhangmelt@gmail.com

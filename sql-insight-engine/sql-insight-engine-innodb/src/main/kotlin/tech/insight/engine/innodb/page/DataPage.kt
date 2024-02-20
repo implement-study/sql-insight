@@ -1,11 +1,11 @@
 package tech.insight.engine.innodb.page
 
-import tech.insight.engine.innodb.factory.PageFactory
-import tech.insight.engine.innodb.utils.RowComparator
 import tech.insight.core.bean.Column
+import tech.insight.engine.innodb.factory.PageFactory
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.compact.IndexRecord
 import tech.insight.engine.innodb.page.compact.RowFormatFactory
+import tech.insight.engine.innodb.utils.RowComparator
 
 
 /**

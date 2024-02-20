@@ -25,6 +25,7 @@ object SqlPipeline {
         //  static init context
         GlobalContext
     }
+
     private val log = slf4j<SqlPipeline>()
     private val optimizer: Optimizer = OptimizerImpl
     private val analyzer: Analyzer = DruidAnalyzer

@@ -15,6 +15,8 @@
  */
 package tech.insight.core.bean
 
+import org.gongxuanzhang.easybyte.core.ByteWrapper
+
 
 /**
  * user record represents a physics row in disk.
@@ -22,7 +24,7 @@ package tech.insight.core.bean
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-interface UserRecord : Row {
+interface UserRecord : ByteWrapper, Row {
     /**
      * the record to byte array.
      */
@@ -53,7 +55,7 @@ interface UserRecord : Row {
     /**
      * [rowBytes]
      */
-    fun toBytes(): ByteArray {
+    override fun toBytes(): ByteArray {
         return rowBytes()
     }
 }

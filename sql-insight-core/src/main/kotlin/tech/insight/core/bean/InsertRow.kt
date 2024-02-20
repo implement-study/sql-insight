@@ -16,13 +16,13 @@
 package tech.insight.core.bean
 
 import tech.insight.core.bean.value.Value
-import tech.insight.core.bean.value.ValueNull
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
 class InsertRow(override val rowId: Long) : Row, SQLBean, Iterable<InsertItem> {
     lateinit var table: Table
+
     /**
      * all table column value，not just columns in SQL
      */

@@ -15,10 +15,10 @@
  */
 package tech.insight.engine.innodb.index
 
-import tech.insight.engine.innodb.page.InnoDbPage
-import tech.insight.engine.innodb.utils.PageSupport
 import tech.insight.core.bean.Table
 import tech.insight.engine.innodb.core.InnodbBTree
+import tech.insight.engine.innodb.page.InnoDbPage
+import tech.insight.engine.innodb.utils.PageSupport
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -38,5 +38,5 @@ abstract class InnodbIndex : InnodbBTree {
          *
          * @return not null
          */
-         get() = PageSupport.getRoot(this)
+        get() = PageSupport.getRoot(this)
 }

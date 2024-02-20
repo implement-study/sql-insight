@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 sql-insight  and the original author or authors <gongxuanzhangmelt@gmail.com>.
+ * Copyright 2023 java-mysql  and the original author or authors <gongxuanzhangmelt@gmail.com>.
  *
  * Licensed under the GNU Affero General Public License v3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package org.gongxuanzhang.sql.insight
+package tech.insight.engine.innodb.page
 
-import java.io.File
+import org.junit.jupiter.api.Test
 
 
-/**
- * @author gxz gongxuanzhangmelt@gmail.com
- **/
+class RootPageTest {
 
-fun File.forEachLineIndex(action: (Int, String) -> Unit) {
-    var lineNumber = 1
-    this.forEachLine {
-        action.invoke(lineNumber, it)
-        lineNumber++
+    @Test
+    fun subListTest() {
+        val list = ArrayList<Int>()
+        for (i in 0..10) {
+            list.add(i)
+        }
+        println(list.subList(0, list.size / 2))
+        println(list.subList(list.size / 2, list.size))
     }
+
+
 }
-
-
-
-

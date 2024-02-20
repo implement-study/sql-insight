@@ -4,7 +4,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import tech.insight.core.*
-import tech.insight.core.bean.Column
 import tech.insight.core.bean.DataType
 import tech.insight.core.bean.value.ValueNull
 import tech.insight.core.bean.value.ValueVarchar
@@ -75,7 +74,7 @@ class ExecutePlanTest {
         assertEquals("性别", genderCol.comment)
         val idCardCol = table.columnList[3]
         assertEquals(DataType.CHAR, idCardCol.dataType)
-        assertEquals("id_card",idCardCol.name)
+        assertEquals("id_card", idCardCol.name)
         assertEquals(DataType.CHAR.defaultLength, idCardCol.length)
         assert(idCardCol.unique)
     }

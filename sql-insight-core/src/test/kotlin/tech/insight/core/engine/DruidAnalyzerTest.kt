@@ -9,14 +9,13 @@ import tech.insight.core.command.DropDatabase
 import tech.insight.core.command.DropTable
 import tech.insight.core.environment.DefaultProperty
 import tech.insight.core.environment.GlobalContext
-import tech.insight.core.optimizer.ExecutePlanTest
 import java.io.File
 
 
 class DruidAnalyzerTest {
 
     @BeforeEach
-    fun prepare(){
+    fun prepare() {
         prepareDatabase()
     }
 

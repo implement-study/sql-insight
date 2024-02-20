@@ -15,7 +15,6 @@
  */
 package tech.insight.engine.innodb
 
-import tech.insight.engine.innodb.factory.PageFactory
 import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
@@ -24,6 +23,7 @@ import tech.insight.core.engine.storage.StorageEngine
 import tech.insight.core.extension.slf4j
 import tech.insight.core.result.MessageResult
 import tech.insight.core.result.ResultInterface
+import tech.insight.engine.innodb.factory.PageFactory
 import tech.insight.engine.innodb.index.ClusteredIndex
 import java.io.File
 import java.io.IOException

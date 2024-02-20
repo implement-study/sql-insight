@@ -70,7 +70,7 @@ object TableReadConverter : ReadConverter<Table> {
     override fun toObject(bytes: ByteArray, length: Int): Table {
         val table = Table()
         with(table) {
-            val buffer = DynamicByteBuffer.wrap(bytes,SqlInsightConfig)
+            val buffer = DynamicByteBuffer.wrap(bytes, SqlInsightConfig)
             name = buffer.string
             database = DatabaseManager.require(buffer.string)
             columnList = buffer.getCollection(Column::class.java)
@@ -171,7 +171,7 @@ object ColumnWriteConverter : WriteConverter<Column> {
         allocate.appendObject(v.dataType)
         allocate.appendInt(v.length)
         allocate.appendString(v.comment)
-        allocate.appendObject(v.defaultValue,ValueWriteConverter)
+        allocate.appendObject(v.defaultValue, ValueWriteConverter)
         val flag = v.autoIncrement append v.notNull append v.primaryKey append v.unique append v.variable
         allocate.append(flag.toByte())
         return allocate.toBytes()
@@ -182,7 +182,7 @@ object ColumnWriteConverter : WriteConverter<Column> {
 object ColumnReadConverter : ReadConverter<Column> {
 
     override fun toObject(bytes: ByteArray, length: Int): Column {
-        val buffer = DynamicByteBuffer.wrap(bytes,SqlInsightConfig)
+        val buffer = DynamicByteBuffer.wrap(bytes, SqlInsightConfig)
         val col = Column()
         col.name = buffer.string
         col.dataType = buffer.getObject(DataType::class.java)

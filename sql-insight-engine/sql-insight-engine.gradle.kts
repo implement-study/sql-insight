@@ -8,3 +8,9 @@ subprojects {
         mavenCentral()
     }
 }
+
+
+
+tasks.test {
+    useJUnitPlatform()
+}

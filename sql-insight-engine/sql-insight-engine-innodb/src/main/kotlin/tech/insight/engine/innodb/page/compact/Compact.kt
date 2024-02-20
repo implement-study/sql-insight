@@ -65,9 +65,6 @@ class Compact : InnodbUserRecord {
     override val values: List<Value<*>>
         get() = sourceRow.values
 
-    fun getRowId(): Long {
-        return sourceRow.rowId
-    }
 
     override fun getValueByColumnName(colName: String): Value<*> {
         return sourceRow.getValueByColumnName(colName)
