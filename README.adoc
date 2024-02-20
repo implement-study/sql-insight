@@ -3,7 +3,10 @@
 
 == 正在开发中..
 
-[.line-through]#最近在把java代码移植到kotlin# 已经完成
+[.line-through]#最近在把java代码移植到kotlin#
+
+已经完成
+
 json引擎开发完成，接下来实现innodb 的非事务版本
 
 ==  SQL-Insight是什么？
