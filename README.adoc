@@ -1,7 +1,10 @@
 = SQL-Insight
 
 
-== 正在开发中.. 作者很懒 最近在把java代码移植到kotlin
+== 正在开发中..
+
+[.line-through]#最近在把java代码移植到kotlin# 已经完成
+json引擎开发完成，接下来实现innodb 的非事务版本
 
 ==  SQL-Insight是什么？
 这个项目可以让你直观了解一条SQL背后发生了什么，
