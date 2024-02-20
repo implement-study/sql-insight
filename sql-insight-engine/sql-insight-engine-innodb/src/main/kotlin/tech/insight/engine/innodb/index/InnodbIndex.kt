@@ -16,7 +16,7 @@
 package tech.insight.engine.innodb.index
 
 import tech.insight.engine.innodb.page.InnoDbPage
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport
+import tech.insight.engine.innodb.utils.PageSupport
 import tech.insight.core.bean.Table
 import tech.insight.engine.innodb.core.InnodbBTree
 

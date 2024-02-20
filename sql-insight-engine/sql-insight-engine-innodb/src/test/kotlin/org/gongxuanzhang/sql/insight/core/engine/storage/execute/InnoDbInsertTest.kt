@@ -20,7 +20,7 @@ import org.gongxuanzhang.sql.insight.*
 import org.gongxuanzhang.sql.insight.core.command.dml.Insert
 import org.gongxuanzhang.sql.insight.core.engine.json.InsightFactory
 import tech.insight.engine.innodb.index.InnodbIndex
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils.PageSupport
+import tech.insight.engine.innodb.utils.PageSupport
 import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseExistsException
 import org.gongxuanzhang.sql.insight.core.exception.TableNotExistsException

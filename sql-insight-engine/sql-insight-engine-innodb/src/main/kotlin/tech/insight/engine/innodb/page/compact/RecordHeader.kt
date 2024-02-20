@@ -1,21 +1,8 @@
-/*
- * Copyright 2023 java-mysql  and the original author or authors <gongxuanzhangmelt@gmail.com>.
- *
- * Licensed under the GNU Affero General Public License v3.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://github.com/implement-study/sql-insight/blob/main/LICENSE
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package tech.insight.engine.innodb.page.compact
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper
+import tech.insight.core.extension.setBit0
+import tech.insight.core.extension.setBit1
 import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.PageObject
 import java.nio.ByteBuffer
@@ -36,12 +23,12 @@ import java.nio.ByteBuffer
  */
 class RecordHeader : ByteWrapper, PageObject {
     private val source: ByteArray
-    private var delete = false
+    var delete = false
     private var minRec = false
-    private var nOwned = 0
+    var nOwned = 0
     private var heapNo = 0
-    private var nextRecordOffset = 0
-    private var recordType: RecordType? = null
+    var nextRecordOffset = 0
+    lateinit var recordType: RecordType
 
     constructor() {
         source = ByteArray(5)
@@ -84,9 +71,9 @@ class RecordHeader : ByteWrapper, PageObject {
         }
         this.delete = delete
         if (delete) {
-            source[0] = BitOperator.setBitToOne(source[0], 5)
+            source[0] = source[0].setBit1(5)
         } else {
-            source[0] = BitOperator.setBitToZero(source[0], 5)
+            source[0] = source[0].setBit0(5)
         }
         return this
     }
@@ -97,9 +84,9 @@ class RecordHeader : ByteWrapper, PageObject {
         }
         this.minRec = minRec
         if (minRec) {
-            source[0] = BitOperator.setBitToOne(source[0], 4)
+            source[0] = source[0].setBit1(4)
         } else {
-            source[0] = BitOperator.setBitToZero(source[0], 4)
+            source[0] = source[0].setBit0(5)
         }
         return this
     }

@@ -16,6 +16,8 @@
 package tech.insight.engine.innodb.page.compact
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper
+import tech.insight.core.bean.Table
+import tech.insight.engine.innodb.page.PageObject
 
 /**
  * contains byte array.
@@ -28,26 +30,26 @@ class CompactNullList
  * the byte array is origin byte in page.
  * begin with right.
  * nullList length maybe 0
- */(var nullList: ByteArray) : ByteWrapper, PageObject {
-    constructor(table: Table) : this(ByteArray(table.getExt().getNullableColCount() / java.lang.Byte.SIZE))
+ */(private var nullList: ByteArray) : ByteWrapper, PageObject {
+    constructor(table: Table) : this(ByteArray(table.ext.nullableColCount / Byte.SIZE_BITS))
 
     /**
      * @param index start 0
      */
     fun isNull(index: Int): Boolean {
-        val byteIndex = nullList.size - index / java.lang.Byte.SIZE - 1
+        val byteIndex = nullList.size - index / Byte.SIZE_BITS - 1
         val bitMap = nullList[byteIndex]
-        val mask = 1 shl index % java.lang.Byte.SIZE
+        val mask = 1 shl index % Byte.SIZE_BITS
         return mask and bitMap.toInt() == mask
     }
 
     fun setNull(index: Int) {
-        val byteIndex = nullList.size - index / java.lang.Byte.SIZE - 1
-        val mask = (1 shl index % java.lang.Byte.SIZE).toByte()
+        val byteIndex = nullList.size - index / Byte.SIZE_BITS - 1
+        val mask = (1 shl index % Byte.SIZE_BITS).toByte()
         nullList[byteIndex] = (nullList[byteIndex].toInt() and mask.toInt()).toByte()
     }
 
-    fun toBytes(): ByteArray {
+    override fun toBytes(): ByteArray {
         return nullList
     }
 

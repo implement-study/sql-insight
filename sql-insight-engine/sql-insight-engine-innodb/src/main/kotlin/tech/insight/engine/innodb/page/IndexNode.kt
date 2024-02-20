@@ -27,9 +27,9 @@ import tech.insight.core.bean.value.Value
  * @author gongxuanzhangmelt@gmail.com
  */
 class IndexNode(key: Array<Value<*>>, pointer: Int) : PageObject, ByteWrapper {
-    private val length: Int
-    private val key: Array<Value<*>>
-    private val pointer: Int
+    val length: Int
+    val key: Array<Value<*>>
+    val pointer: Int
 
     init {
         this.key = key

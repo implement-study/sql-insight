@@ -1,8 +1,10 @@
 package tech.insight.engine.innodb.index
 
-import org.gongxuanzhang.sql.insight.core.environment.SessionContext
 import tech.insight.core.bean.Column
+import tech.insight.core.bean.Cursor
+import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Table
+import tech.insight.core.environment.Session
 import java.io.File
 
 /**
@@ -11,26 +13,27 @@ import java.io.File
  * @author gongxuanzhangmelt@gmail.com
  */
 class SecondIndex protected constructor(table: Table) : InnodbIndex() {
-    override fun rndInit() {}
+    override fun insert(row: InsertRow) {
+        TODO("Not yet implemented")
+    }
+
+    override fun rndInit() {
+        TODO("Not yet implemented")
+    }
+
     override val id: Int
-        get() = 0
+        get() = TODO("Not yet implemented")
 
-    override fun belongTo(): Table {
-        return null
+    override fun find(session: Session): Cursor {
+        TODO("Not yet implemented")
     }
 
-    override fun find(sessionContext: SessionContext?): Cursor? {
-        return null
-    }
-
-    override val name: String?
-        get() = null
-
-    override fun insert(row: InsertRow?) {}
-    override val file: File?
-        get() = null
+    override val name: String
+        get() = TODO("Not yet implemented")
+    override val file: File
+        get() = TODO("Not yet implemented")
 
     override fun columns(): List<Column> {
-        return null
+        TODO("Not yet implemented")
     }
 }

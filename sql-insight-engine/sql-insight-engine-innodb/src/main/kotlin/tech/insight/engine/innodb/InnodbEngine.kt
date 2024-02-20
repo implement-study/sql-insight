@@ -15,7 +15,7 @@
  */
 package tech.insight.engine.innodb
 
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFactory
+import tech.insight.engine.innodb.factory.PageFactory
 import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table

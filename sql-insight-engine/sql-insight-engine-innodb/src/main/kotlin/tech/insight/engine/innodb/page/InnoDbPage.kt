@@ -17,7 +17,15 @@ package tech.insight.engine.innodb.page
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
+import tech.insight.engine.innodb.factory.PageFactory
+import tech.insight.engine.innodb.factory.PageHeaderFactory
+import tech.insight.engine.innodb.utils.PageSupport
+import tech.insight.core.exception.DuplicationPrimaryKeyException
+import tech.insight.core.extension.slf4j
 import tech.insight.engine.innodb.index.InnodbIndex
+import tech.insight.engine.innodb.page.compact.IndexRecord
+import tech.insight.engine.innodb.page.compact.RecordHeader
+import tech.insight.engine.innodb.page.compact.RecordType
 
 
 /**
@@ -26,43 +34,48 @@ import tech.insight.engine.innodb.index.InnodbIndex
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrapper, Comparator<InnodbUserRecord?>,
-    PageObject, Iterable<InnodbUserRecord?> {
+abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrapper, Comparator<InnodbUserRecord>,
+    PageObject, Iterable<InnodbUserRecord> {
+
+    companion object {
+        val log = slf4j<InnoDbPage>()
+    }
+
     /**
      * 38 bytes
      */
-    var fileHeader: FileHeader? = null
+    lateinit var fileHeader: FileHeader
 
     /**
      * 56 bytes
      */
-    var pageHeader: PageHeader? = null
+    lateinit var pageHeader: PageHeader
 
     /**
      * 13 bytes
      */
-    var infimum: Infimum? = null
+    lateinit var infimum: Infimum
 
     /**
      * 13 bytes
      */
-    var supremum: Supremum? = null
+    lateinit var supremum: Supremum
 
     /**
      * uncertain bytes.
      * user records bytes + freeSpace = page size - other fixed size
      */
-    var userRecords: UserRecords? = null
+    lateinit var userRecords: UserRecords
 
     /**
      * uncertain bytes.
      */
-    var pageDirectory: PageDirectory? = null
+    lateinit var pageDirectory: PageDirectory
 
     /**
      * 8 bytes
      */
-    var fileTrailer: FileTrailer? = null
+    lateinit var fileTrailer: FileTrailer
     var ext: PageExt
 
     init {
@@ -70,21 +83,21 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
         ext.belongIndex = index
     }
 
-   override fun toBytes(): ByteArray {
+    override fun toBytes(): ByteArray {
         val buffer: DynamicByteBuffer = DynamicByteBuffer.allocate()
-        buffer.append(fileHeader!!.toBytes())
-        buffer.append(pageHeader!!.toBytes())
+        buffer.append(fileHeader.toBytes())
+        buffer.append(pageHeader.toBytes())
         buffer.append(infimum.toBytes())
         buffer.append(supremum.toBytes())
-        buffer.append(userRecords!!.toBytes())
+        buffer.append(userRecords.toBytes())
         buffer.append(ByteArray(freeSpace.toInt()))
-        buffer.append(pageDirectory!!.toBytes())
-        buffer.append(fileTrailer!!.toBytes())
+        buffer.append(pageDirectory.toBytes())
+        buffer.append(fileTrailer.toBytes())
         return buffer.toBytes()
     }
 
     fun pageType(): PageType {
-        return PageType.Companion.valueOf(fileHeader!!.pageType.toInt())
+        return PageType.Companion.valueOf(fileHeader.pageType.toInt())
     }
 
     val freeSpace: Short
@@ -94,7 +107,7 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
                 ConstantSize.FILE_TRAILER.size() -
                 ConstantSize.SUPREMUM.size() -
                 ConstantSize.INFIMUM.size() -
-                pageDirectory!!.length() - userRecords!!.length()).toShort()
+                pageDirectory.length() - userRecords.length()).toShort()
 
     /**
      * add a data.
@@ -116,9 +129,9 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
      *
      * @param userRecord target record
      */
-    protected fun findPreAndNext(userRecord: InnodbUserRecord?): Pair<InnodbUserRecord?, InnodbUserRecord?> {
+    protected fun findPreAndNext(userRecord: InnodbUserRecord): Pair<InnodbUserRecord, InnodbUserRecord> {
         val targetSlot = findTargetSlot(userRecord)
-        var pre = getUserRecordByOffset(pageDirectory!!.indexSlot(targetSlot + 1).toInt())
+        var pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot + 1).toInt())
         var next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset())
         while (compare(userRecord, next) > 0) {
             pre = next
@@ -136,16 +149,16 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
      * @return slot index is user record inserted never return `slot.length -1 ` because slot.length - 1 is the
      * infimum
      */
-    protected fun findTargetSlot(userRecord: InnodbUserRecord?): Int {
+    protected fun findTargetSlot(userRecord: InnodbUserRecord): Int {
         var left = 0
-        var right = pageDirectory!!.slotCount() - 1
+        var right = pageDirectory.slotCount() - 1
         while (left < right - 1) {
             val mid = (right + left) / 2
-            val offset: Short = pageDirectory.getSlots().get(mid)
+            val offset: Short = pageDirectory.slots[mid]
             val base = getUserRecordByOffset(offset.toInt())
             val compare = compare(userRecord, base)
             if (compare == 0) {
-                throw DuplicationPrimaryKeyException(base.getRowId())
+                throw DuplicationPrimaryKeyException(base.rowId)
             }
             if (compare < 0) {
                 left = mid
@@ -153,10 +166,10 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
                 right = mid
             }
         }
-        val base = getUserRecordByOffset(pageDirectory.getSlots().get(right))
+        val base = getUserRecordByOffset(pageDirectory.slots[right].toInt())
         val compare = compare(userRecord, base)
         if (compare == 0) {
-            throw DuplicationPrimaryKeyException(base.getRowId())
+            throw DuplicationPrimaryKeyException(base.rowId)
         }
         return if (compare > 0) {
             left
@@ -167,7 +180,7 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
      * @param offsetInPage offset in page
      * @return user record
      */
-    protected fun getUserRecordByOffset(offsetInPage: Int): InnodbUserRecord? {
+    protected fun getUserRecordByOffset(offsetInPage: Int): InnodbUserRecord {
         if (offsetInPage == ConstantSize.INFIMUM.offset()) {
             return infimum
         }
@@ -192,12 +205,12 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
             rootPageUpgrade(prePage, nextPage)
         } else {
             // normal leaf node
-            prePage.fileHeader.setOffset(fileHeader!!.offset)
+            prePage.fileHeader.offset = fileHeader.offset
             val newDataPageOffset: Int = PageSupport.allocatePage(ext.belongIndex)
-            nextPage.fileHeader.setOffset(newDataPageOffset)
-            val parent: InnoDbPage? = ext.parent
+            nextPage.fileHeader.offset = newDataPageOffset
+            val parent: InnoDbPage = ext.parent!!
             transferFrom(prePage)
-            parent!!.insertData(nextPage.pageIndex())
+            parent.insertData(nextPage.pageIndex())
         }
     }
 
@@ -211,21 +224,21 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
      * create 2 new page and linked whether upgrading  from index page or data page.
      */
     private fun rootPageUpgrade(preChild: InnoDbPage, secondChild: InnoDbPage) {
-        preChild.pageHeader!!.level = pageHeader!!.level
-        secondChild.pageHeader!!.level = pageHeader!!.level
-        pageHeader!!.level++
-        val firstFileHeader: FileHeader = preChild.getFileHeader()
-        val secondFileHeader: FileHeader = secondChild.getFileHeader()
+        preChild.pageHeader.level = pageHeader.level
+        secondChild.pageHeader.level = pageHeader.level
+        pageHeader.level++
+        val firstFileHeader: FileHeader = preChild.fileHeader
+        val secondFileHeader: FileHeader = secondChild.fileHeader
         val offset: Int = PageSupport.allocatePage(ext.belongIndex, 2)
-        firstFileHeader.setOffset(offset)
-        secondFileHeader.setOffset(offset + ConstantSize.PAGE.size())
-        firstFileHeader.setPre(-1)
-        firstFileHeader.setNext(secondFileHeader.offset)
-        secondFileHeader.setPre(firstFileHeader.offset)
-        secondFileHeader.setNext(-1)
+        firstFileHeader.offset = offset
+        secondFileHeader.offset = (offset + ConstantSize.PAGE.size())
+        firstFileHeader.pre = (-1)
+        firstFileHeader.next = (secondFileHeader.offset)
+        secondFileHeader.pre = (firstFileHeader.offset)
+        secondFileHeader.next = (-1)
         //  transfer to index page
-        fileHeader!!.next = -1
-        fileHeader!!.pageType = PageType.FIL_PAGE_INODE.value
+        fileHeader.next = -1
+        fileHeader.pageType = PageType.FIL_PAGE_INODE.value
         pageHeader = PageHeaderFactory.createPageHeader()
         pageDirectory = PageDirectory()
         //  clear user record
@@ -234,42 +247,42 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
         insertData(secondChild.pageIndex())
     }
 
-    protected fun linkedAndAdjust(pre: InnodbUserRecord?, insertRecord: InnodbUserRecord, next: InnodbUserRecord?) {
+    protected fun linkedAndAdjust(pre: InnodbUserRecord, insertRecord: InnodbUserRecord, next: InnodbUserRecord) {
         var next = next
-        val insertHeader: RecordHeader = insertRecord.getRecordHeader()
-        insertHeader.setHeapNo(pageHeader!!.absoluteRecordCount.toInt())
-        insertRecord.setOffset(pageHeader!!.lastInsertOffset + insertRecord.beforeSplitOffset())
+        val insertHeader: RecordHeader = insertRecord.recordHeader
+        insertHeader.setHeapNo(pageHeader.absoluteRecordCount.toInt())
+        insertRecord.setOffset(pageHeader.lastInsertOffset + insertRecord.beforeSplitOffset())
         insertHeader.setNextRecordOffset(next.offset() - insertRecord.offset())
-        pre.getRecordHeader().setNextRecordOffset(insertRecord.offset() - pre.offset())
+        pre.recordHeader.setNextRecordOffset(insertRecord.offset() - pre.offset())
         refreshRecordHeader(pre)
         insertHeader.setRecordType(RecordType.NORMAL)
 
         //  adjust page
-        userRecords!!.addRecord(insertRecord)
-        pageHeader!!.absoluteRecordCount++
-        pageHeader!!.recordCount++
-        pageHeader!!.heapTop = (pageHeader!!.heapTop + insertRecord.length().toShort()).toShort()
-        pageHeader!!.lastInsertOffset = (pageHeader!!.lastInsertOffset + insertRecord.length().toShort()).toShort()
+        userRecords.addRecord(insertRecord)
+        pageHeader.absoluteRecordCount++
+        pageHeader.recordCount++
+        pageHeader.heapTop = (pageHeader.heapTop + insertRecord.length().toShort()).toShort()
+        pageHeader.lastInsertOffset = (pageHeader.lastInsertOffset + insertRecord.length().toShort()).toShort()
 
 
         //  adjust group
-        while (next.getRecordHeader().getNOwned() === 0) {
+        while (next.recordHeader.nOwned == 0) {
             next = getUserRecordByOffset(next.offset() + next.nextRecordOffset())
         }
-        val nextHeader: RecordHeader = next.getRecordHeader()
-        val groupCount: Int = nextHeader.getNOwned()
+        val nextHeader: RecordHeader = next.recordHeader
+        val groupCount: Int = nextHeader.nOwned
         nextHeader.setNOwned(groupCount + 1)
-        if (next.getRecordHeader().getNOwned() <= Constant.Companion.SLOT_MAX_COUNT) {
+        if (next.recordHeader.nOwned <= Constant.SLOT_MAX_COUNT) {
             return
         }
         log.info("start group split ...")
-        for (i in 0 until pageDirectory!!.slots.size - 1) {
-            if (pageDirectory!!.slots[i] == next.offset()) {
-                var preGroupMax = getUserRecordByOffset(pageDirectory!!.slots[i + 1].toInt())
-                for (j in 0 until (Constant.Companion.SLOT_MAX_COUNT shr 1)) {
+        for (i in 0 until pageDirectory.slots.size - 1) {
+            if (pageDirectory.slots[i].toInt() == next.offset()) {
+                var preGroupMax = getUserRecordByOffset(pageDirectory.slots[i + 1].toInt())
+                for (j in 0 until (Constant.SLOT_MAX_COUNT shr 1)) {
                     preGroupMax = getUserRecordByOffset(preGroupMax.offset() + preGroupMax.nextRecordOffset())
                 }
-                pageDirectory!!.split(i, preGroupMax.offset() as Short)
+                pageDirectory.split(i, preGroupMax.offset().toShort())
             }
         }
         log.info("end group split ...")
@@ -278,7 +291,7 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
     /**
      * byte array copy from target page
      */
-    fun transferFrom(page: InnoDbPage) {
+    private fun transferFrom(page: InnoDbPage) {
         val snapshot: InnoDbPage = PageFactory.swap(page.toBytes(), ext.belongIndex)
         fileHeader = snapshot.fileHeader
         pageHeader = snapshot.pageHeader
@@ -290,31 +303,31 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
         ext = snapshot.ext
     }
 
-    private fun refreshRecordHeader(record: InnodbUserRecord?) {
+    private fun refreshRecordHeader(record: InnodbUserRecord) {
         if (record is Infimum) {
             return
         }
         if (record is Supremum) {
             return
         }
-        val headerByte = record.getRecordHeader().toBytes()
+        val headerByte = record.recordHeader.toBytes()
         val bodyOffset: Int = record.offset() - ConstantSize.RECORD_HEADER.size() - ConstantSize.PAGE_HEADER.size() -
                 ConstantSize.FILE_HEADER.size() -
                 ConstantSize.SUPREMUM.size() -
                 ConstantSize.INFIMUM.size()
-        System.arraycopy(headerByte, 0, userRecords!!.body, bodyOffset, headerByte.size)
+        System.arraycopy(headerByte, 0, userRecords.body, bodyOffset, headerByte.size)
     }
 
     override fun length(): Int {
         return ConstantSize.PAGE.size()
     }
 
-    override fun iterator(): MutableIterator<InnodbUserRecord> {
+    override fun iterator(): Iterator<InnodbUserRecord> {
         return Itr()
     }
 
-    inner class Itr : MutableIterator<InnodbUserRecord> {
-        private var cursor = getUserRecordByOffset(infimum!!.nextRecordOffset() + infimum!!.offset())
+    inner class Itr : Iterator<InnodbUserRecord> {
+        private var cursor = getUserRecordByOffset(infimum.nextRecordOffset() + infimum.offset())
         override fun hasNext(): Boolean {
             return cursor !== supremum
         }
@@ -327,6 +340,7 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
             cursor = getUserRecordByOffset(cursor.nextRecordOffset() + cursor.offset())
             return result
         }
+
     }
 
     class PageExt {

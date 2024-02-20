@@ -15,7 +15,11 @@
  */
 package tech.insight.engine.innodb.page
 
-import lombok.EqualsAndHashCode
+import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
+import tech.insight.engine.innodb.factory.RecordHeaderFactory
+import tech.insight.core.bean.Row
+import tech.insight.core.bean.Table
+import tech.insight.core.bean.value.Value
 import tech.insight.engine.innodb.page.compact.RecordHeader
 
 /**
@@ -23,8 +27,12 @@ import tech.insight.engine.innodb.page.compact.RecordHeader
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-@EqualsAndHashCode
 class Supremum : InnodbUserRecord {
+
+    companion object {
+        const val SUPREMUM_BODY = "supremum"
+    }
+
     /**
      * 5 bytes
      */
@@ -39,7 +47,7 @@ class Supremum : InnodbUserRecord {
         recordHeader = RecordHeaderFactory.supremumHeader()
     }
 
-    fun rowBytes(): ByteArray {
+    override fun rowBytes(): ByteArray {
         return DynamicByteBuffer.wrap(recordHeader.toBytes()).append(body).toBytes()
     }
 
@@ -47,39 +55,40 @@ class Supremum : InnodbUserRecord {
         return recordHeader.toString() + "[body:" + String(body) + "]"
     }
 
-    val values: List<Any>
-        get() = supremumUnsupport<List<Value>>()
-    val rowId: Long
+    override val values: List<Value<*>>
+        get() = supremumUnsupported()
+
+    override val rowId: Long
         get() = Long.MAX_VALUE
 
-    fun getValueByColumnName(colName: String?): Value {
-        return supremumUnsupport()
+    override fun getValueByColumnName(colName: String): Value<*> {
+        supremumUnsupported()
     }
 
-    fun offset(): Int {
+    override fun offset(): Int {
         return ConstantSize.SUPREMUM.offset()
     }
 
-    fun setOffset(offset: Int) {
+    override fun setOffset(offset: Int) {
         throw UnsupportedOperationException("supremum can't set offset ")
     }
 
-    operator fun compareTo(that: Row): Int {
+    override operator fun compareTo(that: Row): Int {
         return if (that is InnodbUserRecord) {
             1
-        } else supremumUnsupport()
+        } else supremumUnsupported()
     }
 
-    fun nextRecordOffset(): Int {
+    override fun nextRecordOffset(): Int {
         return 0
     }
 
-    fun deleteSign(): Boolean {
+    override fun deleteSign(): Boolean {
         return false
     }
 
-    fun belongTo(): Table {
-        return supremumUnsupport()
+    override fun belongTo(): Table {
+        supremumUnsupported()
     }
 
     fun setRecordHeader(recordHeader: RecordHeader): Supremum {
@@ -87,13 +96,10 @@ class Supremum : InnodbUserRecord {
         return this
     }
 
-    private fun <T> supremumUnsupport(): T {
+    private fun supremumUnsupported(): Nothing {
         throw UnsupportedOperationException("this is supremum!")
     }
 
-    override fun getRecordHeader(): RecordHeader {
-        return recordHeader
-    }
 
     override fun beforeSplitOffset(): Int {
         return recordHeader.length()
@@ -103,7 +109,5 @@ class Supremum : InnodbUserRecord {
         return ConstantSize.SUPREMUM.size()
     }
 
-    companion object {
-        const val SUPREMUM_BODY = "supremum"
-    }
+
 }

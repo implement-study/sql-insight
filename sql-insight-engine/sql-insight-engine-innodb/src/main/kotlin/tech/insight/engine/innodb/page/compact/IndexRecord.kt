@@ -17,6 +17,9 @@ package tech.insight.engine.innodb.page.compact
 
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.bean.Index
+import tech.insight.core.bean.Table
+import tech.insight.core.bean.value.Value
+import tech.insight.engine.innodb.factory.RecordHeaderFactory
 import tech.insight.engine.innodb.page.IndexNode
 import tech.insight.engine.innodb.page.InnodbUserRecord
 import java.util.*
@@ -24,7 +27,7 @@ import java.util.*
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class IndexRecord(val recordHeader: RecordHeader, indexNode: IndexNode, index: Index) : InnodbUserRecord {
+class IndexRecord(override val recordHeader: RecordHeader, indexNode: IndexNode, index: Index) : InnodbUserRecord {
     private val index: Index
     private val indexNode: IndexNode
     private var offsetInPage = -1
@@ -43,16 +46,17 @@ class IndexRecord(val recordHeader: RecordHeader, indexNode: IndexNode, index: I
         return indexNode
     }
 
-    val values: List<Any>
-        get() = Arrays.asList(indexNode.getKey())
-    val rowId: Long
+    override val values: List<Value<*>>
+        get() = indexNode.key.toList()
+
+    override val rowId: Long
         get() = -1
 
-    fun getValueByColumnName(colName: String?): Value {
+    override fun getValueByColumnName(colName: String): Value<*> {
         throw UnsupportedOperationException()
     }
 
-    fun belongTo(): Table {
+    override fun belongTo(): Table {
         return index.belongTo()
     }
 
@@ -60,27 +64,27 @@ class IndexRecord(val recordHeader: RecordHeader, indexNode: IndexNode, index: I
         return recordHeader.length()
     }
 
-    fun deleteSign(): Boolean {
-        return recordHeader.isDelete()
+    override fun deleteSign(): Boolean {
+        return recordHeader.delete
     }
 
-    fun rowBytes(): ByteArray {
+    override fun rowBytes(): ByteArray {
         val buffer: DynamicByteBuffer = DynamicByteBuffer.wrap(recordHeader.toBytes())
         buffer.append(indexNode.toBytes())
         return buffer.toBytes()
     }
 
-    fun offset(): Int {
+    override fun offset(): Int {
         require(offsetInPage != -1) { "unknown offset" }
         return offsetInPage
     }
 
-    fun setOffset(offset: Int) {
+    override fun setOffset(offset: Int) {
         offsetInPage = offset
     }
 
-    fun nextRecordOffset(): Int {
-        return recordHeader.getNextRecordOffset()
+    override fun nextRecordOffset(): Int {
+        return recordHeader.nextRecordOffset
     }
 
     override fun length(): Int {

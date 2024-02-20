@@ -1,7 +1,7 @@
 package tech.insight.engine.innodb.page
 
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.RecordHeaderFactory
+import tech.insight.engine.innodb.factory.RecordHeaderFactory
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.Value
@@ -43,7 +43,7 @@ class Infimum : InnodbUserRecord {
     }
 
     override fun nextRecordOffset(): Int {
-        return recordHeader.getNextRecordOffset()
+        return recordHeader.nextRecordOffset
     }
 
     override fun deleteSign(): Boolean {

@@ -16,10 +16,21 @@
 package tech.insight.engine.innodb.page.compact
 
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
+import tech.insight.core.bean.Column
+import tech.insight.core.bean.InsertRow
+import tech.insight.core.bean.ReadRow
+import tech.insight.core.bean.Table
+import tech.insight.core.bean.value.Value
+import tech.insight.core.bean.value.ValueInt
+import tech.insight.core.bean.value.ValueNull
+import tech.insight.core.exception.SqlInsightException
+import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.InnoDbPage
 import tech.insight.engine.innodb.page.InnodbUserRecord
+import tech.insight.engine.innodb.utils.ValueNegotiator
 import java.nio.ByteBuffer
 import java.util.*
+import kotlin.math.pow
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -33,30 +44,30 @@ object RowFormatFactory {
     fun compactFromInsertRow(row: InsertRow): Compact {
         val compact = Compact()
         compact.variables = Variables()
-        compact.nullList = CompactNullList(row.getTable())
+        compact.nullList = CompactNullList(row.belongTo())
         compact.sourceRow = row
-        compact.setRecordHeader(RecordHeader())
+        compact.recordHeader = RecordHeader()
         val bodyBuffer: DynamicByteBuffer = DynamicByteBuffer.allocate()
         for (insertItem in row) {
-            val column: Column = insertItem.getColumn()
-            val value: Value = insertItem.getValue()
-            if (value.getSource() == null && column.isNotNull()) {
-                throw SqlInsightException(column.getName() + " must not null")
+            val column: Column = insertItem.column
+            val value: Value<*> = insertItem.value
+            if (value is ValueNull && column.notNull) {
+                throw SqlInsightException("${column.name} must not null")
             }
-            if (value.getSource() == null) {
-                compact.nullList!!.setNull(column.getNullListIndex())
+            if (value is ValueNull) {
+                compact.nullList.setNull(column.nullListIndex)
                 continue
             }
-            if (column.isVariable()) {
-                val length: Int = value.getLength()
-                if (length >= 2.pow(java.lang.Byte.SIZE.toDouble())) {
+            if (column.variable) {
+                val length: Int = value.length
+                if (length >= 2.0.pow(Byte.SIZE_BITS)) {
                     throw SqlInsightException("length too long ")
                 }
-                compact.variables!!.addVariableLength(value.getLength() as Byte)
+                compact.variables.addVariableLength(value.length.toByte())
             }
             bodyBuffer.append(value.toBytes())
         }
-        compact.setBody(bodyBuffer.toBytes())
+        compact.body = (bodyBuffer.toBytes())
         return compact
     }
 
@@ -73,15 +84,15 @@ object RowFormatFactory {
             return page.supremum
         }
         val compact = Compact()
-        compact.setOffsetInPage(offsetInPage)
-        compact.setRecordHeader(readRecordHeader(page, offsetInPage))
+        compact.offsetInPage = (offsetInPage)
+        compact.recordHeader = (readRecordHeader(page, offsetInPage))
         fillNullAndVar(page, offsetInPage, compact, table)
-        val variableLength: Int = compact.getVariables().variableLength()
+        val variableLength: Int = compact.variables.variableLength()
         val fixLength = compactFixLength(compact, table)
         val body: ByteArray =
             Arrays.copyOfRange(page.toBytes(), offsetInPage, offsetInPage + variableLength + fixLength)
-        compact.setBody(body)
-        compact.setSourceRow(compactReadRow(compact, table))
+        compact.body = (body)
+        compact.sourceRow = (compactReadRow(compact, table))
         return compact
     }
 
@@ -102,28 +113,28 @@ object RowFormatFactory {
      */
     private fun fillNullAndVar(page: InnoDbPage, offset: Int, compact: Compact, table: Table) {
         var offset = offset
-        val nullLength: Int = table.getExt().getNullableColCount() / java.lang.Byte.SIZE
+        val nullLength: Int = table.ext.nullableColCount / Byte.SIZE_BITS
         offset -= ConstantSize.RECORD_HEADER.size() - nullLength
         val pageArr: ByteArray = page.toBytes()
         val nullListByte = Arrays.copyOfRange(pageArr, offset, offset + nullLength)
         //   read null list
         val compactNullList = CompactNullList(nullListByte)
-        compact.setNullList(compactNullList)
+        compact.nullList = (compactNullList)
         //   read variable
         val variableCount = variableColumnCount(table, compactNullList)
         offset -= variableCount
         val variableArray = Arrays.copyOfRange(pageArr, offset, offset + variableCount)
-        compact.setVariables(Variables(variableArray))
+        compact.variables = (Variables(variableArray))
     }
 
     private fun variableColumnCount(table: Table, nullList: CompactNullList): Int {
-        val columnList: List<Column> = table.getColumnList()
+        val columnList: List<Column> = table.columnList
         var result = 0
         for (column in columnList) {
-            if (!column.isNotNull() && nullList.isNull(column.getNullListIndex())) {
+            if (!column.notNull && nullList.isNull(column.nullListIndex)) {
                 continue
             }
-            if (column.isVariable()) {
+            if (column.variable) {
                 result++
             }
         }
@@ -132,39 +143,39 @@ object RowFormatFactory {
 
     private fun compactFixLength(compact: Compact, table: Table): Int {
         var fixLength = 0
-        for (column in table.getColumnList()) {
-            if (column.isVariable()) {
+        for (column in table.columnList) {
+            if (column.variable) {
                 continue
             }
-            if (column.isNotNull() || !compact.getNullList().isNull(column.getNullListIndex())) {
-                fixLength += column.getDataType().getLength()
+            if (column.notNull || !compact.nullList.isNull(column.nullListIndex)) {
+                fixLength += column.length
             }
         }
         return fixLength
     }
 
     private fun compactReadRow(compact: Compact, table: Table): ReadRow {
-        val columnList: List<Column> = table.getColumnList()
-        val valueList: MutableList<Value> = ArrayList<Value>(columnList.size)
-        val bodyBuffer = ByteBuffer.wrap(compact.getBody())
-        val iterator: Iterator<Byte> = compact.getVariables().iterator()
+        val columnList: List<Column> = table.columnList
+        val valueList: MutableList<Value<*>> = ArrayList<Value<*>>(columnList.size)
+        val bodyBuffer = ByteBuffer.wrap(compact.body)
+        val iterator: Iterator<Byte> = compact.variables.iterator()
         var rowId = -1
         for (column in columnList) {
-            if (!column.isNotNull() && compact.getNullList().isNull(column.getNullListIndex())) {
-                valueList.add(if (column.getDefaultValue() == null) ValueNull.getInstance() else column.getDefaultValue())
+            if (!column.notNull && compact.nullList.isNull(column.nullListIndex)) {
+                valueList.add(column.defaultValue)
                 continue
             }
-            val length = if (column.isVariable()) iterator.next().toInt() else column.getDataType().getLength()
+            val length = if (column.variable) iterator.next().toInt() else column.length
             val item = ByteArray(length)
             bodyBuffer[item]
-            val value: Value = ValueNegotiator.wrapValue(column, item)
+            val value: Value<*> = ValueNegotiator.wrapValue(column, item)
             valueList.add(value)
-            if (column.isPrimaryKey()) {
-                rowId = (value as ValueInt).getSource()
+            if (column.primaryKey) {
+                rowId = (value as ValueInt).source
             }
         }
-        val row = ReadRow(valueList, rowId)
-        row.setTable(table)
+        val row = ReadRow(valueList, rowId.toLong())
+        row.table = table
         return row
     }
 }

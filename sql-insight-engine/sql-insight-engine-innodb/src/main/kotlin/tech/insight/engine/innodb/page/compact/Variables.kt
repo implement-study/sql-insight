@@ -16,6 +16,7 @@
 package tech.insight.engine.innodb.page.compact
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper
+import tech.insight.engine.innodb.page.PageObject
 
 /**
  * variable data type like varchar
@@ -34,7 +35,7 @@ class Variables : ByteWrapper, PageObject, Iterable<Byte?> {
     }
 
     fun addVariableLength(length: Byte) {
-        if (varBytes.size == 0) {
+        if (varBytes.isEmpty()) {
             varBytes = byteArrayOf(length)
             return
         }
@@ -55,7 +56,7 @@ class Variables : ByteWrapper, PageObject, Iterable<Byte?> {
         return sumLength
     }
 
-    fun toBytes(): ByteArray {
+    override fun toBytes(): ByteArray {
         return varBytes
     }
 
@@ -63,12 +64,12 @@ class Variables : ByteWrapper, PageObject, Iterable<Byte?> {
         return varBytes.size
     }
 
-    override fun iterator(): MutableIterator<Byte> {
+    override fun iterator(): Iterator<Byte> {
         return ReIter()
     }
 
-    inner class ReIter : MutableIterator<Byte> {
-        var cursor = varBytes.size - 1
+    inner class ReIter : Iterator<Byte> {
+        private var cursor = varBytes.size - 1
         override fun hasNext(): Boolean {
             return cursor >= 0
         }

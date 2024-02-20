@@ -1,23 +1,11 @@
-/*
- * Copyright 2023 java-mysql  and the original author or authors <gongxuanzhangmelt@gmail.com>.
- *
- * Licensed under the GNU Affero General Public License v3.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://github.com/implement-study/sql-insight/blob/main/LICENSE
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package tech.insight.engine.innodb.page
 
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFactory
+import tech.insight.engine.innodb.factory.PageFactory
+import tech.insight.engine.innodb.utils.RowComparator
 import tech.insight.core.bean.Column
+import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.compact.IndexRecord
+import tech.insight.engine.innodb.page.compact.RowFormatFactory
 
 
 /**
@@ -35,10 +23,10 @@ class DataPage(index: InnodbIndex) : InnoDbPage(index) {
         if (this.freeSpace > ConstantSize.PAGE.size() shr 4) {
             return
         }
-        val pageUserRecord: MutableList<InnodbUserRecord?> = ArrayList(
-            pageHeader!!.recordCount + 1
+        val pageUserRecord: MutableList<InnodbUserRecord> = ArrayList(
+            pageHeader.recordCount + 1
         )
-        var base: InnodbUserRecord? = infimum
+        var base: InnodbUserRecord = infimum
         var allLength = 0
         while (true) {
             base = getUserRecordByOffset(base.offset() + base.nextRecordOffset())
@@ -46,10 +34,10 @@ class DataPage(index: InnodbIndex) : InnoDbPage(index) {
                 break
             }
             pageUserRecord.add(base)
-            allLength += base!!.length()
+            allLength += base.length()
         }
         //   todo non middle split ?
-        if (pageHeader!!.directionCount < Constant.Companion.DIRECTION_COUNT_THRESHOLD) {
+        if (pageHeader.directionCount < Constant.DIRECTION_COUNT_THRESHOLD) {
             middleSplit(pageUserRecord, allLength)
         }
     }
@@ -68,13 +56,13 @@ class DataPage(index: InnodbIndex) : InnoDbPage(index) {
      * @param pageUserRecord all user record in page with inserted
      * @param allLength      all user record length
      */
-    private fun middleSplit(pageUserRecord: List<InnodbUserRecord?>, allLength: Int) {
+    private fun middleSplit(pageUserRecord: List<InnodbUserRecord>, allLength: Int) {
         var allLength = allLength
         val half = allLength / 2
         var firstDataPage: DataPage? = null
         var secondDataPage: DataPage? = null
         for (i in pageUserRecord.indices) {
-            allLength -= pageUserRecord[i]!!.length()
+            allLength -= pageUserRecord[i].length()
             if (allLength <= half) {
                 val belong = ext.belongIndex
                 firstDataPage = PageFactory.createDataPage(pageUserRecord.subList(0, i), belong)
@@ -89,13 +77,10 @@ class DataPage(index: InnodbIndex) : InnoDbPage(index) {
     }
 
     override fun pageIndex(): IndexRecord {
-        val firstData = getUserRecordByOffset(infimum!!.offset() + infimum!!.nextRecordOffset())
+        val firstData = getUserRecordByOffset(infimum.offset() + infimum.nextRecordOffset())
         val columns: List<Column> = ext.belongIndex.columns()
-        val values = columns.stream()
-            .map<Any>(Column::getName)
-            .map<Any>(firstData::getValueByColumnName)
-            .toArray(IntFunction<Array<A>> { _Dummy_.__Array__() })
-        return IndexRecord(IndexNode(values, fileHeader!!.offset), ext.belongIndex)
+        val values = columns.map { it.name }.map { firstData.getValueByColumnName(it) }.toTypedArray()
+        return IndexRecord(IndexNode(values, fileHeader.offset), ext.belongIndex)
     }
 
     override fun compare(o1: InnodbUserRecord, o2: InnodbUserRecord): Int {
