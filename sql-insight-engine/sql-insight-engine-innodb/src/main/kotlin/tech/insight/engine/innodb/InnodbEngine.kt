@@ -23,8 +23,8 @@ import tech.insight.core.engine.storage.StorageEngine
 import tech.insight.core.extension.slf4j
 import tech.insight.core.result.MessageResult
 import tech.insight.core.result.ResultInterface
-import tech.insight.engine.innodb.factory.PageFactory
 import tech.insight.engine.innodb.index.ClusteredIndex
+import tech.insight.engine.innodb.page.InnoDbPage
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
@@ -46,7 +46,7 @@ class InnodbEngine : StorageEngine {
 
     override fun openTable(table: Table) {
         if (table.indexList.isEmpty()) {
-            val file: File = File(table.database.dbFolder, "${table.name}.inf")
+            val file = File(table.database.dbFolder, "${table.name}.inf")
             table.indexList.add(ClusteredIndex(table))
             try {
                 val lines = Files.readAllLines(file.toPath())
@@ -61,7 +61,13 @@ class InnodbEngine : StorageEngine {
     }
 
     override fun createTable(table: Table): ResultInterface {
-        PageFactory.initialization(table)
+        val clusteredIndex = ClusteredIndex(table)
+        val primaryFile: File = clusteredIndex.file
+        if (!primaryFile.createNewFile()) {
+            log.warn("{} already exists , execute create table will overwrite file", primaryFile.getAbsoluteFile())
+        }
+        val root = InnoDbPage.createRootPage(clusteredIndex)
+        Files.write(primaryFile.toPath(), root.toBytes())
         log.info("create table {} with innodb,create ibd file", table.name)
         val file = File(table.database.dbFolder, "${table.name}.inf")
         if (file.createNewFile()) {

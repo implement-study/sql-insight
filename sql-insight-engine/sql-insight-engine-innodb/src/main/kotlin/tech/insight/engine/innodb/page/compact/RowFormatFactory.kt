@@ -46,7 +46,7 @@ object RowFormatFactory {
         compact.variables = Variables()
         compact.nullList = CompactNullList(row.belongTo())
         compact.sourceRow = row
-        compact.recordHeader = RecordHeader()
+        compact.recordHeader = RecordHeader.create(RecordType.NORMAL)
         val bodyBuffer: DynamicByteBuffer = DynamicByteBuffer.allocate()
         for (insertItem in row) {
             val column: Column = insertItem.column
@@ -104,7 +104,7 @@ object RowFormatFactory {
     fun readRecordHeader(page: InnoDbPage, offset: Int): RecordHeader {
         val recordHeaderSize: Int = ConstantSize.RECORD_HEADER.size()
         val headerArr: ByteArray = Arrays.copyOfRange(page.toBytes(), offset - recordHeaderSize, offset)
-        return RecordHeader(headerArr)
+        return RecordHeader.wrap(headerArr)
     }
 
     /**

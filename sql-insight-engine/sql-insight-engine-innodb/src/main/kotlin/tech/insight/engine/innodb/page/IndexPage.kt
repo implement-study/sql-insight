@@ -3,7 +3,6 @@ package tech.insight.engine.innodb.page
 import tech.insight.core.bean.Column
 import tech.insight.core.bean.value.Value
 import tech.insight.core.bean.value.ValueNull
-import tech.insight.engine.innodb.factory.PageFactory
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.compact.IndexRecord
 import tech.insight.engine.innodb.page.compact.RecordHeader
@@ -12,9 +11,13 @@ import tech.insight.engine.innodb.utils.ValueNegotiator
 import java.nio.ByteBuffer
 
 /**
+ *
+ * index page
+ *
  * @author gongxuanzhangmelt@gmail.com
  */
 class IndexPage(index: InnodbIndex) : InnoDbPage(index) {
+
     override fun insertData(data: InnodbUserRecord) {
         if (data is IndexRecord) {
             super.insertData(data)
@@ -28,7 +31,7 @@ class IndexPage(index: InnodbIndex) : InnoDbPage(index) {
         } else {
             pre as IndexRecord
         }
-        val pointPage: InnoDbPage = PageFactory.findPageByOffset(hit.indexNode().pointer, ext.belongIndex)
+        val pointPage: InnoDbPage = findPageByOffset(hit.indexNode().pointer, ext.belongIndex)
         pointPage.insertData(data)
     }
 
@@ -63,8 +66,8 @@ class IndexPage(index: InnodbIndex) : InnoDbPage(index) {
             }
             allRecords.add(base)
         }
-        val pre: InnoDbPage = PageFactory.createIndexPage(allRecords.subList(0, allRecords.size / 2), ext.belongIndex)
-        val next: InnoDbPage = PageFactory.createIndexPage(
+        val pre: InnoDbPage = createIndexPage(allRecords.subList(0, allRecords.size / 2), ext.belongIndex)
+        val next: InnoDbPage = createIndexPage(
             allRecords.subList(allRecords.size / 2, allRecords.size),
             ext.belongIndex
         )

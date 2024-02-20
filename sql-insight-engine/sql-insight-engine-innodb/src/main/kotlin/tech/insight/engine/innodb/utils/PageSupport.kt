@@ -3,7 +3,6 @@ package tech.insight.engine.innodb.utils
 import tech.insight.core.bean.Index
 import tech.insight.core.exception.RuntimeIoException
 import tech.insight.core.extension.slf4j
-import tech.insight.engine.innodb.factory.PageFactory
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.InnoDbPage
@@ -23,7 +22,7 @@ object PageSupport {
         FileInputStream(indexFile).use { fileInputStream ->
             val pageByte: ByteArray = ConstantSize.PAGE.emptyBuff()
             require(fileInputStream.read(pageByte) == pageByte.size) { "idb file error [ " + indexFile.getAbsoluteFile() + " ]" }
-            return PageFactory.swap(pageByte, index)
+            return InnoDbPage.swap(pageByte, index)
         }
     }
 

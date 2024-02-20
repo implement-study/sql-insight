@@ -159,7 +159,7 @@ class RecordHeader private constructor() : ByteWrapper, PageObject {
                 RecordType.PAGE -> indexHeader(this)
                 RecordType.INFIMUM -> infimumHeader(this)
                 RecordType.SUPREMUM -> supremumHeader(this)
-                RecordType.NORMAL -> throw IllegalArgumentException()
+                RecordType.NORMAL -> RecordHeader().apply { this.recordType = RecordType.NORMAL }
             }
         }
 

@@ -34,6 +34,10 @@ import java.io.File
  */
 class ClusteredIndex(table: Table) : InnodbIndex() {
 
+    init {
+        this.table = table
+    }
+
     companion object {
         val log = slf4j<ClusteredIndex>()
     }

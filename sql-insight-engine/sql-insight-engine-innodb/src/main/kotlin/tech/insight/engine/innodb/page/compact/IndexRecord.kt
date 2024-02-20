@@ -19,7 +19,6 @@ import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.bean.Index
 import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.Value
-import tech.insight.engine.innodb.factory.RecordHeaderFactory
 import tech.insight.engine.innodb.page.IndexNode
 import tech.insight.engine.innodb.page.InnodbUserRecord
 
@@ -31,7 +30,7 @@ class IndexRecord(override val recordHeader: RecordHeader, indexNode: IndexNode,
     private val indexNode: IndexNode
     private var offsetInPage = -1
 
-    constructor(indexNode: IndexNode, index: Index) : this(RecordHeaderFactory.indexHeader(), indexNode, index)
+    constructor(indexNode: IndexNode, index: Index) : this(RecordHeader.create(RecordType.PAGE), indexNode, index)
 
     init {
         this.index = index

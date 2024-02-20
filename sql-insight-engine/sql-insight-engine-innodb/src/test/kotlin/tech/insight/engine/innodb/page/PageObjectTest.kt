@@ -6,10 +6,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import tech.insight.core.extension.mapper
 import tech.insight.core.extension.tree
-import tech.insight.engine.innodb.factory.FileHeaderFactory
-import tech.insight.engine.innodb.factory.PageFactory
-import tech.insight.engine.innodb.factory.PageHeaderFactory
-import tech.insight.engine.innodb.factory.PageHeaderFactory.EMPTY_PAGE_HEAP_TOP
 import kotlin.random.Random
 
 
@@ -17,27 +13,27 @@ class PageObjectTest {
 
     @Test
     fun testInnodbPageObjectLength() {
-        assertEquals(ConstantSize.INFIMUM.size(), Infimum().toBytes().size)
-        assertEquals(ConstantSize.SUPREMUM.size(), Supremum().toBytes().size)
-        assertEquals(ConstantSize.PAGE_HEADER.size(), PageHeaderFactory.createPageHeader().toBytes().size)
-        assertEquals(ConstantSize.FILE_HEADER.size(), FileHeaderFactory.createFileHeader().toBytes().size)
-        assertEquals(ConstantSize.FILE_TRAILER.size(), FileTrailer().toBytes().size)
-        assertEquals(ConstantSize.INFIMUM.size(), Infimum().length())
-        assertEquals(ConstantSize.SUPREMUM.size(), Supremum().length())
-        assertEquals(ConstantSize.PAGE_HEADER.size(), PageHeaderFactory.createPageHeader().length())
-        assertEquals(ConstantSize.FILE_HEADER.size(), FileHeaderFactory.createFileHeader().length())
-        assertEquals(ConstantSize.FILE_TRAILER.size(), FileTrailer().length())
+        assertEquals(ConstantSize.INFIMUM.size(), Infimum.create().toBytes().size)
+        assertEquals(ConstantSize.SUPREMUM.size(), Supremum.create().toBytes().size)
+        assertEquals(ConstantSize.PAGE_HEADER.size(), PageHeader.create().toBytes().size)
+        assertEquals(ConstantSize.FILE_HEADER.size(), FileHeader.create().toBytes().size)
+        assertEquals(ConstantSize.FILE_TRAILER.size(), FileTrailer.create().toBytes().size)
+        assertEquals(ConstantSize.INFIMUM.size(), Infimum.create().length())
+        assertEquals(ConstantSize.SUPREMUM.size(), Supremum.create().length())
+        assertEquals(ConstantSize.PAGE_HEADER.size(), PageHeader.create().length())
+        assertEquals(ConstantSize.FILE_HEADER.size(), FileHeader.create().length())
+        assertEquals(ConstantSize.FILE_TRAILER.size(), FileTrailer.create().length())
     }
 
     @Test
     fun testWrap() {
-        val pageHeader = fillRandomNumber(PageHeader())
-        assertByteWrapper(pageHeader, PageHeaderFactory::readPageHeader)
-        val fileHeader = fillRandomNumber(FileHeader())
-        assertByteWrapper(fileHeader, FileHeaderFactory::readFileHeader)
-        assertByteWrapper(Infimum(), PageFactory::readInfimum)
-        assertByteWrapper(Supremum(), PageFactory::readSupremum)
-        assertByteWrapper(FileTrailer(), PageFactory::readFileTrailer)
+        val pageHeader = fillRandomNumber(PageHeader.create())
+        assertByteWrapper(pageHeader, PageHeader::wrap)
+        val fileHeader = fillRandomNumber(FileHeader.create())
+        assertByteWrapper(fileHeader, FileHeader::wrap)
+        assertByteWrapper(Infimum.create(), Infimum::wrap)
+        assertByteWrapper(Supremum.create(), Supremum::wrap)
+        assertByteWrapper(FileTrailer.create(), FileTrailer::wrap)
 //        val dataPage = DataPage()
 //        dataPage.fileHeader = FileHeader()
 //        dataPage.pageHeader = PageHeader().also { it.heapTop = (EMPTY_PAGE_HEAP_TOP + 16).toShort() }

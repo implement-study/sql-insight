@@ -1,7 +1,6 @@
 package tech.insight.engine.innodb.page
 
 import tech.insight.core.bean.Column
-import tech.insight.engine.innodb.factory.PageFactory
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.compact.IndexRecord
 import tech.insight.engine.innodb.page.compact.RowFormatFactory
@@ -65,8 +64,8 @@ class DataPage(index: InnodbIndex) : InnoDbPage(index) {
             lengthCandidate -= pageUserRecord[i].length()
             if (lengthCandidate <= half) {
                 val belong = ext.belongIndex
-                firstDataPage = PageFactory.createDataPage(pageUserRecord.subList(0, i), belong)
-                secondDataPage = PageFactory.createDataPage(pageUserRecord.subList(i, pageUserRecord.size), belong)
+                firstDataPage = createDataPage(pageUserRecord.subList(0, i), belong)
+                secondDataPage = createDataPage(pageUserRecord.subList(i, pageUserRecord.size), belong)
                 break
             }
         }
