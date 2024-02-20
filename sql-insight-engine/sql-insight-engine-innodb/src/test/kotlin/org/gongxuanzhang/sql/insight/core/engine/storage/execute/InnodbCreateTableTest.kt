@@ -18,7 +18,7 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.execute
 
 import org.gongxuanzhang.sql.insight.*
 import org.gongxuanzhang.sql.insight.core.command.ddl.CreateTable
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize
+import tech.insight.engine.innodb.page.ConstantSize
 import org.gongxuanzhang.sql.insight.core.environment.SqlInsightContext
 import org.gongxuanzhang.sql.insight.core.exception.DatabaseNotExistsException
 import org.gongxuanzhang.sql.insight.core.`object`.Column

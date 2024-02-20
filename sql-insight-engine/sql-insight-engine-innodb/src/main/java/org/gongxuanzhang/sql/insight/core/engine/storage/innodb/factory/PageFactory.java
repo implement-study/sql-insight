@@ -2,10 +2,11 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.ClusteredIndex;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.InnodbIndex;
+import tech.insight.engine.innodb.index.ClusteredIndex;
+import tech.insight.engine.innodb.index.InnodbIndex;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.*;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
+import tech.insight.engine.innodb.page.*;
+import tech.insight.engine.innodb.page.compact.RecordHeader;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
@@ -18,14 +19,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.FILE_HEADER;
-import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.FILE_TRAILER;
-import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.INFIMUM;
-import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.PAGE;
-import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.PAGE_HEADER;
-import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize.SUPREMUM;
-import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageType.FIL_PAGE_INDEX;
-import static org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageType.FIL_PAGE_INODE;
+import static tech.insight.engine.innodb.page.ConstantSize.FILE_HEADER;
+import static tech.insight.engine.innodb.page.ConstantSize.FILE_TRAILER;
+import static tech.insight.engine.innodb.page.ConstantSize.INFIMUM;
+import static tech.insight.engine.innodb.page.ConstantSize.PAGE;
+import static tech.insight.engine.innodb.page.ConstantSize.PAGE_HEADER;
+import static tech.insight.engine.innodb.page.ConstantSize.SUPREMUM;
+import static tech.insight.engine.innodb.page.PageType.FIL_PAGE_INDEX;
+import static tech.insight.engine.innodb.page.PageType.FIL_PAGE_INODE;
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -61,14 +62,14 @@ public abstract class PageFactory {
     public static DataPage createDataPage(List<InnodbUserRecord> recordList, InnodbIndex index) {
         DataPage dataPage = new DataPage(index);
         fillInnodbUserRecords(recordList, dataPage);
-        dataPage.getFileHeader().setPageType(FIL_PAGE_INDEX.getValue());
+        dataPage.getFileHeader().setPageType(FIL_PAGE_INDEX.value);
         return dataPage;
     }
 
     public static IndexPage createIndexPage(List<InnodbUserRecord> indexRecordList, InnodbIndex index) {
         IndexPage indexPage = new IndexPage(index);
         fillInnodbUserRecords(indexRecordList, indexPage);
-        indexPage.getFileHeader().setPageType(FIL_PAGE_INODE.getValue());
+        indexPage.getFileHeader().setPageType(FIL_PAGE_INODE.value);
         return indexPage;
     }
 
@@ -97,13 +98,13 @@ public abstract class PageFactory {
             InnodbUserRecord current = recordList.get(i);
             int currentOffset = pageHeader.getLastInsertOffset() + current.beforeSplitOffset();
             pageHeader.setLastInsertOffset((short) (pageHeader.getLastInsertOffset() + current.length()));
-            pre.getRecordHeader().setNextRecordOffset(currentOffset - preOffset);
+            pre.recordHeader.setNextRecordOffset(currentOffset - preOffset);
             pre = current;
             if ((i + 1) % Constant.SLOT_MAX_COUNT == 0) {
                 slots[slots.length - 1 - ((i + 1) % Constant.SLOT_MAX_COUNT)] = (short) currentOffset;
             }
         }
-        pre.getRecordHeader().setNextRecordOffset(SUPREMUM.offset());
+        pre.recordHeader.setNextRecordOffset(SUPREMUM.offset());
         page.setPageDirectory(new PageDirectory(slots));
         slots[0] = (short) SUPREMUM.offset();
         slots[slots.length - 1] = (short) INFIMUM.offset();
@@ -142,7 +143,7 @@ public abstract class PageFactory {
         byte[] supremumBytes = buffer.getLength(SUPREMUM.size());
         Supremum supremum = readSupremum(supremumBytes);
         InnoDbPage result;
-        if (fileHeader.getPageType() == FIL_PAGE_INODE.getValue()) {
+        if (fileHeader.getPageType() == FIL_PAGE_INODE.value) {
             result = new IndexPage(index);
         } else {
             result = new DataPage(index);

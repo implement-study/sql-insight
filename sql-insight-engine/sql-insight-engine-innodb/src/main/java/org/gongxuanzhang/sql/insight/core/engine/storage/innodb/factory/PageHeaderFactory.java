@@ -1,7 +1,7 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory;
 
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageHeader;
+import tech.insight.engine.innodb.page.ConstantSize;
+import tech.insight.engine.innodb.page.PageHeader;
 
 import java.nio.ByteBuffer;
 

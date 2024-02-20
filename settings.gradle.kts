@@ -9,7 +9,9 @@ pluginManagement {
 
 
 include(":sql-insight-core")
-//include(":sql-insight-engine")
+include(":sql-insight-engine")
+
+include(":sql-insight-engine:sql-insight-engine-innodb")
 //include(":sql-insight-server")
 //include(":sql-insight-spring")
 

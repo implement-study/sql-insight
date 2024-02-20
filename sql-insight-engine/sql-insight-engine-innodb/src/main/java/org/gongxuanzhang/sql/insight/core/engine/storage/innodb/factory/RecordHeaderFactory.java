@@ -1,8 +1,8 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory;
 
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordHeader;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.compact.RecordType;
+import tech.insight.engine.innodb.page.ConstantSize;
+import tech.insight.engine.innodb.page.compact.RecordHeader;
+import tech.insight.engine.innodb.page.compact.RecordType;
 
 /**
  * @author gongxuanzhangmelt@gmail.com

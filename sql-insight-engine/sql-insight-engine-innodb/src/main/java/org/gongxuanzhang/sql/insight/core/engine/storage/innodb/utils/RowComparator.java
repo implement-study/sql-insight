@@ -16,9 +16,9 @@
 
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils;
 
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Infimum;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnodbUserRecord;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.Supremum;
+import tech.insight.engine.innodb.page.Infimum;
+import tech.insight.engine.innodb.page.InnodbUserRecord;
+import tech.insight.engine.innodb.page.Supremum;
 import org.gongxuanzhang.sql.insight.core.object.Table;
 
 import java.util.Comparator;

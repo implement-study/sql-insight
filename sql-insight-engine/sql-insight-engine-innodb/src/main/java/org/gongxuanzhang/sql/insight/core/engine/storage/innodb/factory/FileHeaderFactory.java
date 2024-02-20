@@ -1,8 +1,8 @@
 package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory;
 
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.FileHeader;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.PageType;
+import tech.insight.engine.innodb.page.ConstantSize;
+import tech.insight.engine.innodb.page.FileHeader;
+import tech.insight.engine.innodb.page.PageType;
 
 import java.nio.ByteBuffer;
 
@@ -35,7 +35,7 @@ public abstract class FileHeaderFactory {
         fileHeader.setNext(0);
         fileHeader.setPre(0);
         fileHeader.setOffset(0);
-        fileHeader.setPageType(PageType.FIL_PAGE_INDEX.getValue());
+        fileHeader.setPageType(PageType.FIL_PAGE_INDEX.value);
         return fileHeader;
     }
 }

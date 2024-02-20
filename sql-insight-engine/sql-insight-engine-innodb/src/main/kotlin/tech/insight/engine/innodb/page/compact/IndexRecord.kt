@@ -1,0 +1,89 @@
+/*
+ * Copyright 2023 java-mysql  and the original author or authors <gongxuanzhangmelt@gmail.com>.
+ *
+ * Licensed under the GNU Affero General Public License v3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://github.com/implement-study/sql-insight/blob/main/LICENSE
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package tech.insight.engine.innodb.page.compact
+
+import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
+import tech.insight.core.bean.Index
+import tech.insight.engine.innodb.page.IndexNode
+import tech.insight.engine.innodb.page.InnodbUserRecord
+import java.util.*
+
+/**
+ * @author gongxuanzhangmelt@gmail.com
+ */
+class IndexRecord(val recordHeader: RecordHeader, indexNode: IndexNode, index: Index) : InnodbUserRecord {
+    private val index: Index
+    private val indexNode: IndexNode
+    private var offsetInPage = -1
+
+    constructor(indexNode: IndexNode, index: Index) : this(RecordHeaderFactory.indexHeader(), indexNode, index)
+
+    init {
+        this.index = index
+        this.indexNode = indexNode
+    }
+
+    /**
+     * a index record body is a index node
+     */
+    fun indexNode(): IndexNode {
+        return indexNode
+    }
+
+    val values: List<Any>
+        get() = Arrays.asList(indexNode.getKey())
+    val rowId: Long
+        get() = -1
+
+    fun getValueByColumnName(colName: String?): Value {
+        throw UnsupportedOperationException()
+    }
+
+    fun belongTo(): Table {
+        return index.belongTo()
+    }
+
+    override fun beforeSplitOffset(): Int {
+        return recordHeader.length()
+    }
+
+    fun deleteSign(): Boolean {
+        return recordHeader.isDelete()
+    }
+
+    fun rowBytes(): ByteArray {
+        val buffer: DynamicByteBuffer = DynamicByteBuffer.wrap(recordHeader.toBytes())
+        buffer.append(indexNode.toBytes())
+        return buffer.toBytes()
+    }
+
+    fun offset(): Int {
+        require(offsetInPage != -1) { "unknown offset" }
+        return offsetInPage
+    }
+
+    fun setOffset(offset: Int) {
+        offsetInPage = offset
+    }
+
+    fun nextRecordOffset(): Int {
+        return recordHeader.getNextRecordOffset()
+    }
+
+    override fun length(): Int {
+        return recordHeader.length() + indexNode.length()
+    }
+}

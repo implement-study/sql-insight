@@ -18,9 +18,9 @@ package org.gongxuanzhang.sql.insight.core.engine.storage.innodb.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.factory.PageFactory;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.index.InnodbIndex;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.ConstantSize;
-import org.gongxuanzhang.sql.insight.core.engine.storage.innodb.page.InnoDbPage;
+import tech.insight.engine.innodb.index.InnodbIndex;
+import tech.insight.engine.innodb.page.ConstantSize;
+import tech.insight.engine.innodb.page.InnoDbPage;
 import org.gongxuanzhang.sql.insight.core.exception.RuntimeIoException;
 import org.gongxuanzhang.sql.insight.core.object.Index;
 
