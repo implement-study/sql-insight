@@ -1,4 +1,4 @@
-package tech.insight.core
+package tech.insight.share.test
 
 import tech.insight.core.engine.SqlPipeline
 import kotlin.random.Random
@@ -48,12 +48,16 @@ fun prepareDatabase() {
     SqlPipeline.doSql(createDatabase)
 }
 
+fun prepareDb() {
+    SqlPipeline.doSql(createDatabase)
+}
+
 fun clearDatabase() {
     SqlPipeline.doSql(dropDatabaseIe)
 }
 
 fun prepareTable() {
-
+    SqlPipeline.doSql(createDatabase)
 }
 
 

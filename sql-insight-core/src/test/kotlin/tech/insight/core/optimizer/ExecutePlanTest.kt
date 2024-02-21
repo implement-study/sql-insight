@@ -3,7 +3,6 @@ package tech.insight.core.optimizer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import tech.insight.core.*
 import tech.insight.core.bean.DataType
 import tech.insight.core.bean.value.ValueNull
 import tech.insight.core.bean.value.ValueVarchar
@@ -15,7 +14,7 @@ import tech.insight.core.environment.TableManager
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
-
+import tech.insight.share.test.*
 
 class ExecutePlanTest {
 

@@ -3,9 +3,9 @@ package tech.insight.core.optimizer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import tech.insight.core.*
 import tech.insight.core.engine.SqlPipeline
 import tech.insight.core.environment.TableManager
+import tech.insight.share.test.*
 
 
 /**

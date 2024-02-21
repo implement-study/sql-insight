@@ -5,7 +5,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import tech.insight.core.*
+import tech.insight.share.test.*
 import tech.insight.core.bean.Table
 import tech.insight.core.engine.SqlPipeline
 import tech.insight.core.engine.json.JsonEngineSupport

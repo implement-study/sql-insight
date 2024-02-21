@@ -12,6 +12,9 @@ include(":sql-insight-core")
 include(":sql-insight-engine")
 
 include(":sql-insight-engine:sql-insight-engine-innodb")
+
+include(":share")
+include(":share:share-test")
 //include(":sql-insight-server")
 //include(":sql-insight-spring")
 
