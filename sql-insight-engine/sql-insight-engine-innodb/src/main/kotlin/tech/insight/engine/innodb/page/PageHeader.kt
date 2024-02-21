@@ -135,6 +135,51 @@ class PageHeader private constructor() : PageObject, ByteWrapper {
         return buffer.toBytes()
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as PageHeader
+
+        return (slotCount == other.slotCount &&
+                heapTop == other.heapTop &&
+                absoluteRecordCount == other.absoluteRecordCount &&
+                recordCount == other.recordCount &&
+                free == other.free &&
+                garbage == other.garbage &&
+                lastInsertOffset == other.lastInsertOffset &&
+                direction == other.direction &&
+                directionCount == other.directionCount &&
+                maxTransactionId == other.maxTransactionId &&
+                level == other.level &&
+                indexId == other.indexId &&
+                segLeafPre == other.segLeafPre &&
+                segLeaf == other.segLeaf &&
+                segTopPre == other.segTopPre &&
+                segTop == other.segTop)
+    }
+
+    override fun hashCode(): Int {
+        var result = slotCount.toInt()
+        result = 31 * result + heapTop
+        result = 31 * result + absoluteRecordCount
+        result = 31 * result + recordCount
+        result = 31 * result + free
+        result = 31 * result + garbage
+        result = 31 * result + lastInsertOffset
+        result = 31 * result + direction
+        result = 31 * result + directionCount
+        result = 31 * result + maxTransactionId.hashCode()
+        result = 31 * result + level
+        result = 31 * result + indexId.hashCode()
+        result = 31 * result + segLeafPre
+        result = 31 * result + segLeaf.hashCode()
+        result = 31 * result + segTopPre
+        result = 31 * result + segTop.hashCode()
+        return result
+    }
+
+
     companion object PageHeaderFactory {
 
         val EMPTY_PAGE_HEAP_TOP = (ConstantSize.FILE_HEADER.size() +

@@ -78,4 +78,19 @@ class PageDirectory : PageObject, ByteWrapper {
     fun indexSlot(index: Int): Short {
         return slots[index]
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is PageDirectory) return false
+
+        if (!slots.contentEquals(other.slots)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return slots.contentHashCode()
+    }
+
+
 }

@@ -106,4 +106,34 @@ class Compact : InnodbUserRecord {
                 "sourceRow=" + sourceRow +
                 '}'
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Compact) return false
+
+        return (variables != other.variables ||
+                nullList != other.nullList ||
+                recordHeader != other.recordHeader ||
+                !body.contentEquals(other.body) ||
+                rowId != other.rowId ||
+                transactionId != other.transactionId ||
+                rollPointer != other.rollPointer ||
+                sourceRow != other.sourceRow ||
+                offsetInPage != other.offsetInPage)
+    }
+
+    override fun hashCode(): Int {
+        var result = variables.hashCode()
+        result = 31 * result + nullList.hashCode()
+        result = 31 * result + recordHeader.hashCode()
+        result = 31 * result + body.contentHashCode()
+        result = 31 * result + rowId.hashCode()
+        result = 31 * result + transactionId.hashCode()
+        result = 31 * result + rollPointer.hashCode()
+        result = 31 * result + sourceRow.hashCode()
+        result = 31 * result + offsetInPage
+        return result
+    }
+
+
 }

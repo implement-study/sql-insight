@@ -119,9 +119,6 @@ class RecordHeader private constructor() : ByteWrapper, PageObject {
     }
 
     fun setRecordType(recordType: RecordType): RecordHeader {
-        if (this.recordType == recordType) {
-            return this
-        }
         this.recordType = recordType
         // 后三位置0
         source[2] = (source[2].toInt() and 248.toByte().toInt()).toByte()

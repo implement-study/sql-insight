@@ -34,4 +34,19 @@ class UserRecords(var body: ByteArray = ByteArray(0)) : ByteWrapper, PageObject 
     override fun length(): Int {
         return body.size
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is UserRecords) return false
+
+        if (!body.contentEquals(other.body)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return body.contentHashCode()
+    }
+
+
 }

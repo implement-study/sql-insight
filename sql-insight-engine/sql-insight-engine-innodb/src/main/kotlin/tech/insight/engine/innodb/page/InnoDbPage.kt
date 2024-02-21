@@ -310,6 +310,34 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
         return Itr()
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is InnoDbPage) return false
+
+        if (fileHeader != other.fileHeader) return false
+        if (pageHeader != other.pageHeader) return false
+        if (infimum != other.infimum) return false
+        if (supremum != other.supremum) return false
+        if (userRecords != other.userRecords) return false
+        if (pageDirectory != other.pageDirectory) return false
+        if (fileTrailer != other.fileTrailer) return false
+        if (ext != other.ext) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = fileHeader.hashCode()
+        result = 31 * result + pageHeader.hashCode()
+        result = 31 * result + infimum.hashCode()
+        result = 31 * result + supremum.hashCode()
+        result = 31 * result + userRecords.hashCode()
+        result = 31 * result + pageDirectory.hashCode()
+        result = 31 * result + fileTrailer.hashCode()
+        result = 31 * result + ext.hashCode()
+        return result
+    }
+
     inner class Itr : Iterator<InnodbUserRecord> {
         private var cursor = getUserRecordByOffset(infimum.nextRecordOffset() + infimum.offset())
         override fun hasNext(): Boolean {
@@ -328,9 +356,31 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
     }
 
     class PageExt {
+
         lateinit var belongIndex: InnodbIndex
+
         var parent: IndexPage? = null
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is PageExt) return false
+
+            if (belongIndex != other.belongIndex) return false
+            if (parent != other.parent) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = belongIndex.hashCode()
+            result = 31 * result + (parent?.hashCode() ?: 0)
+            return result
+        }
+
     }
+
+
+
 
     companion object {
         val log = slf4j<InnoDbPage>()
@@ -391,6 +441,9 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
                 )
                 val userRecords = UserRecords(body)
                 this.userRecords = userRecords
+            }.apply {
+                val trailerArr = Arrays.copyOfRange(bytes, bytes.size - ConstantSize.FILE_TRAILER.size(), bytes.size)
+                this.fileTrailer = FileTrailer.wrap(trailerArr)
             }
         }
 
@@ -400,7 +453,7 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
                 randomAccessFile.seek(pageOffset.toLong())
                 val pageArr: ByteArray = ConstantSize.PAGE.emptyBuff()
                 randomAccessFile.readFully(pageArr)
-                return InnoDbPage.swap(pageArr, index)
+                return swap(pageArr, index)
             }
         }
 

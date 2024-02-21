@@ -57,7 +57,8 @@ fun clearDatabase() {
 }
 
 fun prepareTable() {
-    SqlPipeline.doSql(createDatabase)
+    prepareDatabase()
+    SqlPipeline.doSql(createTableIne)
 }
 
 

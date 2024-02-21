@@ -68,6 +68,20 @@ class Variables : ByteWrapper, PageObject, Iterable<Byte> {
         return ReIter()
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Variables) return false
+
+        if (!varBytes.contentEquals(other.varBytes)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return varBytes.contentHashCode()
+    }
+
+
     inner class ReIter : Iterator<Byte> {
         private var cursor = varBytes.size - 1
         override fun hasNext(): Boolean {

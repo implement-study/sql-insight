@@ -89,6 +89,25 @@ class Supremum private constructor() : SystemUserRecord {
         throw UnsupportedOperationException("this is supremum!")
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Supremum
+
+        if (recordHeader != other.recordHeader) return false
+        if (!body.contentEquals(other.body)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = recordHeader.hashCode()
+        result = 31 * result + body.contentHashCode()
+        return result
+    }
+
+
     companion object {
 
         const val SUPREMUM_BODY = "supremum"
@@ -148,16 +167,35 @@ class Infimum private constructor(): SystemUserRecord {
     }
 
 
-    override fun toString(): String {
-        return recordHeader.toString() + "[body:" + String(body) + "]"
-    }
-
 
     override operator fun compareTo(other: Row): Int {
         if (other is InnodbUserRecord) {
             return -1
         }
         throw UnsupportedOperationException("this is infimum!")
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Infimum
+
+        if (recordHeader != other.recordHeader) return false
+        if (!body.contentEquals(other.body)) return false
+
+        return true
+    }
+
+
+    override fun hashCode(): Int {
+        var result = recordHeader.hashCode()
+        result = 31 * result + body.contentHashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return recordHeader.toString() + "[body:" + String(body) + "]"
     }
 
 

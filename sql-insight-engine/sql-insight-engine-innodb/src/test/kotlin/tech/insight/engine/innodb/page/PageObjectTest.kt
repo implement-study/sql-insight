@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import tech.insight.core.environment.TableManager
 import tech.insight.core.extension.mapper
+import tech.insight.core.extension.slf4j
 import tech.insight.core.extension.tree
 import tech.insight.engine.innodb.index.ClusteredIndex
 import tech.insight.engine.innodb.page.PageHeader.PageHeaderFactory.EMPTY_PAGE_HEAP_TOP
@@ -16,6 +17,10 @@ import kotlin.random.Random
 
 
 class PageObjectTest {
+
+    companion object {
+        val log = slf4j<PageObjectTest>()
+    }
 
     @Test
     fun testInnodbPageObjectLength() {

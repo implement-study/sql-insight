@@ -47,6 +47,23 @@ class FileTrailer private constructor() : ByteWrapper, PageObject {
         return buffer.array()
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is FileTrailer) return false
+
+        if (checkSum != other.checkSum) return false
+        if (lsn != other.lsn) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = checkSum
+        result = 31 * result + lsn
+        return result
+    }
+
+
     companion object {
         fun create() = FileTrailer()
 

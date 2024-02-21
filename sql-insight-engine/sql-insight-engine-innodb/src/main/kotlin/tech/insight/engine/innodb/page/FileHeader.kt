@@ -89,6 +89,32 @@ class FileHeader private constructor() : ByteWrapper, PageObject {
         return buffer.toBytes()
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is FileHeader) return false
+
+        return (checkSum == other.checkSum &&
+            offset == other.offset &&
+            pageType == other.pageType &&
+            pre == other.pre &&
+            next == other.next &&
+            lsn == other.lsn &&
+            flushLsn == other.flushLsn &&
+            spaceId == other.spaceId)
+    }
+
+    override fun hashCode(): Int {
+        var result = checkSum
+        result = 31 * result + offset
+        result = 31 * result + pageType
+        result = 31 * result + pre
+        result = 31 * result + next
+        result = 31 * result + lsn.hashCode()
+        result = 31 * result + flushLsn.hashCode()
+        result = 31 * result + spaceId
+        return result
+    }
+
 
     companion object FileHeaderFactory {
 
