@@ -22,6 +22,7 @@ import tech.insight.core.bean.Table
 import tech.insight.core.engine.AutoIncrementKeyCounter
 import tech.insight.core.environment.Session
 import tech.insight.core.exception.DataTooLongException
+import tech.insight.core.extension.debugIfNecessary
 import tech.insight.core.extension.slf4j
 import tech.insight.engine.innodb.core.InnodbIc
 import tech.insight.engine.innodb.page.Constant
@@ -33,10 +34,15 @@ import java.io.File
  * @author gongxuanzhangmelt@gmail.com
  */
 class ClusteredIndex(table: Table) : InnodbIndex() {
-
     init {
         this.table = table
     }
+
+    override val file: File by lazy {
+        val dbFolder = table.database.dbFolder
+        File(dbFolder, table.name + ".idb")
+    }
+
 
     companion object {
         val log = slf4j<ClusteredIndex>()
@@ -64,12 +70,10 @@ class ClusteredIndex(table: Table) : InnodbIndex() {
     override val name: String
         get() = ""
 
+
     override fun insert(row: InsertRow) {
         if (autoIncrementKeyCounter.dealAutoIncrement(row)) {
-            log.info(
-                "auto increment primary key {}",
-                table.columnList[table.ext.autoColIndex].name
-            )
+            log.debugIfNecessary { "auto increment primary key ${table.columnList[table.ext.autoColIndex].name}" }
         }
         val compact: Compact = RowFormatFactory.compactFromInsertRow(row)
         val root = rootPage
@@ -79,9 +83,4 @@ class ClusteredIndex(table: Table) : InnodbIndex() {
         root.insertData(compact)
     }
 
-    override val file: File
-        get() {
-            val dbFolder = table.database.dbFolder
-            return File(dbFolder, table.name + ".idb")
-        }
 }

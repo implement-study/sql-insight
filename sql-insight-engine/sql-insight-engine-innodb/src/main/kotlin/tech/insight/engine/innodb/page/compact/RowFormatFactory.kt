@@ -44,7 +44,7 @@ object RowFormatFactory {
     fun compactFromInsertRow(row: InsertRow): Compact {
         val compact = Compact()
         compact.variables = Variables()
-        compact.nullList = CompactNullList(row.belongTo())
+        compact.nullList = CompactNullList.allocate(row.belongTo())
         compact.sourceRow = row
         compact.recordHeader = RecordHeader.create(RecordType.NORMAL)
         val bodyBuffer: DynamicByteBuffer = DynamicByteBuffer.allocate()
@@ -113,12 +113,12 @@ object RowFormatFactory {
      */
     private fun fillNullAndVar(page: InnoDbPage, offset: Int, compact: Compact, table: Table) {
         var offset = offset
-        val nullLength: Int = table.ext.nullableColCount / Byte.SIZE_BITS
+        val nullLength: Int = CompactNullList.calcNullListLength(table.ext.nullableColCount)
         offset -= ConstantSize.RECORD_HEADER.size() - nullLength
         val pageArr: ByteArray = page.toBytes()
         val nullListByte = Arrays.copyOfRange(pageArr, offset, offset + nullLength)
         //   read null list
-        val compactNullList = CompactNullList(nullListByte)
+        val compactNullList = CompactNullList.wrap(nullListByte)
         compact.nullList = (compactNullList)
         //   read variable
         val variableCount = variableColumnCount(table, compactNullList)

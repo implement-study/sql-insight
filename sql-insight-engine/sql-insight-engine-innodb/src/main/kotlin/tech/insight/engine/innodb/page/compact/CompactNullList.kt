@@ -30,23 +30,30 @@ class CompactNullList
  * the byte array is origin byte in page.
  * begin with right.
  * nullList length maybe 0
- */(private var nullList: ByteArray) : ByteWrapper, PageObject {
-    constructor(table: Table) : this(ByteArray(table.ext.nullableColCount / Byte.SIZE_BITS))
+ */ private constructor(private var nullList: ByteArray) : ByteWrapper, PageObject {
 
     /**
      * @param index start 0
      */
     fun isNull(index: Int): Boolean {
-        val byteIndex = nullList.size - index / Byte.SIZE_BITS - 1
+        val byteIndex = positionByte(index)
         val bitMap = nullList[byteIndex]
         val mask = 1 shl index % Byte.SIZE_BITS
         return mask and bitMap.toInt() == mask
     }
 
     fun setNull(index: Int) {
-        val byteIndex = nullList.size - index / Byte.SIZE_BITS - 1
+        val byteIndex = positionByte(index)
         val mask = (1 shl index % Byte.SIZE_BITS).toByte()
         nullList[byteIndex] = (nullList[byteIndex].toInt() and mask.toInt()).toByte()
+    }
+
+    /**
+     * @param nullableListIndex target column index in all nullableList
+     * @return byte index, rightmost is 0
+     */
+    private fun positionByte(nullableListIndex: Int): Int {
+        return (nullList.size - (nullableListIndex / Byte.SIZE_BITS)) - 1
     }
 
     override fun toBytes(): ByteArray {
@@ -70,5 +77,18 @@ class CompactNullList
         return nullList.contentHashCode()
     }
 
+    companion object {
+        fun allocate(table: Table) = CompactNullList(ByteArray(calcNullListLength(table.ext.nullableColCount)))
+
+        fun wrap(nullList: ByteArray) = CompactNullList(nullList)
+
+        fun calcNullListLength(nullableCount: Int): Int {
+            if (nullableCount == 0) {
+                return 0
+            }
+            return (nullableCount / Byte.SIZE_BITS) + 1
+        }
+
+    }
 
 }

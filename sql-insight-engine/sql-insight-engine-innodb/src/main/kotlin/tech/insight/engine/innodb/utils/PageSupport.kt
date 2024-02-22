@@ -51,7 +51,7 @@ object PageSupport {
                 }
                 randomAccessFile.seek(page.fileHeader.offset.toLong())
                 randomAccessFile.write(page.toBytes())
-                log.info("write page to {}", indexFile.getAbsoluteFile())
+                log.info("write page to {}", indexFile.canonicalPath)
             }
         } catch (e: IOException) {
             throw RuntimeIoException(e)

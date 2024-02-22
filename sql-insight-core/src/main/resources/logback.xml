@@ -1,27 +1,19 @@
 <configuration>
 
-    <!-- 设置日志输出格式 -->
-    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+    <conversionRule conversionWord="clr" converterClass="tech.insight.core.logging.ColorConverter"/>
 
-    <!-- 控制台输出 -->
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <property name="LOG_PATTERN" value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){yellow} %clr(%-5level) %clr([%thread]){cyan} %clr(%logger{36}){blue} - %clr(%msg){magenta}%n"/>/>
+
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 
-    <!-- 文件输出 -->
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>../log/application.log</file> <!-- 设置日志文件路径 -->
-        <encoder>
-            <pattern>${LOG_PATTERN}</pattern>
-        </encoder>
-    </appender>
 
-    <!-- 根Logger -->
     <root level="INFO">
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
+        <appender-ref ref="STDOUT"/>
     </root>
 
 </configuration>
