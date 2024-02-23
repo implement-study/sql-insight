@@ -31,12 +31,12 @@ abstract class InnodbIndex : InnodbBTree {
         return table
     }
 
-    protected val rootPage: InnoDbPage
-        /**
-         * get the b+ trees root node.
-         * page is node
-         *
-         * @return not null
-         */
-        get() = PageSupport.getRoot(this)
+    /**
+     * get the b+ trees root node.
+     * page is node
+     *
+     * @return not null
+     */
+    val rootPage: InnoDbPage by lazy { PageSupport.getRoot(this) }
+
 }

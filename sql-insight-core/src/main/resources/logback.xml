@@ -12,8 +12,11 @@
     </appender>
 
 
-    <root level="INFO">
+    <logger name="tech.insight" level="DEBUG"/>
+
+    <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>
+
 
 </configuration>

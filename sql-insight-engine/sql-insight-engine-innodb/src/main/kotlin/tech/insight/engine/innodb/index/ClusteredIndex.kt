@@ -15,10 +15,7 @@
  */
 package tech.insight.engine.innodb.index
 
-import tech.insight.core.bean.Column
-import tech.insight.core.bean.Cursor
-import tech.insight.core.bean.InsertRow
-import tech.insight.core.bean.Table
+import tech.insight.core.bean.*
 import tech.insight.core.engine.AutoIncrementKeyCounter
 import tech.insight.core.environment.Session
 import tech.insight.core.exception.DataTooLongException
@@ -26,6 +23,9 @@ import tech.insight.core.extension.debugIfNecessary
 import tech.insight.core.extension.slf4j
 import tech.insight.engine.innodb.core.InnodbIc
 import tech.insight.engine.innodb.page.Constant
+import tech.insight.engine.innodb.page.IndexKey
+import tech.insight.engine.innodb.page.InnoDbPage
+import tech.insight.engine.innodb.page.PrimaryKey
 import tech.insight.engine.innodb.page.compact.Compact
 import tech.insight.engine.innodb.page.compact.RowFormatFactory
 import java.io.File
@@ -38,14 +38,10 @@ class ClusteredIndex(table: Table) : InnodbIndex() {
         this.table = table
     }
 
+
     override val file: File by lazy {
         val dbFolder = table.database.dbFolder
         File(dbFolder, table.name + ".idb")
-    }
-
-
-    companion object {
-        val log = slf4j<ClusteredIndex>()
     }
 
     private lateinit var autoIncrementKeyCounter: AutoIncrementKeyCounter
@@ -54,17 +50,23 @@ class ClusteredIndex(table: Table) : InnodbIndex() {
         return listOf(table.columnList[table.ext.primaryKeyIndex])
     }
 
+    /**
+     * init index
+     * init auto increment key counter
+     * read the root page to buffer
+     *
+     */
     override fun rndInit() {
         if (table.ext.autoColIndex >= 0) {
             autoIncrementKeyCounter = InnodbIc(table)
         }
+
     }
 
-    override val id: Int
-        get() = 1
+    override val id: Int = 1
 
     override fun find(session: Session): Cursor {
-        TODO()
+        return InnodbClusteredCursor(this, session)
     }
 
     override val name: String
@@ -81,6 +83,15 @@ class ClusteredIndex(table: Table) : InnodbIndex() {
             throw DataTooLongException("compact row can't greater than " + Constant.COMPACT_MAX_ROW_LENGTH)
         }
         root.insertData(compact)
+    }
+
+    override fun findByKey(key: IndexKey): InnoDbPage? {
+        TODO("Not yet implemented")
+    }
+
+
+    companion object {
+        val log = slf4j<ClusteredIndex>()
     }
 
 }

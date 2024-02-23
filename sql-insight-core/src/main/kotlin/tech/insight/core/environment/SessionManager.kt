@@ -22,7 +22,7 @@ object SessionManager {
     }
 
     private fun createSession(): Session {
-        return Session()
+        return Session(id.getAndIncrement())
     }
 
     fun getSession(userId: Long): Session {
@@ -34,6 +34,6 @@ object SessionManager {
     }
 }
 
-class Session {
+class Session(var id: Long) {
     lateinit var database: Database
 }

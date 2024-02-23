@@ -2,6 +2,7 @@ package tech.insight.engine.innodb.utils
 
 import tech.insight.core.bean.Index
 import tech.insight.core.exception.RuntimeIoException
+import tech.insight.core.extension.debugIfNecessary
 import tech.insight.core.extension.slf4j
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.ConstantSize
@@ -51,7 +52,7 @@ object PageSupport {
                 }
                 randomAccessFile.seek(page.fileHeader.offset.toLong())
                 randomAccessFile.write(page.toBytes())
-                log.info("write page to {}", indexFile.canonicalPath)
+                log.debugIfNecessary { "write page to ${indexFile.canonicalPath}" }
             }
         } catch (e: IOException) {
             throw RuntimeIoException(e)

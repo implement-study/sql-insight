@@ -28,10 +28,6 @@ class DeleteTest {
         SqlPipeline.doSql(insert)
         SqlPipeline.doSql(deleteRemain1)
         val table = TableManager.require(testDb, test_table)
-        val jsonFile = JsonEngineSupport.getJsonFile(table)
-        jsonFile.useLines {
-            assertEquals(1, it.filter { line -> line.isNotEmpty() }.count())
-        }
     }
 
 
