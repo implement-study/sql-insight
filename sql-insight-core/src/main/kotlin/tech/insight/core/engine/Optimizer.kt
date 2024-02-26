@@ -1,5 +1,11 @@
 package tech.insight.core.engine
 
+import tech.insight.core.bean.Always
+import tech.insight.core.bean.Index
+import tech.insight.core.bean.Where
+import tech.insight.core.bean.condition.Expression
+import tech.insight.core.bean.condition.IdentifierExpression
+import tech.insight.core.bean.condition.ValueOperatorExpression
 import tech.insight.core.command.*
 import tech.insight.core.plan.*
 
@@ -38,12 +44,14 @@ object OptimizerImpl : Optimizer {
             is InsertCommand -> InsertPlan(command)
             is SelectCommand -> SelectPlan(command)
             is UpdateCommand -> UpdatePlan(command)
-            else -> throw UnsupportedOperationException("dont support explain " + command.sql)
         }
 
     }
 
+
+
 }
+
 
 
 

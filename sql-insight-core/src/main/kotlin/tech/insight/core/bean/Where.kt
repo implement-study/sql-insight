@@ -25,7 +25,7 @@ import tech.insight.core.bean.value.ValueTrue
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-open class Where(private val condition: Expression) : BooleanExpression {
+open class Where(val condition: Expression) : BooleanExpression {
 
     lateinit var table: Table
 

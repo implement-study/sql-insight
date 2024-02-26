@@ -2,6 +2,7 @@ package tech.insight.engine.innodb.core
 
 import tech.insight.core.bean.Index
 import tech.insight.core.bean.InsertRow
+import tech.insight.core.bean.Row
 import tech.insight.engine.innodb.page.IndexKey
 import tech.insight.engine.innodb.page.InnoDbPage
 
@@ -18,8 +19,8 @@ interface InnodbBTree : Index {
 
 
     /**
-     * b tree can find the page where the key in,also can't
+     * b tree can find the row
      *
      */
-    fun findByKey(key: IndexKey): InnoDbPage?
+    fun findByKey(key: IndexKey): Row
 }

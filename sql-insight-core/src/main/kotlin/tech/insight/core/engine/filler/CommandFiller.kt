@@ -167,7 +167,14 @@ class DropTableFiller : BaseFiller<DropTable>() {
     }
 }
 
-class DeleteFiller : BaseFiller<DeleteCommand>() {
+open class ExplainableFiller<D : DMLCommand> : BaseFiller<D>() {
+
+    override fun endVisit(x: SQLExplainStatement) {
+        command.isExplain = x.isExtended
+    }
+}
+
+class DeleteFiller : ExplainableFiller<DeleteCommand>() {
     override fun visit(x: SQLDeleteStatement): Boolean {
         x.where.accept(WhereVisitor {
             command.where = it
@@ -178,9 +185,10 @@ class DeleteFiller : BaseFiller<DeleteCommand>() {
         })
         return false
     }
+
 }
 
-class InsertFiller : BaseFiller<InsertCommand>() {
+class InsertFiller : ExplainableFiller<InsertCommand>() {
 
 
     override fun visit(x: SQLInsertStatement): Boolean {
@@ -229,7 +237,7 @@ class InsertFiller : BaseFiller<InsertCommand>() {
 }
 
 
-class UpdateFiller : BaseFiller<UpdateCommand>() {
+class UpdateFiller : ExplainableFiller<UpdateCommand>() {
 
     override fun fill(command: UpdateCommand) {
         command.table = Table()

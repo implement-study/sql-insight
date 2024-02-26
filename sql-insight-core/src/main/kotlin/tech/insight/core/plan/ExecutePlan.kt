@@ -6,9 +6,7 @@ import tech.insight.core.result.ResultInterface
 
 
 /**
- * hand out to [StorageEngine] from [ExecuteEngine]
- * can also be executed directly from the execute engine
- *
+ * sql execution plan,can use explain view details
  * @author gongxuanzhangmelt@gmail.com
  */
 interface ExecutionPlan {
@@ -18,10 +16,21 @@ interface ExecutionPlan {
      * execution
      */
     fun run(): ResultInterface
+
+}
+
+
+data class PlanDetail(val table: String, val type: ExplainType, val possibleKeys: List<String>, val key: String)
+
+enum class ExplainType {
+    ALL, INDEX, RANGE, NULL
 }
 
 
 abstract class DDLExecutionPlan(val ddlCommand: DDLCommand) : ExecutionPlan
 
 
-abstract class DMLExecutionPlan(val dmlCommand: DMLCommand) : ExecutionPlan
+abstract class DMLExecutionPlan(val dmlCommand: DMLCommand) : ExecutionPlan {
+
+    lateinit var explain: PlanDetail
+}

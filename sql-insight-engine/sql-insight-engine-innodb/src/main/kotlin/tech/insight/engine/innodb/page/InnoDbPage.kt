@@ -133,7 +133,7 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
      * @return slot index is user record inserted never return `slot.length -1 ` because slot.length - 1 is the
      * infimum
      */
-    protected fun findTargetSlot(userRecord: InnodbUserRecord): Int {
+    fun findTargetSlot(userRecord: InnodbUserRecord): Int {
         var left = 0
         var right = pageDirectory.slotCount() - 1
         while (left < right - 1) {
@@ -378,8 +378,6 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
         }
 
     }
-
-
 
 
     companion object {

@@ -5,6 +5,8 @@ import tech.insight.core.bean.Cursor
 import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Table
 import tech.insight.core.environment.Session
+import tech.insight.engine.innodb.page.IndexKey
+import tech.insight.engine.innodb.page.InnoDbPage
 import java.io.File
 
 /**
@@ -14,6 +16,10 @@ import java.io.File
  */
 class SecondIndex protected constructor(table: Table) : InnodbIndex() {
     override fun insert(row: InsertRow) {
+        TODO("Not yet implemented")
+    }
+
+    override fun findByKey(key: IndexKey): InnoDbPage? {
         TODO("Not yet implemented")
     }
 

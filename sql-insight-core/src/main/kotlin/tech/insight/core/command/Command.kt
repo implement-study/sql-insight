@@ -25,6 +25,10 @@ sealed class DDLCommand(override val sql: String, override val statement: SQLSta
 }
 
 sealed class DMLCommand(override val sql: String, override val statement: SQLObject) : Command {
+    lateinit var table: Table
+
+    var isExplain = false
+
     override fun toString(): String {
         return sql
     }
@@ -57,13 +61,11 @@ class DropTable(sql: String, statement: SQLDropTableStatement) : DropCommand(sql
 
 
 class DeleteCommand(sql: String, statement: SQLStatement) : DMLCommand(sql, statement) {
-    lateinit var table: Table
 
     var where: Where = Always
 }
 
 class InsertCommand(sql: String, statement: SQLStatement) : DMLCommand(sql, statement) {
-    lateinit var table: Table
 
     val insertColumns: MutableList<Column> = ArrayList()
 
@@ -71,7 +73,6 @@ class InsertCommand(sql: String, statement: SQLStatement) : DMLCommand(sql, stat
 }
 
 class SelectCommand(sql: String, statement: SQLSelectQueryBlock) : DMLCommand(sql, statement) {
-    lateinit var table: Table
 
     var where: Where = Always
 
@@ -83,7 +84,6 @@ class SelectCommand(sql: String, statement: SQLSelectQueryBlock) : DMLCommand(sq
 
 
 class UpdateCommand(sql: String, statement: SQLStatement) : DMLCommand(sql, statement) {
-    lateinit var table: Table
 
     val updateField: MutableMap<String, Expression> = HashMap()
 

@@ -16,15 +16,11 @@ import tech.insight.core.command.SelectCommand
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-class SelectFiller : BaseFiller<SelectCommand>() {
+class SelectFiller : ExplainableFiller<SelectCommand>() {
 
 
     override fun visit(x: SQLSelectQueryBlock): Boolean {
-        x.from.accept(FromVisitor
-        {
-            command.table = it
-        }
-        )
+        x.from.accept(FromVisitor { command.table = it })
         x.where.accept(WhereVisitor { command.where = it })
         x.orderBy?.accept(OrderByVisitor { command.orderBy = it })
         x.limit?.accept(this)

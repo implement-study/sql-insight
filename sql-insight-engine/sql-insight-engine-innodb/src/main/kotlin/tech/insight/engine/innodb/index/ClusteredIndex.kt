@@ -24,7 +24,6 @@ import tech.insight.core.extension.slf4j
 import tech.insight.engine.innodb.core.InnodbIc
 import tech.insight.engine.innodb.page.Constant
 import tech.insight.engine.innodb.page.IndexKey
-import tech.insight.engine.innodb.page.InnoDbPage
 import tech.insight.engine.innodb.page.PrimaryKey
 import tech.insight.engine.innodb.page.compact.Compact
 import tech.insight.engine.innodb.page.compact.RowFormatFactory
@@ -85,8 +84,9 @@ class ClusteredIndex(table: Table) : InnodbIndex() {
         root.insertData(compact)
     }
 
-    override fun findByKey(key: IndexKey): InnoDbPage? {
-        TODO("Not yet implemented")
+    override fun findByKey(key: IndexKey): Row {
+        require(key is PrimaryKey) { "clustered index must search by Primary key " }
+        TODO()
     }
 
 
