@@ -1,8 +1,14 @@
 <configuration>
 
     <conversionRule conversionWord="clr" converterClass="tech.insight.core.logging.ColorConverter"/>
+    <conversionRule conversionWord="wex"
+                    converterClass="tech.insight.core.logging.WhitespaceThrowableProxyConverter"/>
+    <conversionRule conversionWord="wEx"
+                    converterClass="tech.insight.core.logging.ExtendedWhitespaceThrowableProxyConverter"/>
 
-    <property name="LOG_PATTERN" value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){yellow} %clr(%-5level) %clr([%thread]){cyan} %clr(%logger{36}){blue} - %clr(%msg){magenta}%n"/>/>
+
+    <property name="LOG_PATTERN"
+              value="%clr(%d{ISO8601}){cyan}|%t|%clr(%p)|%clr(%.40logger{39}){cyan}.%clr(%method){cyan}:%L|%m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
 
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">

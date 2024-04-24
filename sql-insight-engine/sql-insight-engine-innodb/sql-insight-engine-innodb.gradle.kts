@@ -10,7 +10,6 @@ repositories {
 
 dependencies {
     implementation(project(":sql-insight-core"))
-
     testImplementation(project(":share:share-test"))
     testImplementation(kotlin("test"))
 

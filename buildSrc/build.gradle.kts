@@ -16,6 +16,10 @@ dependencies{
 
 gradlePlugin {
     plugins {
+        register("importLogback") {
+            id = "importLogback"
+            implementationClass = "tech.insight.plugin.LogbackImportPlugin"
+        }
     }
 }
 

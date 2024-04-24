@@ -1,11 +1,14 @@
 package tech.insight.core.logging
 
 import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.PatternLayout
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.pattern.CompositeConverter
 import java.util.*
 
 open class ColorConverter : CompositeConverter<ILoggingEvent>() {
+
+
     override fun transform(event: ILoggingEvent, `in`: String): String {
         var element = ELEMENTS[firstOption]
         if (element == null) {
@@ -13,11 +16,12 @@ open class ColorConverter : CompositeConverter<ILoggingEvent>() {
             element = LEVELS[event.level.toInteger()]
             element = element ?: AnsiColor.GREEN
         }
-        return toAnsiString(`in`, element)
+        val result = toAnsiString(`in`, element)
+        return result
     }
 
-    private fun toAnsiString(`in`: String?, element: AnsiElement?): String {
-        return AnsiOutput.toString(element!!, `in`!!)
+    private fun toAnsiString(`in`: String, element: AnsiElement): String {
+        return AnsiOutput.toString(element, `in`)
     }
 
     companion object {
@@ -33,6 +37,7 @@ open class ColorConverter : CompositeConverter<ILoggingEvent>() {
             ansiElements["magenta"] = AnsiColor.MAGENTA
             ansiElements["cyan"] = AnsiColor.CYAN
             ELEMENTS = Collections.unmodifiableMap(ansiElements)
+            PatternLayout.DEFAULT_CONVERTER_MAP["gaga"] = ColorConverter::class.java.name
         }
 
         private val LEVELS: Map<Int, AnsiElement>
@@ -79,49 +84,12 @@ interface AnsiElement {
 
 object AnsiOutput {
     private const val ENCODE_JOIN = ";"
-    private var enabled = Enabled.DETECT
-    private var consoleAvailable: Boolean? = null
     private var ansiCapable: Boolean? = null
     private val OPERATING_SYSTEM_NAME = System.getProperty("os.name").lowercase()
     private const val ENCODE_START = "\u001b["
     private const val ENCODE_END = "m"
     private val RESET = "0;" + AnsiColor.DEFAULT
 
-    /**
-     * Sets if ANSI output is enabled.
-     * @param enabled if ANSI is enabled, disabled or detected
-     */
-    fun setEnabled(enabled: Enabled) {
-        AnsiOutput.enabled = enabled
-    }
-
-    /**
-     * Returns if ANSI output is enabled
-     * @return if ANSI enabled, disabled or detected
-     */
-    fun getEnabled(): Enabled {
-        return enabled
-    }
-
-    /**
-     * Sets if the System.console() is known to be available.
-     * @param consoleAvailable if the console is known to be available or `null` to
-     * use standard detection logic.
-     */
-    fun setConsoleAvailable(consoleAvailable: Boolean?) {
-        AnsiOutput.consoleAvailable = consoleAvailable
-    }
-
-    /**
-     * Encode a single [AnsiElement] if output is enabled.
-     * @param element the element to encode
-     * @return the encoded element or an empty string
-     */
-    fun encode(element: AnsiElement): String {
-        return if (isEnabled()) {
-            ENCODE_START + element + ENCODE_END
-        } else ""
-    }
 
     /**
      * Create a new ANSI string from the specified elements. Any [AnsiElement]s will
@@ -131,15 +99,11 @@ object AnsiOutput {
      */
     fun toString(vararg elements: Any): String {
         val sb = StringBuilder()
-        if (isEnabled()) {
-            buildEnabled(sb, elements)
-        } else {
-            buildDisabled(sb, elements)
-        }
+        buildString(sb, elements)
         return sb.toString()
     }
 
-    private fun buildEnabled(sb: StringBuilder, elements: Array<out Any>) {
+    private fun buildString(sb: StringBuilder, elements: Array<out Any>) {
         var writingAnsi = false
         var containsEncoding = false
         for (element in elements) {
@@ -166,58 +130,6 @@ object AnsiOutput {
         }
     }
 
-    private fun buildDisabled(sb: StringBuilder, elements: Array<out Any>) {
-        for (element in elements) {
-            if (element !is AnsiElement) {
-                sb.append(element)
-            }
-        }
-    }
-
-    private fun isEnabled(): Boolean {
-        if (enabled == Enabled.DETECT) {
-            if (ansiCapable == null) {
-                ansiCapable = detectIfAnsiCapable()
-            }
-            return ansiCapable!!
-        }
-        return enabled == Enabled.ALWAYS
-    }
-
-    private fun detectIfAnsiCapable(): Boolean {
-        return try {
-            if (java.lang.Boolean.FALSE == consoleAvailable) {
-                return false
-            }
-            if (consoleAvailable == null && System.console() == null) {
-                false
-            } else !OPERATING_SYSTEM_NAME.contains("win")
-        } catch (ex: Throwable) {
-            false
-        }
-    }
-
-    /**
-     * Possible values to pass to [AnsiOutput.setEnabled]. Determines when to output
-     * ANSI escape sequences for coloring application output.
-     */
-    enum class Enabled {
-        /**
-         * Try to detect whether ANSI coloring capabilities are available. The default
-         * value for [AnsiOutput].
-         */
-        DETECT,
-
-        /**
-         * Enable ANSI-colored output.
-         */
-        ALWAYS,
-
-        /**
-         * Disable ANSI-colored output.
-         */
-        NEVER
-    }
 }
 
 enum class AnsiStyle(private val code: String) : AnsiElement {
