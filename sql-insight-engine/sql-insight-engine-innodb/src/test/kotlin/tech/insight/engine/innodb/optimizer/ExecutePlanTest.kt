@@ -14,7 +14,7 @@ import tech.insight.core.environment.TableManager
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
-import tech.insight.share.test.*
+import tech.insight.share.data.*
 
 class ExecutePlanTest {
 

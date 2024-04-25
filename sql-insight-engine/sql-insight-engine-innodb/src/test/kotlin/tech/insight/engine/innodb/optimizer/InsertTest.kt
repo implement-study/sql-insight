@@ -8,7 +8,7 @@ import tech.insight.core.engine.SqlPipeline
 import tech.insight.core.engine.json.JsonEngineSupport
 import tech.insight.core.environment.TableManager
 import tech.insight.core.optimizer.ExecutePlanTest
-import tech.insight.share.test.*
+import tech.insight.share.data.*
 
 
 /**

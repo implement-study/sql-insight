@@ -15,6 +15,11 @@
  */
 package tech.insight.core.bean
 
+
+/**
+ * Currently supported data types
+ * @author gongxuanzhangmelt@gmail.com
+ */
 enum class DataType(val defaultLength: Int) {
     INT(4),
     VARCHAR(255),

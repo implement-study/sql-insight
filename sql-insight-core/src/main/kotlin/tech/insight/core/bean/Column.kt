@@ -37,8 +37,8 @@ class Column : SQLBean {
 
 
     override fun checkMyself() {
-        check(length != -1)
-        check(length.toUShort() <= UShort.MAX_VALUE) { "col length must less than ${UShort.MAX_VALUE}" }
+        check(length > 0) { "col length must gather than 0" }
+        check(length <= UShort.MAX_VALUE.toInt()) { "col length must less than ${UShort.MAX_VALUE}" }
         if (this.primaryKey) {
             check(defaultValue is ValueNull) { "primary key can't have default value" }
         }

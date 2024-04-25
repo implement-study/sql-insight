@@ -1,4 +1,4 @@
-package tech.insight.share.test
+package tech.insight.share.data
 
 import tech.insight.core.engine.SqlPipeline
 import kotlin.random.Random

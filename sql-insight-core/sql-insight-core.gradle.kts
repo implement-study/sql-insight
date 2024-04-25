@@ -17,7 +17,7 @@ dependencies {
     api("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.0")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.0")
     api("io.github.gongxuanzhang:easyByte-core:0.0.1")
-    testImplementation(project(":share:share-test"))
+    testImplementation(project(":share:share-data"))
     testImplementation(kotlin("test"))
 }
 

@@ -2,7 +2,7 @@ package tech.insight.core.engine
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import tech.insight.share.test.*
+import tech.insight.share.data.*
 import tech.insight.core.command.CreateDatabase
 import tech.insight.core.command.CreateTable
 import tech.insight.core.command.DropDatabase

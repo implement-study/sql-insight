@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import tech.insight.core.engine.SqlPipeline
 import tech.insight.core.environment.TableManager
-import tech.insight.share.test.*
+import tech.insight.share.data.*
 
 
 /**

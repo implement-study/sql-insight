@@ -10,9 +10,9 @@ import tech.insight.core.extension.slf4j
 import tech.insight.core.extension.tree
 import tech.insight.engine.innodb.index.ClusteredIndex
 import tech.insight.engine.innodb.page.PageHeader.PageHeaderFactory.EMPTY_PAGE_HEAP_TOP
-import tech.insight.share.test.prepareTable
-import tech.insight.share.test.testDb
-import tech.insight.share.test.test_table
+import tech.insight.share.data.prepareTable
+import tech.insight.share.data.testDb
+import tech.insight.share.data.test_table
 import kotlin.random.Random
 
 
