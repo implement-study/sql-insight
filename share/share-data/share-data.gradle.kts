@@ -9,7 +9,6 @@ repositories {
 
 
 dependencies {
-    implementation(project(":sql-insight-core"))
 }
 
 

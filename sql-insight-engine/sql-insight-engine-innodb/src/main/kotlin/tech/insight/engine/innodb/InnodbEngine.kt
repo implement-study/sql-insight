@@ -88,4 +88,8 @@ class InnodbEngine : StorageEngine {
         }
     }
 
+    override fun toString(): String {
+        return "InnodbEngine"
+    }
+
 }

@@ -1,4 +1,4 @@
-package tech.insight.core.optimizer
+package tech.insight.engine.innodb.execute
 
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -8,46 +8,41 @@ import tech.insight.core.bean.value.ValueNull
 import tech.insight.core.bean.value.ValueVarchar
 import tech.insight.core.engine.SqlPipeline
 import tech.insight.core.environment.DatabaseManager
-import tech.insight.core.environment.DefaultProperty
-import tech.insight.core.environment.GlobalContext
 import tech.insight.core.environment.TableManager
-import java.io.File
+import tech.insight.core.exception.DatabaseExistsException
+import tech.insight.core.result.ExceptionResult
+import tech.insight.engine.innodb.dropDb
+import tech.insight.share.data.createDatabase
+import tech.insight.share.data.createTable
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
-import tech.insight.share.data.*
 
-class ExecutePlanTest {
 
+/**
+ * @author gxz gongxuanzhangmelt@gmail.com
+ **/
+class CreateTableTest : SqlTestCase {
+
+
+    private val dbName = "test_db"
+
+    private val tableName = "test_table"
+
+    private val comment = "用户表"
 
     @BeforeEach
     @AfterEach
     fun clear() {
-        clearDatabase()
+        dropDb(dbName)
     }
 
     @Test
-    fun createDatabaseTest() {
-        SqlPipeline.doSql(createDatabase)
-        assert(File(GlobalContext[DefaultProperty.DATA_DIR], testDb).exists())
-        assert(DatabaseManager.require(testDb).name == testDb)
-    }
-
-    @Test
-    fun dropDatabaseTest() {
-        createDatabaseTest()
-        SqlPipeline.doSql(dropDatabaseIe)
-        assert(!File(GlobalContext[DefaultProperty.DATA_DIR], testDb).exists())
-        assertNull(DatabaseManager.select(testDb))
-    }
-
-    @Test
-    fun createTableTest() {
-        createDatabaseTest()
-        SqlPipeline.doSql(createTableIne)
-        val table = TableManager.require(testDb, test_table)
-        assertEquals(table.name, test_table)
-        assertEquals(table.database, DatabaseManager.select(testDb))
-        assertEquals(table.comment, "用户表")
+    override fun correctTest() {
+        SqlPipeline.executeSql(createDatabase(dbName))
+        SqlPipeline.executeSql(createTable(tableName, dbName, comment, false))
+        val table = TableManager.require(dbName, tableName)
+        assertEquals(table.name, tableName)
+        assertEquals(table.database, DatabaseManager.select(dbName))
+        assertEquals(table.comment, comment)
         val idCol = table.columnList[0]
         assertEquals("id", idCol.name)
         assertEquals(DataType.INT, idCol.dataType)
@@ -77,4 +72,15 @@ class ExecutePlanTest {
         assertEquals(DataType.CHAR.defaultLength, idCardCol.length)
         assert(idCardCol.unique)
     }
+
+    @Test
+    override fun errorTest() {
+        SqlPipeline.executeSql(createDatabase(dbName, false))
+        val db = DatabaseManager.require(dbName)
+        assertEquals(db.name, dbName)
+        val result = SqlPipeline.executeSql(createDatabase(dbName, false))
+        assert(result is ExceptionResult)
+        assert((result as ExceptionResult).exception is DatabaseExistsException)
+    }
+
 }

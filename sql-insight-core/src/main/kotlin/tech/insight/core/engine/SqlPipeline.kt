@@ -32,7 +32,7 @@ object SqlPipeline {
     private val executeEngine: ExecuteEngine = ExecuteEngineImpl
 
 
-    fun doSql(sql: String): ResultInterface {
+    fun executeSql(sql: String): ResultInterface {
         val startTime = System.currentTimeMillis()
         log.info("start analysis sql \n {}  ...", sql)
         val command = analyzer.analysisSql(sql)

@@ -73,6 +73,10 @@ class Table : SQLBean {
         }
     }
 
+    override fun toString(): String {
+        return "Table=[$name] ${columnList.size} columns"
+    }
+
 }
 
 

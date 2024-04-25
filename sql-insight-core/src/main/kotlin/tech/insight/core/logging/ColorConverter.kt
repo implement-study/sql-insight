@@ -6,6 +6,10 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.pattern.CompositeConverter
 import java.util.*
 
+
+/**
+ * fine tuned spring boot ColorConverter
+ */
 open class ColorConverter : CompositeConverter<ILoggingEvent>() {
 
 

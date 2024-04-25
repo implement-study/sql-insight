@@ -45,4 +45,8 @@ class Column : SQLBean {
     }
 
 
+    override fun toString(): String {
+        return "Column($name $dataType $length)"
+    }
+
 }

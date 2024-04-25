@@ -24,7 +24,7 @@ class UpdateResult(private val count: Int, val table: Table) : ResultInterface {
     }
 }
 
-class ExceptionResult(val e: Exception) : ResultInterface
+class ExceptionResult(val exception: Exception) : ResultInterface
 
 
 
