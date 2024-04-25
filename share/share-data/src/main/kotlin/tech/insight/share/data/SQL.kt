@@ -15,7 +15,6 @@ const val dropTableDine = "drop table $testDb.$test_table"
 const val dropTableIe = "drop table if exists $testDb.$test_table"
 
 
-const val insert = "insert into $testDb.$test_table (id,name) values(1,'a'),(2,'b'),(null,'c'),(null,'b'),(null,'c')"
 
 val largeValue = (1..1000).joinToString(",") { "('${StringGenerator.generatorRandomString(10)}')" }
 

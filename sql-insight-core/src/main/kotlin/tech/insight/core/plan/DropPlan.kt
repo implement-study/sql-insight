@@ -36,11 +36,12 @@ class DropDatabasePlan(private val command: DropDatabase) : DDLExecutionPlan(com
             EventPublisher.publishEvent {
                 DropDatabaseEvent(database)
             }
+            return MessageResult("drop ${command.databaseName}")
         }
         if (!command.ifIsExists) {
             throw DatabaseNotExistsException(this.command.databaseName)
         }
-        return MessageResult("delete ${command.databaseName}")
+        return MessageResult("skip drop ${command.databaseName} because database not exists")
     }
 
 }
