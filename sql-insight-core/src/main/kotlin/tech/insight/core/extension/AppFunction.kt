@@ -3,6 +3,7 @@ package tech.insight.core.extension
 import com.google.common.collect.Table
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import kotlin.time.Duration.Companion.milliseconds
 
 
 /**
@@ -29,9 +30,8 @@ inline fun timeReport(actionName: String, action: () -> Unit) {
     val startTime = System.currentTimeMillis()
     log.info("run $actionName")
     action.invoke()
-    log.info("finish $actionName for ${System.currentTimeMillis() - startTime} mill")
+    log.info("finish $actionName for ${(System.currentTimeMillis() - startTime).milliseconds}")
 }
-
 
 typealias GuavaTable<A, B, C> = Table<A, B, C>
 

@@ -19,8 +19,6 @@ import tech.insight.core.bean.*
 import tech.insight.core.engine.AutoIncrementKeyCounter
 import tech.insight.core.environment.Session
 import tech.insight.core.exception.DataTooLongException
-import tech.insight.core.extension.debugIfNecessary
-import tech.insight.core.extension.slf4j
 import tech.insight.engine.innodb.core.InnodbIc
 import tech.insight.engine.innodb.page.Constant
 import tech.insight.engine.innodb.page.IndexKey
@@ -74,7 +72,7 @@ class ClusteredIndex(table: Table) : InnodbIndex() {
 
     override fun insert(row: InsertRow) {
         if (autoIncrementKeyCounter.dealAutoIncrement(row)) {
-            log.debugIfNecessary { "auto increment primary key ${table.columnList[table.ext.autoColIndex].name}" }
+            debug("auto increment primary key ${table.columnList[table.ext.autoColIndex].name}")
         }
         val compact: Compact = RowFormatFactory.compactFromInsertRow(row)
         val root = rootPage
@@ -89,9 +87,5 @@ class ClusteredIndex(table: Table) : InnodbIndex() {
         TODO()
     }
 
-
-    companion object {
-        val log = slf4j<ClusteredIndex>()
-    }
 
 }

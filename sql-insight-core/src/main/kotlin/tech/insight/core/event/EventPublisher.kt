@@ -19,14 +19,13 @@ package tech.insight.core.event
 
 import tech.insight.core.environment.DatabaseManager
 import tech.insight.core.environment.TableManager
-import tech.insight.core.extension.slf4j
+import tech.insight.core.logging.Logging
 import java.lang.reflect.ParameterizedType
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-object EventPublisher {
-    private val log = slf4j<EventPublisher>()
+object EventPublisher : Logging() {
     private val listenerMap: MutableMap<Class<out InsightEvent>, MutableList<EventListener<InsightEvent>>> = HashMap()
 
     init {
@@ -40,7 +39,7 @@ object EventPublisher {
     }
 
     fun registerMultipleListener(listener: MultipleEventListener) {
-        log.info("register MultipleEventListener ${listener.javaClass.name}")
+        info("register MultipleEventListener ${listener.javaClass.name}")
         for (type in listener.listenEvent()) {
             registerListener(type, true) { e -> listener.onEvent(e) }
         }
@@ -67,7 +66,7 @@ object EventPublisher {
         listener: EventListener<InsightEvent>
     ) {
         if (!suppress) {
-            log.info("register listener {} listen {}", listener.javaClass.getName(), type.getName())
+            info("register listener {} listen {}", listener.javaClass.getName(), type.getName())
         }
         listenerMap.computeIfAbsent(type) { ArrayList() }.add(listener)
     }

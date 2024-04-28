@@ -5,7 +5,7 @@ import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
 import tech.insight.core.command.UpdateCommand
 import tech.insight.core.engine.storage.StorageEngine
-import tech.insight.core.extension.slf4j
+import tech.insight.core.logging.Logging
 import tech.insight.core.result.MessageResult
 import tech.insight.core.result.ResultInterface
 import tech.insight.engine.innodb.index.ClusteredIndex
@@ -17,11 +17,7 @@ import java.nio.file.Files
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class InnodbEngine : StorageEngine {
-
-    companion object {
-        val log = slf4j<InnodbEngine>()
-    }
+class InnodbEngine : Logging(), StorageEngine {
 
     override val name: String = "innodb"
 
@@ -49,11 +45,11 @@ class InnodbEngine : StorageEngine {
         val clusteredIndex = ClusteredIndex(table)
         val primaryFile: File = clusteredIndex.file
         if (!primaryFile.createNewFile()) {
-            log.warn("{} already exists , execute create table will overwrite file", primaryFile.getAbsoluteFile())
+            warn("{} already exists , execute create table will overwrite file", primaryFile.getAbsoluteFile())
         }
         val root = InnoDbPage.createRootPage(clusteredIndex)
         Files.write(primaryFile.toPath(), root.toBytes())
-        log.info("create table {} with innodb,create ibd file", table.name)
+        info("create table {} with innodb,create ibd file", table.name)
         val file = File(table.database.dbFolder, "${table.name}.inf")
         if (file.createNewFile()) {
             return MessageResult("success create table ${table.name}")
@@ -76,7 +72,7 @@ class InnodbEngine : StorageEngine {
     }
 
     override fun refresh(table: Table) {
-        log.warn("refresh innodb ... ")
+        warn("refresh innodb ... ")
     }
 
 

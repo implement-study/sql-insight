@@ -5,7 +5,6 @@ import ch.qos.logback.classic.spi.IThrowableProxy
 import ch.qos.logback.core.CoreConstants
 
 
-
 /**
  * copy spring boot WhitespaceThrowableProxyConverter
  */

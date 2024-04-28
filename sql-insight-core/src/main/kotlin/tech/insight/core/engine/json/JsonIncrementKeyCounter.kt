@@ -21,8 +21,8 @@ import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.ValueInt
 import tech.insight.core.bean.value.ValueNull
 import tech.insight.core.engine.AutoIncrementKeyCounter
-import tech.insight.core.extension.slf4j
 import tech.insight.core.extension.tree
+import tech.insight.core.logging.Logging
 import java.nio.file.Files
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
@@ -30,9 +30,8 @@ import java.util.concurrent.atomic.AtomicLong
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-object JsonIncrementKeyCounter : AutoIncrementKeyCounter {
+object JsonIncrementKeyCounter : Logging(), AutoIncrementKeyCounter {
     private val keyTable: MutableMap<String, MutableMap<String, AtomicLong>> = ConcurrentHashMap()
-    private val log = slf4j<JsonIncrementKeyCounter>()
 
     /**
      * if auto increment column have value,fresh cache value.
@@ -54,7 +53,7 @@ object JsonIncrementKeyCounter : AutoIncrementKeyCounter {
         }
         val insertValue = autoIncrementValue.source as Int
         if (insertValue > atomicLong.get()) {
-            log.info(
+            info(
                 "database[{}],table[{}],auto increment col value set {}",
                 databaseName,
                 row.table.name,

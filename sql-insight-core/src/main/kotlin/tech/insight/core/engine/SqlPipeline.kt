@@ -1,7 +1,7 @@
 package tech.insight.core.engine
 
 import tech.insight.core.environment.GlobalContext
-import tech.insight.core.extension.slf4j
+import tech.insight.core.logging.Logging
 import tech.insight.core.result.ResultInterface
 
 
@@ -20,13 +20,12 @@ import tech.insight.core.result.ResultInterface
 /**
  * sql lifecycle container
  */
-object SqlPipeline {
+object SqlPipeline : Logging() {
     init {
         //  static init context
         GlobalContext
     }
 
-    private val log = slf4j<SqlPipeline>()
     private val optimizer: Optimizer = OptimizerImpl
     private val analyzer: Analyzer = DruidAnalyzer
     private val executeEngine: ExecuteEngine = ExecuteEngineImpl
@@ -34,12 +33,12 @@ object SqlPipeline {
 
     fun executeSql(sql: String): ResultInterface {
         val startTime = System.currentTimeMillis()
-        log.info("start analysis sql \n {}  ...", sql)
+        info("start analysis sql \n {}  ...", sql)
         val command = analyzer.analysisSql(sql)
-        log.info("start optimize command {}", command)
+        info("start optimize command {}", command)
         val plan = optimizer.assign(command)
         val resultInterface = executeEngine.executePlan(plan)
-        log.info(
+        info(
             "end sql \n {} ...take time {}ms",
             sql.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0],
             System.currentTimeMillis() - startTime

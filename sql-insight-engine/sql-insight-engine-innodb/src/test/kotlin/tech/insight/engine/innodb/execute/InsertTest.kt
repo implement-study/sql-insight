@@ -7,6 +7,7 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import tech.insight.core.engine.SqlPipeline
 import tech.insight.core.environment.TableManager
 import tech.insight.engine.innodb.dropDb
+import tech.insight.engine.innodb.execute.CreateTableTest
 import tech.insight.share.data.insertData
 import tech.insight.share.data.testDb
 import tech.insight.share.data.test_table
@@ -30,7 +31,7 @@ class InsertTest {
 
     @Test
     fun insertRow() {
-
+        CreateTableTest().correctTest()
         SqlPipeline.executeSql(insertData(tableName, dbName))
         assertDoesNotThrow { TableManager.require(testDb, test_table) }
     }

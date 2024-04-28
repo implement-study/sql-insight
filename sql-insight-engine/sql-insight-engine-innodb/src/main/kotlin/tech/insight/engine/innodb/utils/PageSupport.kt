@@ -2,8 +2,7 @@ package tech.insight.engine.innodb.utils
 
 import tech.insight.core.bean.Index
 import tech.insight.core.exception.RuntimeIoException
-import tech.insight.core.extension.debugIfNecessary
-import tech.insight.core.extension.slf4j
+import tech.insight.core.logging.Logging
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.InnoDbPage
@@ -15,8 +14,7 @@ import java.io.RandomAccessFile
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-object PageSupport {
-    private val log = slf4j<PageSupport>()
+object PageSupport : Logging() {
 
     fun getRoot(index: InnodbIndex): InnoDbPage {
         val indexFile: File = index.file
@@ -52,7 +50,7 @@ object PageSupport {
                 }
                 randomAccessFile.seek(page.fileHeader.offset.toLong())
                 randomAccessFile.write(page.toBytes())
-                log.debugIfNecessary { "write page to ${indexFile.canonicalPath}" }
+                debug("write page to ${indexFile.canonicalPath}")
             }
         } catch (e: IOException) {
             throw RuntimeIoException(e)

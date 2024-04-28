@@ -3,7 +3,7 @@ package tech.insight.engine.innodb.page
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.exception.DuplicationPrimaryKeyException
-import tech.insight.core.extension.slf4j
+import tech.insight.core.logging.Logging
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.compact.IndexRecord
 import tech.insight.engine.innodb.page.compact.RecordHeader
@@ -21,7 +21,8 @@ import java.util.*
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrapper, Comparator<InnodbUserRecord>,
+abstract class InnoDbPage protected constructor(index: InnodbIndex) : Logging(), ByteWrapper,
+    Comparator<InnodbUserRecord>,
     PageObject, Iterable<InnodbUserRecord> {
 
 
@@ -183,6 +184,7 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
      * in general after insert row call this method
      */
     protected abstract fun splitIfNecessary()
+
     protected fun upgrade(prePage: InnoDbPage, nextPage: InnoDbPage) {
         //  is root page
         if (ext.parent == null) {
@@ -259,7 +261,7 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
         if (next.recordHeader.nOwned <= Constant.SLOT_MAX_COUNT) {
             return
         }
-        log.info("start group split ...")
+        info("start group split ...")
         for (i in 0 until pageDirectory.slots.size - 1) {
             if (pageDirectory.slots[i].toInt() == next.offset()) {
                 var preGroupMax = getUserRecordByOffset(pageDirectory.slots[i + 1].toInt())
@@ -269,7 +271,7 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
                 pageDirectory.split(i, preGroupMax.offset().toShort())
             }
         }
-        log.info("end group split ...")
+        info("end group split ...")
     }
 
     /**
@@ -381,7 +383,6 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : ByteWrappe
 
 
     companion object {
-        val log = slf4j<InnoDbPage>()
 
         fun createRootPage(index: InnodbIndex) = DataPage(index).apply {
             this.fileHeader = FileHeader.create()

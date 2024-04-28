@@ -40,8 +40,8 @@ class FromVisitor(private var tableAction: (Table) -> Unit) : SQLASTVisitor {
     @Temporary(detail = "how to deal join condition?")
     override fun visit(x: SQLJoinTableSource): Boolean {
         throw UnsupportedOperationException("join select don't support")
-//        x.left.accept(this)
-//        x.right.accept(this)
+        //        x.left.accept(this)
+        //        x.right.accept(this)
     }
 
     override fun visit(x: SQLExprTableSource): Boolean {

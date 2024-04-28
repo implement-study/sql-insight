@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 java-mysql  and the original author or authors <gongxuanzhangmelt@gmail.com>.
+ * Copyright 2023 sql-insight  and the original author or authors <gongxuanzhangmelt@gmail.com>.
  *
  * Licensed under the GNU Affero General Public License v3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package tech.insight.engine.innodb.core
 
 import tech.insight.core.bean.Database
@@ -21,12 +22,13 @@ import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.ValueInt
 import tech.insight.core.bean.value.ValueNull
 import tech.insight.core.engine.AutoIncrementKeyCounter
+import tech.insight.core.logging.Logging
 import java.util.concurrent.atomic.AtomicLong
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class InnodbIc(table: Table) : AutoIncrementKeyCounter {
+class InnodbIc(table: Table) : Logging(), AutoIncrementKeyCounter {
     private val table: Table
     private val incrementColIndex: Int
     private val counter: AtomicLong

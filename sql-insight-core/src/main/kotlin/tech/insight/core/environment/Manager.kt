@@ -13,8 +13,8 @@ import tech.insight.core.exception.DuplicationEngineNameException
 import tech.insight.core.exception.EngineNotFoundException
 import tech.insight.core.exception.TableNotExistsException
 import tech.insight.core.extension.GuavaTable
-import tech.insight.core.extension.slf4j
 import tech.insight.core.extension.timeReport
+import tech.insight.core.logging.Logging
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-object TableManager : MultipleEventListener {
+object TableManager : Logging(), MultipleEventListener {
 
     private val tableInfoCache: GuavaTable<String, String, Table> = HashBasedTable.create()
 
@@ -129,9 +129,8 @@ object DatabaseManager : MultipleEventListener {
 }
 
 
-object EngineManager : StorageEngineManager {
+object EngineManager : Logging(), StorageEngineManager {
     private val storageEngineMap: MutableMap<String, StorageEngine> = ConcurrentHashMap()
-    private val log = slf4j<EngineManager>()
 
     init {
         EngineLoader.loadEngine().forEach { registerEngine(it) }
@@ -142,7 +141,7 @@ object EngineManager : StorageEngineManager {
     }
 
     override fun registerEngine(engine: StorageEngine) {
-        log.info("register engine [{}], class {}", engine.name, engine.javaClass.getName())
+        info("register engine [{}], class {}", engine.name, engine.javaClass.getName())
         if (storageEngineMap.putIfAbsent(engine.name.uppercase(Locale.getDefault()), engine) != null) {
             throw DuplicationEngineNameException("engine ${engine.name} already register ")
         }

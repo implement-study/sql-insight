@@ -30,10 +30,9 @@ import tech.insight.core.event.MultipleEventListener
 import tech.insight.core.exception.CreateTableException
 import tech.insight.core.exception.InsertException
 import tech.insight.core.exception.TableDontOpenException
-import tech.insight.core.extension.debugIfNecessary
 import tech.insight.core.extension.json
-import tech.insight.core.extension.slf4j
 import tech.insight.core.extension.tree
+import tech.insight.core.logging.Logging
 import tech.insight.core.result.MessageResult
 import tech.insight.core.result.ResultInterface
 import java.io.File
@@ -43,8 +42,7 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class JsonEngine : StorageEngine, MultipleEventListener {
-    private val log = slf4j<JsonEngine>()
+class JsonEngine : Logging(), StorageEngine, MultipleEventListener {
 
     companion object {
         const val MIN_PRIMARY_KEY = 1
@@ -83,14 +81,14 @@ class JsonEngine : StorageEngine, MultipleEventListener {
         }
         val jsonFile = File(dbFolder, "${table.name}.json")
         if (!jsonFile.createNewFile()) {
-            log.warn("create file {} fail", jsonFile.getName())
+            warn("create file {} fail", jsonFile.getName())
         }
         val initContent: MutableList<String> = ArrayList()
         for (i in 0 until MAX_PRIMARY_KEY) {
             initContent.add("")
         }
         Files.write(jsonFile.toPath(), initContent)
-        log.info("write {} json to {}", initContent.size, jsonFile.toPath().toAbsolutePath())
+        info("write {} json to {}", initContent.size, jsonFile.toPath().toAbsolutePath())
         return MessageResult("success create table ${table.name}")
     }
 
@@ -119,7 +117,7 @@ class JsonEngine : StorageEngine, MultipleEventListener {
             InsertException("Duplicate entry $insertPrimaryKey for key 'PRIMARY'")
         }
         lines[insertPrimaryKey] = jsonObject.toString()
-        log.debugIfNecessary { "insert $jsonObject to table [${row.table.name}] " }
+        debug("insert $jsonObject to table [${row.table.name}] ")
     }
 
     override fun update(oldRow: Row, update: UpdateCommand) {
@@ -132,7 +130,7 @@ class JsonEngine : StorageEngine, MultipleEventListener {
             jsonNode.put(colName, expressionValue.source)
             val newLine = jsonNode.json()
             lines[rowId] = newLine
-            log.debugIfNecessary { "update $line to $newLine" }
+            debug("update $line to $newLine")
         }
     }
 
