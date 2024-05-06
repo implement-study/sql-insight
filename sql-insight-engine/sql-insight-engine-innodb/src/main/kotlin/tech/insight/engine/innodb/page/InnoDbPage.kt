@@ -103,7 +103,11 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : Logging(),
      */
     open fun insertData(data: InnodbUserRecord) {
         val (pre, next) = findPreAndNext(data)
+        val prefree = this.freeSpace
         linkedAndAdjust(pre, data, next)
+        val after = this.freeSpace
+        val diff = prefree - after
+        println(" data: ${data.toBytes().size} diff: $diff pre: $prefree after: $after ")
         splitIfNecessary()
         PageSupport.flushPage(this)
     }
@@ -176,6 +180,15 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : Logging(),
         wrap.setOffset(offsetInPage)
         return wrap
     }
+
+
+    /**
+     * get next user record offset in page.
+     * different from [getUserRecordByOffset] is this method not analysis user record, just analysis record header.
+     *
+     */
+    protected abstract fun nextOffset(offsetInPage: Int): Int
+
 
     protected abstract fun wrapUserRecord(offsetInPage: Int): InnodbUserRecord
 
@@ -262,15 +275,21 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : Logging(),
             return
         }
         info("start group split ...")
-        for (i in 0 until pageDirectory.slots.size - 1) {
-            if (pageDirectory.slots[i].toInt() == next.offset()) {
-                var preGroupMax = getUserRecordByOffset(pageDirectory.slots[i + 1].toInt())
-                for (j in 0 until (Constant.SLOT_MAX_COUNT shr 1)) {
-                    preGroupMax = getUserRecordByOffset(preGroupMax.offset() + preGroupMax.nextRecordOffset())
-                }
-                pageDirectory.split(i, preGroupMax.offset().toShort())
-            }
+        val nextGroupIndex = pageDirectory.slots.indexOfFirst { it.toInt() == next.offset() }
+        var preGroupMax = getUserRecordByOffset(pageDirectory.slots[nextGroupIndex + 1].toInt())
+        for (j in 0 until (Constant.SLOT_MAX_COUNT shr 1)) {
+            preGroupMax = getUserRecordByOffset(preGroupMax.offset() + preGroupMax.nextRecordOffset())
         }
+//        pageDirectory.split(i, preGroupMax.offset().toShort())
+//        for (i in 0 until pageDirectory.slots.size - 1) {
+//            if (pageDirectory.slots[i].toInt() == next.offset()) {
+//                var preGroupMax = getUserRecordByOffset(pageDirectory.slots[i + 1].toInt())
+//                for (j in 0 until (Constant.SLOT_MAX_COUNT shr 1)) {
+//                    preGroupMax = getUserRecordByOffset(preGroupMax.offset() + preGroupMax.nextRecordOffset())
+//                }
+//                pageDirectory.split(i, preGroupMax.offset().toShort())
+//            }
+//        }
         info("end group split ...")
     }
 

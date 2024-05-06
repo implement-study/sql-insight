@@ -79,7 +79,7 @@ class Supremum private constructor() : SystemUserRecord {
     }
 
     override fun toString(): String {
-        return recordHeader.toString() + "[body:" + String(body) + "]"
+        return "[body:" + String(body) + "]"
     }
 
     override operator fun compareTo(other: Row): Int {

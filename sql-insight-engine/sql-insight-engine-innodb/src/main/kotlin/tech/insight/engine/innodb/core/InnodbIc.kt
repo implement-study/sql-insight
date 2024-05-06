@@ -28,23 +28,17 @@ import java.util.concurrent.atomic.AtomicLong
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class InnodbIc(table: Table) : Logging(), AutoIncrementKeyCounter {
-    private val table: Table
-    private val incrementColIndex: Int
-    private val counter: AtomicLong
+class InnodbIc(private val table: Table) : Logging(), AutoIncrementKeyCounter {
+    private val incrementColIndex: Int = table.ext.autoColIndex
+    private val counter: AtomicLong by lazy { resumeCounter() }
 
-    init {
-        this.table = table
-        incrementColIndex = table.ext.autoColIndex
-        //  todo
-        counter = AtomicLong(0)
-    }
 
     override fun dealAutoIncrement(row: InsertRow): Boolean {
         val targetValue = row.valueList[incrementColIndex]
         if (targetValue is ValueNull) {
             val valueInt = ValueInt(counter.incrementAndGet().toInt())
             row.valueList[incrementColIndex] = valueInt
+            debug("auto increment primary key ${table.columnList[table.ext.autoColIndex].name} to ${valueInt.source}")
             return true
         }
         val source: Int = (targetValue as ValueInt).source
@@ -52,6 +46,12 @@ class InnodbIc(table: Table) : Logging(), AutoIncrementKeyCounter {
             counter.set(source.toLong())
         }
         return false
+    }
+
+
+    private fun resumeCounter(): AtomicLong {
+        //  todo resume from disk
+        return AtomicLong(0)
     }
 
     override fun reset(table: Table) {

@@ -20,6 +20,10 @@ package tech.insight.engine.innodb.page
  */
 interface Constant {
     companion object {
+
+        /**
+         * in page directory , max user record count in a slot
+         */
         const val SLOT_MAX_COUNT = 8
         val COMPACT_MAX_ROW_LENGTH = ConstantSize.PAGE.size() shr 1
         const val DIRECTION_COUNT_THRESHOLD = 5

@@ -1,14 +1,17 @@
 package tech.insight.engine.innodb.optimizer
 
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import tech.insight.core.engine.SqlPipeline
+import tech.insight.core.engine.json.JsonEngineSupport
 import tech.insight.core.environment.TableManager
 import tech.insight.engine.innodb.dropDb
 import tech.insight.engine.innodb.execute.CreateTableTest
 import tech.insight.share.data.insertData
+import tech.insight.share.data.largeInsert
 import tech.insight.share.data.testDb
 import tech.insight.share.data.test_table
 
@@ -37,16 +40,16 @@ class InsertTest {
     }
 
 
-    //    @Test
-    //    fun largeInsertTest() {
-    //        ExecutePlanTest().createTableTest()
-    //        SqlPipeline.executeSql(largeInsert)
-    //        val table = TableManager.require(testDb, test_table)
-    //        val jsonFile = JsonEngineSupport.getJsonFile(table)
-    //        jsonFile.useLines {
-    //            assertEquals(1000, it.filter { line -> line.isNotEmpty() }.count())
-    //        }
-    //    }
+    @Test
+    fun largeInsertTest() {
+        CreateTableTest().correctTest()
+        SqlPipeline.executeSql(largeInsert)
+        val table = TableManager.require(testDb, test_table)
+        val jsonFile = JsonEngineSupport.getJsonFile(table)
+        jsonFile.useLines {
+            assertEquals(1000, it.count { line -> line.isNotEmpty() })
+        }
+    }
     //
     //    @Test
     //    fun twoTimeInsertTest() {

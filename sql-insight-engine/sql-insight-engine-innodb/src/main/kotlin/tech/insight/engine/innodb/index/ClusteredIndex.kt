@@ -71,9 +71,7 @@ class ClusteredIndex(table: Table) : InnodbIndex() {
 
 
     override fun insert(row: InsertRow) {
-        if (autoIncrementKeyCounter.dealAutoIncrement(row)) {
-            debug("auto increment primary key ${table.columnList[table.ext.autoColIndex].name}")
-        }
+        autoIncrementKeyCounter.dealAutoIncrement(row)
         val compact: Compact = RowFormatFactory.compactFromInsertRow(row)
         val root = rootPage
         if (compact.length() >= Constant.COMPACT_MAX_ROW_LENGTH) {

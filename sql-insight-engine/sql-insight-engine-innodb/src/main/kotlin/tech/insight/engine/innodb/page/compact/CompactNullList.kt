@@ -38,14 +38,21 @@ class CompactNullList
     fun isNull(index: Int): Boolean {
         val byteIndex = positionByte(index)
         val bitMap = nullList[byteIndex]
-        val mask = 1 shl index % Byte.SIZE_BITS
+        val mask = mask(index)
         return mask and bitMap.toInt() == mask
     }
 
     fun setNull(index: Int) {
         val byteIndex = positionByte(index)
-        val mask = (1 shl index % Byte.SIZE_BITS).toByte()
-        nullList[byteIndex] = (nullList[byteIndex].toInt() and mask.toInt()).toByte()
+        val mask = mask(index)
+        nullList[byteIndex] = (nullList[byteIndex].toInt() and mask).toByte()
+    }
+
+    /**
+     * @param index target null column in all nullableList
+     */
+    private fun mask(index: Int): Int {
+        return 1 shl (index and (Byte.SIZE_BITS - 1))
     }
 
     /**
