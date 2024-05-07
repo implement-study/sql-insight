@@ -21,7 +21,7 @@ class InnodbClusteredCursor(index: InnodbIndex, private val session: Session) : 
 
     override fun close() {
         file.close()
-        debug("close the cursor session id:[${session.id}]")
+        debug { "close the cursor session id:[${session.id}]" }
     }
 
     override fun hasNext(): Boolean {

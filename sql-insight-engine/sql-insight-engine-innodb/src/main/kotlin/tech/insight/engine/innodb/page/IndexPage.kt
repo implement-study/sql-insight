@@ -35,6 +35,7 @@ class IndexPage(index: InnodbIndex) : InnoDbPage(index) {
         pointPage.insertData(data)
     }
 
+
     override fun wrapUserRecord(offsetInPage: Int): IndexRecord {
         //  todo dynamic primary key
         val columns: List<Column> = ext.belongIndex.columns()
@@ -53,7 +54,7 @@ class IndexPage(index: InnodbIndex) : InnoDbPage(index) {
     /**
      * data page will split when free space less than one in thirty-two page size
      */
-    override fun splitIfNecessary() {
+    override fun pageSplitIfNecessary() {
         if (this.freeSpace > ConstantSize.PAGE.size() shr 5) {
             return
         }

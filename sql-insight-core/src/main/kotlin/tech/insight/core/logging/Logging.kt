@@ -16,63 +16,9 @@ abstract class Logging {
 
     private val log: Logger = LoggerFactory.getLogger(this.javaClass)
 
-    fun debug(msg: String?) {
+    fun debug(messageSupplier: () -> String) {
         if (log.isDebugEnabled) {
-            log.debug(msg)
-        }
-    }
-
-    fun debug(format: String?, arg: Any?) {
-        if (log.isDebugEnabled) {
-            log.debug(format, arg)
-        }
-    }
-
-    fun debug(format: String?, arg1: Any?, arg2: Any?) {
-        if (log.isDebugEnabled) {
-            log.debug(format, arg1, arg2)
-        }
-    }
-
-    fun debug(format: String?, vararg arguments: Any?) {
-        if (log.isDebugEnabled) {
-            log.debug(format, arguments)
-        }
-    }
-
-    fun debug(msg: String?, t: Throwable?) {
-        if (log.isDebugEnabled) {
-            log.debug(msg, t)
-        }
-    }
-
-    fun debug(marker: Marker?, msg: String?) {
-        if (log.isDebugEnabled) {
-            log.debug(marker, msg)
-        }
-    }
-
-    fun debug(marker: Marker?, format: String?, arg: Any?) {
-        if (log.isDebugEnabled) {
-            log.debug(marker, format, arg)
-        }
-    }
-
-    fun debug(marker: Marker?, format: String?, arg1: Any?, arg2: Any?) {
-        if (log.isDebugEnabled) {
-            log.debug(marker, format, arg1, arg2)
-        }
-    }
-
-    fun debug(marker: Marker?, format: String?, vararg arguments: Any?) {
-        if (log.isDebugEnabled) {
-            log.debug(marker, format, arguments)
-        }
-    }
-
-    fun debug(marker: Marker?, msg: String?, t: Throwable?) {
-        if (log.isDebugEnabled) {
-            log.debug(marker, msg, t)
+            log.debug(messageSupplier.invoke())
         }
     }
 

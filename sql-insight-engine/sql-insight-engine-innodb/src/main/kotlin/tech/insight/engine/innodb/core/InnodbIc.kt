@@ -38,7 +38,7 @@ class InnodbIc(private val table: Table) : Logging(), AutoIncrementKeyCounter {
         if (targetValue is ValueNull) {
             val valueInt = ValueInt(counter.incrementAndGet().toInt())
             row.valueList[incrementColIndex] = valueInt
-            debug("auto increment primary key ${table.columnList[table.ext.autoColIndex].name} to ${valueInt.source}")
+            debug { "auto increment primary key ${table.columnList[table.ext.autoColIndex].name} to ${valueInt.source}" }
             return true
         }
         val source: Int = (targetValue as ValueInt).source

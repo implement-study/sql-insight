@@ -117,7 +117,7 @@ class JsonEngine : Logging(), StorageEngine, MultipleEventListener {
             InsertException("Duplicate entry $insertPrimaryKey for key 'PRIMARY'")
         }
         lines[insertPrimaryKey] = jsonObject.toString()
-        debug("insert $jsonObject to table [${row.table.name}] ")
+        debug { "insert $jsonObject to table [${row.table.name}] " }
     }
 
     override fun update(oldRow: Row, update: UpdateCommand) {
@@ -130,7 +130,7 @@ class JsonEngine : Logging(), StorageEngine, MultipleEventListener {
             jsonNode.put(colName, expressionValue.source)
             val newLine = jsonNode.json()
             lines[rowId] = newLine
-            debug("update $line to $newLine")
+            debug { "update $line to $newLine" }
         }
     }
 

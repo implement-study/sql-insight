@@ -11,6 +11,8 @@ import tech.insight.engine.innodb.utils.RowComparator
  * @author gongxuanzhangmelt@gmail.com
  */
 class DataPage(index: InnodbIndex) : InnoDbPage(index) {
+
+
     override fun wrapUserRecord(offsetInPage: Int): InnodbUserRecord {
         return RowFormatFactory.readRecordInPage(this, offsetInPage, ext.belongIndex.belongTo())
     }
@@ -18,7 +20,7 @@ class DataPage(index: InnodbIndex) : InnoDbPage(index) {
     /**
      * data page will split when free space less than one-sixteenth page size
      */
-    override fun splitIfNecessary() {
+    override fun pageSplitIfNecessary() {
         if (this.freeSpace > ConstantSize.PAGE.size() shr 4) {
             return
         }

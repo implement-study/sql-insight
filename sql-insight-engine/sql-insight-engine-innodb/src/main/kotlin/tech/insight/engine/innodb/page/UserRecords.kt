@@ -31,6 +31,12 @@ class UserRecords(var body: ByteArray = ByteArray(0)) : ByteWrapper, PageObject 
         body = DynamicByteBuffer.wrap(body).append(userRecord.toBytes()).toBytes()
     }
 
+    fun addRecords(userRecord: List<InnodbUserRecord>) {
+        body = DynamicByteBuffer.wrap(body).apply {
+            userRecord.forEach { append(it.toBytes()) }
+        }.toBytes()
+    }
+
     override fun length(): Int {
         return body.size
     }
