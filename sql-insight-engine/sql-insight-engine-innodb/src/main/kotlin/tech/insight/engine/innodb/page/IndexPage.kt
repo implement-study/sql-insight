@@ -55,7 +55,7 @@ class IndexPage(index: InnodbIndex) : InnoDbPage(index) {
      * data page will split when free space less than one in thirty-two page size
      */
     override fun pageSplitIfNecessary() {
-        if (this.freeSpace > ConstantSize.PAGE.size() shr 5) {
+        if (this.freeSpace.toInt() > ConstantSize.PAGE.size() shr 5) {
             return
         }
         val allRecords: MutableList<InnodbUserRecord> = ArrayList(pageHeader.recordCount + 1)

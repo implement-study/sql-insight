@@ -80,6 +80,10 @@ class ValueChar(value: String, length: Int) : Value<String> {
     }
 
 
+    override fun toString(): String {
+        return source
+    }
+
     override fun toBytes(): ByteArray {
         return source.toByteArray()
     }
@@ -121,6 +125,10 @@ data class ValueVarchar(override val source: String) : Value<String> {
     override fun plus(other: Value<*>): Value<String> {
         return ValueVarchar("$source${other.source}")
     }
+
+    override fun toString(): String {
+        return this.source
+    }
 }
 
 data class ValueInt(override val source: Int) : Value<Int> {
@@ -130,6 +138,10 @@ data class ValueInt(override val source: Int) : Value<Int> {
 
     override fun toBytes(): ByteArray {
         return source.toByteArray()
+    }
+
+    override fun toString(): String {
+        return source.toString()
     }
 
     override fun compareTo(other: Value<*>): Int {

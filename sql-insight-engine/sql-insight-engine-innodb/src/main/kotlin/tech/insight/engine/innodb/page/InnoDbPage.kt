@@ -8,6 +8,7 @@ import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.compact.IndexRecord
 import tech.insight.engine.innodb.page.compact.RecordHeader
 import tech.insight.engine.innodb.page.compact.RecordType
+import tech.insight.engine.innodb.utils.Console
 import tech.insight.engine.innodb.utils.PageSupport
 import java.io.File
 import java.io.RandomAccessFile
@@ -85,14 +86,14 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : Logging(),
         return PageType.Companion.valueOf(fileHeader.pageType.toInt())
     }
 
-    val freeSpace: Short
+    val freeSpace: UShort
         get() = (ConstantSize.PAGE.size() -
                 ConstantSize.PAGE_HEADER.size() -
                 ConstantSize.FILE_HEADER.size() -
                 ConstantSize.FILE_TRAILER.size() -
                 ConstantSize.SUPREMUM.size() -
                 ConstantSize.INFIMUM.size() -
-                pageDirectory.length() - userRecords.length()).toShort()
+                pageDirectory.length() - userRecords.length()).toUShort()
 
     /**
      * add a data.
@@ -109,6 +110,7 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : Logging(),
         val diff = prefree - after
         println(" data: ${data.toBytes().size} diff: $diff pre: $prefree after: $after ")
         pageSplitIfNecessary()
+//        Console.pageDescription(this)
         PageSupport.flushPage(this)
     }
 

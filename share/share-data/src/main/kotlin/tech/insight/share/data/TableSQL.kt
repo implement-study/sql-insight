@@ -60,4 +60,17 @@ fun insertData(tableName: String, databaseName: String? = null): String {
     """
 }
 
+fun insertDataCount(tableName: String, databaseName: String? = null, count: Int): String {
+    val databaseNamePre = if (databaseName == null) {
+        ""
+    } else {
+        "$databaseName."
+    }
+    val values = (1..count).joinToString(",") { "($it,'a$it')" }
+    return """
+        insert into $databaseNamePre$tableName (id,name) values 
+        $values
+    """
+
+}
 
