@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 java-mysql  and the original author or authors <gongxuanzhangmelt@gmail.com>.
+ * Copyright 2023 sql-insight  and the original author or authors <gongxuanzhangmelt@gmail.com>.
  *
  * Licensed under the GNU Affero General Public License v3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,15 +27,15 @@ import java.util.function.Function
  */
 object RowComparator {
     fun primaryKeyComparator(): Comparator<InnodbUserRecord> {
-        return baseComparator().thenComparing(Function<InnodbUserRecord, Value<*>> { innodbUserRecord: InnodbUserRecord ->
+        return baseComparator().thenComparing { innodbUserRecord: InnodbUserRecord ->
             val table: Table = innodbUserRecord.belongTo()
             val primaryKeyName: String = table.ext.primaryKeyName!!
             innodbUserRecord.getValueByColumnName(primaryKeyName)
-        })
+        }
     }
 
-    fun baseComparator(): Comparator<InnodbUserRecord> {
-        return Comparator<InnodbUserRecord> { record1: InnodbUserRecord?, record2: InnodbUserRecord? ->
+    private fun baseComparator(): Comparator<InnodbUserRecord> {
+        return Comparator { record1: InnodbUserRecord?, record2: InnodbUserRecord? ->
             if (record1 is Supremum) {
                 return@Comparator 1
             }

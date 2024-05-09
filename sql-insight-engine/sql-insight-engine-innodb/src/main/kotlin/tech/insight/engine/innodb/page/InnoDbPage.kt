@@ -8,8 +8,9 @@ import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.compact.IndexRecord
 import tech.insight.engine.innodb.page.compact.RecordHeader
 import tech.insight.engine.innodb.page.compact.RecordType
-import tech.insight.engine.innodb.utils.Console
+import tech.insight.engine.innodb.page.type.PageType
 import tech.insight.engine.innodb.utils.PageSupport
+import tech.insight.engine.innodb.utils.RowComparator
 import java.io.File
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
@@ -22,7 +23,7 @@ import java.util.*
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-abstract class InnoDbPage protected constructor(index: InnodbIndex) : Logging(), ByteWrapper,
+class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     Comparator<InnodbUserRecord>,
     PageObject, Iterable<InnodbUserRecord> {
 
@@ -62,6 +63,10 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : Logging(),
      * 8 bytes
      */
     lateinit var fileTrailer: FileTrailer
+
+    /**
+     * some extra info for page
+     */
     var ext: PageExt
 
     init {
@@ -83,7 +88,7 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : Logging(),
     }
 
     fun pageType(): PageType {
-        return PageType.Companion.valueOf(fileHeader.pageType.toInt())
+        return PageType.valueOf(fileHeader.pageType.toInt(), this)
     }
 
     val freeSpace: UShort
@@ -102,15 +107,30 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : Logging(),
      * page is index node will find target leaf node and insert data.
      * may be split page in process
      */
-    open fun insertData(data: InnodbUserRecord) {
+    fun insertData(data: InnodbUserRecord) {
+        val targetPage = this.locatePage(data)
+        targetPage.doInsertData(data)
+    }
+
+    /**
+     * link [PageType.locatePage]
+     */
+    private fun locatePage(data: InnodbUserRecord): InnoDbPage {
+        return this.pageType().locatePage(data)
+    }
+
+    /**
+     * link [PageType.doInsertData]
+     */
+    private fun doInsertData(data: InnodbUserRecord) {
         val (pre, next) = findPreAndNext(data)
         val prefree = this.freeSpace
         linkedAndAdjust(pre, data, next)
         val after = this.freeSpace
         val diff = prefree - after
-        println(" data: ${data.toBytes().size} diff: $diff pre: $prefree after: $after ")
+        debug { " data: ${data.toBytes().size} diff: $diff pre: $prefree after: $after " }
         pageSplitIfNecessary()
-//        Console.pageDescription(this)
+        //        Console.pageDescription(this)
         PageSupport.flushPage(this)
     }
 
@@ -120,7 +140,7 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : Logging(),
      *
      * @param userRecord target record
      */
-    protected fun findPreAndNext(userRecord: InnodbUserRecord): Pair<InnodbUserRecord, InnodbUserRecord> {
+    private fun findPreAndNext(userRecord: InnodbUserRecord): Pair<InnodbUserRecord, InnodbUserRecord> {
         val targetSlot = findTargetSlot(userRecord)
         var pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot + 1).toInt())
         var next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset())
@@ -171,7 +191,7 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : Logging(),
      * @param offsetInPage offset in page
      * @return user record
      */
-    protected fun getUserRecordByOffset(offsetInPage: Int): InnodbUserRecord {
+    fun getUserRecordByOffset(offsetInPage: Int): InnodbUserRecord {
         if (offsetInPage == ConstantSize.INFIMUM.offset()) {
             return infimum
         }
@@ -240,7 +260,7 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : Logging(),
         insertData(secondChild.pageIndex())
     }
 
-    protected fun linkedAndAdjust(pre: InnodbUserRecord, insertRecord: InnodbUserRecord, next: InnodbUserRecord) {
+     private fun linkedAndAdjust(pre: InnodbUserRecord, insertRecord: InnodbUserRecord, next: InnodbUserRecord) {
         val insertHeader: RecordHeader = insertRecord.recordHeader
         insertHeader.setHeapNo(pageHeader.absoluteRecordCount.toUInt())
         insertRecord.setOffset(pageHeader.lastInsertOffset + insertRecord.beforeSplitOffset())
@@ -353,6 +373,10 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : Logging(),
         return result
     }
 
+    override fun compare(o1: InnodbUserRecord, o2: InnodbUserRecord): Int {
+        return RowComparator.primaryKeyComparator().compare(o1, o2)
+    }
+
     inner class Itr : Iterator<InnodbUserRecord> {
         private var cursor = getUserRecordByOffset(infimum.nextRecordOffset() + infimum.offset())
         override fun hasNext(): Boolean {
@@ -374,7 +398,7 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : Logging(),
 
         lateinit var belongIndex: InnodbIndex
 
-        var parent: IndexPage? = null
+        var parent: InnoDbPage? = null
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -470,19 +494,6 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : Logging(),
         }
 
 
-        /**
-         * page split create a new data page.
-         *
-         * @param recordList data in the page that sorted
-         * @return the data page but the file header , page header is not complete
-         */
-        fun createDataPage(recordList: List<InnodbUserRecord>, index: InnodbIndex): DataPage {
-            val dataPage = DataPage(index)
-            fillInnodbUserRecords(recordList, dataPage)
-            dataPage.fileHeader.pageType = PageType.FIL_PAGE_INDEX.value
-            return dataPage
-        }
-
         fun createIndexPage(indexRecordList: List<InnodbUserRecord>, index: InnodbIndex): IndexPage {
             val indexPage = IndexPage(index)
             fillInnodbUserRecords(indexRecordList, indexPage)
@@ -490,37 +501,6 @@ abstract class InnoDbPage protected constructor(index: InnodbIndex) : Logging(),
             return indexPage
         }
 
-        private fun fillInnodbUserRecords(recordList: List<InnodbUserRecord>, page: InnoDbPage) {
-            page.fileHeader = FileHeader.create()
-            page.supremum = Supremum.create()
-            page.infimum = Infimum.create()
-            val pageHeader = PageHeader.create().apply {
-                this.slotCount = ((recordList.size + 1) / 8 + 1).toShort()
-                this.absoluteRecordCount = (2 + recordList.size).toShort()
-                this.recordCount = recordList.size.toShort()
-                this.lastInsertOffset = ConstantSize.USER_RECORDS.offset().toShort()
-            }
-            page.pageHeader = pageHeader
-            val slots = ShortArray((recordList.size + 1) / Constant.SLOT_MAX_COUNT + 1)
-            slots[0] = ConstantSize.SUPREMUM.offset().toShort()
-            slots[slots.size - 1] = ConstantSize.INFIMUM.offset().toShort()
-            page.pageDirectory = PageDirectory(slots)
-            page.userRecords = UserRecords().apply { addRecords(recordList) }
-            var pre: InnodbUserRecord = page.infimum
-            val preOffset: Short = ConstantSize.SUPREMUM.offset().toShort()
-            for (i in recordList.indices) {
-                val current: InnodbUserRecord = recordList[i]
-                val currentOffset: Int = pageHeader.lastInsertOffset + current.beforeSplitOffset()
-                pageHeader.lastInsertOffset = (pageHeader.lastInsertOffset + current.length()).toShort()
-                pre.recordHeader.setNextRecordOffset(currentOffset - preOffset)
-                pre = current
-                if ((i + 1) % Constant.SLOT_MAX_COUNT == 0) {
-                    slots[slots.size - 1 - (i + 1) % Constant.SLOT_MAX_COUNT] = currentOffset.toShort()
-                }
-            }
-            pre.recordHeader.setNextRecordOffset(ConstantSize.SUPREMUM.offset())
-            page.fileTrailer = FileTrailer.create()
-        }
 
     }
 }

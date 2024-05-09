@@ -2,7 +2,7 @@ package tech.insight.engine.innodb.utils
 
 import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.InnoDbPage
-import tech.insight.engine.innodb.page.PageType
+import tech.insight.engine.innodb.page.type.PageType
 
 
 /**

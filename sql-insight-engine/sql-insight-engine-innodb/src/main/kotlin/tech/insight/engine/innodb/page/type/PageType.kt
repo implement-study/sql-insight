@@ -1,0 +1,68 @@
+/*
+ * Copyright 2023 sql-insight  and the original author or authors <gongxuanzhangmelt@gmail.com>.
+ *
+ * Licensed under the GNU Affero General Public License v3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://github.com/implement-study/sql-insight/blob/main/LICENSE
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package tech.insight.engine.innodb.page.type
+
+import tech.insight.engine.innodb.page.InnoDbPage
+import tech.insight.engine.innodb.page.InnodbUserRecord
+
+
+/**
+ * innodb page type,different page type has different action.
+ * @author gxz gongxuanzhang@foxmail.com
+ */
+interface PageType : Comparator<InnodbUserRecord> {
+
+    val value: Short
+
+    val page: InnoDbPage
+
+    /**
+     * insert data.
+     * data page can insert row.
+     * index page can insert index.
+     * tip: before call method,must be sure the param record in the page
+     * @param data insert data object.
+     */
+    fun doInsertData(data: InnodbUserRecord)
+
+
+    /**
+     * before call method,must be sure the param record in the page
+     * @param userRecord
+     */
+    fun findPreAndNext(userRecord: InnodbUserRecord): Pair<InnodbUserRecord, InnodbUserRecord>
+
+    /**
+     * locate the page that have the record.
+     * Maybe the user record does not exist. Return the page where record should be
+     * if the page is data page but the record not in the page, find for the parent index page.
+     *
+     * @param userRecord user record
+     */
+    fun locatePage(userRecord: InnodbUserRecord): InnoDbPage
+
+
+    companion object {
+        fun valueOf(value: Int, innoDbPage: InnoDbPage): PageType {
+            return when (value.toShort()) {
+                DataPage.FIL_PAGE_INDEX_VALUE -> DataPage(innoDbPage)
+                IndexPage.FIL_PAGE_INODE -> IndexPage(innoDbPage)
+                UndoPage.FIL_PAGE_TYPE_UNDO_LOG -> UndoPage(innoDbPage)
+                else -> throw IllegalArgumentException("page type error value[ $value ]")
+            }
+        }
+    }
+}
