@@ -17,6 +17,7 @@ package tech.insight.engine.innodb.page.type
 
 import tech.insight.engine.innodb.page.InnoDbPage
 import tech.insight.engine.innodb.page.InnodbUserRecord
+import tech.insight.engine.innodb.page.compact.IndexRecord
 
 
 /**
@@ -40,10 +41,10 @@ interface PageType : Comparator<InnodbUserRecord> {
 
 
     /**
-     * before call method,must be sure the param record in the page
-     * @param userRecord
+     * this page should split.
+     * in general after insert row call this method
      */
-    fun findPreAndNext(userRecord: InnodbUserRecord): Pair<InnodbUserRecord, InnodbUserRecord>
+    fun pageSplitIfNecessary()
 
     /**
      * locate the page that have the record.
@@ -53,6 +54,17 @@ interface PageType : Comparator<InnodbUserRecord> {
      * @param userRecord user record
      */
     fun locatePage(userRecord: InnodbUserRecord): InnoDbPage
+
+    /**
+     * convert the record in the page to user record.
+     * @param offsetInPage the record offset in page
+     */
+    fun convertUserRecord(offsetInPage: Int): InnodbUserRecord
+
+    /**
+     * get the first index node to parent node insert
+     */
+    fun pageIndex(): IndexRecord
 
 
     companion object {

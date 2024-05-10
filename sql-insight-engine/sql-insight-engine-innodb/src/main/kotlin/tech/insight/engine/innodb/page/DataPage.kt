@@ -14,9 +14,7 @@ import tech.insight.engine.innodb.utils.RowComparator
 class DataPage(index: InnodbIndex) : InnoDbPage(index) {
 
 
-    override fun wrapUserRecord(offsetInPage: Int): InnodbUserRecord {
-        return RowFormatFactory.readRecordInPage(this, offsetInPage, ext.belongIndex.belongTo())
-    }
+
 
     /**
      * data page will split when free space less than one-sixteenth page size
@@ -44,39 +42,7 @@ class DataPage(index: InnodbIndex) : InnoDbPage(index) {
         }
     }
 
-    /**
-     * middle split.
-     * insert direction unidentified (directionCount less than 5)
-     *
-     *
-     * if this page is root page.
-     * transfer root page to index page from data page.
-     * create two data page linked.
-     * if this page is normal leaf node,
-     * create a data page append to index file and insert a index record to parent (index page)
-     *
-     * @param pageUserRecord all user record in page with inserted
-     * @param allLength      all user record length
-     */
-    private fun middleSplit(pageUserRecord: List<InnodbUserRecord>, allLength: Int) {
-        var lengthCandidate = allLength
-        val half = lengthCandidate / 2
-        for (i in pageUserRecord.indices) {
-            lengthCandidate -= pageUserRecord[i].length()
-            if (lengthCandidate <= half) {
-                val (firstDataPage, secondDataPage) = splitToDataPage(pageUserRecord, i, this)
-                upgrade(firstDataPage, secondDataPage)
-                return
-            }
-        }
-    }
 
-    override fun pageIndex(): IndexRecord {
-        val firstData = getUserRecordByOffset(infimum.offset() + infimum.nextRecordOffset())
-        val columns: List<Column> = ext.belongIndex.columns()
-        val values = columns.map { it.name }.map { firstData.getValueByColumnName(it) }.toTypedArray()
-        return IndexRecord(IndexNode(values, fileHeader.offset), ext.belongIndex)
-    }
 
     override fun compare(o1: InnodbUserRecord, o2: InnodbUserRecord): Int {
         return RowComparator.primaryKeyComparator().compare(o1, o2)
@@ -85,67 +51,5 @@ class DataPage(index: InnodbIndex) : InnoDbPage(index) {
     companion object {
 
 
-        /**
-         * page split create a new data page.
-         *
-         * @param recordList data in the page that sorted
-         * @return first of pair is left node,second is right node
-         */
-        fun splitToDataPage(
-            recordList: List<InnodbUserRecord>,
-            splitIndex: Int,
-            parentPage: DataPage
-        ): Pair<DataPage, DataPage> {
-            val index = parentPage.ext.belongIndex
-            val left = createFromUserRecords(recordList.subList(0, splitIndex), index)
-            val right = createFromUserRecords(recordList.subList(splitIndex, recordList.size), index)
-            left.fileHeader = FileHeader.create().apply {
-                this.next = 0
-                this.pre = 0
-                this.offset = 0
-                this.pageType = PageType.FIL_PAGE_INDEX.value
-            }
-
-            return Pair(left, right)
-        }
-
-        private fun createFromUserRecords(recordList: List<InnodbUserRecord>, index: InnodbIndex): DataPage {
-            val dataPage = DataPage(index)
-            fillInnodbUserRecords(recordList, dataPage)
-            dataPage.fileHeader.pageType = PageType.FIL_PAGE_INDEX.value
-            return dataPage
-        }
-
-        private fun fillInnodbUserRecords(recordList: List<InnodbUserRecord>, page: InnoDbPage) {
-            page.fileHeader = FileHeader.create()
-            page.supremum = Supremum.create()
-            page.infimum = Infimum.create()
-            val pageHeader = PageHeader.create().apply {
-                this.slotCount = ((recordList.size + 1) / 8 + 1).toShort()
-                this.absoluteRecordCount = (2 + recordList.size).toShort()
-                this.recordCount = recordList.size.toShort()
-                this.lastInsertOffset = ConstantSize.USER_RECORDS.offset().toShort()
-            }
-            page.pageHeader = pageHeader
-            val slots = ShortArray((recordList.size + 1) / Constant.SLOT_MAX_COUNT + 1)
-            slots[0] = ConstantSize.SUPREMUM.offset().toShort()
-            slots[slots.size - 1] = ConstantSize.INFIMUM.offset().toShort()
-            page.pageDirectory = PageDirectory(slots)
-            page.userRecords = UserRecords().apply { addRecords(recordList) }
-            var pre: InnodbUserRecord = page.infimum
-            val preOffset: Short = ConstantSize.SUPREMUM.offset().toShort()
-            for (i in recordList.indices) {
-                val current: InnodbUserRecord = recordList[i]
-                val currentOffset: Int = pageHeader.lastInsertOffset + current.beforeSplitOffset()
-                pageHeader.lastInsertOffset = (pageHeader.lastInsertOffset + current.length()).toShort()
-                pre.recordHeader.setNextRecordOffset(currentOffset - preOffset)
-                pre = current
-                if ((i + 1) % Constant.SLOT_MAX_COUNT == 0) {
-                    slots[slots.size - 1 - (i + 1) % Constant.SLOT_MAX_COUNT] = currentOffset.toShort()
-                }
-            }
-            pre.recordHeader.setNextRecordOffset(ConstantSize.SUPREMUM.offset())
-            page.fileTrailer = FileTrailer.create()
-        }
     }
 }
