@@ -231,6 +231,12 @@ data object ValueNull : Value<Unit> {
     override fun compareTo(other: Value<*>): Int {
         return -1
     }
+
+    override fun toString(): String {
+        return "null"
+    }
+
+
 }
 
 

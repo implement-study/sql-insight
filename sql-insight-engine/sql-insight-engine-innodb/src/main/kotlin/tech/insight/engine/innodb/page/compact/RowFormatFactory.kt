@@ -60,7 +60,7 @@ object RowFormatFactory {
             }
             if (column.variable) {
                 val length: Int = value.length
-                if (length >= 2.0.pow(Byte.SIZE_BITS)) {
+                if (length > UByte.MAX_VALUE.toInt()) {
                     throw SqlInsightException("length too long ")
                 }
                 compact.variables.addVariableLength(value.length.toByte())
@@ -71,30 +71,6 @@ object RowFormatFactory {
         return compact
     }
 
-    /**
-     * read page source solve a user record.
-     * the offset is offset in page.
-     * offset is after record header .in other words offset - record header size  means record header offset
-     */
-    fun readRecordInPage(page: InnoDbPage, offsetInPage: Int, table: Table): InnodbUserRecord {
-        if (ConstantSize.INFIMUM.offset() == offsetInPage) {
-            return page.infimum
-        }
-        if (ConstantSize.SUPREMUM.offset() == offsetInPage) {
-            return page.supremum
-        }
-        val compact = Compact()
-        compact.offsetInPage = (offsetInPage)
-        compact.recordHeader = (readRecordHeader(page, offsetInPage))
-        fillNullAndVar(page, offsetInPage, compact, table)
-        val variableLength: Int = compact.variables.variableLength()
-        val fixLength = compactFixLength(compact, table)
-        val body: ByteArray =
-            Arrays.copyOfRange(page.toBytes(), offsetInPage, offsetInPage + variableLength + fixLength)
-        compact.body = (body)
-        compact.sourceRow = (compactReadRow(compact, table))
-        return compact
-    }
 
     /**
      * @param page   innodb page
@@ -107,75 +83,5 @@ object RowFormatFactory {
         return RecordHeader.wrap(headerArr)
     }
 
-    /**
-     * fill compact field null list and variables
-     * depend on table info.
-     */
-    private fun fillNullAndVar(page: InnoDbPage, offset: Int, compact: Compact, table: Table) {
-        var offset = offset
-        val nullLength: Int = CompactNullList.calcNullListLength(table.ext.nullableColCount)
-        offset -= ConstantSize.RECORD_HEADER.size() - nullLength
-        val pageArr: ByteArray = page.toBytes()
-        val nullListByte = Arrays.copyOfRange(pageArr, offset, offset + nullLength)
-        //   read null list
-        val compactNullList = CompactNullList.wrap(nullListByte)
-        compact.nullList = (compactNullList)
-        //   read variable
-        val variableCount = variableColumnCount(table, compactNullList)
-        offset -= variableCount
-        val variableArray = Arrays.copyOfRange(pageArr, offset, offset + variableCount)
-        compact.variables = (Variables(variableArray))
-    }
 
-    private fun variableColumnCount(table: Table, nullList: CompactNullList): Int {
-        val columnList: List<Column> = table.columnList
-        var result = 0
-        for (column in columnList) {
-            if (!column.notNull && nullList.isNull(column.nullListIndex)) {
-                continue
-            }
-            if (column.variable) {
-                result++
-            }
-        }
-        return result
-    }
-
-    private fun compactFixLength(compact: Compact, table: Table): Int {
-        var fixLength = 0
-        for (column in table.columnList) {
-            if (column.variable) {
-                continue
-            }
-            if (column.notNull || !compact.nullList.isNull(column.nullListIndex)) {
-                fixLength += column.length
-            }
-        }
-        return fixLength
-    }
-
-    private fun compactReadRow(compact: Compact, table: Table): ReadRow {
-        val columnList: List<Column> = table.columnList
-        val valueList: MutableList<Value<*>> = ArrayList<Value<*>>(columnList.size)
-        val bodyBuffer = ByteBuffer.wrap(compact.body)
-        val iterator: Iterator<Byte> = compact.variables.iterator()
-        var rowId = -1
-        for (column in columnList) {
-            if (!column.notNull && compact.nullList.isNull(column.nullListIndex)) {
-                valueList.add(column.defaultValue)
-                continue
-            }
-            val length = if (column.variable) iterator.next().toInt() else column.length
-            val item = ByteArray(length)
-            bodyBuffer[item]
-            val value: Value<*> = ValueNegotiator.wrapValue(column, item)
-            valueList.add(value)
-            if (column.primaryKey) {
-                rowId = (value as ValueInt).source
-            }
-        }
-        val row = ReadRow(valueList, rowId.toLong())
-        row.table = table
-        return row
-    }
 }

@@ -47,7 +47,7 @@ class InsertTest {
     @Test
     fun largeInsertTest() {
         CreateTableTest().correctTest()
-        SqlPipeline.executeSql(largeInsert)
+        SqlPipeline.executeSql(insertDataCount(tableName, dbName, 1000))
         assertNotNull(TableManager.require(testDb, test_table))
     }
     //

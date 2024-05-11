@@ -345,6 +345,8 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         pageDirectory = PageDirectory()
         //  clear user record
         userRecords = UserRecords()
+        infimum = Infimum.create()
+        supremum = Supremum.create()
         insertData(preChild.pageIndex())
         insertData(secondChild.pageIndex())
     }

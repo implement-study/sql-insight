@@ -45,7 +45,7 @@ class CompactNullList
     fun setNull(index: Int) {
         val byteIndex = positionByte(index)
         val mask = mask(index)
-        nullList[byteIndex] = (nullList[byteIndex].toInt() and mask).toByte()
+        nullList[byteIndex] = (nullList[byteIndex].toInt() or mask).toByte()
     }
 
     /**
