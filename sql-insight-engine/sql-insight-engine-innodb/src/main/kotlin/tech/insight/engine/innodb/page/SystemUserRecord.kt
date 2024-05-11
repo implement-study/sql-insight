@@ -4,6 +4,7 @@ import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.Value
+import tech.insight.engine.innodb.page.compact.IndexRecord
 import tech.insight.engine.innodb.page.compact.RecordHeader
 import tech.insight.engine.innodb.page.compact.RecordType
 
@@ -35,6 +36,10 @@ sealed interface SystemUserRecord : InnodbUserRecord {
 
     override fun deleteSign(): Boolean {
         return false
+    }
+
+    override fun indexKey(): Array<Value<*>> {
+        systemUserRecordUnsupported()
     }
 
     private fun systemUserRecordUnsupported(): Nothing {

@@ -17,6 +17,7 @@ package tech.insight.engine.innodb.page
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
+import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VALUE
 import tech.insight.engine.innodb.page.type.PageType
 import java.nio.ByteBuffer
 
@@ -95,13 +96,13 @@ class FileHeader private constructor() : ByteWrapper, PageObject {
         if (other !is FileHeader) return false
 
         return (checkSum == other.checkSum &&
-            offset == other.offset &&
-            pageType == other.pageType &&
-            pre == other.pre &&
-            next == other.next &&
-            lsn == other.lsn &&
-            flushLsn == other.flushLsn &&
-            spaceId == other.spaceId)
+                offset == other.offset &&
+                pageType == other.pageType &&
+                pre == other.pre &&
+                next == other.next &&
+                lsn == other.lsn &&
+                flushLsn == other.flushLsn &&
+                spaceId == other.spaceId)
     }
 
     override fun hashCode(): Int {
@@ -139,7 +140,7 @@ class FileHeader private constructor() : ByteWrapper, PageObject {
             this.next = 0
             this.pre = 0
             this.offset = 0
-            this.pageType = PageType.FIL_PAGE_INDEX.value
+            this.pageType = FIL_PAGE_INDEX_VALUE
         }
     }
 }

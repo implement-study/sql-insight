@@ -62,6 +62,10 @@ class IndexRecord(override val recordHeader: RecordHeader, indexNode: IndexNode,
         return recordHeader.length()
     }
 
+    override fun indexKey(): Array<Value<*>> {
+        return this.indexNode.key
+    }
+
     override fun deleteSign(): Boolean {
         return recordHeader.delete
     }

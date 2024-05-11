@@ -30,21 +30,6 @@ interface PageType : Comparator<InnodbUserRecord> {
 
     val page: InnoDbPage
 
-    /**
-     * insert data.
-     * data page can insert row.
-     * index page can insert index.
-     * tip: before call method,must be sure the param record in the page
-     * @param data insert data object.
-     */
-    fun doInsertData(data: InnodbUserRecord)
-
-
-    /**
-     * this page should split.
-     * in general after insert row call this method
-     */
-    fun pageSplitIfNecessary()
 
     /**
      * locate the page that have the record.
@@ -63,6 +48,7 @@ interface PageType : Comparator<InnodbUserRecord> {
 
     /**
      * get the first index node to parent node insert
+     * link [InnoDbPage.pageIndex]
      */
     fun pageIndex(): IndexRecord
 

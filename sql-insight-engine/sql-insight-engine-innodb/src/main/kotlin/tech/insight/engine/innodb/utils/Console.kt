@@ -2,7 +2,9 @@ package tech.insight.engine.innodb.utils
 
 import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.InnoDbPage
-import tech.insight.engine.innodb.page.type.PageType
+import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VALUE
+import tech.insight.engine.innodb.page.type.IndexPage.Companion.FIL_PAGE_INODE
+import tech.insight.engine.innodb.page.type.UndoPage.Companion.FIL_PAGE_TYPE_UNDO_LOG
 
 
 /**
@@ -51,10 +53,10 @@ object Console {
         }
         val dump = StringBuilder(ConstantSize.PAGE.size() shr 2)
         dump.append(BLANK.repeat(9))
-        when (innoDbPage.pageType()) {
-            PageType.FIL_PAGE_TYPE_UNDO_LOG -> dump.appendLine(createTitle("Page(log)"))
-            PageType.FIL_PAGE_INDEX -> dump.appendLine(createTitle("Page(data)"))
-            PageType.FIL_PAGE_INODE -> dump.appendLine(createTitle("Page(index)"))
+        when (innoDbPage.pageType().value) {
+            FIL_PAGE_TYPE_UNDO_LOG -> dump.appendLine(createTitle("Page(log)"))
+            FIL_PAGE_INDEX_VALUE -> dump.appendLine(createTitle("Page(data)"))
+            FIL_PAGE_INODE -> dump.appendLine(createTitle("Page(index)"))
         }
         dump.append(BLANK.repeat(9))
         dump.append("| offset: [${innoDbPage.fileHeader.offset}]$BLANK")

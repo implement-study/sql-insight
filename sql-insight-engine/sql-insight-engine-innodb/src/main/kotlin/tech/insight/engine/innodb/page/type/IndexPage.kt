@@ -3,11 +3,11 @@ package tech.insight.engine.innodb.page.type
 import tech.insight.core.bean.Column
 import tech.insight.core.bean.value.Value
 import tech.insight.core.bean.value.ValueNull
-import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.IndexNode
 import tech.insight.engine.innodb.page.InnoDbPage
-import tech.insight.engine.innodb.page.InnoDbPage.Companion.createIndexPage
+import tech.insight.engine.innodb.page.InnoDbPage.Companion.findPageByOffset
 import tech.insight.engine.innodb.page.InnodbUserRecord
+import tech.insight.engine.innodb.page.SystemUserRecord
 import tech.insight.engine.innodb.page.compact.IndexRecord
 import tech.insight.engine.innodb.page.compact.RecordHeader
 import tech.insight.engine.innodb.page.compact.RowFormatFactory
@@ -23,40 +23,20 @@ class IndexPage(override val page: InnoDbPage) : PageType {
 
     override val value: Short = FIL_PAGE_INODE
 
-    override fun doInsertData(data: InnodbUserRecord) {
-        TODO("Not yet implemented")
-    }
-
-    override fun pageSplitIfNecessary() {
-        if (this.freeSpace.toInt() > ConstantSize.PAGE.size() shr 5) {
-            return
-        }
-        val allRecords: MutableList<InnodbUserRecord> = ArrayList(pageHeader.recordCount + 1)
-        var base: InnodbUserRecord = infimum
-        while (true) {
-            base = getUserRecordByOffset(base.offset() + base.nextRecordOffset())
-            if (base === supremum) {
-                break
-            }
-            allRecords.add(base)
-        }
-        val pre: InnoDbPage = createIndexPage(allRecords.subList(0, allRecords.size / 2), ext.belongIndex)
-        val next: InnoDbPage = createIndexPage(
-            allRecords.subList(allRecords.size / 2, allRecords.size),
-            ext.belongIndex
-        )
-        upgrade(pre, next)
-    }
-
     override fun locatePage(userRecord: InnodbUserRecord): InnoDbPage {
-        TODO("Not yet implemented")
+        val targetSlot = page.findTargetSlot(userRecord)
+        var firstIndex = page.targetSlotFirstUserRecord(targetSlot)
+        //   todo Whether it is better to allow nodes to implement comparison functions?
+        while (compare(userRecord, firstIndex as IndexRecord) > 0) {
+            firstIndex = page.getUserRecordByOffset(firstIndex.offset() + firstIndex.nextRecordOffset())
+        }
+        val targetIndex = firstIndex
+        return findPageByOffset(targetIndex.indexNode().pointer, page.ext.belongIndex)
     }
 
     override fun pageIndex(): IndexRecord {
         val firstData = this.page.getUserRecordByOffset(page.infimum.offset() + page.infimum.nextRecordOffset())
-        val columns: List<Column> = page.ext.belongIndex.columns()
-        val values = columns.map { it.name }.map { firstData.getValueByColumnName(it) }.toTypedArray()
-        return IndexRecord(IndexNode(values, page.fileHeader.offset), page.ext.belongIndex)
+        return firstData as IndexRecord
     }
 
 
@@ -76,9 +56,14 @@ class IndexPage(override val page: InnoDbPage) : PageType {
     }
 
     override fun compare(o1: InnodbUserRecord, o2: InnodbUserRecord): Int {
-        require(o1 is IndexRecord && o2 is IndexRecord) { "index page only support compare index record" }
-        val values1 = o1.indexNode().key
-        val values2 = o2.indexNode().key
+        if (o1 is SystemUserRecord) {
+            return o1.compareTo(o2)
+        }
+        if (o2 is SystemUserRecord) {
+            return -o2.compareTo(o1)
+        }
+        val values1 = o1.indexKey()
+        val values2 = o2.indexKey()
         for (i in values1.indices) {
             val compare: Int = values1[i].compareTo(values2[i])
             if (compare != 0) {
@@ -87,7 +72,6 @@ class IndexPage(override val page: InnoDbPage) : PageType {
         }
         return 0
     }
-
 
     companion object {
         const val FIL_PAGE_INODE = 0x0003.toShort()

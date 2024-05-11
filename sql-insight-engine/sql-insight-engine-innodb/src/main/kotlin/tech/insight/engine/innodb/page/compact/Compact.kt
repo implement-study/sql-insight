@@ -5,6 +5,7 @@ import tech.insight.core.annotation.Unused
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.Value
+import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.InnodbUserRecord
 
@@ -53,6 +54,9 @@ class Compact : InnodbUserRecord {
     var rollPointer: Long = 0
     lateinit var sourceRow: Row
     var offsetInPage = -1
+
+    lateinit var belongIndex: InnodbIndex
+
     override fun rowBytes(): ByteArray {
         val buffer: DynamicByteBuffer = DynamicByteBuffer.allocate()
         buffer.append(variables.toBytes())
@@ -82,6 +86,11 @@ class Compact : InnodbUserRecord {
 
     override fun beforeSplitOffset(): Int {
         return variables.length() + nullList.length() + ConstantSize.RECORD_HEADER.size()
+    }
+
+    override fun indexKey(): Array<Value<*>> {
+        val columns = belongIndex.columns()
+        return columns.map { it.name }.map { this.getValueByColumnName(it) }.toTypedArray()
     }
 
     override fun offset(): Int {

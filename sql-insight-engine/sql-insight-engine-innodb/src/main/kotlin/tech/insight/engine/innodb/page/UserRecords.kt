@@ -54,5 +54,9 @@ class UserRecords(var body: ByteArray = ByteArray(0)) : ByteWrapper, PageObject 
         return body.contentHashCode()
     }
 
+    override fun toString(): String {
+        return "UserRecords(length=${body.size})"
+    }
+
 
 }
