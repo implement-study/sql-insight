@@ -176,7 +176,7 @@ class RecordHeader private constructor() : ByteWrapper, PageObject {
 
         private fun infimumHeader(recordHeader: RecordHeader) {
             recordHeader.setRecordType(RecordType.INFIMUM)
-            recordHeader.setHeapNo(1U)
+            recordHeader.setHeapNo(0U)
             recordHeader.setDelete(false)
             recordHeader.setNOwned(1)
             recordHeader.setNextRecordOffset(ConstantSize.INFIMUM.size())

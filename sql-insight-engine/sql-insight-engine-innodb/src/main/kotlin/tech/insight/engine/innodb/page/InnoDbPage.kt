@@ -294,7 +294,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     }
 
     /**
-     * @param offsetInPage offset in page
+     * @param offsetInPage offset in page, offset is after record header , aka    |vars|null|record header| here!| record body|
      * @return user record
      */
     fun getUserRecordByOffset(offsetInPage: Int): InnodbUserRecord {
@@ -369,13 +369,14 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
 
 
     private fun linkedAndAdjust(pre: InnodbUserRecord, insertRecord: InnodbUserRecord, next: InnodbUserRecord) {
-        val insertHeader: RecordHeader = insertRecord.recordHeader
-        insertHeader.setHeapNo(pageHeader.absoluteRecordCount.toUInt())
-        insertRecord.setOffset(pageHeader.lastInsertOffset + insertRecord.beforeSplitOffset())
-        insertHeader.setNextRecordOffset(next.offset() - insertRecord.offset())
+        insertRecord.apply {
+            setOffset(pageHeader.lastInsertOffset + insertRecord.beforeSplitOffset())
+            this.recordHeader.setHeapNo(pageHeader.absoluteRecordCount.toUInt())
+            this.recordHeader.setNextRecordOffset(next.offset() - insertRecord.offset())
+            this.recordHeader.setRecordType(RecordType.NORMAL)
+        }
         pre.recordHeader.setNextRecordOffset(insertRecord.offset() - pre.offset())
         refreshRecordHeader(pre)
-        insertHeader.setRecordType(RecordType.NORMAL)
 
         //  adjust page
         userRecords.addRecord(insertRecord)

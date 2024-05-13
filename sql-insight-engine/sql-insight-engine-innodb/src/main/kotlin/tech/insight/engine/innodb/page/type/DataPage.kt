@@ -9,8 +9,11 @@ import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.IndexNode
 import tech.insight.engine.innodb.page.InnoDbPage
 import tech.insight.engine.innodb.page.InnodbUserRecord
-import tech.insight.engine.innodb.page.compact.*
+import tech.insight.engine.innodb.page.compact.Compact
+import tech.insight.engine.innodb.page.compact.CompactNullList
+import tech.insight.engine.innodb.page.compact.IndexRecord
 import tech.insight.engine.innodb.page.compact.RowFormatFactory.readRecordHeader
+import tech.insight.engine.innodb.page.compact.Variables
 import tech.insight.engine.innodb.utils.RowComparator
 import tech.insight.engine.innodb.utils.ValueNegotiator
 import java.nio.ByteBuffer
@@ -75,18 +78,18 @@ class DataPage(override val page: InnoDbPage) : PageType {
      * depend on table info.
      */
     private fun fillNullAndVar(page: InnoDbPage, offset: Int, compact: Compact, table: Table) {
-        var varOffset = offset
+        val nullBytesEnd = offset - ConstantSize.RECORD_HEADER.size()
         val nullLength: Int = CompactNullList.calcNullListLength(table.ext.nullableColCount)
-        varOffset -= ConstantSize.RECORD_HEADER.size() + nullLength
         val pageArr: ByteArray = page.toBytes()
-        val nullListByte = Arrays.copyOfRange(pageArr, varOffset, varOffset + nullLength)
+        val nullStart = nullBytesEnd - nullLength
+        val nullListByte = Arrays.copyOfRange(pageArr, nullStart, nullBytesEnd)
         //   read null list
         val compactNullList = CompactNullList.wrap(nullListByte)
         compact.nullList = (compactNullList)
         //   read variable
         val variableCount = variableColumnCount(table, compactNullList)
-        varOffset -= variableCount
-        val variableArray = Arrays.copyOfRange(pageArr, varOffset, varOffset + variableCount)
+        val varStart = nullStart - variableCount
+        val variableArray = Arrays.copyOfRange(pageArr, varStart, nullStart)
         compact.variables = (Variables(variableArray))
     }
 
