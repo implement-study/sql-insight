@@ -76,12 +76,12 @@ class IndexRecord(override val recordHeader: RecordHeader, indexNode: IndexNode,
         return buffer.toBytes()
     }
 
-    override fun offset(): Int {
+    override fun absoluteOffset(): Int {
         require(offsetInPage != -1) { "unknown offset" }
         return offsetInPage
     }
 
-    override fun setOffset(offset: Int) {
+    override fun setAbsoluteOffset(offset: Int) {
         offsetInPage = offset
     }
 

@@ -18,14 +18,14 @@ interface UserRecord : ByteWrapper, Row {
     /**
      * absolute offset in page， field not in page , application calculate
      */
-    fun offset(): Int
+    fun absoluteOffset(): Int
 
     /**
      * [offset]
      * absolute offset in page don't in source.
      * require set up
      */
-    fun setOffset(offset: Int)
+    fun setAbsoluteOffset(offset: Int)
 
     /**
      * next node relative offset

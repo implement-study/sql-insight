@@ -26,7 +26,7 @@ sealed interface SystemUserRecord : InnodbUserRecord {
         systemUserRecordUnsupported()
     }
 
-    override fun setOffset(offset: Int) {
+    override fun setAbsoluteOffset(offset: Int) {
         throw UnsupportedOperationException("infimum and supremum can't set offset ")
     }
 
@@ -63,7 +63,7 @@ class Supremum private constructor() : SystemUserRecord {
         return DynamicByteBuffer.wrap(recordHeader.toBytes()).append(body).toBytes()
     }
 
-    override fun offset(): Int {
+    override fun absoluteOffset(): Int {
         return ConstantSize.SUPREMUM.offset()
     }
 
@@ -162,7 +162,7 @@ class Infimum private constructor(): SystemUserRecord {
         return recordHeader.nextRecordOffset
     }
 
-    override fun offset(): Int {
+    override fun absoluteOffset(): Int {
         return ConstantSize.INFIMUM.offset()
     }
 

@@ -93,12 +93,12 @@ class Compact : InnodbUserRecord {
         return columns.map { it.name }.map { this.getValueByColumnName(it) }.toTypedArray()
     }
 
-    override fun offset(): Int {
+    override fun absoluteOffset(): Int {
         require(offsetInPage != -1) { "unknown offset" }
         return offsetInPage
     }
 
-    override fun setOffset(offset: Int) {
+    override fun setAbsoluteOffset(offset: Int) {
         offsetInPage = offset
     }
 

@@ -3,14 +3,12 @@ package tech.insight.engine.innodb.page.type
 import tech.insight.core.bean.Column
 import tech.insight.core.bean.value.Value
 import tech.insight.core.bean.value.ValueNull
-import tech.insight.engine.innodb.page.IndexNode
-import tech.insight.engine.innodb.page.InnoDbPage
+import tech.insight.engine.innodb.page.*
 import tech.insight.engine.innodb.page.InnoDbPage.Companion.findPageByOffset
-import tech.insight.engine.innodb.page.InnodbUserRecord
-import tech.insight.engine.innodb.page.SystemUserRecord
 import tech.insight.engine.innodb.page.compact.IndexRecord
 import tech.insight.engine.innodb.page.compact.RecordHeader
 import tech.insight.engine.innodb.page.compact.RowFormatFactory
+import tech.insight.engine.innodb.utils.PageSupport
 import tech.insight.engine.innodb.utils.ValueNegotiator
 import java.nio.ByteBuffer
 
@@ -28,15 +26,47 @@ class IndexPage(override val page: InnoDbPage) : PageType {
         var firstIndex = page.targetSlotFirstUserRecord(targetSlot)
         //   todo Whether it is better to allow nodes to implement comparison functions?
         while (compare(userRecord, firstIndex as IndexRecord) > 0) {
-            firstIndex = page.getUserRecordByOffset(firstIndex.offset() + firstIndex.nextRecordOffset())
+            firstIndex = page.getUserRecordByOffset(firstIndex.absoluteOffset() + firstIndex.nextRecordOffset())
         }
         val targetIndex = firstIndex
         return findPageByOffset(targetIndex.indexNode().pointer, page.ext.belongIndex)
     }
 
     override fun pageIndex(): IndexRecord {
-        val firstData = this.page.getUserRecordByOffset(page.infimum.offset() + page.infimum.nextRecordOffset())
+        val firstData = this.page.getUserRecordByOffset(page.infimum.absoluteOffset() + page.infimum.nextRecordOffset())
         return firstData as IndexRecord
+    }
+
+
+    /**
+     * if root page need up grade, page header level is tree height
+     */
+    override fun rootUpgrade(leftPage: InnoDbPage, rightPage: InnoDbPage) {
+        val firstOffset: Int = PageSupport.allocatePage(page.ext.belongIndex, 2)
+        val secondOffset = firstOffset + ConstantSize.PAGE.size()
+        leftPage.apply {
+            pageHeader.level = page.pageHeader.level
+            pageHeader.indexId = page.pageHeader.indexId
+            fileHeader.offset = firstOffset
+            fileHeader.next = secondOffset
+        }
+        rightPage.apply {
+            pageHeader.level = page.pageHeader.level
+            pageHeader.indexId = page.pageHeader.indexId
+            fileHeader.offset = secondOffset
+            fileHeader.pre = firstOffset
+        }
+        //  clear root page
+        page.apply {
+            pageHeader = PageHeader.create()
+            pageHeader.level++
+            pageDirectory = PageDirectory()
+            userRecords = UserRecords()
+            infimum = Infimum.create()
+            supremum = Supremum.create()
+            insertData(leftPage.pageIndex())
+            insertData(rightPage.pageIndex())
+        }
     }
 
 

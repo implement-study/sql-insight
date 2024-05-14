@@ -23,6 +23,10 @@ class UndoPage(override val page: InnoDbPage) : PageType {
         TODO("Not yet implemented")
     }
 
+    override fun rootUpgrade(leftPage: InnoDbPage, rightPage: InnoDbPage) {
+        TODO("Not yet implemented")
+    }
+
     override fun compare(o1: InnodbUserRecord?, o2: InnodbUserRecord?): Int {
         TODO("Not yet implemented")
     }

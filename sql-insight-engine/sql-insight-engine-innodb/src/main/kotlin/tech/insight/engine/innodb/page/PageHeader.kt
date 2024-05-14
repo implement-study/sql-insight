@@ -17,6 +17,7 @@ package tech.insight.engine.innodb.page
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
+import tech.insight.core.annotation.Unused
 import java.nio.ByteBuffer
 
 /**
@@ -76,6 +77,7 @@ class PageHeader private constructor() : PageObject, ByteWrapper {
     /**
      * the max transaction id in page
      */
+    @Unused
     var maxTransactionId: Long = 0
 
     /**
@@ -92,17 +94,20 @@ class PageHeader private constructor() : PageObject, ByteWrapper {
     /**
      * join seg leaf 10 bytes
      */
+    @Unused
     var segLeafPre: Short = 0
 
     /**
      * 10 bytes.
      * b-tree leaf-node header info . only root page have.
      */
+    @Unused
     var segLeaf: Long = 0
 
     /**
      * join seg top 10 bytes
      */
+    @Unused
     var segTopPre: Short = 0
 
     /**

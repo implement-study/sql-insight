@@ -8,6 +8,7 @@ import tech.insight.core.engine.SqlPipeline
 import tech.insight.core.environment.TableManager
 import tech.insight.engine.innodb.dropDb
 import tech.insight.engine.innodb.execute.CreateTableTest
+import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.share.data.*
 import kotlin.test.assertNotNull
 

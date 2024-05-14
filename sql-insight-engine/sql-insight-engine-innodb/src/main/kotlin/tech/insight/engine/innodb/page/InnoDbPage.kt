@@ -148,10 +148,10 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     private fun findPreAndNext(userRecord: InnodbUserRecord): Pair<InnodbUserRecord, InnodbUserRecord> {
         val targetSlot = findTargetSlot(userRecord)
         var pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot + 1).toInt())
-        var next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset())
+        var next = getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
         while (this.pageType().compare(userRecord, next) > 0) {
             pre = next
-            next = getUserRecordByOffset(pre.nextRecordOffset() + pre.offset())
+            next = getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
         }
         return Pair(pre, next)
     }
@@ -162,7 +162,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
      */
     fun targetSlotFirstUserRecord(targetSlot: Int): InnodbUserRecord {
         val pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot + 1).toInt())
-        return getUserRecordByOffset(pre.nextRecordOffset() + pre.offset())
+        return getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
     }
 
     /**
@@ -215,7 +215,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         var base: InnodbUserRecord = infimum
         var allLength = 0
         while (true) {
-            base = getUserRecordByOffset(base.offset() + base.nextRecordOffset())
+            base = getUserRecordByOffset(base.absoluteOffset() + base.nextRecordOffset())
             if (base === supremum) {
                 break
             }
@@ -244,18 +244,21 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
      * @param allLength      all user record length
      */
     private fun middleSplit(pageUserRecord: List<InnodbUserRecord>, allLength: Int) {
-        var lengthCandidate = allLength
-        val half = lengthCandidate / 2
-        for (i in pageUserRecord.indices) {
-            lengthCandidate -= pageUserRecord[i].length()
-            if (lengthCandidate <= half) {
-                val (firstDataPage, secondDataPage) = splitToDataPage(pageUserRecord, i, this)
-                Console.pageDescription(firstDataPage)
-                Console.pageDescription(secondDataPage)
-                upgrade(firstDataPage, secondDataPage)
-                return
-            }
+        var remainLength = allLength
+        val half = remainLength / 2
+        val middleIndex = pageUserRecord.indexOfFirst {
+            remainLength -= it.length()
+            remainLength <= half
         }
+        if (ext.parent == null) {
+            //  is root page
+            val (leftPage, rightPage) = splitToSubPage(pageUserRecord, middleIndex, this)
+            return this.pageType().rootUpgrade(leftPage, rightPage)
+        }
+        val (firstDataPage, secondDataPage) = splitToSubPage(pageUserRecord, middleIndex, this)
+        Console.pageDescription(firstDataPage)
+        Console.pageDescription(secondDataPage)
+        upgrade(firstDataPage, secondDataPage)
     }
 
 
@@ -265,7 +268,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
      * @param recordList data or index in the page that sorted
      * @return first of pair is left node,second is right node
      */
-    private fun splitToDataPage(
+    private fun splitToSubPage(
         recordList: List<InnodbUserRecord>,
         splitIndex: Int,
         parentPage: InnoDbPage
@@ -305,8 +308,21 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
             return supremum
         }
         val wrap = this.pageType().convertUserRecord(offsetInPage)
-        wrap.setOffset(offsetInPage)
+        wrap.setAbsoluteOffset(offsetInPage)
         return wrap
+    }
+
+
+    /**
+     * get the first user record in page user records linked.
+     */
+    fun getFirstUserRecord() {
+        if (this.pageHeader.recordCount.toInt() == 0) {
+            throw NoSuchElementException("page is empty")
+        }
+
+        getUserRecordByOffset(infimum.absoluteOffset() + infimum.nextRecordOffset())
+
     }
 
 
@@ -370,13 +386,13 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
 
     private fun linkedAndAdjust(pre: InnodbUserRecord, insertRecord: InnodbUserRecord, next: InnodbUserRecord) {
         insertRecord.apply {
-            setOffset(pageHeader.lastInsertOffset + insertRecord.beforeSplitOffset())
+            setAbsoluteOffset(pageHeader.lastInsertOffset + insertRecord.beforeSplitOffset())
             this.recordHeader.setHeapNo(pageHeader.absoluteRecordCount.toUInt())
-            this.recordHeader.setNextRecordOffset(next.offset() - insertRecord.offset())
+            this.recordHeader.setNextRecordOffset(next.absoluteOffset() - insertRecord.absoluteOffset())
             this.recordHeader.setRecordType(RecordType.NORMAL)
         }
-        pre.recordHeader.setNextRecordOffset(insertRecord.offset() - pre.offset())
-        refreshRecordHeader(pre)
+        pre.recordHeader.setNextRecordOffset(insertRecord.absoluteOffset() - pre.absoluteOffset())
+//        refreshRecordHeader(pre)
 
         //  adjust page
         userRecords.addRecord(insertRecord)
@@ -384,35 +400,35 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         pageHeader.recordCount++
         pageHeader.heapTop = (pageHeader.heapTop + insertRecord.length().toShort()).toShort()
         pageHeader.lastInsertOffset = (pageHeader.lastInsertOffset + insertRecord.length().toShort()).toShort()
-
         var groupMax = next
         //  adjust group
         while (groupMax.recordHeader.nOwned == 0) {
-            groupMax = getUserRecordByOffset(next.offset() + next.nextRecordOffset())
+            groupMax = getUserRecordByOffset(next.absoluteOffset() + next.nextRecordOffset())
         }
         val groupMaxHeader: RecordHeader = groupMax.recordHeader
         val groupCount: Int = groupMaxHeader.nOwned
         groupMaxHeader.setNOwned(groupCount + 1)
         if (next.recordHeader.nOwned <= Constant.SLOT_MAX_COUNT) {
-            return refreshRecordHeader(next)
+//            refreshRecordHeader(next)
+            return
         }
         debug { "start group split ..." }
-        val nextGroupIndex = pageDirectory.slots.indexOfFirst { it.toInt() == groupMax.offset() }
+        val nextGroupIndex = pageDirectory.slots.indexOfFirst { it.toInt() == groupMax.absoluteOffset() }
         var preMaxRecord = getUserRecordByOffset(pageDirectory.slots[nextGroupIndex + 1].toInt())
         val leftGroupCount = Constant.SLOT_MAX_COUNT shr 1
         val rightGroupCount = Constant.SLOT_MAX_COUNT - leftGroupCount + 1
         for (j in 0 until leftGroupCount) {
-            preMaxRecord = getUserRecordByOffset(preMaxRecord.offset() + preMaxRecord.nextRecordOffset())
+            preMaxRecord = getUserRecordByOffset(preMaxRecord.absoluteOffset() + preMaxRecord.nextRecordOffset())
         }
         preMaxRecord.apply {
             recordHeader.setNOwned(leftGroupCount)
-            refreshRecordHeader(this)
+//            refreshRecordHeader(this)
         }
         groupMax.apply {
             recordHeader.setNOwned(rightGroupCount)
-            refreshRecordHeader(this)
+//            refreshRecordHeader(this)
         }
-        pageDirectory.split(nextGroupIndex, preMaxRecord.offset().toShort())
+        pageDirectory.split(nextGroupIndex, preMaxRecord.absoluteOffset().toShort())
         debug { "end group split ..." }
     }
 
@@ -439,10 +455,11 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
             return
         }
         val headerByte = record.recordHeader.toBytes()
-        val bodyOffset: Int = record.offset() - ConstantSize.RECORD_HEADER.size() - ConstantSize.PAGE_HEADER.size() -
-                ConstantSize.FILE_HEADER.size() -
-                ConstantSize.SUPREMUM.size() -
-                ConstantSize.INFIMUM.size()
+        val bodyOffset: Int =
+            record.absoluteOffset() - ConstantSize.RECORD_HEADER.size() - ConstantSize.PAGE_HEADER.size() -
+                    ConstantSize.FILE_HEADER.size() -
+                    ConstantSize.SUPREMUM.size() -
+                    ConstantSize.INFIMUM.size()
         System.arraycopy(headerByte, 0, userRecords.body, bodyOffset, headerByte.size)
     }
 
@@ -484,7 +501,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
 
 
     inner class Itr : Iterator<InnodbUserRecord> {
-        private var cursor = getUserRecordByOffset(infimum.nextRecordOffset() + infimum.offset())
+        private var cursor = getUserRecordByOffset(infimum.nextRecordOffset() + infimum.absoluteOffset())
         override fun hasNext(): Boolean {
             return cursor !== supremum
         }
@@ -494,7 +511,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
                 throw NoSuchElementException()
             }
             val result = cursor
-            cursor = getUserRecordByOffset(cursor.nextRecordOffset() + cursor.offset())
+            cursor = getUserRecordByOffset(cursor.nextRecordOffset() + cursor.absoluteOffset())
             return result
         }
 
@@ -544,7 +561,6 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
                 this.slotCount = ((recordList.size + 1) / 8 + 1).toShort()
                 this.absoluteRecordCount = (2 + recordList.size).toShort()
                 this.recordCount = recordList.size.toShort()
-                this.lastInsertOffset = ConstantSize.USER_RECORDS.offset().toShort()
             }
             page.pageHeader = pageHeader
             val slots = ShortArray((recordList.size + 1) / Constant.SLOT_MAX_COUNT + 1)

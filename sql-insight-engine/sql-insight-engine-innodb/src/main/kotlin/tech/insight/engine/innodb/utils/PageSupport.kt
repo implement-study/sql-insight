@@ -30,7 +30,6 @@ object PageSupport : Logging() {
      *
      * @return offset namely length of file before extension.
      */
-    @JvmOverloads
     fun allocatePage(index: InnodbIndex, pageCount: Int = 1): Int {
         RandomAccessFile(index.file, "rw").use { randomAccessFile ->
             val currentLength: Long = randomAccessFile.length()

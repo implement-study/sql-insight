@@ -52,6 +52,14 @@ interface PageType : Comparator<InnodbUserRecord> {
      */
     fun pageIndex(): IndexRecord
 
+    /**
+     * if page is root page that to say page don't have parent page,split page will create two pages.
+     *
+     * @param leftPage
+     * @param rightPage left and right page don't have offset
+     */
+    fun rootUpgrade(leftPage: InnoDbPage, rightPage: InnoDbPage)
+
 
     companion object {
         fun valueOf(value: Int, innoDbPage: InnoDbPage): PageType {

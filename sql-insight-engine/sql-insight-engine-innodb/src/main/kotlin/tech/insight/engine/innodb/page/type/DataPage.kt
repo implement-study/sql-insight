@@ -5,15 +5,14 @@ import tech.insight.core.bean.ReadRow
 import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.Value
 import tech.insight.core.bean.value.ValueInt
-import tech.insight.engine.innodb.page.ConstantSize
-import tech.insight.engine.innodb.page.IndexNode
-import tech.insight.engine.innodb.page.InnoDbPage
-import tech.insight.engine.innodb.page.InnodbUserRecord
+import tech.insight.engine.innodb.page.*
 import tech.insight.engine.innodb.page.compact.Compact
 import tech.insight.engine.innodb.page.compact.CompactNullList
 import tech.insight.engine.innodb.page.compact.IndexRecord
 import tech.insight.engine.innodb.page.compact.RowFormatFactory.readRecordHeader
 import tech.insight.engine.innodb.page.compact.Variables
+import tech.insight.engine.innodb.page.type.IndexPage.Companion.FIL_PAGE_INODE
+import tech.insight.engine.innodb.utils.PageSupport
 import tech.insight.engine.innodb.utils.RowComparator
 import tech.insight.engine.innodb.utils.ValueNegotiator
 import java.nio.ByteBuffer
@@ -62,10 +61,44 @@ class DataPage(override val page: InnoDbPage) : PageType {
     }
 
     override fun pageIndex(): IndexRecord {
-        val firstData = page.getUserRecordByOffset(page.infimum.offset() + page.infimum.nextRecordOffset())
+        val firstData = page.getUserRecordByOffset(page.infimum.absoluteOffset() + page.infimum.nextRecordOffset())
         val columns = page.ext.belongIndex.columns()
         val values = columns.map { it.name }.map { firstData.getValueByColumnName(it) }.toTypedArray()
         return IndexRecord(IndexNode(values, page.fileHeader.offset), page.ext.belongIndex)
+    }
+
+
+    /**
+     * if root page is data page, b plus tree height must be 1.
+     * so root page upgrade to index page and link to two data page.
+     */
+    override fun rootUpgrade(leftPage: InnoDbPage, rightPage: InnoDbPage) {
+        val firstOffset: Int = PageSupport.allocatePage(page.ext.belongIndex, 2)
+        val secondOffset = firstOffset + ConstantSize.PAGE.size()
+        leftPage.apply {
+            pageHeader.level = 0
+            pageHeader.indexId = page.pageHeader.indexId
+            fileHeader.offset = firstOffset
+            fileHeader.next = secondOffset
+        }
+        rightPage.apply {
+            pageHeader.level = 0
+            pageHeader.indexId = page.pageHeader.indexId
+            fileHeader.offset = secondOffset
+            fileHeader.pre = firstOffset
+        }
+        //  transfer to index page and clear root page
+        page.apply {
+            pageHeader = PageHeader.create()
+            pageHeader.level++
+            pageDirectory = PageDirectory()
+            fileHeader.pageType = FIL_PAGE_INODE
+            userRecords = UserRecords()
+            infimum = Infimum.create()
+            supremum = Supremum.create()
+            insertData(leftPage.pageIndex())
+            insertData(rightPage.pageIndex())
+        }
     }
 
     override fun compare(o1: InnodbUserRecord, o2: InnodbUserRecord): Int {
