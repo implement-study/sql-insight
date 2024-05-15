@@ -44,16 +44,21 @@ class PageDirectory : PageObject, ByteWrapper {
         this.slots = slots
     }
 
+    /**
+     * page directory split.
+     * @param splitSlotIndex split slot index. max slot is 0
+     * @param newGroupMaxOffset new group max offset.  the new group max should be in [splitSlotIndex] before split
+     */
     fun split(splitSlotIndex: Int, newGroupMaxOffset: Short) {
-        val newSlots = ShortArray(slots.size + 1)
-        for (i in 0..splitSlotIndex) {
-            newSlots[i] = slots[i]
+        slots = ShortArray(slots.size + 1) {
+            if (it <= splitSlotIndex) {
+                slots[it]
+            } else if (it == splitSlotIndex + 1) {
+                newGroupMaxOffset
+            } else {
+                slots[it - 1]
+            }
         }
-        newSlots[splitSlotIndex + 1] = newGroupMaxOffset
-        for (i in splitSlotIndex + 1 until newSlots.size) {
-            newSlots[i] = slots[i - 1]
-        }
-        slots = newSlots
     }
 
     override fun length(): Int {

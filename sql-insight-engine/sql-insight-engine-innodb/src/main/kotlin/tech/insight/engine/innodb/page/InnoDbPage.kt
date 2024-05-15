@@ -135,7 +135,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         val diff = prefree - after
         debug { " data: ${data.toBytes().size} diff: $diff pre: $prefree after: $after " }
         pageSplitIfNecessary()
-        //        Console.pageDescription(this)
+        Console.pageDescription(this)
         PageSupport.flushPage(this)
     }
 
@@ -175,10 +175,17 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
      * infimum
      */
     fun findTargetSlot(userRecord: InnodbUserRecord): Int {
+        if (pageDirectory.slots.size == 2) {
+            return 0
+        }
+        val maxExcludeSupremum = getUserRecordByOffset(pageDirectory.slots[1].toInt())
+        if (this.pageType().compare(maxExcludeSupremum, userRecord) < 0) {
+            return 0
+        }
         var left = 0
         var right = pageDirectory.slotCount() - 1
-        while (left < right - 1) {
-            val mid = (right + left) / 2
+        while (left <= right) {
+            val mid = left + ((right - left) shr 1)
             val offset: Short = pageDirectory.slots[mid]
             val base = getUserRecordByOffset(offset.toInt())
             val compare = pageType().compare(userRecord, base)
@@ -316,13 +323,11 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     /**
      * get the first user record in page user records linked.
      */
-    fun getFirstUserRecord() {
+    fun getFirstUserRecord(): InnodbUserRecord {
         if (this.pageHeader.recordCount.toInt() == 0) {
             throw NoSuchElementException("page is empty")
         }
-
-        getUserRecordByOffset(infimum.absoluteOffset() + infimum.nextRecordOffset())
-
+        return getUserRecordByOffset(infimum.absoluteOffset() + infimum.nextRecordOffset())
     }
 
 
@@ -392,7 +397,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
             this.recordHeader.setRecordType(RecordType.NORMAL)
         }
         pre.recordHeader.setNextRecordOffset(insertRecord.absoluteOffset() - pre.absoluteOffset())
-//        refreshRecordHeader(pre)
+        refreshRecordHeader(pre)
 
         //  adjust page
         userRecords.addRecord(insertRecord)
@@ -403,14 +408,13 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         var groupMax = next
         //  adjust group
         while (groupMax.recordHeader.nOwned == 0) {
-            groupMax = getUserRecordByOffset(next.absoluteOffset() + next.nextRecordOffset())
+            groupMax = getUserRecordByOffset(groupMax.absoluteOffset() + groupMax.nextRecordOffset())
         }
         val groupMaxHeader: RecordHeader = groupMax.recordHeader
         val groupCount: Int = groupMaxHeader.nOwned
         groupMaxHeader.setNOwned(groupCount + 1)
-        if (next.recordHeader.nOwned <= Constant.SLOT_MAX_COUNT) {
-//            refreshRecordHeader(next)
-            return
+        if (groupMax.recordHeader.nOwned <= Constant.SLOT_MAX_COUNT) {
+            return refreshRecordHeader(next)
         }
         debug { "start group split ..." }
         val nextGroupIndex = pageDirectory.slots.indexOfFirst { it.toInt() == groupMax.absoluteOffset() }
@@ -420,14 +424,8 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         for (j in 0 until leftGroupCount) {
             preMaxRecord = getUserRecordByOffset(preMaxRecord.absoluteOffset() + preMaxRecord.nextRecordOffset())
         }
-        preMaxRecord.apply {
-            recordHeader.setNOwned(leftGroupCount)
-//            refreshRecordHeader(this)
-        }
-        groupMax.apply {
-            recordHeader.setNOwned(rightGroupCount)
-//            refreshRecordHeader(this)
-        }
+        preMaxRecord.recordHeader.setNOwned(leftGroupCount)
+        groupMax.recordHeader.setNOwned(rightGroupCount)
         pageDirectory.split(nextGroupIndex, preMaxRecord.absoluteOffset().toShort())
         debug { "end group split ..." }
     }
@@ -447,6 +445,9 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         ext = snapshot.ext
     }
 
+    /**
+     * you should rewrote to page when you update user record that resolve by [getUserRecordByOffset]
+     */
     private fun refreshRecordHeader(record: InnodbUserRecord) {
         if (record is Infimum) {
             return

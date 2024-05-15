@@ -33,8 +33,7 @@ class IndexPage(override val page: InnoDbPage) : PageType {
     }
 
     override fun pageIndex(): IndexRecord {
-        val firstData = this.page.getUserRecordByOffset(page.infimum.absoluteOffset() + page.infimum.nextRecordOffset())
-        return firstData as IndexRecord
+        return this.page.getFirstUserRecord() as IndexRecord
     }
 
 
