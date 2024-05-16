@@ -8,6 +8,7 @@ import tech.insight.core.bean.value.Value
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.InnodbUserRecord
+import tech.insight.engine.innodb.page.SystemUserRecord
 
 
 /**
@@ -91,6 +92,10 @@ class Compact : InnodbUserRecord {
     override fun indexKey(): Array<Value<*>> {
         val columns = belongIndex.columns()
         return columns.map { it.name }.map { this.getValueByColumnName(it) }.toTypedArray()
+    }
+
+    override fun belongIndex(): InnodbIndex {
+        return belongIndex
     }
 
     override fun absoluteOffset(): Int {

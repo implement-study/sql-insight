@@ -57,6 +57,7 @@ class DataPage(override val page: InnoDbPage) : PageType {
             Arrays.copyOfRange(page.toBytes(), offsetInPage, offsetInPage + variableLength + fixLength)
         compact.body = (body)
         compact.sourceRow = (compactReadRow(compact, table))
+        compact.belongIndex = (page.ext.belongIndex)
         return compact
     }
 
@@ -94,8 +95,8 @@ class DataPage(override val page: InnoDbPage) : PageType {
             pageDirectory = PageDirectory()
             fileHeader.pageType = FIL_PAGE_INODE
             userRecords = UserRecords()
-            infimum = Infimum.create()
-            supremum = Supremum.create()
+            infimum = Infimum.create(this.ext.belongIndex)
+            supremum = Supremum.create(this.ext.belongIndex)
             insertData(leftPage.pageIndex())
             insertData(rightPage.pageIndex())
         }

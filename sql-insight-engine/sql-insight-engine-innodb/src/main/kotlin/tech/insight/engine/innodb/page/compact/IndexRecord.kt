@@ -16,26 +16,23 @@
 package tech.insight.engine.innodb.page.compact
 
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
-import tech.insight.core.bean.Index
 import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.Value
+import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.IndexNode
 import tech.insight.engine.innodb.page.InnodbUserRecord
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class IndexRecord(override val recordHeader: RecordHeader, indexNode: IndexNode, index: Index) : InnodbUserRecord {
-    private val index: Index
-    private val indexNode: IndexNode
+class IndexRecord(
+    override val recordHeader: RecordHeader,
+    private val indexNode: IndexNode,
+    private val index: InnodbIndex
+) : InnodbUserRecord {
     private var offsetInPage = -1
 
-    constructor(indexNode: IndexNode, index: Index) : this(RecordHeader.create(RecordType.PAGE), indexNode, index)
-
-    init {
-        this.index = index
-        this.indexNode = indexNode
-    }
+    constructor(indexNode: IndexNode, index: InnodbIndex) : this(RecordHeader.create(RecordType.PAGE), indexNode, index)
 
     /**
      * a index record body is a index node
@@ -64,6 +61,10 @@ class IndexRecord(override val recordHeader: RecordHeader, indexNode: IndexNode,
 
     override fun indexKey(): Array<Value<*>> {
         return this.indexNode.key
+    }
+
+    override fun belongIndex(): InnodbIndex {
+        return index
     }
 
     override fun deleteSign(): Boolean {

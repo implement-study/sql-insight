@@ -11,7 +11,6 @@ import tech.insight.engine.innodb.page.compact.RecordType
 import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VALUE
 import tech.insight.engine.innodb.page.type.IndexPage.Companion.FIL_PAGE_INODE
 import tech.insight.engine.innodb.page.type.PageType
-import tech.insight.engine.innodb.utils.Console
 import tech.insight.engine.innodb.utils.PageSupport
 import java.io.File
 import java.io.RandomAccessFile
@@ -135,14 +134,14 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         val diff = prefree - after
         debug { " data: ${data.toBytes().size} diff: $diff pre: $prefree after: $after " }
         pageSplitIfNecessary()
-        Console.pageDescription(this)
+        //        Console.pageDescription(this)
         PageSupport.flushPage(this)
     }
 
     /**
      * find location where the record linked in page and return pre and next.
      * search only,don't affect the page .
-     *
+     * use by [doInsertData] so if primary key duplication will throw [DuplicationPrimaryKeyException]
      * @param userRecord target record
      */
     private fun findPreAndNext(userRecord: InnodbUserRecord): Pair<InnodbUserRecord, InnodbUserRecord> {
@@ -182,30 +181,29 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         if (this.pageType().compare(maxExcludeSupremum, userRecord) < 0) {
             return 0
         }
-        var left = 0
+        var left = 1
         var right = pageDirectory.slotCount() - 1
-        while (left <= right) {
+        while (left < right) {
             val mid = left + ((right - left) shr 1)
             val offset: Short = pageDirectory.slots[mid]
             val base = getUserRecordByOffset(offset.toInt())
             val compare = pageType().compare(userRecord, base)
             if (compare == 0) {
-                throw DuplicationPrimaryKeyException(base.rowId)
+                return mid
             }
-            if (compare < 0) {
-                left = mid
-            } else {
-                right = mid
+            if (compare > 0) {
+                right = mid - 1
+                continue
             }
+            if (left == mid) {
+                break
+            }
+            left = mid
         }
-        val base = getUserRecordByOffset(pageDirectory.slots[right].toInt())
-        val compare = pageType().compare(userRecord, base)
-        if (compare == 0) {
-            throw DuplicationPrimaryKeyException(base.rowId)
+        if(pageType().compare(userRecord,getUserRecordByOffset(pageDirectory.slots[right].toInt()))<=0){
+            return right
         }
-        return if (compare > 0) {
-            left
-        } else right
+        return left
     }
 
 
@@ -263,8 +261,8 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
             return this.pageType().rootUpgrade(leftPage, rightPage)
         }
         val (firstDataPage, secondDataPage) = splitToSubPage(pageUserRecord, middleIndex, this)
-        Console.pageDescription(firstDataPage)
-        Console.pageDescription(secondDataPage)
+        //        Console.pageDescription(firstDataPage)
+        //        Console.pageDescription(secondDataPage)
         upgrade(firstDataPage, secondDataPage)
     }
 
@@ -366,8 +364,8 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         pageDirectory = PageDirectory()
         //  clear user record
         userRecords = UserRecords()
-        infimum = Infimum.create()
-        supremum = Supremum.create()
+        infimum = Infimum.create(this.ext.belongIndex)
+        supremum = Supremum.create(this.ext.belongIndex)
         insertData(preChild.pageIndex())
         insertData(secondChild.pageIndex())
     }
@@ -556,8 +554,8 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
 
         private fun fillInnodbUserRecords(recordList: List<InnodbUserRecord>, page: InnoDbPage) {
             page.fileHeader = FileHeader.create()
-            page.supremum = Supremum.create()
-            page.infimum = Infimum.create()
+            page.supremum = Supremum.create(page.ext.belongIndex)
+            page.infimum = Infimum.create(page.ext.belongIndex)
             val pageHeader = PageHeader.create().apply {
                 this.slotCount = ((recordList.size + 1) / 8 + 1).toShort()
                 this.absoluteRecordCount = (2 + recordList.size).toShort()
@@ -588,8 +586,8 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         fun createRootPage(index: InnodbIndex) = InnoDbPage(index).apply {
             this.fileHeader = FileHeader.create()
             this.pageHeader = PageHeader.create()
-            this.infimum = Infimum.create()
-            this.supremum = Supremum.create()
+            this.infimum = Infimum.create(index)
+            this.supremum = Supremum.create(index)
             this.userRecords = UserRecords()
             this.pageDirectory = PageDirectory()
             this.fileTrailer = FileTrailer.create()
@@ -611,9 +609,9 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
                 this.pageHeader = PageHeader.wrap(pageHeaderBytes)
             }.apply {
                 val infimumBytes = buffer.getLength(ConstantSize.INFIMUM.size())
-                this.infimum = Infimum.wrap(infimumBytes)
+                this.infimum = Infimum.wrap(infimumBytes, index)
                 val supremumBytes: ByteArray = buffer.getLength(ConstantSize.SUPREMUM.size())
-                this.supremum = Supremum.wrap(supremumBytes)
+                this.supremum = Supremum.wrap(supremumBytes, index)
             }.apply {
                 var dirOffset: Int = bytes.size - ConstantSize.FILE_TRAILER.size() - Short.SIZE_BYTES
                 val byteBuffer = ByteBuffer.wrap(bytes)

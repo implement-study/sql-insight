@@ -61,8 +61,8 @@ class IndexPage(override val page: InnoDbPage) : PageType {
             pageHeader.level++
             pageDirectory = PageDirectory()
             userRecords = UserRecords()
-            infimum = Infimum.create()
-            supremum = Supremum.create()
+            infimum = Infimum.create(this.ext.belongIndex)
+            supremum = Supremum.create(this.ext.belongIndex)
             insertData(leftPage.pageIndex())
             insertData(rightPage.pageIndex())
         }

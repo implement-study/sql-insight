@@ -4,7 +4,7 @@ import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.Value
-import tech.insight.engine.innodb.page.compact.IndexRecord
+import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.compact.RecordHeader
 import tech.insight.engine.innodb.page.compact.RecordType
 
@@ -47,7 +47,7 @@ sealed interface SystemUserRecord : InnodbUserRecord {
     }
 }
 
-class Supremum private constructor() : SystemUserRecord {
+class Supremum private constructor(private val belongToIndex: InnodbIndex) : SystemUserRecord {
 
     /**
      * 5 bytes
@@ -77,6 +77,10 @@ class Supremum private constructor() : SystemUserRecord {
 
     override fun beforeSplitOffset(): Int {
         return recordHeader.length()
+    }
+
+    override fun belongIndex(): InnodbIndex {
+        return belongToIndex
     }
 
     override fun length(): Int {
@@ -117,11 +121,11 @@ class Supremum private constructor() : SystemUserRecord {
 
         const val SUPREMUM_BODY = "supremum"
 
-        fun create() = Supremum().apply {
+        fun create(belongToIndex: InnodbIndex) = Supremum(belongToIndex).apply {
             this.recordHeader = RecordHeader.create(RecordType.SUPREMUM)
         }
 
-        fun wrap(bytes: ByteArray) = Supremum().apply {
+        fun wrap(bytes: ByteArray, belongToIndex: InnodbIndex) = Supremum(belongToIndex).apply {
             ConstantSize.SUPREMUM.checkSize(bytes)
             val buffer: DynamicByteBuffer = DynamicByteBuffer.wrap(bytes)
             val headBuffer: ByteArray = buffer.getLength(ConstantSize.RECORD_HEADER.size())
@@ -137,7 +141,7 @@ class Supremum private constructor() : SystemUserRecord {
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class Infimum private constructor(): SystemUserRecord {
+class Infimum private constructor(private val belongToIndex: InnodbIndex) : SystemUserRecord {
 
     /**
      * 5 bytes.
@@ -158,6 +162,10 @@ class Infimum private constructor(): SystemUserRecord {
         return recordHeader.length()
     }
 
+    override fun belongIndex(): InnodbIndex {
+        return belongToIndex
+    }
+
     override fun nextRecordOffset(): Int {
         return recordHeader.nextRecordOffset
     }
@@ -170,7 +178,6 @@ class Infimum private constructor(): SystemUserRecord {
     override fun length(): Int {
         return ConstantSize.INFIMUM.size()
     }
-
 
 
     override operator fun compareTo(other: Row): Int {
@@ -208,11 +215,12 @@ class Infimum private constructor(): SystemUserRecord {
 
         private const val INFIMUM_BODY = "infimum"
 
-        fun create() = Infimum().apply {
+        fun create(belongToIndex: InnodbIndex) = Infimum(belongToIndex).apply {
             this.recordHeader = RecordHeader.create(RecordType.INFIMUM)
+
         }
 
-        fun wrap(bytes: ByteArray) = Infimum().apply {
+        fun wrap(bytes: ByteArray, belongToIndex: InnodbIndex) = Infimum(belongToIndex).apply {
             ConstantSize.SUPREMUM.checkSize(bytes)
             val buffer: DynamicByteBuffer = DynamicByteBuffer.wrap(bytes)
             val headBuffer: ByteArray = buffer.getLength(ConstantSize.RECORD_HEADER.size())
