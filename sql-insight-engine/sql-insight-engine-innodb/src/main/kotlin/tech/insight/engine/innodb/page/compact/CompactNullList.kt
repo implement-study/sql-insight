@@ -17,6 +17,7 @@ package tech.insight.engine.innodb.page.compact
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import tech.insight.core.bean.Table
+import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.PageObject
 
 /**
@@ -85,7 +86,13 @@ class CompactNullList
     }
 
     companion object {
+
         fun allocate(table: Table) = CompactNullList(ByteArray(calcNullListLength(table.ext.nullableColCount)))
+
+        fun allocate(index: InnodbIndex): CompactNullList {
+            val nullableCount = index.columns().filter { !it.notNull }.size
+            return CompactNullList(ByteArray(calcNullListLength(nullableCount)))
+        }
 
         fun wrap(nullList: ByteArray) = CompactNullList(nullList)
 

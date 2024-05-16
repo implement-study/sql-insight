@@ -32,10 +32,10 @@ interface InnodbUserRecord : UserRecord, PageObject {
     fun belongIndex(): InnodbIndex
 
 
-//    /**
-//     * a user record up to index node
-//     */
-//    fun indexNode(): InnodbUserRecord
+    /**
+     * a user record up to index node
+     */
+    fun indexNode(): InnodbUserRecord
 
     override fun compareTo(other: Row): Int {
         if (other is SystemUserRecord) {

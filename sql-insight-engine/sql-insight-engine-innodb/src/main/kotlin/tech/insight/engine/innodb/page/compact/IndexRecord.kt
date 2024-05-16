@@ -37,8 +37,8 @@ class IndexRecord(
     /**
      * a index record body is a index node
      */
-    fun indexNode(): IndexNode {
-        return indexNode
+    override fun indexNode(): IndexRecord {
+        TODO()
     }
 
     override val values: List<Value<*>>

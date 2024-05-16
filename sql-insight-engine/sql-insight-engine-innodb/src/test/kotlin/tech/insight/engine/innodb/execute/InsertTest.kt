@@ -1,4 +1,4 @@
-package tech.insight.engine.innodb.optimizer
+package tech.insight.engine.innodb.execute
 
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

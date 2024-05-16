@@ -1,10 +1,12 @@
 package tech.insight.engine.innodb.page.compact
 
+import org.checkerframework.checker.units.qual.t
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.annotation.Unused
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.Value
+import tech.insight.core.bean.value.ValueNull
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.InnodbUserRecord
@@ -98,6 +100,19 @@ class Compact : InnodbUserRecord {
         return belongIndex
     }
 
+    override fun indexNode(): InnodbUserRecord {
+        if (this.recordHeader.recordType == RecordType.PAGE) {
+            return this
+        }
+        val dataCompact = this
+        return Compact().apply {
+            this.recordHeader = RecordHeader.copy(dataCompact.recordHeader)
+            this.belongIndex = dataCompact.belongIndex
+            this.variables = indexVariables()
+            this.nullList = indexNullList()
+        }
+    }
+
     override fun absoluteOffset(): Int {
         require(offsetInPage != -1) { "unknown offset" }
         return offsetInPage
@@ -147,6 +162,35 @@ class Compact : InnodbUserRecord {
         result = 31 * result + sourceRow.hashCode()
         result = 31 * result + offsetInPage
         return result
+    }
+
+    /**
+     * variables that the compact transfer to index node
+     */
+    private fun indexVariables(): Variables {
+        val variables = Variables()
+        belongIndex.columns()
+            .filter { it.variable }
+            .map { this.getValueByColumnName(it.name) }
+            .forEach { variables.appendVariableLength(it.length.toByte()) }
+        return variables
+    }
+
+
+    /**
+     * null list that the compact transfer to index node
+     */
+    private fun indexNullList(): CompactNullList {
+       val indexNullList =  CompactNullList.allocate(belongIndex)
+        if (indexNullList.length() == 0) {
+            return indexNullList
+        }
+        belongIndex.columns().filter { !it.notNull }.forEachIndexed { index, column ->
+            if (getValueByColumnName(column.name) is ValueNull) {
+                indexNullList.setNull(index)
+            }
+        }
+        return indexNullList
     }
 
 

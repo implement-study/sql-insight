@@ -167,6 +167,8 @@ class RecordHeader private constructor() : ByteWrapper, PageObject {
             swapProperties()
         }
 
+        fun copy(source: RecordHeader) = wrap(source.toBytes())
+
         private fun normalHeader(recordHeader: RecordHeader) {
             recordHeader.setRecordType(RecordType.NORMAL)
             recordHeader.setHeapNo(2U)

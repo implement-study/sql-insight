@@ -34,7 +34,11 @@ class Variables : ByteWrapper, PageObject, Iterable<Byte> {
         this.varBytes = varBytes
     }
 
-    fun addVariableLength(length: Byte) {
+    /**
+     * append variable length
+     * @param length column value length
+     */
+    fun appendVariableLength(length: Byte) {
         if (varBytes.isEmpty()) {
             varBytes = byteArrayOf(length)
             return

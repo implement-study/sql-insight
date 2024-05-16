@@ -26,6 +26,7 @@ import tech.insight.core.bean.value.Value
  *
  * @author gongxuanzhangmelt@gmail.com
  */
+@Deprecated(message = "Index node shouldn't exists, row format replace")
 class IndexNode(key: Array<Value<*>>, pointer: Int) : PageObject, ByteWrapper {
     val length: Int
     val key: Array<Value<*>>
