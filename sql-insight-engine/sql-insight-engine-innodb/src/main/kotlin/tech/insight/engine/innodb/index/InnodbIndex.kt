@@ -28,6 +28,8 @@ abstract class InnodbIndex : Logging(), InnodbBTree {
 
     lateinit var table: Table
 
+    abstract val isClusteringIndex: Boolean
+
     override fun belongTo(): Table {
         return table
     }

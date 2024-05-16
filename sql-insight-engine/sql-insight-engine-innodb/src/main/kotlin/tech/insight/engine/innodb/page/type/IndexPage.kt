@@ -7,6 +7,7 @@ import tech.insight.engine.innodb.page.*
 import tech.insight.engine.innodb.page.InnoDbPage.Companion.findPageByOffset
 import tech.insight.engine.innodb.page.compact.IndexRecord
 import tech.insight.engine.innodb.page.compact.RecordHeader
+import tech.insight.engine.innodb.page.compact.RecordType
 import tech.insight.engine.innodb.page.compact.RowFormatFactory
 import tech.insight.engine.innodb.utils.PageSupport
 import tech.insight.engine.innodb.utils.ValueNegotiator
@@ -22,14 +23,12 @@ class IndexPage(override val page: InnoDbPage) : PageType {
     override val value: Short = FIL_PAGE_INODE
 
     override fun locatePage(userRecord: InnodbUserRecord): InnoDbPage {
-        val targetSlot = page.findTargetSlot(userRecord)
-        var firstIndex = page.targetSlotFirstUserRecord(targetSlot)
-        //   todo Whether it is better to allow nodes to implement comparison functions?
-        while (compare(userRecord, firstIndex as IndexRecord) > 0) {
-            firstIndex = page.getUserRecordByOffset(firstIndex.absoluteOffset() + firstIndex.nextRecordOffset())
+        return when(userRecord.recordHeader.recordType){
+            RecordType.NORMAL ->  doLocateDown(userRecord)
+            RecordType.PAGE -> doLocateIndex(userRecord)
+            RecordType.INFIMUM -> throw IllegalArgumentException("infimum can't be locate")
+            RecordType.SUPREMUM -> throw IllegalArgumentException("supremum can't be locate")
         }
-        val targetIndex = firstIndex
-        return findPageByOffset(targetIndex.indexNode().pointer, page.ext.belongIndex)
     }
 
     override fun pageIndex(): IndexRecord {
@@ -84,6 +83,7 @@ class IndexPage(override val page: InnoDbPage) : PageType {
         return IndexRecord(recordHeader, IndexNode(key, buffer.getInt()), page.ext.belongIndex)
     }
 
+
     override fun compare(o1: InnodbUserRecord, o2: InnodbUserRecord): Int {
         if (o1 is SystemUserRecord) {
             return o1.compareTo(o2)
@@ -100,6 +100,28 @@ class IndexPage(override val page: InnoDbPage) : PageType {
             }
         }
         return 0
+    }
+
+    private fun doLocateIndex(userRecord: InnodbUserRecord): InnoDbPage {
+        //  if page is empty , return self
+        if (page.pageHeader.recordCount.toInt() == 0) {
+            return page
+        }
+        if(page.pageHeader.level.toInt() == 1){
+            return page
+        }
+        return doLocateDown(userRecord)
+    }
+
+    private fun doLocateDown(userRecord: InnodbUserRecord): InnoDbPage {
+        val targetSlot = page.findTargetSlot(userRecord)
+        var firstIndex = page.targetSlotFirstUserRecord(targetSlot)
+        //   todo Whether it is better to allow nodes to implement comparison functions?
+        while (compare(userRecord, firstIndex as IndexRecord) > 0) {
+            firstIndex = page.getUserRecordByOffset(firstIndex.absoluteOffset() + firstIndex.nextRecordOffset())
+        }
+        val targetIndex = firstIndex
+        return findPageByOffset(targetIndex.indexNode().pointer, page.ext.belongIndex)
     }
 
     companion object {

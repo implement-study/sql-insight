@@ -156,8 +156,9 @@ class RecordHeader private constructor() : ByteWrapper, PageObject {
                 RecordType.PAGE -> indexHeader(this)
                 RecordType.INFIMUM -> infimumHeader(this)
                 RecordType.SUPREMUM -> supremumHeader(this)
-                RecordType.NORMAL -> RecordHeader().apply { this.recordType = RecordType.NORMAL }
+                RecordType.NORMAL -> normalHeader(this)
             }
+            swapProperties()
         }
 
         fun wrap(source: ByteArray) = RecordHeader().apply {
@@ -166,11 +167,19 @@ class RecordHeader private constructor() : ByteWrapper, PageObject {
             swapProperties()
         }
 
+        private fun normalHeader(recordHeader: RecordHeader) {
+            recordHeader.setRecordType(RecordType.NORMAL)
+            recordHeader.setHeapNo(2U)
+            recordHeader.setDelete(false)
+            recordHeader.setNOwned(0)
+            recordHeader.setNextRecordOffset(0)
+        }
+
         private fun indexHeader(recordHeader: RecordHeader) {
             recordHeader.setRecordType(RecordType.PAGE)
             recordHeader.setHeapNo(1U)
             recordHeader.setDelete(false)
-            recordHeader.setNOwned(1)
+            recordHeader.setNOwned(0)
             recordHeader.setNextRecordOffset(0)
         }
 

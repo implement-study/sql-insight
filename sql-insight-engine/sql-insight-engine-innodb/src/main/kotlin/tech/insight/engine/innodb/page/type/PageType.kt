@@ -34,7 +34,7 @@ interface PageType : Comparator<InnodbUserRecord> {
     /**
      * locate the page that have the record.
      * Maybe the user record does not exist. Return the page where record should be
-     * if the page is data page but the record not in the page, find for the parent index page.
+     *
      *
      * @param userRecord user record
      */

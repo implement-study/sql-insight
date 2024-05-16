@@ -269,7 +269,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
 
     /**
      * page split create a new page.
-     *
+     * page only have user records
      * @param recordList data or index in the page that sorted
      * @return first of pair is left node,second is right node
      */

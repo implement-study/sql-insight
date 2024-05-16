@@ -31,10 +31,10 @@ import java.io.File
  * @author gongxuanzhangmelt@gmail.com
  */
 class ClusteredIndex(table: Table) : InnodbIndex() {
+
     init {
         this.table = table
     }
-
 
     override val file: File by lazy {
         val dbFolder = table.database.dbFolder
@@ -69,6 +69,9 @@ class ClusteredIndex(table: Table) : InnodbIndex() {
     override val name: String
         get() = ""
 
+    override val isClusteringIndex: Boolean = true
+
+
 
     override fun insert(row: InsertRow) {
         autoIncrementKeyCounter.dealAutoIncrement(row)
@@ -77,6 +80,7 @@ class ClusteredIndex(table: Table) : InnodbIndex() {
         if (compact.length() >= Constant.COMPACT_MAX_ROW_LENGTH) {
             throw DataTooLongException("compact row can't greater than " + Constant.COMPACT_MAX_ROW_LENGTH)
         }
+        compact.belongIndex = this
         root.insertData(compact)
     }
 

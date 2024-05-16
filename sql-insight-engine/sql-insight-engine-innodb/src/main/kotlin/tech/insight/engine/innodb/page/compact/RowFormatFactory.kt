@@ -18,19 +18,12 @@ package tech.insight.engine.innodb.page.compact
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.bean.Column
 import tech.insight.core.bean.InsertRow
-import tech.insight.core.bean.ReadRow
-import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.Value
-import tech.insight.core.bean.value.ValueInt
 import tech.insight.core.bean.value.ValueNull
 import tech.insight.core.exception.SqlInsightException
 import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.InnoDbPage
-import tech.insight.engine.innodb.page.InnodbUserRecord
-import tech.insight.engine.innodb.utils.ValueNegotiator
-import java.nio.ByteBuffer
 import java.util.*
-import kotlin.math.pow
 
 /**
  * @author gongxuanzhangmelt@gmail.com
