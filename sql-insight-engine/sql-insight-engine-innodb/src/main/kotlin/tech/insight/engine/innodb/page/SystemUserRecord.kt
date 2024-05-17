@@ -83,6 +83,10 @@ class Supremum private constructor(private val belongToIndex: InnodbIndex) : Sys
         return belongToIndex
     }
 
+    override fun indexNode(): InnodbUserRecord {
+        throw UnsupportedOperationException("this is supremum!")
+    }
+
     override fun length(): Int {
         return ConstantSize.SUPREMUM.size()
     }
@@ -164,6 +168,10 @@ class Infimum private constructor(private val belongToIndex: InnodbIndex) : Syst
 
     override fun belongIndex(): InnodbIndex {
         return belongToIndex
+    }
+
+    override fun indexNode(): InnodbUserRecord {
+        throw UnsupportedOperationException("this is infimum!")
     }
 
     override fun nextRecordOffset(): Int {

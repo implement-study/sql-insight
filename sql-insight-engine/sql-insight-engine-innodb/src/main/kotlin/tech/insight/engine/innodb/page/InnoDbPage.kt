@@ -5,7 +5,6 @@ import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.exception.DuplicationPrimaryKeyException
 import tech.insight.core.logging.Logging
 import tech.insight.engine.innodb.index.InnodbIndex
-import tech.insight.engine.innodb.page.compact.IndexRecord
 import tech.insight.engine.innodb.page.compact.RecordHeader
 import tech.insight.engine.innodb.page.compact.RecordType
 import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VALUE
@@ -119,7 +118,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     /**
      * link [PageType.locatePage]
      */
-    private fun locatePage(data: InnodbUserRecord): InnoDbPage {
+    fun locatePage(data: InnodbUserRecord): InnoDbPage {
         return this.pageType().locatePage(data)
     }
 
@@ -200,7 +199,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
             }
             left = mid
         }
-        if(pageType().compare(userRecord,getUserRecordByOffset(pageDirectory.slots[right].toInt()))<=0){
+        if (pageType().compare(userRecord, getUserRecordByOffset(pageDirectory.slots[right].toInt())) <= 0) {
             return right
         }
         return left
@@ -333,7 +332,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
      * get the first index node to parent node insert
      * link [PageType.pageIndex]
      */
-    fun pageIndex(): IndexRecord {
+    fun pageIndex(): InnodbUserRecord {
         return pageType().pageIndex()
     }
 

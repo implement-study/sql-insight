@@ -9,6 +9,6 @@ package tech.insight.engine.innodb.page
  **/
 enum class PageSplitStrategy {
 
-    MIDDLE_SPLIT,LEFT_SPLIT,RIGHT_SPLIT,NOT_SPLIT;
+    MIDDLE_SPLIT, LEFT_SPLIT, RIGHT_SPLIT, NOT_SPLIT;
 
 }

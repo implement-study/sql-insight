@@ -4,7 +4,6 @@ import tech.insight.core.bean.Index
 import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Row
 import tech.insight.engine.innodb.page.IndexKey
-import tech.insight.engine.innodb.page.InnoDbPage
 
 /**
  * innodb b+ tree

@@ -1,17 +1,20 @@
 package tech.insight.engine.innodb.page.type
 
-import tech.insight.core.bean.Column
+import tech.insight.core.bean.ReadRow
 import tech.insight.core.bean.value.Value
 import tech.insight.core.bean.value.ValueNull
+import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.*
 import tech.insight.engine.innodb.page.InnoDbPage.Companion.findPageByOffset
-import tech.insight.engine.innodb.page.compact.IndexRecord
-import tech.insight.engine.innodb.page.compact.RecordHeader
+import tech.insight.engine.innodb.page.compact.Compact
+import tech.insight.engine.innodb.page.compact.CompactNullList
 import tech.insight.engine.innodb.page.compact.RecordType
-import tech.insight.engine.innodb.page.compact.RowFormatFactory
+import tech.insight.engine.innodb.page.compact.RowFormatFactory.readRecordHeader
+import tech.insight.engine.innodb.page.compact.Variables
 import tech.insight.engine.innodb.utils.PageSupport
 import tech.insight.engine.innodb.utils.ValueNegotiator
 import java.nio.ByteBuffer
+import java.util.*
 
 
 /**
@@ -23,16 +26,16 @@ class IndexPage(override val page: InnoDbPage) : PageType {
     override val value: Short = FIL_PAGE_INODE
 
     override fun locatePage(userRecord: InnodbUserRecord): InnoDbPage {
-        return when(userRecord.recordHeader.recordType){
-            RecordType.NORMAL ->  doLocateDown(userRecord)
+        return when (userRecord.recordHeader.recordType) {
+            RecordType.NORMAL -> doLocateDown(userRecord)
             RecordType.PAGE -> doLocateIndex(userRecord)
             RecordType.INFIMUM -> throw IllegalArgumentException("infimum can't be locate")
             RecordType.SUPREMUM -> throw IllegalArgumentException("supremum can't be locate")
         }
     }
 
-    override fun pageIndex(): IndexRecord {
-        return this.page.getFirstUserRecord() as IndexRecord
+    override fun pageIndex(): InnodbUserRecord {
+        return this.page.getFirstUserRecord()
     }
 
 
@@ -68,19 +71,65 @@ class IndexPage(override val page: InnoDbPage) : PageType {
     }
 
 
-    override fun convertUserRecord(offsetInPage: Int): IndexRecord {
-        //  todo dynamic primary key
-        val columns: List<Column> = page.ext.belongIndex.columns()
-        val recordHeader: RecordHeader = RowFormatFactory.readRecordHeader(page, offsetInPage)
-        val key: Array<Value<*>> = Array(columns.size) { ValueNull }
-        val buffer = ByteBuffer.wrap(page.toBytes(), offsetInPage, page.length() - offsetInPage)
-        for (i in key.indices) {
-            val column: Column = columns[i]
-            val valueArr = ByteArray(column.length)
-            buffer[valueArr]
-            key[i] = ValueNegotiator.wrapValue(column, valueArr)
+    override fun convertUserRecord(offsetInPage: Int): InnodbUserRecord {
+        if (ConstantSize.INFIMUM.offset() == offsetInPage) {
+            return page.infimum
         }
-        return IndexRecord(recordHeader, IndexNode(key, buffer.getInt()), page.ext.belongIndex)
+        if (ConstantSize.SUPREMUM.offset() == offsetInPage) {
+            return page.supremum
+        }
+        val belongIndex = page.ext.belongIndex
+        val compact = Compact()
+        compact.offsetInPage = (offsetInPage)
+        compact.recordHeader = (readRecordHeader(page, offsetInPage))
+        fillNullAndVar(page, offsetInPage, compact, belongIndex)
+        val variableLength: Int = compact.variables.variableLength()
+        val fixLength = run {
+            var nullIndex = -1
+            var length = 0
+            belongIndex.columns().forEach {
+                var isNull = false
+                if (!it.notNull) {
+                    nullIndex++
+                    isNull = compact.nullList.isNull(nullIndex)
+                }
+                if (!it.variable && !isNull) {
+                    length += it.length
+                }
+            }
+            length
+        }
+        compact.body = Arrays.copyOfRange(page.toBytes(), offsetInPage, offsetInPage + variableLength + fixLength)
+        compact.sourceRow = (compactIndexReadRow(compact, belongIndex))
+        compact.belongIndex = belongIndex
+        return compact
+    }
+
+    private fun fillNullAndVar(page: InnoDbPage, offsetInPage: Int, compact: Compact, index: InnodbIndex) {
+        val nullBytesEnd = offsetInPage - ConstantSize.RECORD_HEADER.size()
+        val pageArr: ByteArray = page.toBytes()
+        compact.nullList = run {
+            val nullListLength = CompactNullList.allocate(index).length()
+            val nullListBytes = Arrays.copyOfRange(pageArr, nullBytesEnd - nullListLength, nullBytesEnd)
+            CompactNullList.wrap(nullListBytes)
+        }
+        //   read variable
+        val variableCount = run {
+            var count = 0
+            var nullIndex = -1
+            index.columns().forEach {
+                if (!it.notNull) {
+                    nullIndex++
+                }
+                if (it.variable && !compact.nullList.isNull(nullIndex)) {
+                    count++
+                }
+            }
+            count
+        }
+        val varStart = nullBytesEnd - compact.nullList.length() - variableCount
+        val variableArray = Arrays.copyOfRange(pageArr, varStart, nullBytesEnd - compact.nullList.length())
+        compact.variables = Variables(variableArray)
     }
 
 
@@ -107,7 +156,7 @@ class IndexPage(override val page: InnoDbPage) : PageType {
         if (page.pageHeader.recordCount.toInt() == 0) {
             return page
         }
-        if(page.pageHeader.level.toInt() == 1){
+        if (page.pageHeader.level.toInt() == 1) {
             return page
         }
         return doLocateDown(userRecord)
@@ -117,11 +166,39 @@ class IndexPage(override val page: InnoDbPage) : PageType {
         val targetSlot = page.findTargetSlot(userRecord)
         var firstIndex = page.targetSlotFirstUserRecord(targetSlot)
         //   todo Whether it is better to allow nodes to implement comparison functions?
-        while (compare(userRecord, firstIndex as IndexRecord) > 0) {
+        while (compare(userRecord, firstIndex) > 0) {
             firstIndex = page.getUserRecordByOffset(firstIndex.absoluteOffset() + firstIndex.nextRecordOffset())
         }
         val targetIndex = firstIndex
-        return findPageByOffset(targetIndex.indexNode().pointer, page.ext.belongIndex)
+        val offset = ByteBuffer.wrap((targetIndex as Compact).point).getInt()
+        return findPageByOffset(offset, page.ext.belongIndex).locatePage(userRecord)
+    }
+
+    private fun compactIndexReadRow(compact: Compact, index: InnodbIndex): ReadRow {
+        val valueList: MutableList<Value<*>> = ArrayList<Value<*>>(index.columns().size)
+        var nullIndex = -1
+        val bodyBuffer = ByteBuffer.wrap(compact.body)
+        val iterator = compact.variables.iterator()
+        index.columns().forEach {
+            var isNull = false
+            if (!it.notNull) {
+                nullIndex++
+                isNull = compact.nullList.isNull(nullIndex)
+            }
+            val addedValue = run {
+                if (isNull) {
+                    ValueNull
+                }
+                val length = if (it.variable) iterator.next().toInt() else it.length
+                val item = ByteArray(length)
+                bodyBuffer[item]
+                ValueNegotiator.wrapValue(it, item)
+            }
+            valueList.add(addedValue)
+        }
+        val row = ReadRow(valueList, -1)
+        row.table = index.belongTo()
+        return row
     }
 
     companion object {

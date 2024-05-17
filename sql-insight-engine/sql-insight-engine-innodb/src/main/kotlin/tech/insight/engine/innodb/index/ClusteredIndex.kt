@@ -72,7 +72,6 @@ class ClusteredIndex(table: Table) : InnodbIndex() {
     override val isClusteringIndex: Boolean = true
 
 
-
     override fun insert(row: InsertRow) {
         autoIncrementKeyCounter.dealAutoIncrement(row)
         val compact: Compact = RowFormatFactory.compactFromInsertRow(row)

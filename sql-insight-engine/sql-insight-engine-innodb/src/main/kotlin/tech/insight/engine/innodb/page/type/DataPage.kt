@@ -8,7 +8,6 @@ import tech.insight.core.bean.value.ValueInt
 import tech.insight.engine.innodb.page.*
 import tech.insight.engine.innodb.page.compact.Compact
 import tech.insight.engine.innodb.page.compact.CompactNullList
-import tech.insight.engine.innodb.page.compact.IndexRecord
 import tech.insight.engine.innodb.page.compact.RowFormatFactory.readRecordHeader
 import tech.insight.engine.innodb.page.compact.Variables
 import tech.insight.engine.innodb.page.type.IndexPage.Companion.FIL_PAGE_INODE
@@ -61,11 +60,9 @@ class DataPage(override val page: InnoDbPage) : PageType {
         return compact
     }
 
-    override fun pageIndex(): IndexRecord {
+    override fun pageIndex(): InnodbUserRecord {
         val firstData = page.getUserRecordByOffset(page.infimum.absoluteOffset() + page.infimum.nextRecordOffset())
-        val columns = page.ext.belongIndex.columns()
-        val values = columns.map { it.name }.map { firstData.getValueByColumnName(it) }.toTypedArray()
-        return IndexRecord(IndexNode(values, page.fileHeader.offset), page.ext.belongIndex)
+        return firstData.indexNode()
     }
 
 

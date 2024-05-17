@@ -60,6 +60,14 @@ class Variables : ByteWrapper, PageObject, Iterable<Byte> {
         return sumLength
     }
 
+
+    /**
+     * @param indexInColumn col in column index exclude null list
+     */
+    fun getVariableLength(indexInColumn: Int): Byte {
+        return varBytes[varBytes.size - indexInColumn - 1]
+    }
+
     override fun toBytes(): ByteArray {
         return varBytes
     }

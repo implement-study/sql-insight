@@ -1,8 +1,8 @@
 package tech.insight.engine.innodb.page.compact
 
-import org.checkerframework.checker.units.qual.t
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.annotation.Unused
+import tech.insight.core.bean.ReadRow
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.Value
@@ -10,7 +10,6 @@ import tech.insight.core.bean.value.ValueNull
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.InnodbUserRecord
-import tech.insight.engine.innodb.page.SystemUserRecord
 
 
 /**
@@ -39,6 +38,12 @@ class Compact : InnodbUserRecord {
     lateinit var body: ByteArray
 
     /**
+     * in cluster index,if compact record is index node , the point means sub page offset, otherwise is empty.
+     * in second index ,if compact record is index node , the point means sub page offset, otherwise is primary key.
+     */
+    var point: ByteArray = byteArrayOf()
+
+    /**
      * 6字节  唯一标识
      */
     @Unused
@@ -55,7 +60,9 @@ class Compact : InnodbUserRecord {
      */
     @Unused
     var rollPointer: Long = 0
+
     lateinit var sourceRow: Row
+
     var offsetInPage = -1
 
     lateinit var belongIndex: InnodbIndex
@@ -66,6 +73,7 @@ class Compact : InnodbUserRecord {
         buffer.append(nullList.toBytes())
         buffer.append(recordHeader.toBytes())
         buffer.append(body)
+        buffer.append(point)
         return buffer.toBytes()
     }
 
@@ -104,13 +112,15 @@ class Compact : InnodbUserRecord {
         if (this.recordHeader.recordType == RecordType.PAGE) {
             return this
         }
-        val dataCompact = this
-        return Compact().apply {
-            this.recordHeader = RecordHeader.copy(dataCompact.recordHeader)
-            this.belongIndex = dataCompact.belongIndex
-            this.variables = indexVariables()
-            this.nullList = indexNullList()
-        }
+        val indexCompact = Compact()
+        indexCompact.sourceRow = indexRow()
+        indexCompact.recordHeader = RecordHeader.copy(recordHeader)
+        indexCompact.recordHeader.setRecordType(RecordType.PAGE)
+        indexCompact.belongIndex = belongIndex
+        indexCompact.variables = indexVariables()
+        indexCompact.nullList = indexNullList()
+        indexCompact.body = indexBody()
+        return indexCompact
     }
 
     override fun absoluteOffset(): Int {
@@ -181,7 +191,7 @@ class Compact : InnodbUserRecord {
      * null list that the compact transfer to index node
      */
     private fun indexNullList(): CompactNullList {
-       val indexNullList =  CompactNullList.allocate(belongIndex)
+        val indexNullList = CompactNullList.allocate(belongIndex)
         if (indexNullList.length() == 0) {
             return indexNullList
         }
@@ -193,5 +203,17 @@ class Compact : InnodbUserRecord {
         return indexNullList
     }
 
+    private fun indexBody(): ByteArray {
+        val bodyBuffer = DynamicByteBuffer.allocate()
+        belongIndex.columns().forEach {
+            bodyBuffer.append(getValueByColumnName(it.name).toBytes())
+        }
+        return bodyBuffer.toBytes()
+    }
+
+    private fun indexRow(): Row {
+        val indexValue = belongIndex.columns().map { getValueByColumnName(it.name) }
+        return ReadRow(indexValue, sourceRow.rowId)
+    }
 
 }

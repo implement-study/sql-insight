@@ -17,7 +17,6 @@ package tech.insight.engine.innodb.page.type
 
 import tech.insight.engine.innodb.page.InnoDbPage
 import tech.insight.engine.innodb.page.InnodbUserRecord
-import tech.insight.engine.innodb.page.compact.IndexRecord
 
 
 /**
@@ -50,7 +49,7 @@ interface PageType : Comparator<InnodbUserRecord> {
      * get the first index node to parent node insert
      * link [InnoDbPage.pageIndex]
      */
-    fun pageIndex(): IndexRecord
+    fun pageIndex(): InnodbUserRecord
 
     /**
      * if page is root page that to say page don't have parent page,split page will create two pages.

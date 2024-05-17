@@ -16,11 +16,9 @@
 package tech.insight.engine.innodb.utils
 
 import tech.insight.core.bean.Table
-import tech.insight.core.bean.value.Value
 import tech.insight.engine.innodb.page.Infimum
 import tech.insight.engine.innodb.page.InnodbUserRecord
 import tech.insight.engine.innodb.page.Supremum
-import java.util.function.Function
 
 /**
  * @author gongxuanzhangmelt@gmail.com
