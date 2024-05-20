@@ -3,6 +3,7 @@ package tech.insight.core.plan
 import tech.insight.core.command.DDLCommand
 import tech.insight.core.command.DMLCommand
 import tech.insight.core.engine.storage.StorageEngine
+import tech.insight.core.environment.SessionContext
 import tech.insight.core.result.ResultInterface
 
 
@@ -14,8 +15,6 @@ interface ExecutionPlan {
 
     val originalSql: String
 
-
-    val engine: StorageEngine
 
     /**
      * execution
@@ -34,11 +33,12 @@ enum class ExplainType {
 
 abstract class DDLExecutionPlan(val ddlCommand: DDLCommand) : ExecutionPlan {
 
-    override val engine: Nothing = throw UnsupportedOperationException("DDL dont have engine")
 }
 
 
 abstract class DMLExecutionPlan(val dmlCommand: DMLCommand) : ExecutionPlan {
 
     lateinit var explain: PlanDetail
+
+    abstract val engine: StorageEngine
 }

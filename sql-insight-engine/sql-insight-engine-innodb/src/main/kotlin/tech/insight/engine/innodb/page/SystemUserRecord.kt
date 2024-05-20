@@ -47,7 +47,7 @@ sealed interface SystemUserRecord : InnodbUserRecord {
     }
 }
 
-class Supremum private constructor(private val belongToIndex: InnodbIndex) : SystemUserRecord {
+class Supremum private constructor(private val inPage: InnoDbPage) : SystemUserRecord {
 
     /**
      * 5 bytes
@@ -58,6 +58,7 @@ class Supremum private constructor(private val belongToIndex: InnodbIndex) : Sys
      * 8 bytes as "supremum"
      */
     private val body = SUPREMUM_BODY.toByteArray()
+
 
     override fun rowBytes(): ByteArray {
         return DynamicByteBuffer.wrap(recordHeader.toBytes()).append(body).toBytes()
@@ -80,11 +81,15 @@ class Supremum private constructor(private val belongToIndex: InnodbIndex) : Sys
     }
 
     override fun belongIndex(): InnodbIndex {
-        return belongToIndex
+        return inPage.ext.belongIndex
     }
 
     override fun indexNode(): InnodbUserRecord {
         throw UnsupportedOperationException("this is supremum!")
+    }
+
+    override fun inPage(): InnoDbPage {
+        return inPage
     }
 
     override fun length(): Int {
@@ -125,11 +130,11 @@ class Supremum private constructor(private val belongToIndex: InnodbIndex) : Sys
 
         const val SUPREMUM_BODY = "supremum"
 
-        fun create(belongToIndex: InnodbIndex) = Supremum(belongToIndex).apply {
+        fun create(belongToPage: InnoDbPage) = Supremum(belongToPage).apply {
             this.recordHeader = RecordHeader.create(RecordType.SUPREMUM)
         }
 
-        fun wrap(bytes: ByteArray, belongToIndex: InnodbIndex) = Supremum(belongToIndex).apply {
+        fun wrap(bytes: ByteArray, belongToPage: InnoDbPage) = Supremum(belongToPage).apply {
             ConstantSize.SUPREMUM.checkSize(bytes)
             val buffer: DynamicByteBuffer = DynamicByteBuffer.wrap(bytes)
             val headBuffer: ByteArray = buffer.getLength(ConstantSize.RECORD_HEADER.size())
@@ -145,7 +150,7 @@ class Supremum private constructor(private val belongToIndex: InnodbIndex) : Sys
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class Infimum private constructor(private val belongToIndex: InnodbIndex) : SystemUserRecord {
+class Infimum private constructor(private val belongToPage: InnoDbPage) : SystemUserRecord {
 
     /**
      * 5 bytes.
@@ -167,11 +172,15 @@ class Infimum private constructor(private val belongToIndex: InnodbIndex) : Syst
     }
 
     override fun belongIndex(): InnodbIndex {
-        return belongToIndex
+        return belongToPage.ext.belongIndex
     }
 
     override fun indexNode(): InnodbUserRecord {
         throw UnsupportedOperationException("this is infimum!")
+    }
+
+    override fun inPage(): InnoDbPage {
+        return belongToPage
     }
 
     override fun nextRecordOffset(): Int {
@@ -223,17 +232,19 @@ class Infimum private constructor(private val belongToIndex: InnodbIndex) : Syst
 
         private const val INFIMUM_BODY = "infimum"
 
-        fun create(belongToIndex: InnodbIndex) = Infimum(belongToIndex).apply {
+        fun create(belongToPage: InnoDbPage) = Infimum(belongToPage).apply {
             this.recordHeader = RecordHeader.create(RecordType.INFIMUM)
 
         }
 
-        fun wrap(bytes: ByteArray, belongToIndex: InnodbIndex) = Infimum(belongToIndex).apply {
-            ConstantSize.SUPREMUM.checkSize(bytes)
-            val buffer: DynamicByteBuffer = DynamicByteBuffer.wrap(bytes)
-            val headBuffer: ByteArray = buffer.getLength(ConstantSize.RECORD_HEADER.size())
-            this.recordHeader = RecordHeader.wrap(headBuffer)
-        }
+        fun wrap(bytes: ByteArray, belongToPage: InnoDbPage) =
+            Infimum(belongToPage).apply {
+                ConstantSize.SUPREMUM.checkSize(bytes)
+                val buffer: DynamicByteBuffer = DynamicByteBuffer.wrap(bytes)
+                val headBuffer: ByteArray = buffer.getLength(ConstantSize.RECORD_HEADER.size())
+                this.recordHeader = RecordHeader.wrap(headBuffer)
+                this.inPage()
+            }
 
     }
 

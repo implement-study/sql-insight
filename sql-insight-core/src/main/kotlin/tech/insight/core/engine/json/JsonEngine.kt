@@ -23,6 +23,7 @@ import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
 import tech.insight.core.command.UpdateCommand
 import tech.insight.core.engine.storage.StorageEngine
+import tech.insight.core.environment.SessionContext
 import tech.insight.core.event.DropDatabaseEvent
 import tech.insight.core.event.DropTableEvent
 import tech.insight.core.event.InsightEvent
@@ -143,6 +144,10 @@ class JsonEngine : Logging(), StorageEngine, MultipleEventListener {
     override fun refresh(table: Table) {
         val lines = tableCache[table]
         Files.write(JsonEngineSupport.getJsonFile(table).toPath(), lines)
+    }
+
+    override fun initSessionContext(): SessionContext {
+        return SessionContext.create()
     }
 
     private fun getLinesCache(table: Table): MutableList<String> {

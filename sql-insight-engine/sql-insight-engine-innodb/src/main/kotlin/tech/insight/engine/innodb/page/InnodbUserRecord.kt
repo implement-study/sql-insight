@@ -37,6 +37,11 @@ interface InnodbUserRecord : UserRecord, PageObject {
      */
     fun indexNode(): InnodbUserRecord
 
+    /**
+     * the record belong to which page
+     */
+    fun inPage(): InnoDbPage
+
     override fun compareTo(other: Row): Int {
         if (other is SystemUserRecord) {
             return -other.compareTo(this)

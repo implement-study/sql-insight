@@ -4,6 +4,7 @@ import org.gongxuanzhang.easybyte.core.ByteWrapper
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.exception.DuplicationPrimaryKeyException
 import tech.insight.core.logging.Logging
+import tech.insight.engine.innodb.core.InnodbSessionContext
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.compact.RecordHeader
 import tech.insight.engine.innodb.page.compact.RecordType
@@ -126,6 +127,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
      *
      */
     private fun doInsertData(data: InnodbUserRecord) {
+        InnodbSessionContext.getInnodbSessionContext().modifyPage(this)
         val (pre, next) = findPreAndNext(data)
         val prefree = this.freeSpace
         linkedAndAdjust(pre, data, next)
@@ -254,6 +256,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
             remainLength <= half
         }
         if (ext.parent == null) {
+            PageSupport.flushPage(this)
             //  is root page
             val (leftPage, rightPage) = splitToSubPage(pageUserRecord, middleIndex, this)
             return this.pageType().rootUpgrade(leftPage, rightPage)
@@ -362,8 +365,10 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         pageDirectory = PageDirectory()
         //  clear user record
         userRecords = UserRecords()
-        infimum = Infimum.create(this.ext.belongIndex)
-        supremum = Supremum.create(this.ext.belongIndex)
+        infimum = Infimum.create(preChild)
+        supremum = Supremum.create(secondChild)
+        InnodbSessionContext.getInnodbSessionContext().modifyPage(preChild)
+        InnodbSessionContext.getInnodbSessionContext().modifyPage(secondChild)
         insertData(preChild.pageIndex())
         insertData(secondChild.pageIndex())
     }
@@ -552,8 +557,8 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
 
         private fun fillInnodbUserRecords(recordList: List<InnodbUserRecord>, page: InnoDbPage) {
             page.fileHeader = FileHeader.create()
-            page.supremum = Supremum.create(page.ext.belongIndex)
-            page.infimum = Infimum.create(page.ext.belongIndex)
+            page.supremum = Supremum.create(page)
+            page.infimum = Infimum.create(page)
             val pageHeader = PageHeader.create().apply {
                 this.slotCount = ((recordList.size + 1) / 8 + 1).toShort()
                 this.absoluteRecordCount = (2 + recordList.size).toShort()
@@ -584,8 +589,8 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         fun createRootPage(index: InnodbIndex) = InnoDbPage(index).apply {
             this.fileHeader = FileHeader.create()
             this.pageHeader = PageHeader.create()
-            this.infimum = Infimum.create(index)
-            this.supremum = Supremum.create(index)
+            this.infimum = Infimum.create(this)
+            this.supremum = Supremum.create(this)
             this.userRecords = UserRecords()
             this.pageDirectory = PageDirectory()
             this.fileTrailer = FileTrailer.create()
@@ -607,9 +612,9 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
                 this.pageHeader = PageHeader.wrap(pageHeaderBytes)
             }.apply {
                 val infimumBytes = buffer.getLength(ConstantSize.INFIMUM.size())
-                this.infimum = Infimum.wrap(infimumBytes, index)
+                this.infimum = Infimum.wrap(infimumBytes, page)
                 val supremumBytes: ByteArray = buffer.getLength(ConstantSize.SUPREMUM.size())
-                this.supremum = Supremum.wrap(supremumBytes, index)
+                this.supremum = Supremum.wrap(supremumBytes, page)
             }.apply {
                 var dirOffset: Int = bytes.size - ConstantSize.FILE_TRAILER.size() - Short.SIZE_BYTES
                 val byteBuffer = ByteBuffer.wrap(bytes)

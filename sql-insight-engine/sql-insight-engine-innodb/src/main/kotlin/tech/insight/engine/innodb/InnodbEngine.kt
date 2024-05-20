@@ -8,6 +8,7 @@ import tech.insight.core.engine.storage.StorageEngine
 import tech.insight.core.logging.Logging
 import tech.insight.core.result.MessageResult
 import tech.insight.core.result.ResultInterface
+import tech.insight.engine.innodb.core.InnodbSessionContext
 import tech.insight.engine.innodb.index.ClusteredIndex
 import tech.insight.engine.innodb.page.InnoDbPage
 import java.io.File
@@ -73,6 +74,10 @@ class InnodbEngine : Logging(), StorageEngine {
 
     override fun refresh(table: Table) {
         warn("refresh innodb ... ")
+    }
+
+    override fun initSessionContext(): InnodbSessionContext {
+        return InnodbSessionContext.create()
     }
 
 

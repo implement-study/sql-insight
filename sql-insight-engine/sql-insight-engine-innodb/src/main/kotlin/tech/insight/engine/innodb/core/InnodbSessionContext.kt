@@ -3,6 +3,7 @@ package tech.insight.engine.innodb.core
 import tech.insight.core.environment.SessionContext
 import tech.insight.engine.innodb.page.InnoDbPage
 import tech.insight.engine.innodb.utils.PageSupport
+import java.util.concurrent.ConcurrentHashMap
 
 
 /**
@@ -13,20 +14,20 @@ import tech.insight.engine.innodb.utils.PageSupport
  **/
 class InnodbSessionContext(thread: Thread = Thread.currentThread()) : SessionContext(thread) {
 
-    private val modifyPages = mutableSetOf<InnoDbPage>()
+    private val modifyPages = HashMap<Int, InnoDbPage>()
 
     fun modifyPage(page: InnoDbPage) {
-        modifyPages.add(page)
+        modifyPages[page.fileHeader.offset] = page
     }
 
     override fun close() {
-        modifyPages.forEach { PageSupport.flushPage(it) }
+        modifyPages.values.forEach { PageSupport.flushPage(it) }
         sessionManager.remove(id)
     }
 
     companion object {
 
-        private val sessionManager = mutableMapOf<Long, InnodbSessionContext>()
+        private val sessionManager = ConcurrentHashMap<Long, InnodbSessionContext>()
 
         fun getInnodbSessionContext(): InnodbSessionContext {
             return sessionManager.computeIfAbsent(Thread.currentThread().id) { create() }

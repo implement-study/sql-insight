@@ -9,6 +9,7 @@ import tech.insight.core.bean.value.Value
 import tech.insight.core.bean.value.ValueNull
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.ConstantSize
+import tech.insight.engine.innodb.page.InnoDbPage
 import tech.insight.engine.innodb.page.InnodbUserRecord
 
 
@@ -38,12 +39,6 @@ class Compact : InnodbUserRecord {
     lateinit var body: ByteArray
 
     /**
-     * in cluster index,if compact record is index node , the point means sub page offset, otherwise is empty.
-     * in second index ,if compact record is index node , the point means sub page offset, otherwise is primary key.
-     */
-    var point: ByteArray = byteArrayOf()
-
-    /**
      * 6字节  唯一标识
      */
     @Unused
@@ -66,6 +61,14 @@ class Compact : InnodbUserRecord {
     var offsetInPage = -1
 
     lateinit var belongIndex: InnodbIndex
+
+    /**
+     * in cluster index,if compact record is index node , the point means sub page offset, otherwise is empty.
+     * in second index ,if compact record is index node , the point means sub page offset, otherwise is primary key.
+     */
+    var point: ByteArray = byteArrayOf()
+
+    lateinit var inPage: InnoDbPage
 
     override fun rowBytes(): ByteArray {
         val buffer: DynamicByteBuffer = DynamicByteBuffer.allocate()
@@ -120,7 +123,12 @@ class Compact : InnodbUserRecord {
         indexCompact.variables = indexVariables()
         indexCompact.nullList = indexNullList()
         indexCompact.body = indexBody()
+        indexCompact.point = DynamicByteBuffer.allocate().appendInt(inPage.fileHeader.offset).toBytes()
         return indexCompact
+    }
+
+    override fun inPage(): InnoDbPage {
+        return inPage
     }
 
     override fun absoluteOffset(): Int {
@@ -213,7 +221,10 @@ class Compact : InnodbUserRecord {
 
     private fun indexRow(): Row {
         val indexValue = belongIndex.columns().map { getValueByColumnName(it.name) }
-        return ReadRow(indexValue, sourceRow.rowId)
+        return ReadRow(indexValue, sourceRow.rowId).apply {
+            this.table = sourceRow.belongTo()
+        }
+
     }
 
 }

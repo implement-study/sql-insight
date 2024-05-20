@@ -20,6 +20,7 @@ import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.Value
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.IndexNode
+import tech.insight.engine.innodb.page.InnoDbPage
 import tech.insight.engine.innodb.page.InnodbUserRecord
 
 /**
@@ -39,6 +40,10 @@ class IndexRecord(
      */
     override fun indexNode(): IndexRecord {
         TODO()
+    }
+
+    override fun inPage(): InnoDbPage {
+        TODO("Not yet implemented")
     }
 
     override val values: List<Value<*>>

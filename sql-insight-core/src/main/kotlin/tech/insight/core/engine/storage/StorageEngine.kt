@@ -19,6 +19,7 @@ import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
 import tech.insight.core.command.UpdateCommand
+import tech.insight.core.environment.SessionContext
 import tech.insight.core.exception.DuplicationEngineNameException
 import tech.insight.core.result.ResultInterface
 
@@ -88,4 +89,9 @@ interface StorageEngine {
      * refresh the data
      */
     fun refresh(table: Table)
+
+    /**
+     * before do dml,init session context
+     */
+    fun initSessionContext(): SessionContext
 }

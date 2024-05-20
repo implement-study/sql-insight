@@ -92,10 +92,9 @@ class DataPage(override val page: InnoDbPage) : PageType {
             pageDirectory = PageDirectory()
             fileHeader.pageType = FIL_PAGE_INODE
             userRecords = UserRecords()
-            infimum = Infimum.create(this.ext.belongIndex)
-            supremum = Supremum.create(this.ext.belongIndex)
-            PageSupport.flushPage(leftPage)
-            PageSupport.flushPage(rightPage)
+            infimum = Infimum.create(this)
+            supremum = Supremum.create(this)
+            PageSupport.flushPage(this)
             insertData(leftPage.pageIndex())
             insertData(rightPage.pageIndex())
         }
