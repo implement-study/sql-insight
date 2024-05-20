@@ -57,6 +57,7 @@ class DataPage(override val page: InnoDbPage) : PageType {
         compact.body = (body)
         compact.sourceRow = (compactReadRow(compact, table))
         compact.belongIndex = (page.ext.belongIndex)
+        compact.belongPage = this.page
         return compact
     }
 

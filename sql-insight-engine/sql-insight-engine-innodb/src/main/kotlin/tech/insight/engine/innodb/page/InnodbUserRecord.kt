@@ -40,7 +40,7 @@ interface InnodbUserRecord : UserRecord, PageObject {
     /**
      * the record belong to which page
      */
-    fun inPage(): InnoDbPage
+    fun belongPage(): InnoDbPage
 
     override fun compareTo(other: Row): Int {
         if (other is SystemUserRecord) {

@@ -42,7 +42,7 @@ class IndexRecord(
         TODO()
     }
 
-    override fun inPage(): InnoDbPage {
+    override fun belongPage(): InnoDbPage {
         TODO("Not yet implemented")
     }
 

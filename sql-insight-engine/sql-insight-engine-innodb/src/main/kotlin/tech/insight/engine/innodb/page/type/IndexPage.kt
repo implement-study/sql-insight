@@ -102,6 +102,7 @@ class IndexPage(override val page: InnoDbPage) : PageType {
         compact.body = Arrays.copyOfRange(page.toBytes(), offsetInPage, offsetInPage + variableLength + fixLength)
         compact.sourceRow = (compactIndexReadRow(compact, belongIndex))
         compact.belongIndex = belongIndex
+        compact.belongPage = this.page
         return compact
     }
 

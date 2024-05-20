@@ -68,7 +68,7 @@ class Compact : InnodbUserRecord {
      */
     var point: ByteArray = byteArrayOf()
 
-    lateinit var inPage: InnoDbPage
+    lateinit var belongPage: InnoDbPage
 
     override fun rowBytes(): ByteArray {
         val buffer: DynamicByteBuffer = DynamicByteBuffer.allocate()
@@ -123,12 +123,12 @@ class Compact : InnodbUserRecord {
         indexCompact.variables = indexVariables()
         indexCompact.nullList = indexNullList()
         indexCompact.body = indexBody()
-        indexCompact.point = DynamicByteBuffer.allocate().appendInt(inPage.fileHeader.offset).toBytes()
+        indexCompact.point = DynamicByteBuffer.allocate().appendInt(belongPage.fileHeader.offset).toBytes()
         return indexCompact
     }
 
-    override fun inPage(): InnoDbPage {
-        return inPage
+    override fun belongPage(): InnoDbPage {
+        return belongPage
     }
 
     override fun absoluteOffset(): Int {

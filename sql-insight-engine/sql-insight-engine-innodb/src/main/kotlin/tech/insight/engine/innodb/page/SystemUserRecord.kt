@@ -88,7 +88,7 @@ class Supremum private constructor(private val inPage: InnoDbPage) : SystemUserR
         throw UnsupportedOperationException("this is supremum!")
     }
 
-    override fun inPage(): InnoDbPage {
+    override fun belongPage(): InnoDbPage {
         return inPage
     }
 
@@ -179,7 +179,7 @@ class Infimum private constructor(private val belongToPage: InnoDbPage) : System
         throw UnsupportedOperationException("this is infimum!")
     }
 
-    override fun inPage(): InnoDbPage {
+    override fun belongPage(): InnoDbPage {
         return belongToPage
     }
 
@@ -243,7 +243,7 @@ class Infimum private constructor(private val belongToPage: InnoDbPage) : System
                 val buffer: DynamicByteBuffer = DynamicByteBuffer.wrap(bytes)
                 val headBuffer: ByteArray = buffer.getLength(ConstantSize.RECORD_HEADER.size())
                 this.recordHeader = RecordHeader.wrap(headBuffer)
-                this.inPage()
+                this.belongPage()
             }
 
     }
