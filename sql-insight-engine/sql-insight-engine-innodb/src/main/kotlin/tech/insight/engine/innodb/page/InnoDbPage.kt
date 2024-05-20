@@ -134,7 +134,6 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         debug { " data: ${data.toBytes().size} diff: $diff pre: $prefree after: $after " }
         pageSplitIfNecessary()
         //        Console.pageDescription(this)
-        PageSupport.flushPage(this)
     }
 
     /**

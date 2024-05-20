@@ -12,8 +12,11 @@ import tech.insight.core.result.UpdateResult
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 class UpdatePlan(private val command: UpdateCommand) : DMLExecutionPlan(command) {
-    private val engine: StorageEngine = command.table.engine
+
+    override val engine: StorageEngine = command.table.engine
+
     private val table: Table = command.table
+
     override val originalSql: String
         get() = command.sql
 

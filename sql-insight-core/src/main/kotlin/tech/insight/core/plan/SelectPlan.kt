@@ -13,8 +13,11 @@ import tech.insight.core.result.SelectResult
  **/
 //   todo
 class SelectPlan(private val command: SelectCommand) : DMLExecutionPlan(command) {
-    private val engine: StorageEngine = command.table.engine
+
+    override val engine: StorageEngine = command.table.engine
+
     private val table: Table = command.table
+
     override val originalSql: String
         get() = command.sql
 

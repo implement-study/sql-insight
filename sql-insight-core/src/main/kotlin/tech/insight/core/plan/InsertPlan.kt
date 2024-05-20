@@ -11,7 +11,9 @@ import tech.insight.core.result.ResultInterface
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 class InsertPlan(private val command: InsertCommand) : DMLExecutionPlan(command) {
-    private val engine: StorageEngine = command.table.engine
+
+    override val engine: StorageEngine = command.table.engine
+
     private val table: Table = command.table
 
     override val originalSql: String

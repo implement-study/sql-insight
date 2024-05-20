@@ -31,7 +31,7 @@ fun interface Analyzer {
 object DruidAnalyzer : Analyzer {
 
     override fun analysisSql(sql: String): Command {
-        return CommandTypeVisitor(sql).command.also { DispatcherFiller.fill(it) }
+        return CommandTypeVisitor(sql).command.apply { DispatcherFiller.fill(this) }
     }
 }
 

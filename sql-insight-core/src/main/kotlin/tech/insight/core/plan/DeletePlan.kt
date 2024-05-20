@@ -10,8 +10,10 @@ import tech.insight.core.result.ResultInterface
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 class DeletePlan(private val command: DeleteCommand) : DMLExecutionPlan(command) {
+
     val table = command.table
-    val engine = table.engine
+
+    override val engine = table.engine
 
     override val originalSql: String
         get() = command.sql
