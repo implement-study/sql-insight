@@ -99,7 +99,8 @@ class IndexPage(override val page: InnoDbPage) : PageType {
             }
             length
         }
-        compact.body = Arrays.copyOfRange(page.toBytes(), offsetInPage, offsetInPage + variableLength + fixLength)
+        val bodyLength = variableLength + fixLength + Int.SIZE_BYTES
+        compact.body = Arrays.copyOfRange(page.toBytes(), offsetInPage, offsetInPage + bodyLength)
         compact.sourceRow = (compactIndexReadRow(compact, belongIndex))
         compact.belongIndex = belongIndex
         compact.belongPage = this.page
@@ -168,10 +169,15 @@ class IndexPage(override val page: InnoDbPage) : PageType {
         var firstIndex = page.targetSlotFirstUserRecord(targetSlot)
         //   todo Whether it is better to allow nodes to implement comparison functions?
         while (compare(userRecord, firstIndex) > 0) {
-            firstIndex = page.getUserRecordByOffset(firstIndex.absoluteOffset() + firstIndex.nextRecordOffset())
+            val nextOffset = firstIndex.absoluteOffset() + firstIndex.nextRecordOffset()
+            val nextRecord = page.getUserRecordByOffset(nextOffset)
+            if (nextRecord is SystemUserRecord) {
+                break
+            }
+            firstIndex = nextRecord
         }
         val targetIndex = firstIndex
-        val offset = ByteBuffer.wrap((targetIndex as Compact).point).getInt()
+        val offset = ByteBuffer.wrap((targetIndex as Compact).point()).getInt()
         return findPageByOffset(offset, page.ext.belongIndex).locatePage(userRecord)
     }
 

@@ -2,7 +2,6 @@ package tech.insight.engine.innodb.page.type
 
 import tech.insight.engine.innodb.page.InnoDbPage
 import tech.insight.engine.innodb.page.InnodbUserRecord
-import tech.insight.engine.innodb.page.compact.IndexRecord
 
 
 /**
@@ -19,7 +18,7 @@ class UndoPage(override val page: InnoDbPage) : PageType {
         TODO("Not yet implemented")
     }
 
-    override fun pageIndex(): IndexRecord {
+    override fun pageIndex(): InnodbUserRecord {
         TODO("Not yet implemented")
     }
 

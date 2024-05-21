@@ -11,6 +11,7 @@ import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.InnoDbPage
 import tech.insight.engine.innodb.page.InnodbUserRecord
+import java.util.*
 
 
 /**
@@ -62,12 +63,6 @@ class Compact : InnodbUserRecord {
 
     lateinit var belongIndex: InnodbIndex
 
-    /**
-     * in cluster index,if compact record is index node , the point means sub page offset, otherwise is empty.
-     * in second index ,if compact record is index node , the point means sub page offset, otherwise is primary key.
-     */
-    var point: ByteArray = byteArrayOf()
-
     lateinit var belongPage: InnoDbPage
 
     override fun rowBytes(): ByteArray {
@@ -76,7 +71,6 @@ class Compact : InnodbUserRecord {
         buffer.append(nullList.toBytes())
         buffer.append(recordHeader.toBytes())
         buffer.append(body)
-        buffer.append(point)
         return buffer.toBytes()
     }
 
@@ -119,12 +113,23 @@ class Compact : InnodbUserRecord {
         indexCompact.sourceRow = indexRow()
         indexCompact.recordHeader = RecordHeader.copy(recordHeader)
         indexCompact.recordHeader.setRecordType(RecordType.PAGE)
+        indexCompact.recordHeader.setNOwned(0)
         indexCompact.belongIndex = belongIndex
         indexCompact.variables = indexVariables()
         indexCompact.nullList = indexNullList()
         indexCompact.body = indexBody()
-        indexCompact.point = DynamicByteBuffer.allocate().appendInt(belongPage.fileHeader.offset).toBytes()
         return indexCompact
+    }
+
+    /**
+     * in cluster index,if compact record is index node , the point means sub page offset, otherwise is empty.
+     * in second index ,if compact record is index node , the point means sub page offset, otherwise is primary key.
+     */
+    fun point(): ByteArray {
+        if (this.recordHeader.recordType == RecordType.PAGE) {
+            return Arrays.copyOfRange(body, body.size - 4, body.size)
+        }
+        return ByteArray(0)
     }
 
     override fun belongPage(): InnoDbPage {
@@ -216,6 +221,7 @@ class Compact : InnodbUserRecord {
         belongIndex.columns().forEach {
             bodyBuffer.append(getValueByColumnName(it.name).toBytes())
         }
+        bodyBuffer.appendInt(belongPage.fileHeader.offset)
         return bodyBuffer.toBytes()
     }
 

@@ -28,13 +28,14 @@ class RecordHeader private constructor() : ByteWrapper, PageObject {
     var delete = false
     private var minRec = false
     var nOwned = 0
-    private var heapNo: UInt = 0U
+    var heapNo: UInt = 0U
     var nextRecordOffset = 0
     lateinit var recordType: RecordType
 
 
     private fun initType() {
-        val typeValue = source[2].toInt() and 0x07
+        source[2] = (source[2].toInt() and 0b11111000).toByte()
+        val typeValue = source[2].toInt() and 0b0111
         for (type in RecordType.entries) {
             if (type.value == typeValue) {
                 recordType = type
@@ -52,10 +53,12 @@ class RecordHeader private constructor() : ByteWrapper, PageObject {
         val nOwnedBase = 0x0F
         nOwned = source[0].toInt() and nOwnedBase
 
-        val high = source[1].toUInt()
-        val low = source[2].toUInt()
-        heapNo = (high shl 8 or low shr 3)
-        nextRecordOffset = (source[3].toInt() and 0xFF shl 8 or (source[4].toInt() and 0xFF)).toShort().toInt()
+        val heapNoHigh = source[1].toUInt()
+        val heapNoLow = source[2].toUInt()
+        heapNo = (heapNoHigh shl 8) or (heapNoLow shr 3)
+        val offsetHigh = source[3].toUInt()
+        val offsetLow = source[4].toUInt()
+        nextRecordOffset = ((offsetHigh shl 8) or (offsetLow)).toInt()
         initType()
     }
 
@@ -121,8 +124,8 @@ class RecordHeader private constructor() : ByteWrapper, PageObject {
     fun setRecordType(recordType: RecordType): RecordHeader {
         this.recordType = recordType
         // 后三位置0
-        source[2] = (source[2].toInt() and 248.toByte().toInt()).toByte()
-        source[2] = (source[2].toInt() or recordType.value.toByte().toInt()).toByte()
+        source[2] = (source[2].toInt() and 0b11111000).toByte()
+        source[2] = (source[2].toInt() or recordType.value).toByte()
         return this
     }
 

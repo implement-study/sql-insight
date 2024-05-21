@@ -62,7 +62,7 @@ class DataPage(override val page: InnoDbPage) : PageType {
     }
 
     override fun pageIndex(): InnodbUserRecord {
-        val firstData = page.getUserRecordByOffset(page.infimum.absoluteOffset() + page.infimum.nextRecordOffset())
+        val firstData = page.getFirstUserRecord()
         return firstData.indexNode()
     }
 

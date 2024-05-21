@@ -7,7 +7,6 @@ import tech.insight.core.logging.Logging
 import tech.insight.engine.innodb.core.InnodbSessionContext
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.compact.RecordHeader
-import tech.insight.engine.innodb.page.compact.RecordType
 import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VALUE
 import tech.insight.engine.innodb.page.type.IndexPage.Companion.FIL_PAGE_INODE
 import tech.insight.engine.innodb.page.type.PageType
@@ -392,10 +391,9 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
 
     private fun linkedAndAdjust(pre: InnodbUserRecord, insertRecord: InnodbUserRecord, next: InnodbUserRecord) {
         insertRecord.apply {
-            setAbsoluteOffset(pageHeader.lastInsertOffset + insertRecord.beforeSplitOffset())
+            setAbsoluteOffset(pageHeader.heapTop + insertRecord.beforeSplitOffset())
             this.recordHeader.setHeapNo(pageHeader.absoluteRecordCount.toUInt())
             this.recordHeader.setNextRecordOffset(next.absoluteOffset() - insertRecord.absoluteOffset())
-            this.recordHeader.setRecordType(RecordType.NORMAL)
         }
         pre.recordHeader.setNextRecordOffset(insertRecord.absoluteOffset() - pre.absoluteOffset())
         refreshRecordHeader(pre)
@@ -404,8 +402,8 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         userRecords.addRecord(insertRecord)
         pageHeader.absoluteRecordCount++
         pageHeader.recordCount++
-        pageHeader.heapTop = (pageHeader.heapTop + insertRecord.length().toShort()).toShort()
-        pageHeader.lastInsertOffset = (pageHeader.lastInsertOffset + insertRecord.length().toShort()).toShort()
+        pageHeader.heapTop = (pageHeader.heapTop + insertRecord.length()).toShort()
+        pageHeader.lastInsertOffset = insertRecord.absoluteOffset().toShort()
         var groupMax = next
         //  adjust group
         while (groupMax.recordHeader.nOwned == 0) {
@@ -571,13 +569,14 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
             page.pageDirectory = PageDirectory(slots)
             page.userRecords = UserRecords().apply { addRecords(recordList) }
             var pre: InnodbUserRecord = page.infimum
-            val preOffset: Short = ConstantSize.SUPREMUM.offset().toShort()
+            var preOffset: Short = ConstantSize.INFIMUM.offset().toShort()
             for (i in recordList.indices) {
                 val current: InnodbUserRecord = recordList[i]
                 val currentOffset: Int = pageHeader.lastInsertOffset + current.beforeSplitOffset()
                 pageHeader.lastInsertOffset = (pageHeader.lastInsertOffset + current.length()).toShort()
                 pre.recordHeader.setNextRecordOffset(currentOffset - preOffset)
                 pre = current
+                preOffset = currentOffset.toShort()
                 if ((i + 1) % Constant.SLOT_MAX_COUNT == 0) {
                     slots[slots.size - 1 - (i + 1) % Constant.SLOT_MAX_COUNT] = currentOffset.toShort()
                 }

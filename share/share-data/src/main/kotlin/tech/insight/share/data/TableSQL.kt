@@ -44,6 +44,18 @@ fun createTable(
 }
 
 
+fun insertOneData(tableName: String, databaseName: String? = null): String {
+    val databaseNamePre = if (databaseName == null) {
+        ""
+    } else {
+        "$databaseName."
+    }
+    return """
+        insert into $databaseNamePre$tableName (id,name) values
+        (1,'a')
+    """
+}
+
 fun insertData(tableName: String, databaseName: String? = null): String {
     val databaseNamePre = if (databaseName == null) {
         ""

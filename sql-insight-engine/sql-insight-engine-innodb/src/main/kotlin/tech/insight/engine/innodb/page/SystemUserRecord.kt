@@ -234,7 +234,6 @@ class Infimum private constructor(private val belongToPage: InnoDbPage) : System
 
         fun create(belongToPage: InnoDbPage) = Infimum(belongToPage).apply {
             this.recordHeader = RecordHeader.create(RecordType.INFIMUM)
-
         }
 
         fun wrap(bytes: ByteArray, belongToPage: InnoDbPage) =

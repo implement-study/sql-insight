@@ -33,7 +33,9 @@ object PageSupport : Logging() {
     fun allocatePage(index: InnodbIndex, pageCount: Int = 1): Int {
         RandomAccessFile(index.file, "rw").use { randomAccessFile ->
             val currentLength: Long = randomAccessFile.length()
-            randomAccessFile.setLength(currentLength + ConstantSize.PAGE_HEADER.size().toLong() * pageCount)
+            val expendLength = currentLength + ConstantSize.PAGE.size().toLong() * pageCount
+            randomAccessFile.setLength(expendLength)
+            info("expend file [${index.file.name}] to $expendLength")
             return currentLength.toInt()
         }
     }
