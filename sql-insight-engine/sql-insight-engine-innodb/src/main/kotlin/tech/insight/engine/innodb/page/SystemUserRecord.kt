@@ -224,7 +224,7 @@ class Infimum private constructor(private val belongToPage: InnoDbPage) : System
     }
 
     override fun toString(): String {
-        return recordHeader.toString() + "[body:" + String(body) + "]"
+        return "[body:" + String(body) + "]"
     }
 
 

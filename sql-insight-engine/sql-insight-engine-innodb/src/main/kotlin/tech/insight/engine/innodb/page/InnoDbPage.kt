@@ -10,6 +10,7 @@ import tech.insight.engine.innodb.page.compact.RecordHeader
 import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VALUE
 import tech.insight.engine.innodb.page.type.IndexPage.Companion.FIL_PAGE_INODE
 import tech.insight.engine.innodb.page.type.PageType
+import tech.insight.engine.innodb.utils.Console
 import tech.insight.engine.innodb.utils.PageSupport
 import java.io.File
 import java.io.RandomAccessFile
@@ -113,6 +114,8 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     fun insertData(data: InnodbUserRecord) {
         val targetPage = this.locatePage(data)
         targetPage.doInsertData(data)
+        Console.pageByteDescription(this)
+        Console.pageCompactDescription(this)
     }
 
     /**
@@ -134,7 +137,6 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         val diff = prefree - after
         debug { " data: ${data.toBytes().size} diff: $diff pre: $prefree after: $after " }
         pageSplitIfNecessary()
-        //        Console.pageDescription(this)
     }
 
     /**

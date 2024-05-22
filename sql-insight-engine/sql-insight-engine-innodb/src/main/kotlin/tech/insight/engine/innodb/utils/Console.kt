@@ -45,7 +45,7 @@ object Console {
     }
 
 
-    fun pageDescription(innoDbPage: InnoDbPage) {
+    fun pageByteDescription(innoDbPage: InnoDbPage) {
         val bytes = innoDbPage.toBytes()
         val totalLine = bytes.size / LINE_COUNT
         val breakLength = with(innoDbPage) {
@@ -93,6 +93,25 @@ object Console {
         dump.append(BOX_BORDER)
         dump.append(LINE)
         println(dump.toString())
+    }
+
+    fun pageCompactDescription(innoDbPage: InnoDbPage) {
+        println("${innoDbPage.infimum}   [groupMax]")
+        println("---------------------------------------------")
+        for (record in innoDbPage) {
+            val sb = StringBuilder()
+            sb.append(record)
+                .append(BLANK.repeat(3))
+                .append("heepNo:${record.recordHeader.heapNo} ")
+            if (record.recordHeader.nOwned != 0) {
+                sb.append("[groupMax]")
+                sb.appendLine()
+                sb.append("---------------------------------------------")
+            }
+            println(sb.toString())
+        }
+        println("${innoDbPage.supremum}   [groupMax]")
+        println("---------------------------------------------")
     }
 
     private fun dumpSkipBytesRow(dump: StringBuilder, bytes: ByteArray, startIndex: Int) {

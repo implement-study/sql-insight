@@ -154,9 +154,7 @@ class Compact : InnodbUserRecord {
     }
 
     override fun toString(): String {
-        return "Compact{" +
-                "sourceRow=" + sourceRow +
-                '}'
+        return "[Compact]   $sourceRow"
     }
 
     override fun equals(other: Any?): Boolean {

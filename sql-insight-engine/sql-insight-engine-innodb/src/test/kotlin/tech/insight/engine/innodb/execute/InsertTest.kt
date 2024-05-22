@@ -196,6 +196,59 @@ class InsertTest {
         )
     }
 
+    @Test
+    fun insertPageTwiceDictionarySplitPage() {
+        CreateTableTest().correctTest()
+        SqlPipeline.executeSql(insertDataCount(tableName, dbName, 16))
+//        val table = TableManager.require(testDb, test_table)
+//        val rootPage = PageSupport.getRoot(table.indexList[0] as InnodbIndex)
+//        val pageHeader = rootPage.pageHeader
+//        assertEquals(12, pageHeader.absoluteRecordCount)
+//        assertEquals(10, pageHeader.recordCount)
+//        //  120(two header + two sys record) +17(user record length)
+//        assertEquals((120 + 17 * 9 + 18).toShort(), pageHeader.heapTop)
+//        //  120(two header + two sys record) +8(vars 2 + null list 1 + header 5)
+//        assertEquals((120 + 17 * 9 + 8).toShort(), pageHeader.lastInsertOffset)
+//        assertEquals(0, pageHeader.level)
+//
+//        val infimum = rootPage.infimum
+//        infimum.apply {
+//            assertEquals(0U, this.recordHeader.heapNo)
+//            // 16 means 8 + ConstantSize.INFIMUM_BODY.size()
+//            assertEquals(16 + ConstantSize.SUPREMUM.size(), this.recordHeader.nextRecordOffset)
+//            assertEquals(1, this.recordHeader.nOwned)
+//            assertEquals(RecordType.INFIMUM, this.recordHeader.recordType)
+//        }
+//        rootPage.supremum.apply {
+//            assertEquals(1U, this.recordHeader.heapNo)
+//            assertEquals(0, this.recordHeader.nextRecordOffset)
+//            assertEquals(7, this.recordHeader.nOwned)
+//            assertEquals(RecordType.SUPREMUM, this.recordHeader.recordType)
+//        }
+//        assertEquals(17 * 9 + 18, rootPage.userRecords.length())
+//
+//        var pre: InnodbUserRecord = infimum
+//        for (i in 0 until 9) {
+//            val userRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+//            assertEquals(17, userRecord.length())
+//            assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
+//            assertEquals(if (i == 3) 4 else 0, userRecord.recordHeader.nOwned)
+//            assertEquals(2U + i.toUInt(), userRecord.recordHeader.heapNo)
+//            assertEquals(false, userRecord.recordHeader.delete)
+//            pre = userRecord
+//        }
+//        val lastUserRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+//        assertEquals(18, lastUserRecord.length())
+//        assertEquals(RecordType.NORMAL, lastUserRecord.recordHeader.recordType)
+//        assertEquals(0, lastUserRecord.recordHeader.nOwned)
+//        assertEquals(11U, lastUserRecord.recordHeader.heapNo)
+//        assertEquals(false, lastUserRecord.recordHeader.delete)
+//        assertEquals(
+//            rootPage.supremum.absoluteOffset(),
+//            lastUserRecord.nextRecordOffset() + lastUserRecord.absoluteOffset()
+//        )
+    }
+
 
     @Test
     fun largeInsertTest() {
