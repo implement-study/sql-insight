@@ -392,10 +392,10 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     private fun linkedAndAdjust(pre: InnodbUserRecord, insertRecord: InnodbUserRecord, next: InnodbUserRecord) {
         insertRecord.apply {
             setAbsoluteOffset(pageHeader.heapTop + insertRecord.beforeSplitOffset())
-            this.recordHeader.setHeapNo(pageHeader.absoluteRecordCount.toUInt())
-            this.recordHeader.setNextRecordOffset(next.absoluteOffset() - insertRecord.absoluteOffset())
+            this.recordHeader.heapNo = pageHeader.absoluteRecordCount.toUInt()
+            this.recordHeader.nextRecordOffset = next.absoluteOffset() - insertRecord.absoluteOffset()
         }
-        pre.recordHeader.setNextRecordOffset(insertRecord.absoluteOffset() - pre.absoluteOffset())
+        pre.recordHeader.nextRecordOffset = insertRecord.absoluteOffset() - pre.absoluteOffset()
         refreshRecordHeader(pre)
 
         //  adjust page
@@ -411,7 +411,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         }
         val groupMaxHeader: RecordHeader = groupMax.recordHeader
         val groupCount: Int = groupMaxHeader.nOwned
-        groupMaxHeader.setNOwned(groupCount + 1)
+        groupMaxHeader.nOwned = groupCount + 1
         if (groupMax.recordHeader.nOwned <= Constant.SLOT_MAX_COUNT) {
             return refreshRecordHeader(next)
         }
@@ -423,8 +423,8 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         for (j in 0 until leftGroupCount) {
             preMaxRecord = getUserRecordByOffset(preMaxRecord.absoluteOffset() + preMaxRecord.nextRecordOffset())
         }
-        preMaxRecord.recordHeader.setNOwned(leftGroupCount)
-        groupMax.recordHeader.setNOwned(rightGroupCount)
+        preMaxRecord.recordHeader.nOwned = leftGroupCount
+        groupMax.recordHeader.nOwned = rightGroupCount
         pageDirectory.split(nextGroupIndex, preMaxRecord.absoluteOffset().toShort())
         debug { "end group split ..." }
     }
@@ -574,14 +574,14 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
                 val current: InnodbUserRecord = recordList[i]
                 val currentOffset: Int = pageHeader.lastInsertOffset + current.beforeSplitOffset()
                 pageHeader.lastInsertOffset = (pageHeader.lastInsertOffset + current.length()).toShort()
-                pre.recordHeader.setNextRecordOffset(currentOffset - preOffset)
+                pre.recordHeader.nextRecordOffset = currentOffset - preOffset
                 pre = current
                 preOffset = currentOffset.toShort()
                 if ((i + 1) % Constant.SLOT_MAX_COUNT == 0) {
                     slots[slots.size - 1 - (i + 1) % Constant.SLOT_MAX_COUNT] = currentOffset.toShort()
                 }
             }
-            pre.recordHeader.setNextRecordOffset(ConstantSize.SUPREMUM.offset())
+            pre.recordHeader.nextRecordOffset = ConstantSize.SUPREMUM.offset()
             page.fileTrailer = FileTrailer.create()
         }
 

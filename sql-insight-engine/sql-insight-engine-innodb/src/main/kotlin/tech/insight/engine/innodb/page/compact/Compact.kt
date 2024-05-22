@@ -112,8 +112,8 @@ class Compact : InnodbUserRecord {
         val indexCompact = Compact()
         indexCompact.sourceRow = indexRow()
         indexCompact.recordHeader = RecordHeader.copy(recordHeader)
-        indexCompact.recordHeader.setRecordType(RecordType.PAGE)
-        indexCompact.recordHeader.setNOwned(0)
+        indexCompact.recordHeader.recordType = RecordType.PAGE
+        indexCompact.recordHeader.nOwned = 0
         indexCompact.belongIndex = belongIndex
         indexCompact.variables = indexVariables()
         indexCompact.nullList = indexNullList()

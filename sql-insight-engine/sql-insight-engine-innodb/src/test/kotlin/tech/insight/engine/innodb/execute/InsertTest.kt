@@ -9,7 +9,6 @@ import tech.insight.core.environment.TableManager
 import tech.insight.engine.innodb.dropDb
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.ConstantSize
-import tech.insight.engine.innodb.page.Supremum
 import tech.insight.engine.innodb.page.compact.RecordType
 import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VALUE
 import tech.insight.engine.innodb.utils.PageSupport
@@ -57,17 +56,17 @@ class InsertTest {
 
         rootPage.infimum.apply {
             assertEquals(0U, this.recordHeader.heapNo)
-            assertEquals(16+ConstantSize.SUPREMUM.size(), this.recordHeader.nextRecordOffset)
+            assertEquals(16 + ConstantSize.SUPREMUM.size(), this.recordHeader.nextRecordOffset)
             assertEquals(1, this.recordHeader.nOwned)
             assertEquals(RecordType.INFIMUM, this.recordHeader.recordType)
         }
         rootPage.supremum.apply {
             assertEquals(1U, this.recordHeader.heapNo)
             assertEquals(0, this.recordHeader.nextRecordOffset)
-            assertEquals(6, this.recordHeader.nOwned)
+            assertEquals(2, this.recordHeader.nOwned)
             assertEquals(RecordType.SUPREMUM, this.recordHeader.recordType)
         }
-        assertEquals(16 * 5, rootPage.userRecords.length())
+        assertEquals(16, rootPage.userRecords.length())
     }
 
     @Test

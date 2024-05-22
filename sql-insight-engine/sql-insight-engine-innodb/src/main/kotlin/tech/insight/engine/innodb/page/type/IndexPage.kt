@@ -31,6 +31,7 @@ class IndexPage(override val page: InnoDbPage) : PageType {
             RecordType.PAGE -> doLocateIndex(userRecord)
             RecordType.INFIMUM -> throw IllegalArgumentException("infimum can't be locate")
             RecordType.SUPREMUM -> throw IllegalArgumentException("supremum can't be locate")
+            else -> throw IllegalArgumentException("unknown record type")
         }
     }
 

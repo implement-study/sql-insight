@@ -26,26 +26,70 @@ class RecordHeader private constructor() : ByteWrapper, PageObject {
 
     private val source: ByteArray = ByteArray(5)
     var delete = false
-    private var minRec = false
-    var nOwned = 0
-    var heapNo: UInt = 0U
-    var nextRecordOffset = 0
-    lateinit var recordType: RecordType
-
-
-    private fun initType() {
-        source[2] = (source[2].toInt() and 0b11111000).toByte()
-        val typeValue = source[2].toInt() and 0b0111
-        for (type in RecordType.entries) {
-            if (type.value == typeValue) {
-                recordType = type
+        set(value) {
+            if (field == value) {
                 return
             }
+            field = value
+            if (value) {
+                source[0] = source[0].setBit1(5)
+            } else {
+                source[0] = source[0].setBit0(5)
+            }
         }
-        throw IllegalArgumentException()
-    }
+    var minRec = false
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            if (value) {
+                source[0] = source[0].setBit1(4)
+            } else {
+                source[0] = source[0].setBit0(5)
+            }
+        }
 
-    private fun swapProperties() {
+    var nOwned = 0
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source[0] = (source[0].toInt() and 0xF0).toByte()
+            source[0] = (source[0].toInt() or value).toByte()
+        }
+    var heapNo: UInt = 0U
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source[1] = (value shr 5).toByte()
+            source[2] = (source[2].toInt() and 7).toByte()
+            source[2] = (source[2].toInt() or (value shl 3).toByte().toInt()).toByte()
+        }
+    var nextRecordOffset = 0
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            val array = ByteBuffer.allocate(Short.SIZE_BYTES).putShort(value.toShort()).array()
+            source[3] = array[0]
+            source[4] = array[1]
+            return
+        }
+    var recordType: RecordType = RecordType.UNKNOWN
+        set(value) {
+            field = value
+            // 后三位置0
+            source[2] = (source[2].toInt() and 0b11111000).toByte()
+            source[2] = (source[2].toInt() or recordType.value).toByte()
+        }
+
+
+    private fun refreshProperties() {
         val deleteMask = 1 shl 5
         delete = source[0].toInt() and deleteMask == deleteMask
         val minRecMask = 1 shl 4
@@ -59,75 +103,16 @@ class RecordHeader private constructor() : ByteWrapper, PageObject {
         val offsetHigh = source[3].toUInt()
         val offsetLow = source[4].toUInt()
         nextRecordOffset = ((offsetHigh shl 8) or (offsetLow)).toInt()
-        initType()
+        val typeValue = source[2].toInt() and 0b0111
+        for (type in RecordType.entries) {
+            if (type.value == typeValue) {
+                recordType = type
+                return
+            }
+        }
+        throw IllegalArgumentException()
     }
 
-    fun setDelete(delete: Boolean): RecordHeader {
-        if (this.delete == delete) {
-            return this
-        }
-        this.delete = delete
-        if (delete) {
-            source[0] = source[0].setBit1(5)
-        } else {
-            source[0] = source[0].setBit0(5)
-        }
-        return this
-    }
-
-    fun setMinRec(minRec: Boolean): RecordHeader {
-        if (this.minRec == minRec) {
-            return this
-        }
-        this.minRec = minRec
-        if (minRec) {
-            source[0] = source[0].setBit1(4)
-        } else {
-            source[0] = source[0].setBit0(5)
-        }
-        return this
-    }
-
-    fun setNOwned(nOwned: Int): RecordHeader {
-        if (this.nOwned == nOwned) {
-            return this
-        }
-        //  清零source[0]的后四位
-        source[0] = (source[0].toInt() and 0xF0.toByte().toInt()).toByte()
-        source[0] = (source[0].toInt() or nOwned.toByte().toInt()).toByte()
-        this.nOwned = nOwned
-        return this
-    }
-
-    fun setHeapNo(heapNo: UInt): RecordHeader {
-        if (this.heapNo == heapNo) {
-            return this
-        }
-        this.heapNo = heapNo
-        source[1] = (heapNo shr 5).toByte()
-        source[2] = (source[2].toInt() and 7).toByte()
-        source[2] = (source[2].toInt() or (heapNo shl 3).toByte().toInt()).toByte()
-        return this
-    }
-
-    fun setNextRecordOffset(nextRecordOffset: Int): RecordHeader {
-        if (this.nextRecordOffset == nextRecordOffset) {
-            return this
-        }
-        this.nextRecordOffset = nextRecordOffset
-        val array = ByteBuffer.allocate(Short.SIZE_BYTES).putShort(nextRecordOffset.toShort()).array()
-        source[3] = array[0]
-        source[4] = array[1]
-        return this
-    }
-
-    fun setRecordType(recordType: RecordType): RecordHeader {
-        this.recordType = recordType
-        // 后三位置0
-        source[2] = (source[2].toInt() and 0b11111000).toByte()
-        source[2] = (source[2].toInt() or recordType.value).toByte()
-        return this
-    }
 
     override fun toBytes(): ByteArray {
         return source
@@ -160,48 +145,68 @@ class RecordHeader private constructor() : ByteWrapper, PageObject {
                 RecordType.INFIMUM -> infimumHeader(this)
                 RecordType.SUPREMUM -> supremumHeader(this)
                 RecordType.NORMAL -> normalHeader(this)
+                else -> unknownHeader(this)
             }
-            swapProperties()
+            refreshProperties()
         }
 
         fun wrap(source: ByteArray) = RecordHeader().apply {
             ConstantSize.RECORD_HEADER.checkSize(source)
             source.copyInto(this.source)
-            swapProperties()
+            refreshProperties()
         }
 
         fun copy(source: RecordHeader) = wrap(source.toBytes())
 
+
+        private fun unknownHeader(recordHeader: RecordHeader) {
+            recordHeader.apply {
+                recordType = RecordType.UNKNOWN
+                heapNo = 2U
+                delete = false
+                nOwned = 0
+                nextRecordOffset = 0
+            }
+        }
+
         private fun normalHeader(recordHeader: RecordHeader) {
-            recordHeader.setRecordType(RecordType.NORMAL)
-            recordHeader.setHeapNo(2U)
-            recordHeader.setDelete(false)
-            recordHeader.setNOwned(0)
-            recordHeader.setNextRecordOffset(0)
+            recordHeader.apply {
+                recordType = RecordType.NORMAL
+                heapNo = 2U
+                delete = false
+                nOwned = 0
+                nextRecordOffset = 0
+            }
         }
 
         private fun indexHeader(recordHeader: RecordHeader) {
-            recordHeader.setRecordType(RecordType.PAGE)
-            recordHeader.setHeapNo(1U)
-            recordHeader.setDelete(false)
-            recordHeader.setNOwned(0)
-            recordHeader.setNextRecordOffset(0)
+            recordHeader.apply {
+                recordType = RecordType.PAGE
+                heapNo = 1U
+                delete = false
+                nOwned = 0
+                nextRecordOffset = 0
+            }
         }
 
         private fun infimumHeader(recordHeader: RecordHeader) {
-            recordHeader.setRecordType(RecordType.INFIMUM)
-            recordHeader.setHeapNo(0U)
-            recordHeader.setDelete(false)
-            recordHeader.setNOwned(1)
-            recordHeader.setNextRecordOffset(ConstantSize.INFIMUM.size())
+            recordHeader.apply {
+                recordType = RecordType.INFIMUM
+                heapNo = 0U
+                delete = false
+                nOwned = 1
+                nextRecordOffset = ConstantSize.INFIMUM.size()
+            }
         }
 
         private fun supremumHeader(recordHeader: RecordHeader) {
-            recordHeader.setRecordType(RecordType.SUPREMUM)
-            recordHeader.setHeapNo(1U)
-            recordHeader.setDelete(false)
-            recordHeader.setNOwned(1)
-            recordHeader.setNextRecordOffset(0)
+            recordHeader.apply {
+                recordType = RecordType.SUPREMUM
+                heapNo = 1U
+                delete = false
+                nOwned = 1
+                nextRecordOffset = 0
+            }
         }
     }
 }

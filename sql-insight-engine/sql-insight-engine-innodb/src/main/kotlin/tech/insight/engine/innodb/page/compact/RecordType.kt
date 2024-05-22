@@ -39,5 +39,10 @@ enum class RecordType(val value: Int) {
     /**
      * supremum
      */
-    SUPREMUM(0x03)
+    SUPREMUM(0x03),
+
+    /**
+     * init unknown
+     */
+    UNKNOWN(Int.MAX_VALUE)
 }
