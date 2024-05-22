@@ -424,7 +424,9 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
             preMaxRecord = getUserRecordByOffset(preMaxRecord.absoluteOffset() + preMaxRecord.nextRecordOffset())
         }
         preMaxRecord.recordHeader.nOwned = leftGroupCount
+        this.refreshRecordHeader(preMaxRecord)
         groupMax.recordHeader.nOwned = rightGroupCount
+        this.refreshRecordHeader(groupMax)
         pageDirectory.split(nextGroupIndex, preMaxRecord.absoluteOffset().toShort())
         debug { "end group split ..." }
     }
