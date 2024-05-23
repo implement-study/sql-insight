@@ -6,7 +6,6 @@ import tech.insight.core.exception.DuplicationPrimaryKeyException
 import tech.insight.core.logging.Logging
 import tech.insight.engine.innodb.core.InnodbSessionContext
 import tech.insight.engine.innodb.index.InnodbIndex
-import tech.insight.engine.innodb.page.compact.RecordHeader
 import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VALUE
 import tech.insight.engine.innodb.page.type.IndexPage.Companion.FIL_PAGE_INODE
 import tech.insight.engine.innodb.page.type.PageType
@@ -411,9 +410,8 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         while (groupMax.recordHeader.nOwned == 0) {
             groupMax = getUserRecordByOffset(groupMax.absoluteOffset() + groupMax.nextRecordOffset())
         }
-        val groupMaxHeader: RecordHeader = groupMax.recordHeader
-        val groupCount: Int = groupMaxHeader.nOwned
-        groupMaxHeader.nOwned = groupCount + 1
+        val groupMaxHeader = groupMax.recordHeader
+        groupMaxHeader.nOwned += 1
         if (groupMax.recordHeader.nOwned <= Constant.SLOT_MAX_COUNT) {
             return refreshRecordHeader(next)
         }
@@ -429,6 +427,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         this.refreshRecordHeader(preMaxRecord)
         groupMax.recordHeader.nOwned = rightGroupCount
         this.refreshRecordHeader(groupMax)
+        this.pageHeader.slotCount = (this.pageHeader.slotCount.toInt() + 1).toShort()
         pageDirectory.split(nextGroupIndex, preMaxRecord.absoluteOffset().toShort())
         debug { "end group split ..." }
     }

@@ -16,6 +16,7 @@ object Console {
     private val LINE: String = System.getProperty("line.separator", "\n")
     private const val LINE_LENGTH = 138
     private const val DATA_LINE_LENGTH = 130
+    private val COMPONENT_LINE = "-".repeat(45)
     private val BASE_TITLE_LINE = "+${"-".repeat(128)}+"
     private val BOX_BORDER = "${"-".repeat(9)}+${"-".repeat(64)}+${"-".repeat(63)}+"
     private const val BLANK = " "
@@ -96,23 +97,24 @@ object Console {
     }
 
     fun pageCompactDescription(innoDbPage: InnoDbPage) {
-        println("${innoDbPage.infimum}   [groupMax]")
-        println("---------------------------------------------")
+        println("${innoDbPage.infimum}   ")
+        println(COMPONENT_LINE)
         for (record in innoDbPage) {
-            val sb = StringBuilder()
-            sb.append(record)
-                .append(BLANK.repeat(3))
-                .append("heepNo:${record.recordHeader.heapNo} ")
-            if (record.recordHeader.nOwned != 0) {
-                sb.append("[groupMax]")
+            val groupMax = record.recordHeader.nOwned != 0
+            val sb = StringBuilder().append("heepNo:${record.recordHeader.heapNo} ")
+            sb.append(record).append(BLANK.repeat(3))
+            if (groupMax) {
+                sb.append("group count :[${record.recordHeader.nOwned}]")
                 sb.appendLine()
-                sb.append("---------------------------------------------")
+                sb.append(COMPONENT_LINE)
             }
             println(sb.toString())
         }
-        println("${innoDbPage.supremum}   [groupMax]")
-        println("---------------------------------------------")
+        val supremum = innoDbPage.supremum
+        println("$supremum  group count :[${supremum.recordHeader.nOwned}]")
+        println(COMPONENT_LINE)
     }
+
 
     private fun dumpSkipBytesRow(dump: StringBuilder, bytes: ByteArray, startIndex: Int) {
         appendLinePre(dump, startIndex / LINE_COUNT)
@@ -148,10 +150,6 @@ object Console {
         preStringBuilder.append("[$omitBytes]")
         preStringBuilder.append(BLANK.repeat(LINE_LENGTH - preStringBuilder.length))
         preStringBuilder.append("|")
-        //        val skipRow = beforeRow + remainRow
-        //        val skipBytes = skipRow shl 5
-        //        preStringBuilder.append(java.lang.Long.toHexString(skipBytes.toLong() and 0xFFFFFFFFL or 0x100000000L))
-
         dump.appendLine(preStringBuilder)
     }
 

@@ -9,6 +9,7 @@ import tech.insight.engine.innodb.dropDb
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.InnodbUserRecord
+import tech.insight.engine.innodb.page.Supremum
 import tech.insight.engine.innodb.page.compact.RecordType
 import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VALUE
 import tech.insight.engine.innodb.utils.PageSupport
@@ -152,6 +153,7 @@ class InsertTest {
         val pageHeader = rootPage.pageHeader
         assertEquals(12, pageHeader.absoluteRecordCount)
         assertEquals(10, pageHeader.recordCount)
+        assertEquals(3, pageHeader.slotCount)
         //  120(two header + two sys record) +17(user record length)
         assertEquals((120 + 17 * 9 + 18).toShort(), pageHeader.heapTop)
         //  120(two header + two sys record) +8(vars 2 + null list 1 + header 5)
@@ -199,54 +201,67 @@ class InsertTest {
     @Test
     fun insertPageTwiceDictionarySplitPage() {
         CreateTableTest().correctTest()
-        SqlPipeline.executeSql(insertDataCount(tableName, dbName, 16))
-//        val table = TableManager.require(testDb, test_table)
-//        val rootPage = PageSupport.getRoot(table.indexList[0] as InnodbIndex)
-//        val pageHeader = rootPage.pageHeader
-//        assertEquals(12, pageHeader.absoluteRecordCount)
-//        assertEquals(10, pageHeader.recordCount)
-//        //  120(two header + two sys record) +17(user record length)
-//        assertEquals((120 + 17 * 9 + 18).toShort(), pageHeader.heapTop)
-//        //  120(two header + two sys record) +8(vars 2 + null list 1 + header 5)
-//        assertEquals((120 + 17 * 9 + 8).toShort(), pageHeader.lastInsertOffset)
-//        assertEquals(0, pageHeader.level)
-//
-//        val infimum = rootPage.infimum
-//        infimum.apply {
-//            assertEquals(0U, this.recordHeader.heapNo)
-//            // 16 means 8 + ConstantSize.INFIMUM_BODY.size()
-//            assertEquals(16 + ConstantSize.SUPREMUM.size(), this.recordHeader.nextRecordOffset)
-//            assertEquals(1, this.recordHeader.nOwned)
-//            assertEquals(RecordType.INFIMUM, this.recordHeader.recordType)
-//        }
-//        rootPage.supremum.apply {
-//            assertEquals(1U, this.recordHeader.heapNo)
-//            assertEquals(0, this.recordHeader.nextRecordOffset)
-//            assertEquals(7, this.recordHeader.nOwned)
-//            assertEquals(RecordType.SUPREMUM, this.recordHeader.recordType)
-//        }
-//        assertEquals(17 * 9 + 18, rootPage.userRecords.length())
-//
-//        var pre: InnodbUserRecord = infimum
-//        for (i in 0 until 9) {
-//            val userRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
-//            assertEquals(17, userRecord.length())
-//            assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
-//            assertEquals(if (i == 3) 4 else 0, userRecord.recordHeader.nOwned)
-//            assertEquals(2U + i.toUInt(), userRecord.recordHeader.heapNo)
-//            assertEquals(false, userRecord.recordHeader.delete)
-//            pre = userRecord
-//        }
-//        val lastUserRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
-//        assertEquals(18, lastUserRecord.length())
-//        assertEquals(RecordType.NORMAL, lastUserRecord.recordHeader.recordType)
-//        assertEquals(0, lastUserRecord.recordHeader.nOwned)
-//        assertEquals(11U, lastUserRecord.recordHeader.heapNo)
-//        assertEquals(false, lastUserRecord.recordHeader.delete)
-//        assertEquals(
-//            rootPage.supremum.absoluteOffset(),
-//            lastUserRecord.nextRecordOffset() + lastUserRecord.absoluteOffset()
-//        )
+        SqlPipeline.executeSql(insertDataCount(tableName, dbName, 15))
+        val table = TableManager.require(testDb, test_table)
+        val rootPage = PageSupport.getRoot(table.indexList[0] as InnodbIndex)
+        val pageHeader = rootPage.pageHeader
+        assertEquals(17, pageHeader.absoluteRecordCount)
+        assertEquals(15, pageHeader.recordCount)
+        //  120(two header + two sys record) +17(user record length)
+        assertEquals((120 + 17 * 9 + 18 * 6).toShort(), pageHeader.heapTop)
+        //  120(two header + two sys record) +8(vars 2 + null list 1 + header 5)
+        assertEquals((120 + 17 * 9 + 18 * 5 + 8).toShort(), pageHeader.lastInsertOffset)
+        assertEquals(0, pageHeader.level)
+        assertEquals(4, pageHeader.slotCount)
+        rootPage.supremum.apply {
+            assertEquals(1U, this.recordHeader.heapNo)
+            assertEquals(0, this.recordHeader.nextRecordOffset)
+            assertEquals(8, this.recordHeader.nOwned)
+            assertEquals(RecordType.SUPREMUM, this.recordHeader.recordType)
+        }
+        assertEquals(17 * 9 + 18 * 6, rootPage.userRecords.length())
+
+        var pre: InnodbUserRecord = rootPage.infimum
+        //  first group 1-4  count:4
+        for (i in 0 until 4) {
+            val userRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+            assertEquals(17, userRecord.length())
+            assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
+            assertEquals(if (i == 3) 4 else 0, userRecord.recordHeader.nOwned)
+            assertEquals(2U + i.toUInt(), userRecord.recordHeader.heapNo)
+            assertEquals(false, userRecord.recordHeader.delete)
+            pre = userRecord
+        }
+
+        //  second group 5-8 count:4
+        for (i in 0 until 4) {
+            val userRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+            assertEquals(17, userRecord.length())
+            assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
+            assertEquals(if (i == 3) 4 else 0, userRecord.recordHeader.nOwned)
+            assertEquals(6U + i.toUInt(), userRecord.recordHeader.heapNo)
+            assertEquals(false, userRecord.recordHeader.delete)
+            pre = userRecord
+        }
+
+        //  third group 9-15 count 8(include supremum)
+        for (i in 0 until 7) {
+            val userRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+            assertEquals(if (i == 0) 17 else 18, userRecord.length())
+            assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
+            assertEquals(0, userRecord.recordHeader.nOwned)
+            assertEquals(10U + i.toUInt(), userRecord.recordHeader.heapNo)
+            assertEquals(false, userRecord.recordHeader.delete)
+            pre = userRecord
+        }
+
+        val lastUserRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+        assert(lastUserRecord is Supremum)
+        assertEquals(13, lastUserRecord.length())
+        assertEquals(RecordType.SUPREMUM, lastUserRecord.recordHeader.recordType)
+        assertEquals(8, lastUserRecord.recordHeader.nOwned)
+        assertEquals(1U, lastUserRecord.recordHeader.heapNo)
+        assertEquals(false, lastUserRecord.recordHeader.delete)
     }
 
 
