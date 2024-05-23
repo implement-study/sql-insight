@@ -16,6 +16,8 @@
 package tech.insight.core.bean
 
 import tech.insight.core.bean.value.Value
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -58,6 +60,14 @@ class InsertRow(override val rowId: Long) : Row, SQLBean, Iterable<InsertItem> {
             cursor = i + 1
             return InsertItem(table.columnList[i], valueList[i])
         }
+    }
+
+    override fun toString(): String {
+        val stringJoiner = StringJoiner("|", "|", "|")
+        for (value in values) {
+            stringJoiner.add(value.toString())
+        }
+        return stringJoiner.toString()
     }
 
 }

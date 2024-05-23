@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import tech.insight.core.bean.Table
-import tech.insight.core.bean.value.Value
 import tech.insight.core.bean.value.ValueInt
 import tech.insight.core.engine.SqlPipeline
 import tech.insight.core.environment.TableManager

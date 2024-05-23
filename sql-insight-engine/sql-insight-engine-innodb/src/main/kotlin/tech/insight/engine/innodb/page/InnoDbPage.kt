@@ -113,7 +113,6 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     fun insertData(data: InnodbUserRecord) {
         val targetPage = this.locatePage(data)
         targetPage.doInsertData(data)
-        Console.pageByteDescription(this)
         Console.pageCompactDescription(this)
     }
 
@@ -394,9 +393,9 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         insertRecord.apply {
             setAbsoluteOffset(pageHeader.heapTop + insertRecord.beforeSplitOffset())
             this.recordHeader.heapNo = pageHeader.absoluteRecordCount.toUInt()
-            this.recordHeader.nextRecordOffset = next.absoluteOffset() - insertRecord.absoluteOffset()
+            this.recordHeader.nextRecordOffset = (next.absoluteOffset() - insertRecord.absoluteOffset()).toShort()
         }
-        pre.recordHeader.nextRecordOffset = insertRecord.absoluteOffset() - pre.absoluteOffset()
+        pre.recordHeader.nextRecordOffset = (insertRecord.absoluteOffset() - pre.absoluteOffset()).toShort()
         refreshRecordHeader(pre)
 
         //  adjust page
@@ -577,14 +576,14 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
                 val current: InnodbUserRecord = recordList[i]
                 val currentOffset: Int = pageHeader.lastInsertOffset + current.beforeSplitOffset()
                 pageHeader.lastInsertOffset = (pageHeader.lastInsertOffset + current.length()).toShort()
-                pre.recordHeader.nextRecordOffset = currentOffset - preOffset
+                pre.recordHeader.nextRecordOffset = (currentOffset - preOffset).toShort()
                 pre = current
                 preOffset = currentOffset.toShort()
                 if ((i + 1) % Constant.SLOT_MAX_COUNT == 0) {
                     slots[slots.size - 1 - (i + 1) % Constant.SLOT_MAX_COUNT] = currentOffset.toShort()
                 }
             }
-            pre.recordHeader.nextRecordOffset = ConstantSize.SUPREMUM.offset()
+            pre.recordHeader.nextRecordOffset = ConstantSize.SUPREMUM.offset().toShort()
             page.fileTrailer = FileTrailer.create()
         }
 

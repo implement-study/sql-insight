@@ -6,6 +6,8 @@ import tech.insight.core.extension.setBit1
 import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.PageObject
 import java.nio.ByteBuffer
+import kotlin.experimental.and
+import kotlin.experimental.or
 
 /**
  * 5 bytes 40 bits.
@@ -65,17 +67,19 @@ class RecordHeader private constructor() : ByteWrapper, PageObject {
                 return
             }
             field = value
-            source[1] = (value shr 5).toByte()
-            source[2] = (source[2].toInt() and 7).toByte()
-            source[2] = (source[2].toInt() or (value shl 3).toByte().toInt()).toByte()
+            val buffer = ByteBuffer.allocate(Int.SIZE_BYTES)
+            val bytes = buffer.putShort((value.toInt() shl 3).toShort()).array()
+            source[1] = bytes[0]
+            source[2] = source[2] and 0b00000111.toByte()
+            source[2] = source[2] or bytes[1]
         }
-    var nextRecordOffset = 0
+    var nextRecordOffset: Short = 0
         set(value) {
             if (field == value) {
                 return
             }
             field = value
-            val array = ByteBuffer.allocate(Short.SIZE_BYTES).putShort(value.toShort()).array()
+            val array = ByteBuffer.allocate(Short.SIZE_BYTES).putShort(value).array()
             source[3] = array[0]
             source[4] = array[1]
             return
@@ -97,20 +101,12 @@ class RecordHeader private constructor() : ByteWrapper, PageObject {
         val nOwnedBase = 0x0F
         nOwned = source[0].toInt() and nOwnedBase
 
-        val heapNoHigh = source[1].toUInt()
-        val heapNoLow = source[2].toUInt()
-        heapNo = (heapNoHigh shl 8) or (heapNoLow shr 3)
-        val offsetHigh = source[3].toUInt()
-        val offsetLow = source[4].toUInt()
-        nextRecordOffset = ((offsetHigh shl 8) or (offsetLow)).toInt()
-        val typeValue = source[2].toInt() and 0b0111
-        for (type in RecordType.entries) {
-            if (type.value == typeValue) {
-                recordType = type
-                return
-            }
+        ByteBuffer.wrap(byteArrayOf(source[1], source[2])).let {
+            val s = it.getShort()
+            heapNo = (s.toInt() shr 3).toUInt()
+            recordType = RecordType.entries[s.toInt() and 0b00000111]
         }
-        throw IllegalArgumentException()
+        nextRecordOffset = ByteBuffer.wrap(byteArrayOf(source[3], source[4])).getShort()
     }
 
 
@@ -195,7 +191,7 @@ class RecordHeader private constructor() : ByteWrapper, PageObject {
                 heapNo = 0U
                 delete = false
                 nOwned = 1
-                nextRecordOffset = ConstantSize.INFIMUM.size()
+                nextRecordOffset = ConstantSize.INFIMUM.size().toShort()
             }
         }
 

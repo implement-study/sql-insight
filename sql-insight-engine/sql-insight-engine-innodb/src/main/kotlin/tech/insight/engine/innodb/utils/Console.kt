@@ -101,10 +101,15 @@ object Console {
         println(COMPONENT_LINE)
         for (record in innoDbPage) {
             val groupMax = record.recordHeader.nOwned != 0
-            val sb = StringBuilder().append("heepNo:${record.recordHeader.heapNo} ")
-            sb.append(record).append(BLANK.repeat(3))
+            val sb = StringBuilder("heapNo:${record.recordHeader.heapNo}")
+                .append("  offset:${record.absoluteOffset()}")
+                .append("  nextOffset:${record.absoluteOffset() + record.nextRecordOffset()}  ")
+                .append(record)
+                .append(BLANK.repeat(3))
+                .append(record.toBytes().contentToString())
+                .append(BLANK.repeat(3))
             if (groupMax) {
-                sb.append("group count :[${record.recordHeader.nOwned}]")
+                sb.append("group count :[${record.recordHeader.nOwned}]  ")
                 sb.appendLine()
                 sb.append(COMPONENT_LINE)
             }

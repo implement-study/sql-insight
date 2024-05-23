@@ -88,8 +88,6 @@ interface AnsiElement {
 
 object AnsiOutput {
     private const val ENCODE_JOIN = ";"
-    private var ansiCapable: Boolean? = null
-    private val OPERATING_SYSTEM_NAME = System.getProperty("os.name").lowercase()
     private const val ENCODE_START = "\u001b["
     private const val ENCODE_END = "m"
     private val RESET = "0;" + AnsiColor.DEFAULT

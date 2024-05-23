@@ -44,5 +44,12 @@ enum class RecordType(val value: Int) {
     /**
      * init unknown
      */
-    UNKNOWN(Int.MAX_VALUE)
+    UNKNOWN(Int.MAX_VALUE);
+
+    companion object {
+        fun valueOf(value: Int): RecordType {
+            return entries.find { it.value == value }!!
+        }
+    }
+
 }

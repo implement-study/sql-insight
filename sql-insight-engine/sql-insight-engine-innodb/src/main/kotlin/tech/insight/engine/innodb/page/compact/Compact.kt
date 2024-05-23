@@ -146,7 +146,7 @@ class Compact : InnodbUserRecord {
     }
 
     override fun nextRecordOffset(): Int {
-        return recordHeader.nextRecordOffset
+        return recordHeader.nextRecordOffset.toInt()
     }
 
     override fun deleteSign(): Boolean {

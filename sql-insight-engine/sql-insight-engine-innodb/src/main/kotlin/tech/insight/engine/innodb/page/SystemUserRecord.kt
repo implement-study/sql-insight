@@ -184,7 +184,7 @@ class Infimum private constructor(private val belongToPage: InnoDbPage) : System
     }
 
     override fun nextRecordOffset(): Int {
-        return recordHeader.nextRecordOffset
+        return recordHeader.nextRecordOffset.toInt()
     }
 
     override fun absoluteOffset(): Int {

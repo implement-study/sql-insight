@@ -37,46 +37,46 @@ class PageObjectTest {
     }
 
     @Test
-    fun testPageHeaderWrap(){
+    fun testPageHeaderWrap() {
         val pageHeader = fillRandomNumber(PageHeader.create())
         assertByteWrapper(pageHeader, PageHeader::wrap)
     }
 
     @Test
-    fun testFileHeaderWrap(){
+    fun testFileHeaderWrap() {
         val fileHeader = fillRandomNumber(FileHeader.create())
         assertByteWrapper(fileHeader, FileHeader::wrap)
     }
 
     @Test
-    fun testInfimumWrap(){
+    fun testInfimumWrap() {
         val mockPage = mock<InnoDbPage>()
         val infimum = Infimum.create(mockPage)
-        assertByteWrapper(infimum){
+        assertByteWrapper(infimum) {
             Infimum.wrap(it, mockPage)
         }
     }
 
     @Test
-    fun testSupremumWrap(){
+    fun testSupremumWrap() {
         val mockPage = mock<InnoDbPage>()
         val supremum = Supremum.create(mockPage)
-        assertByteWrapper(supremum){
+        assertByteWrapper(supremum) {
             Supremum.wrap(it, mockPage)
         }
     }
 
     @Test
-    fun testFileTrailerWrap(){
+    fun testFileTrailerWrap() {
         val fileTrailer = FileTrailer.create()
         assertByteWrapper(fileTrailer, FileTrailer::wrap)
     }
 
     @Test
-    fun testRootPage(){
+    fun testRootPage() {
         val index = mock<InnodbIndex>()
         val page = InnoDbPage.createRootPage(index)
-        val swap = InnoDbPage.swap(page.toBytes(),index)
+        val swap = InnoDbPage.swap(page.toBytes(), index)
         assertEquals(page, swap)
     }
 
@@ -88,10 +88,10 @@ class PageObjectTest {
         assertByteWrapper(pageHeader, PageHeader::wrap)
         val fileHeader = fillRandomNumber(FileHeader.create())
         assertByteWrapper(fileHeader, FileHeader::wrap)
-        assertByteWrapper(Infimum.create(mockPage)){
+        assertByteWrapper(Infimum.create(mockPage)) {
             Infimum.wrap(it, mockPage)
         }
-        assertByteWrapper(Supremum.create(mockPage)){
+        assertByteWrapper(Supremum.create(mockPage)) {
             Supremum.wrap(it, mockPage)
         }
         assertByteWrapper(FileTrailer.create(), FileTrailer::wrap)
