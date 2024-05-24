@@ -2,16 +2,15 @@ package tech.insight.engine.innodb.page
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
+import tech.insight.core.annotation.Temporary
 import tech.insight.core.exception.DuplicationPrimaryKeyException
 import tech.insight.core.logging.Logging
 import tech.insight.engine.innodb.core.InnodbSessionContext
+import tech.insight.engine.innodb.core.buffer.BufferPool
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VALUE
-import tech.insight.engine.innodb.page.type.IndexPage.Companion.FIL_PAGE_INODE
 import tech.insight.engine.innodb.page.type.PageType
 import tech.insight.engine.innodb.utils.PageSupport
-import java.io.File
-import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 import java.util.*
 
@@ -343,31 +342,31 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
      * @param secondChild right node
      */
     private fun upgrade(preChild: InnoDbPage, secondChild: InnoDbPage) {
-        preChild.pageHeader.level = pageHeader.level
-        secondChild.pageHeader.level = pageHeader.level
-        pageHeader.level++
-        val firstFileHeader: FileHeader = preChild.fileHeader
-        val secondFileHeader: FileHeader = secondChild.fileHeader
-        val offset: Int = PageSupport.allocatePage(ext.belongIndex, 2)
-        firstFileHeader.offset = offset
-        secondFileHeader.offset = (offset + ConstantSize.PAGE.size())
-        firstFileHeader.pre = (-1)
-        firstFileHeader.next = (secondFileHeader.offset)
-        secondFileHeader.pre = (firstFileHeader.offset)
-        secondFileHeader.next = (-1)
-        //  transfer to index page
-        fileHeader.next = -1
-        fileHeader.pageType = FIL_PAGE_INODE
-        pageHeader = PageHeader.create()
-        pageDirectory = PageDirectory()
-        //  clear user record
-        userRecords = UserRecords()
-        infimum = Infimum.create(preChild)
-        supremum = Supremum.create(secondChild)
-        InnodbSessionContext.getInnodbSessionContext().modifyPage(preChild)
-        InnodbSessionContext.getInnodbSessionContext().modifyPage(secondChild)
-        insertData(preChild.pageIndex())
-        insertData(secondChild.pageIndex())
+        //        preChild.pageHeader.level = pageHeader.level
+        //        secondChild.pageHeader.level = pageHeader.level
+        //        pageHeader.level++
+        //        val firstFileHeader: FileHeader = preChild.fileHeader
+        //        val secondFileHeader: FileHeader = secondChild.fileHeader
+        //        val offset: Int = PageSupport.allocatePage(ext.belongIndex, 2)
+        //        firstFileHeader.offset = offset
+        //        secondFileHeader.offset = (offset + ConstantSize.PAGE.size())
+        //        firstFileHeader.pre = (-1)
+        //        firstFileHeader.next = (secondFileHeader.offset)
+        //        secondFileHeader.pre = (firstFileHeader.offset)
+        //        secondFileHeader.next = (-1)
+        //        //  transfer to index page
+        //        fileHeader.next = -1
+        //        fileHeader.pageType = FIL_PAGE_INODE
+        //        pageHeader = PageHeader.create()
+        //        pageDirectory = PageDirectory()
+        //        //  clear user record
+        //        userRecords = UserRecords()
+        //        infimum = Infimum.create(preChild)
+        //        supremum = Supremum.create(secondChild)
+        //        InnodbSessionContext.getInnodbSessionContext().modifyPage(preChild)
+        //        InnodbSessionContext.getInnodbSessionContext().modifyPage(secondChild)
+        //        insertData(preChild.pageIndex())
+        //        insertData(secondChild.pageIndex())
     }
 
     //
@@ -531,14 +530,13 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     companion object {
 
         fun createFromUserRecords(recordList: List<InnodbUserRecord>, index: InnodbIndex): InnoDbPage {
-            val dataPage = InnoDbPage(index)
+            val dataPage = BufferPool.allocatePage(index)
             fillInnodbUserRecords(recordList, dataPage)
             dataPage.fileHeader.pageType = FIL_PAGE_INDEX_VALUE
             return dataPage
         }
 
         private fun fillInnodbUserRecords(recordList: List<InnodbUserRecord>, page: InnoDbPage) {
-            page.fileHeader = FileHeader.create()
             page.supremum = Supremum.create(page)
             page.infimum = Infimum.create(page)
             val pageHeader = PageHeader.create().apply {
@@ -627,14 +625,9 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
             }
         }
 
+        @Temporary("direct get from buffer pool")
         fun findPageByOffset(pageOffset: Int, index: InnodbIndex): InnoDbPage {
-            val file: File = index.file
-            RandomAccessFile(file, "rw").use { randomAccessFile ->
-                randomAccessFile.seek(pageOffset.toLong())
-                val pageArr: ByteArray = ConstantSize.PAGE.emptyBuff()
-                randomAccessFile.readFully(pageArr)
-                return swap(pageArr, index)
-            }
+            return BufferPool.getPageAndCache(pageOffset, index)
         }
 
 

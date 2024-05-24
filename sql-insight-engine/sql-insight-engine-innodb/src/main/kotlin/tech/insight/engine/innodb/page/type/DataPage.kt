@@ -72,19 +72,15 @@ class DataPage(override val page: InnoDbPage) : PageType {
      * so root page upgrade to index page and link to two data page.
      */
     override fun rootUpgrade(leftPage: InnoDbPage, rightPage: InnoDbPage) {
-        val firstOffset: Int = PageSupport.allocatePage(page.ext.belongIndex, 2)
-        val secondOffset = firstOffset + ConstantSize.PAGE.size()
         leftPage.apply {
             pageHeader.level = 0
             pageHeader.indexId = page.pageHeader.indexId
-            fileHeader.offset = firstOffset
-            fileHeader.next = secondOffset
+            fileHeader.next = rightPage.fileHeader.offset
         }
         rightPage.apply {
             pageHeader.level = 0
             pageHeader.indexId = page.pageHeader.indexId
-            fileHeader.offset = secondOffset
-            fileHeader.pre = firstOffset
+            fileHeader.pre = leftPage.fileHeader.offset
         }
         //  transfer to index page and clear root page
         page.apply {

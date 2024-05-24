@@ -9,6 +9,7 @@ import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.ValueInt
 import tech.insight.core.engine.SqlPipeline
 import tech.insight.core.environment.TableManager
+import tech.insight.engine.innodb.core.buffer.BufferPool
 import tech.insight.engine.innodb.dropDb
 import tech.insight.engine.innodb.execute.CreateTableTest
 import tech.insight.engine.innodb.index.InnodbIndex
@@ -33,7 +34,7 @@ class InnodbPageTest {
         CreateTableTest().correctTest()
         SqlPipeline.executeSql(insertDataCount(tableName, dbName, 500))
         val table = TableManager.require(dbName, tableName)
-        innodbPage = PageSupport.getRoot(table.indexList[0] as InnodbIndex)
+        innodbPage = BufferPool.getRoot(table.indexList[0] as InnodbIndex)
     }
 
     @AfterEach

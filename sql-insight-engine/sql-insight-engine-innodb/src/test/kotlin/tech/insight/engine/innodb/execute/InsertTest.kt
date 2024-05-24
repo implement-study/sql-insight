@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import tech.insight.core.engine.SqlPipeline
 import tech.insight.core.environment.TableManager
+import tech.insight.engine.innodb.core.buffer.BufferPool
 import tech.insight.engine.innodb.dropDb
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.ConstantSize
@@ -39,7 +40,7 @@ class InsertTest {
         CreateTableTest().correctTest()
         SqlPipeline.executeSql(insertOneData(tableName, dbName))
         val table = TableManager.require(testDb, test_table)
-        val rootPage = PageSupport.getRoot(table.indexList[0] as InnodbIndex)
+        val rootPage = BufferPool.getRoot(table.indexList[0] as InnodbIndex)
         val fileHeader = rootPage.fileHeader
         assertEquals(0, fileHeader.offset)
         assertEquals(0, fileHeader.next)
@@ -86,7 +87,7 @@ class InsertTest {
         CreateTableTest().correctTest()
         SqlPipeline.executeSql(insertData(tableName, dbName))
         val table = TableManager.require(testDb, test_table)
-        val rootPage = PageSupport.getRoot(table.indexList[0] as InnodbIndex)
+        val rootPage = BufferPool.getRoot(table.indexList[0] as InnodbIndex)
         val fileHeader = rootPage.fileHeader
         assertEquals(0, fileHeader.offset)
         assertEquals(0, fileHeader.next)
@@ -149,7 +150,7 @@ class InsertTest {
         CreateTableTest().correctTest()
         SqlPipeline.executeSql(insertDataCount(tableName, dbName, 10))
         val table = TableManager.require(testDb, test_table)
-        val rootPage = PageSupport.getRoot(table.indexList[0] as InnodbIndex)
+        val rootPage = BufferPool.getRoot(table.indexList[0] as InnodbIndex)
         val pageHeader = rootPage.pageHeader
         assertEquals(12, pageHeader.absoluteRecordCount)
         assertEquals(10, pageHeader.recordCount)
@@ -203,7 +204,7 @@ class InsertTest {
         CreateTableTest().correctTest()
         SqlPipeline.executeSql(insertDataCount(tableName, dbName, 15))
         val table = TableManager.require(testDb, test_table)
-        val rootPage = PageSupport.getRoot(table.indexList[0] as InnodbIndex)
+        val rootPage = BufferPool.getRoot(table.indexList[0] as InnodbIndex)
         val pageHeader = rootPage.pageHeader
         assertEquals(17, pageHeader.absoluteRecordCount)
         assertEquals(15, pageHeader.recordCount)

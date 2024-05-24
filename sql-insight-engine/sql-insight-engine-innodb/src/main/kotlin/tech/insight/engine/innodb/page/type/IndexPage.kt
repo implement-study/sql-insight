@@ -11,7 +11,6 @@ import tech.insight.engine.innodb.page.compact.CompactNullList
 import tech.insight.engine.innodb.page.compact.RecordType
 import tech.insight.engine.innodb.page.compact.RowFormatFactory.readRecordHeader
 import tech.insight.engine.innodb.page.compact.Variables
-import tech.insight.engine.innodb.utils.PageSupport
 import tech.insight.engine.innodb.utils.ValueNegotiator
 import java.nio.ByteBuffer
 import java.util.*
@@ -44,19 +43,15 @@ class IndexPage(override val page: InnoDbPage) : PageType {
      * if root page need up grade, page header level is tree height
      */
     override fun rootUpgrade(leftPage: InnoDbPage, rightPage: InnoDbPage) {
-        val firstOffset: Int = PageSupport.allocatePage(page.ext.belongIndex, 2)
-        val secondOffset = firstOffset + ConstantSize.PAGE.size()
         leftPage.apply {
             pageHeader.level = page.pageHeader.level
             pageHeader.indexId = page.pageHeader.indexId
-            fileHeader.offset = firstOffset
-            fileHeader.next = secondOffset
+            fileHeader.next = rightPage.fileHeader.offset
         }
         rightPage.apply {
             pageHeader.level = page.pageHeader.level
             pageHeader.indexId = page.pageHeader.indexId
-            fileHeader.offset = secondOffset
-            fileHeader.pre = firstOffset
+            fileHeader.pre = leftPage.fileHeader.offset
         }
         //  clear root page
         page.apply {

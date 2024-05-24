@@ -18,8 +18,8 @@ package tech.insight.engine.innodb.index
 import tech.insight.core.bean.Table
 import tech.insight.core.logging.Logging
 import tech.insight.engine.innodb.core.InnodbBTree
+import tech.insight.engine.innodb.core.buffer.BufferPool
 import tech.insight.engine.innodb.page.InnoDbPage
-import tech.insight.engine.innodb.utils.PageSupport
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -40,6 +40,6 @@ abstract class InnodbIndex : Logging(), InnodbBTree {
      *
      * @return not null
      */
-    val rootPage: InnoDbPage by lazy { PageSupport.getRoot(this) }
+    val rootPage: InnoDbPage by lazy { BufferPool.getRoot(this) }
 
 }
