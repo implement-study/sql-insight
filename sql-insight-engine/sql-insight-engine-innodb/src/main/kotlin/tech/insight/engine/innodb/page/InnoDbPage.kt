@@ -8,7 +8,6 @@ import tech.insight.core.logging.Logging
 import tech.insight.engine.innodb.core.InnodbSessionContext
 import tech.insight.engine.innodb.core.buffer.BufferPool
 import tech.insight.engine.innodb.index.InnodbIndex
-import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VALUE
 import tech.insight.engine.innodb.page.type.PageType
 import tech.insight.engine.innodb.utils.PageSupport
 import java.nio.ByteBuffer
@@ -257,9 +256,8 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
             val (leftPage, rightPage) = splitToSubPage(pageUserRecord, middleIndex, this)
             return this.pageType().rootUpgrade(leftPage, rightPage)
         }
+        TODO()
         val (firstDataPage, secondDataPage) = splitToSubPage(pageUserRecord, middleIndex, this)
-        //        Console.pageDescription(firstDataPage)
-        //        Console.pageDescription(secondDataPage)
         upgrade(firstDataPage, secondDataPage)
     }
 
@@ -276,15 +274,12 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         parentPage: InnoDbPage
     ): Pair<InnoDbPage, InnoDbPage> {
         val index = parentPage.ext.belongIndex
-        val leftPage = createFromUserRecords(recordList.subList(0, splitIndex), index)
-        val rightPage = createFromUserRecords(recordList.subList(splitIndex, recordList.size), index)
-        leftPage.fileHeader = FileHeader.create().apply {
-            this.next = 0
-            this.pre = 0
-            this.offset = 0
-            this.pageType = FIL_PAGE_INDEX_VALUE
-        }
-
+        val leftRecords = recordList.subList(0, splitIndex)
+        val rightRecords = recordList.subList(splitIndex, recordList.size)
+        val leftPage = BufferPool.allocatePage(index)
+        fillInnodbUserRecords(leftRecords, leftPage)
+        val rightPage = BufferPool.allocatePage(index)
+        fillInnodbUserRecords(rightRecords, rightPage)
         return Pair(leftPage, rightPage)
     }
 
@@ -529,23 +524,16 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
 
     companion object {
 
-        fun createFromUserRecords(recordList: List<InnodbUserRecord>, index: InnodbIndex): InnoDbPage {
-            val dataPage = BufferPool.allocatePage(index)
-            fillInnodbUserRecords(recordList, dataPage)
-            dataPage.fileHeader.pageType = FIL_PAGE_INDEX_VALUE
-            return dataPage
-        }
-
-        private fun fillInnodbUserRecords(recordList: List<InnodbUserRecord>, page: InnoDbPage) {
+        fun fillInnodbUserRecords(recordList: List<InnodbUserRecord>, page: InnoDbPage) {
             page.supremum = Supremum.create(page)
             page.infimum = Infimum.create(page)
             val pageHeader = PageHeader.create().apply {
-                this.slotCount = ((recordList.size + 1) / 8 + 1).toShort()
+                this.slotCount = ((recordList.size / Constant.SLOT_MAX_COUNT) + 2).toShort()
                 this.absoluteRecordCount = (2 + recordList.size).toShort()
                 this.recordCount = recordList.size.toShort()
             }
             page.pageHeader = pageHeader
-            val slots = ShortArray((recordList.size + 1) / Constant.SLOT_MAX_COUNT + 1)
+            val slots = ShortArray(pageHeader.slotCount.toInt())
             slots[0] = ConstantSize.SUPREMUM.offset().toShort()
             slots[slots.size - 1] = ConstantSize.INFIMUM.offset().toShort()
             page.pageDirectory = PageDirectory(slots)
@@ -560,7 +548,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
                 pre = current
                 preOffset = currentOffset.toShort()
                 if ((i + 1) % Constant.SLOT_MAX_COUNT == 0) {
-                    slots[slots.size - 1 - (i + 1) % Constant.SLOT_MAX_COUNT] = currentOffset.toShort()
+                    slots[slots.size - 1 - ((i + 1) / Constant.SLOT_MAX_COUNT)] = currentOffset.toShort()
                 }
             }
             pre.recordHeader.nextRecordOffset = ConstantSize.SUPREMUM.offset().toShort()

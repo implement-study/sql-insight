@@ -76,11 +76,13 @@ class DataPage(override val page: InnoDbPage) : PageType {
             pageHeader.level = 0
             pageHeader.indexId = page.pageHeader.indexId
             fileHeader.next = rightPage.fileHeader.offset
+            fileHeader.pageType = FIL_PAGE_INDEX_VALUE
         }
         rightPage.apply {
             pageHeader.level = 0
             pageHeader.indexId = page.pageHeader.indexId
             fileHeader.pre = leftPage.fileHeader.offset
+            fileHeader.pageType = FIL_PAGE_INDEX_VALUE
         }
         //  transfer to index page and clear root page
         page.apply {

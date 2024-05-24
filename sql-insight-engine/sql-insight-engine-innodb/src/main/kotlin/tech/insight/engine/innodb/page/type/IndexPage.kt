@@ -47,11 +47,13 @@ class IndexPage(override val page: InnoDbPage) : PageType {
             pageHeader.level = page.pageHeader.level
             pageHeader.indexId = page.pageHeader.indexId
             fileHeader.next = rightPage.fileHeader.offset
+            fileHeader.pageType = FIL_PAGE_INODE
         }
         rightPage.apply {
             pageHeader.level = page.pageHeader.level
             pageHeader.indexId = page.pageHeader.indexId
             fileHeader.pre = leftPage.fileHeader.offset
+            fileHeader.pageType = FIL_PAGE_INODE
         }
         //  clear root page
         page.apply {

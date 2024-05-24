@@ -97,5 +97,9 @@ class PageDirectory : PageObject, ByteWrapper {
         return slots.contentHashCode()
     }
 
+    override fun toString(): String {
+        return "PageDirectory(slot size: ${slots.size})"
+    }
+
 
 }

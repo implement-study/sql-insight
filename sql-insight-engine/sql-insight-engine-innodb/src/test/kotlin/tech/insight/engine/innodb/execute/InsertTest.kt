@@ -13,7 +13,6 @@ import tech.insight.engine.innodb.page.InnodbUserRecord
 import tech.insight.engine.innodb.page.Supremum
 import tech.insight.engine.innodb.page.compact.RecordType
 import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VALUE
-import tech.insight.engine.innodb.utils.PageSupport
 import tech.insight.share.data.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
