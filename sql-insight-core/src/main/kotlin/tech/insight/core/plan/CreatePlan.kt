@@ -4,7 +4,6 @@ import tech.insight.core.bean.Database
 import tech.insight.core.bean.Table
 import tech.insight.core.command.CreateDatabase
 import tech.insight.core.command.CreateTable
-import tech.insight.core.engine.storage.StorageEngine
 import tech.insight.core.environment.DefaultProperty
 import tech.insight.core.environment.GlobalContext
 import tech.insight.core.environment.TableLoader

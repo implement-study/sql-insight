@@ -82,14 +82,14 @@ class JsonEngine : Logging(), StorageEngine, MultipleEventListener {
         }
         val jsonFile = File(dbFolder, "${table.name}.json")
         if (!jsonFile.createNewFile()) {
-            warn("create file {} fail", jsonFile.getName())
+            warn("create file ${jsonFile.getName()} fail")
         }
         val initContent: MutableList<String> = ArrayList()
         for (i in 0 until MAX_PRIMARY_KEY) {
             initContent.add("")
         }
         Files.write(jsonFile.toPath(), initContent)
-        info("write {} json to {}", initContent.size, jsonFile.toPath().toAbsolutePath())
+        info("write ${initContent.size} json to ${jsonFile.toPath().toAbsolutePath()}")
         return MessageResult("success create table ${table.name}")
     }
 

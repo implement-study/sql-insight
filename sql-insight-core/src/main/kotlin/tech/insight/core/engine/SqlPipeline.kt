@@ -36,9 +36,9 @@ object SqlPipeline : Logging() {
 
     fun executeSql(sql: String): ResultInterface {
         val startTime = System.currentTimeMillis()
-        info("start analysis sql \n {}  ...", sql)
+        info("start analysis sql \n $sql  ...")
         val command = analyzer.analysisSql(sql)
-        info("start optimize command {}", command)
+        info("start optimize command $command")
         return when (val plan = optimizer.assign(command)) {
             is DDLExecutionPlan -> {
                 doExecutePlan(plan, startTime)
@@ -56,11 +56,8 @@ object SqlPipeline : Logging() {
 
     private fun doExecutePlan(plan: ExecutionPlan, startTime: Long): ResultInterface {
         val resultInterface = executeEngine.executePlan(plan)
-        info(
-            "end sql \n {} ...take time {}ms",
-            plan.originalSql.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0],
-            System.currentTimeMillis() - startTime
-        )
+        val sql = plan.originalSql.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
+        info("end sql \n $sql ...take time ${System.currentTimeMillis() - startTime}ms")
         return resultInterface
     }
 }

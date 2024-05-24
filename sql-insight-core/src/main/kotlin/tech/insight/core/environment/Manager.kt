@@ -141,7 +141,7 @@ object EngineManager : Logging(), StorageEngineManager {
     }
 
     override fun registerEngine(engine: StorageEngine) {
-        info("register engine [{}], class {}", engine.name, engine.javaClass.getName())
+        info("register engine [${engine.name}], class ${engine.javaClass.getName()}")
         if (storageEngineMap.putIfAbsent(engine.name.uppercase(Locale.getDefault()), engine) != null) {
             throw DuplicationEngineNameException("engine ${engine.name} already register ")
         }

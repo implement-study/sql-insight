@@ -66,7 +66,7 @@ object EventPublisher : Logging() {
         listener: EventListener<InsightEvent>
     ) {
         if (!suppress) {
-            info("register listener {} listen {}", listener.javaClass.getName(), type.getName())
+            info("register listener ${listener.javaClass.getName()} listen ${type.getName()}")
         }
         listenerMap.computeIfAbsent(type) { ArrayList() }.add(listener)
     }

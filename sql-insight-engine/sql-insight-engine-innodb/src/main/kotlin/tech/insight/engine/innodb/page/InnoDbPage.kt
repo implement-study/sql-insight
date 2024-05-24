@@ -9,7 +9,6 @@ import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VALUE
 import tech.insight.engine.innodb.page.type.IndexPage.Companion.FIL_PAGE_INODE
 import tech.insight.engine.innodb.page.type.PageType
-import tech.insight.engine.innodb.utils.Console
 import tech.insight.engine.innodb.utils.PageSupport
 import java.io.File
 import java.io.RandomAccessFile
@@ -113,7 +112,6 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     fun insertData(data: InnodbUserRecord) {
         val targetPage = this.locatePage(data)
         targetPage.doInsertData(data)
-        Console.pageCompactDescription(this)
     }
 
     /**
@@ -129,11 +127,11 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     private fun doInsertData(data: InnodbUserRecord) {
         InnodbSessionContext.getInnodbSessionContext().modifyPage(this)
         val (pre, next) = findPreAndNext(data)
-        val prefree = this.freeSpace
+        val preFree = this.freeSpace
         linkedAndAdjust(pre, data, next)
         val after = this.freeSpace
-        val diff = prefree - after
-        debug { " data: ${data.toBytes().size} diff: $diff pre: $prefree after: $after " }
+        val diff = preFree - after
+        debug { " data: ${data.toBytes().size} diff: $diff pre: $preFree after: $after " }
         pageSplitIfNecessary()
     }
 
@@ -209,7 +207,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     /**
      * data page will split when free space less than one in thirty-two page size
      */
-    fun pageSplitIfNecessary() {
+    private fun pageSplitIfNecessary() {
         if (freeSpace.toInt() > ConstantSize.PAGE.size() shr 4) {
             return
         }
@@ -414,7 +412,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         if (groupMax.recordHeader.nOwned <= Constant.SLOT_MAX_COUNT) {
             return refreshRecordHeader(next)
         }
-        debug { "start group split ..." }
+        debug { "occurred group split ..." }
         val nextGroupIndex = pageDirectory.slots.indexOfFirst { it.toInt() == groupMax.absoluteOffset() }
         var preMaxRecord = getUserRecordByOffset(pageDirectory.slots[nextGroupIndex + 1].toInt())
         val leftGroupCount = Constant.SLOT_MAX_COUNT shr 1
@@ -428,22 +426,6 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         this.refreshRecordHeader(groupMax)
         this.pageHeader.slotCount = (this.pageHeader.slotCount.toInt() + 1).toShort()
         pageDirectory.split(nextGroupIndex, preMaxRecord.absoluteOffset().toShort())
-        debug { "end group split ..." }
-    }
-
-    /**
-     * byte array copy from target page
-     */
-    private fun transferFrom(page: InnoDbPage) {
-        val snapshot: InnoDbPage = swap(page.toBytes(), ext.belongIndex)
-        fileHeader = snapshot.fileHeader
-        pageHeader = snapshot.pageHeader
-        infimum = snapshot.infimum
-        supremum = snapshot.supremum
-        userRecords = snapshot.userRecords
-        pageDirectory = snapshot.pageDirectory
-        fileTrailer = snapshot.fileTrailer
-        ext = snapshot.ext
     }
 
     /**

@@ -3,7 +3,6 @@ package tech.insight.core.plan
 import tech.insight.core.command.DDLCommand
 import tech.insight.core.command.DMLCommand
 import tech.insight.core.engine.storage.StorageEngine
-import tech.insight.core.environment.SessionContext
 import tech.insight.core.result.ResultInterface
 
 

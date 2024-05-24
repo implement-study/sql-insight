@@ -53,12 +53,7 @@ object JsonIncrementKeyCounter : Logging(), AutoIncrementKeyCounter {
         }
         val insertValue = autoIncrementValue.source as Int
         if (insertValue > atomicLong.get()) {
-            info(
-                "database[{}],table[{}],auto increment col value set {}",
-                databaseName,
-                row.table.name,
-                insertValue
-            )
+            info("database[$databaseName],table[${row.table.name}],auto increment col value set $insertValue")
             atomicLong.set(insertValue.toLong())
         }
         return false

@@ -35,7 +35,7 @@ object PageSupport : Logging() {
             val currentLength: Long = randomAccessFile.length()
             val expendLength = currentLength + ConstantSize.PAGE.size().toLong() * pageCount
             randomAccessFile.setLength(expendLength)
-            info("expend file [${index.file.name}] to $expendLength")
+            info("expend file [${index.file.name}] to $expendLength (${expendLength shr 14} page)")
             return currentLength.toInt()
         }
     }

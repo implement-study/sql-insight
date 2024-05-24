@@ -17,7 +17,6 @@ package tech.insight.core.bean
 
 import tech.insight.core.bean.value.Value
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * @author gongxuanzhangmelt@gmail.com

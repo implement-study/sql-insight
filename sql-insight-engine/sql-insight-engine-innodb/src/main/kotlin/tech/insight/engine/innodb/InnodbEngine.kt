@@ -46,11 +46,11 @@ class InnodbEngine : Logging(), StorageEngine {
         val clusteredIndex = ClusteredIndex(table)
         val primaryFile: File = clusteredIndex.file
         if (!primaryFile.createNewFile()) {
-            warn("{} already exists , execute create table will overwrite file", primaryFile.getAbsoluteFile())
+            warn("${primaryFile.getAbsoluteFile()} already exists , execute create table will overwrite file")
         }
         val root = InnoDbPage.createRootPage(clusteredIndex)
         Files.write(primaryFile.toPath(), root.toBytes())
-        info("create table {} with innodb,create ibd file", table.name)
+        info("create table ${table.name} with innodb,create ibd file")
         val file = File(table.database.dbFolder, "${table.name}.inf")
         if (file.createNewFile()) {
             return MessageResult("success create table ${table.name}")
