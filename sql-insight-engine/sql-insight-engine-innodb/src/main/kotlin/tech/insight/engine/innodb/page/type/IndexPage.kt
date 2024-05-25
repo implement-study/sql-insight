@@ -102,6 +102,7 @@ class IndexPage(override val page: InnoDbPage) : PageType {
         compact.sourceRow = (compactIndexReadRow(compact, belongIndex))
         compact.belongIndex = belongIndex
         compact.belongPage = this.page
+        compact.setAbsoluteOffset(offsetInPage)
         return compact
     }
 

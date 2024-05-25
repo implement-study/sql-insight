@@ -75,12 +75,11 @@ class ClusteredIndex(table: Table) : InnodbIndex() {
     override fun insert(row: InsertRow) {
         autoIncrementKeyCounter.dealAutoIncrement(row)
         val compact: Compact = RowFormatFactory.compactFromInsertRow(row)
-        val root = rootPage
         if (compact.length() >= Constant.COMPACT_MAX_ROW_LENGTH) {
             throw DataTooLongException("compact row can't greater than " + Constant.COMPACT_MAX_ROW_LENGTH)
         }
         compact.belongIndex = this
-        root.insertData(compact)
+        rootPage.insertData(compact)
     }
 
     override fun findByKey(key: IndexKey): Row {

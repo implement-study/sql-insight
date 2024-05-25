@@ -73,6 +73,7 @@ class InnodbPageTest {
         assertEquals(2, innodbPage.pageDirectory.slots.size)
         assertEquals(innodbPage.supremum.absoluteOffset().toShort(), innodbPage.pageDirectory.slots[0])
         assertEquals(innodbPage.infimum.absoluteOffset().toShort(), innodbPage.pageDirectory.slots[1])
+        val supremumOffset = innodbPage.supremum.absoluteOffset()
 
         for (id in 6..15) {
             recordList.add(mockUserRecord(id, table))
@@ -85,12 +86,11 @@ class InnodbPageTest {
 
         recordList.add(mockUserRecord(16, table))
         innodbPage = InnoDbPage.swap(pageBytes, table.indexList[0] as InnodbIndex)
+
         fillInnodbUserRecords(recordList, innodbPage)
         assertEquals(4, innodbPage.pageDirectory.slots.size)
-        assertEquals(innodbPage.supremum.absoluteOffset().toShort(), innodbPage.pageDirectory.slots[0])
+        assertEquals(supremumOffset, innodbPage.pageDirectory.slots[0].toInt())
         assertEquals(innodbPage.infimum.absoluteOffset().toShort(), innodbPage.pageDirectory.slots[3])
-
-
     }
 
     private fun mockUserRecord(id: Int, table: Table): InnodbUserRecord {
@@ -100,6 +100,7 @@ class InnodbPageTest {
             on { belongTo() } doReturn table
             on { getValueByColumnName("id") } doReturn ValueInt(id)
             on { toBytes() } doReturn ByteArray(16)
+            on { length() } doReturn 16 + id.toString().length
             on { beforeSplitOffset() } doReturn 8
             on { recordHeader } doReturn mock<RecordHeader>()
         }

@@ -304,9 +304,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         if (offsetInPage == ConstantSize.SUPREMUM.offset()) {
             return supremum
         }
-        val wrap = this.pageType().convertUserRecord(offsetInPage)
-        wrap.setAbsoluteOffset(offsetInPage)
-        return wrap
+        return this.pageType().convertUserRecord(offsetInPage)
     }
 
 
@@ -537,13 +535,14 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
             slots[0] = ConstantSize.SUPREMUM.offset().toShort()
             slots[slots.size - 1] = ConstantSize.INFIMUM.offset().toShort()
             page.pageDirectory = PageDirectory(slots)
-            page.userRecords = UserRecords().apply { addRecords(recordList) }
             var pre: InnodbUserRecord = page.infimum
             var preOffset: Short = ConstantSize.INFIMUM.offset().toShort()
             for (i in recordList.indices) {
                 val current: InnodbUserRecord = recordList[i]
                 val currentOffset: Int = pageHeader.lastInsertOffset + current.beforeSplitOffset()
+                current.setAbsoluteOffset(currentOffset)
                 pageHeader.lastInsertOffset = (pageHeader.lastInsertOffset + current.length()).toShort()
+                pageHeader.heapTop = pageHeader.lastInsertOffset
                 pre.recordHeader.nextRecordOffset = (currentOffset - preOffset).toShort()
                 pre = current
                 preOffset = currentOffset.toShort()
@@ -551,7 +550,9 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
                     slots[slots.size - 1 - ((i + 1) / Constant.SLOT_MAX_COUNT)] = currentOffset.toShort()
                 }
             }
-            pre.recordHeader.nextRecordOffset = ConstantSize.SUPREMUM.offset().toShort()
+            pre.recordHeader.nextRecordOffset = (ConstantSize.SUPREMUM.offset() - pre.absoluteOffset()).toShort()
+            page.userRecords = UserRecords().apply { addRecords(recordList) }
+            page.supremum.recordHeader.nOwned = (recordList.size and (Constant.SLOT_MAX_COUNT - 1)) + 1
             page.fileTrailer = FileTrailer.create()
         }
 
