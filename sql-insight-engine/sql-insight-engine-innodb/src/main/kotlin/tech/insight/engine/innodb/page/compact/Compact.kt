@@ -193,7 +193,7 @@ class Compact : InnodbUserRecord {
         belongIndex.columns()
             .filter { it.variable }
             .map { this.getValueByColumnName(it.name) }
-            .forEach { variables.appendVariableLength(it.length.toByte()) }
+            .forEach { variables.appendVariableLength(it.length.toUByte()) }
         return variables
     }
 

@@ -21,29 +21,23 @@ object Console {
     private val BOX_BORDER = "${"-".repeat(9)}+${"-".repeat(64)}+${"-".repeat(63)}+"
     private const val BLANK = " "
     private const val LINE_COUNT = 1 shl 5 // aka 32
-    private val preLine: Array<String>
-    private val byte2String: Array<String>
-    private val titleCache: MutableMap<String, String> = mutableMapOf()
-
-    init {
-        preLine = Array(ConstantSize.PAGE.size() / LINE_COUNT) {
-            val buf = StringBuilder(12)
-            buf.append(java.lang.Long.toHexString(it.toLong() shl 5 and 0xFFFFFFFFL or 0x100000000L))
-            buf.setCharAt(buf.length - 9, '|')
-            buf.append('|')
-            buf.toString()
-        }
-        byte2String = Array(1 shl Byte.SIZE_BITS) {
-            val buf = StringBuilder(3)
-            buf.append(BLANK)
-            if (it <= 0xf) {
-                buf.append('0')
-            }
-            buf.append(Integer.toHexString(it))
-            buf.toString()
-        }
-
+    private val preLine: Array<String> = Array(ConstantSize.PAGE.size() / LINE_COUNT) {
+        val buf = StringBuilder(12)
+        buf.append(java.lang.Long.toHexString(it.toLong() shl 5 and 0xFFFFFFFFL or 0x100000000L))
+        buf.setCharAt(buf.length - 9, '|')
+        buf.append('|')
+        buf.toString()
     }
+    private val byte2String: Array<String> = Array(1 shl Byte.SIZE_BITS) {
+        val buf = StringBuilder(3)
+        buf.append(BLANK)
+        if (it <= 0xf) {
+            buf.append('0')
+        }
+        buf.append(Integer.toHexString(it))
+        buf.toString()
+    }
+    private val titleCache: MutableMap<String, String> = mutableMapOf()
 
 
     fun pageByteDescription(innoDbPage: InnoDbPage) {

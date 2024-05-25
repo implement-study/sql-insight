@@ -164,7 +164,7 @@ class DataPage(override val page: InnoDbPage) : PageType {
                 valueList.add(column.defaultValue)
                 continue
             }
-            val length = if (column.variable) iterator.next().toInt() else column.length
+            val length = if (column.variable) iterator.next().toUByte().toInt() else column.length
             val item = ByteArray(length)
             bodyBuffer[item]
             val value: Value<*> = ValueNegotiator.wrapValue(column, item)

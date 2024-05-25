@@ -16,6 +16,7 @@
 package tech.insight.core.bean
 
 import tech.insight.core.bean.value.Value
+import tech.insight.core.util.truncateStringIfTooLong
 import java.util.*
 
 /**
@@ -64,7 +65,7 @@ class InsertRow(override val rowId: Long) : Row, SQLBean, Iterable<InsertItem> {
     override fun toString(): String {
         val stringJoiner = StringJoiner("|", "|", "|")
         for (value in values) {
-            stringJoiner.add(value.toString())
+            stringJoiner.add(truncateStringIfTooLong(value.toString(), 10))
         }
         return stringJoiner.toString()
     }

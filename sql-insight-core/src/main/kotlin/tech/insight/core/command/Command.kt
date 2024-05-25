@@ -5,6 +5,7 @@ import com.alibaba.druid.sql.ast.SQLStatement
 import com.alibaba.druid.sql.ast.statement.*
 import tech.insight.core.bean.*
 import tech.insight.core.bean.condition.Expression
+import tech.insight.core.util.truncateStringIfTooLong
 
 
 /**
@@ -30,7 +31,7 @@ sealed class DMLCommand(override val sql: String, override val statement: SQLObj
     var isExplain = false
 
     override fun toString(): String {
-        return sql
+        return truncateStringIfTooLong(sql)
     }
 }
 

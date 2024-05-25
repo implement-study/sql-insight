@@ -56,7 +56,7 @@ object RowFormatFactory {
                 if (length > UByte.MAX_VALUE.toInt()) {
                     throw SqlInsightException("length too long ")
                 }
-                compact.variables.appendVariableLength(value.length.toByte())
+                compact.variables.appendVariableLength(value.length.toUByte())
             }
             bodyBuffer.append(value.toBytes())
         }

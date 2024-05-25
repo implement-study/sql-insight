@@ -6,6 +6,7 @@ import tech.insight.core.plan.DDLExecutionPlan
 import tech.insight.core.plan.DMLExecutionPlan
 import tech.insight.core.plan.ExecutionPlan
 import tech.insight.core.result.ResultInterface
+import tech.insight.core.util.truncateStringIfTooLong
 
 
 /**
@@ -36,7 +37,7 @@ object SqlPipeline : Logging() {
 
     fun executeSql(sql: String): ResultInterface {
         val startTime = System.currentTimeMillis()
-        info("start analysis sql \n $sql  ...")
+        info("start analysis sql \n ${truncateStringIfTooLong(sql)}  ...")
         val command = analyzer.analysisSql(sql)
         info("start optimize command $command")
         return when (val plan = optimizer.assign(command)) {

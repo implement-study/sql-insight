@@ -1,5 +1,7 @@
 package tech.insight.share.data
 
+import javax.swing.text.html.HTML.Tag.P
+
 
 /**
  *
@@ -12,11 +14,7 @@ fun dropTable(
     databaseName: String? = null,
     ifExists: Boolean = false
 ): String {
-    val databaseNamePre = if (databaseName == null) {
-        ""
-    } else {
-        "$databaseName."
-    }
+    val databaseNamePre = prepareDbPre(databaseName)
     return """
         DROP TABLE ${if (ifExists) "IF EXISTS" else ""} $databaseNamePre$tableName;
     """.trimIndent()
@@ -28,11 +26,7 @@ fun createTable(
     comment: String = tableName,
     ifNotExists: Boolean = false
 ): String {
-    val databaseNamePre = if (databaseName == null) {
-        ""
-    } else {
-        "$databaseName."
-    }
+    val databaseNamePre = prepareDbPre(databaseName)
     return """
         create table ${if (ifNotExists) "IF NOT EXISTS" else ""} $databaseNamePre$tableName(
         id int primary key auto_increment,
@@ -49,11 +43,7 @@ fun insertOneData(tableName: String, databaseName: String? = null): String {
 }
 
 fun insertData(tableName: String, databaseName: String? = null): String {
-    val databaseNamePre = if (databaseName == null) {
-        ""
-    } else {
-        "$databaseName."
-    }
+    val databaseNamePre = prepareDbPre(databaseName)
     return """
         insert into $databaseNamePre$tableName (id,name) values
         (1,'a'),
@@ -65,16 +55,29 @@ fun insertData(tableName: String, databaseName: String? = null): String {
 }
 
 fun insertDataCount(tableName: String, databaseName: String? = null, count: Int): String {
-    val databaseNamePre = if (databaseName == null) {
-        ""
-    } else {
-        "$databaseName."
-    }
+    val databaseNamePre = prepareDbPre(databaseName)
     val values = (1..count).joinToString(",") { "($it,'a$it')" }
     return """
         insert into $databaseNamePre$tableName (id,name) values 
         $values
     """
-
 }
 
+
+fun insertBigDataCount(tableName: String, databaseName: String? = null, count: Int): String {
+    val databaseNamePre = prepareDbPre(databaseName)
+    val values = (1..count).joinToString(",") { "($it,'${"aaaaaaaa".repeat(30)}')" }
+    return """
+        insert into $databaseNamePre$tableName (id,name) values 
+        $values
+    """
+}
+
+private fun prepareDbPre(databaseName: String?): String {
+    val databaseNamePre = if (databaseName == null) {
+        ""
+    } else {
+        "$databaseName."
+    }
+    return databaseNamePre
+}

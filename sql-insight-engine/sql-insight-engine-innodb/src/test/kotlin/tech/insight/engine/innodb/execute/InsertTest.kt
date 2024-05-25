@@ -271,18 +271,14 @@ class InsertTest {
         SqlPipeline.executeSql(insertDataCount(tableName, dbName, 1000))
         assertNotNull(TableManager.require(testDb, test_table))
     }
-    //
-    //    @Test
-    //    fun twoTimeInsertTest() {
-    //        ExecutePlanTest().createTableTest()
-    //        SqlPipeline.executeSql(largeInsert)
-    //        SqlPipeline.executeSql(largeInsert)
-    //        val table = TableManager.require(testDb, test_table)
-    //        val jsonFile = JsonEngineSupport.getJsonFile(table)
-    //        jsonFile.useLines {
-    //            assertEquals(2000, it.filter { line -> line.isNotEmpty() }.count())
-    //        }
-    //    }
+
+    @Test
+    fun vastInsertTest() {
+        CreateTableTest().correctTest()
+        SqlPipeline.executeSql(insertBigDataCount(tableName, dbName, 1000))
+        assertNotNull(TableManager.require(testDb, test_table))
+    }
+
 
 }
 

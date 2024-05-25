@@ -16,6 +16,7 @@
 package tech.insight.core.bean
 
 import tech.insight.core.bean.value.Value
+import tech.insight.core.util.truncateStringIfTooLong
 import java.util.*
 
 /**
@@ -45,7 +46,7 @@ class ReadRow(valueList: List<Value<*>>, override val rowId: Long) : Row {
     override fun toString(): String {
         val stringJoiner = StringJoiner("|", "|", "|")
         for (value in valueList) {
-            stringJoiner.add(value.toString())
+            stringJoiner.add(truncateStringIfTooLong(value.toString(), 10))
         }
         return stringJoiner.toString()
     }

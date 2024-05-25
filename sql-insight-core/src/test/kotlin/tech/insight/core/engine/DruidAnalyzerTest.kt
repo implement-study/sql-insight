@@ -2,13 +2,13 @@ package tech.insight.core.engine
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import tech.insight.share.data.*
 import tech.insight.core.command.CreateDatabase
 import tech.insight.core.command.CreateTable
 import tech.insight.core.command.DropDatabase
 import tech.insight.core.command.DropTable
 import tech.insight.core.environment.DefaultProperty
 import tech.insight.core.environment.GlobalContext
+import tech.insight.share.data.*
 import java.io.File
 
 

@@ -38,14 +38,14 @@ class Variables : ByteWrapper, PageObject, Iterable<Byte> {
      * append variable length
      * @param length column value length
      */
-    fun appendVariableLength(length: Byte) {
+    fun appendVariableLength(length: UByte) {
         if (varBytes.isEmpty()) {
-            varBytes = byteArrayOf(length)
+            varBytes = byteArrayOf(length.toByte())
             return
         }
         val newBytes = ByteArray(varBytes.size + 1)
         System.arraycopy(varBytes, 0, newBytes, 1, varBytes.size)
-        newBytes[0] = length
+        newBytes[0] = length.toByte()
         varBytes = newBytes
     }
 
@@ -55,7 +55,7 @@ class Variables : ByteWrapper, PageObject, Iterable<Byte> {
     fun variableLength(): Int {
         var sumLength = 0
         for (varByte in varBytes) {
-            sumLength += varByte.toInt()
+            sumLength += varByte.toUByte().toInt()
         }
         return sumLength
     }
