@@ -10,6 +10,7 @@ import tech.insight.engine.innodb.page.InnodbUserRecord
 class UndoPage(override val page: InnoDbPage) : PageType {
 
     override val value: Short = FIL_PAGE_TYPE_UNDO_LOG
+
     override fun locatePage(userRecord: InnodbUserRecord): InnoDbPage {
         TODO("Not yet implemented")
     }
@@ -23,6 +24,10 @@ class UndoPage(override val page: InnoDbPage) : PageType {
     }
 
     override fun rootUpgrade(leftPage: InnoDbPage, rightPage: InnoDbPage) {
+        TODO("Not yet implemented")
+    }
+
+    override fun upgrade(otherPage: InnoDbPage) {
         TODO("Not yet implemented")
     }
 

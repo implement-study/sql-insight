@@ -60,6 +60,12 @@ interface PageType : Comparator<InnodbUserRecord> {
     fun rootUpgrade(leftPage: InnoDbPage, rightPage: InnoDbPage)
 
 
+    /**
+     * if page not is root page, create a page and insert row into parent page
+     */
+    fun upgrade(otherPage: InnoDbPage)
+
+
     companion object {
         fun valueOf(value: Int, innoDbPage: InnoDbPage): PageType {
             return when (value.toShort()) {

@@ -100,6 +100,19 @@ class DataPage(override val page: InnoDbPage) : PageType {
         }
     }
 
+    override fun upgrade(otherPage: InnoDbPage) {
+        this.page.apply {
+            fileHeader.next = otherPage.fileHeader.offset
+        }
+        otherPage.apply {
+            otherPage.ext.parent = page.ext.parent
+            pageHeader.indexId = page.pageHeader.indexId
+            fileHeader.pre = page.fileHeader.offset
+            fileHeader.pageType = FIL_PAGE_INDEX_VALUE
+        }
+        page.ext.parent!!.insertData(otherPage.pageIndex())
+    }
+
     override fun compare(o1: InnodbUserRecord, o2: InnodbUserRecord): Int {
         return RowComparator.primaryKeyComparator().compare(o1, o2)
     }

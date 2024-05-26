@@ -275,7 +275,7 @@ class InsertTest {
     @Test
     fun vastInsertTest() {
         CreateTableTest().correctTest()
-        SqlPipeline.executeSql(insertBigDataCount(tableName, dbName, 1000))
+        SqlPipeline.executeSql(insertBigDataCount(tableName, dbName, 30000))
         assertNotNull(TableManager.require(testDb, test_table))
     }
 

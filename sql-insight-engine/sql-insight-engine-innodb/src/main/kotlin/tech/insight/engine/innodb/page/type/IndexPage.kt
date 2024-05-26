@@ -68,6 +68,10 @@ class IndexPage(override val page: InnoDbPage) : PageType {
         }
     }
 
+    override fun upgrade(otherPage: InnoDbPage) {
+        TODO("Not yet implemented")
+    }
+
 
     override fun convertUserRecord(offsetInPage: Int): InnodbUserRecord {
         if (ConstantSize.INFIMUM.offset() == offsetInPage) {
@@ -178,7 +182,9 @@ class IndexPage(override val page: InnoDbPage) : PageType {
         }
         val targetIndex = preRecord
         val offset = ByteBuffer.wrap((targetIndex as Compact).point()).getInt()
-        return findPageByOffset(offset, page.ext.belongIndex).locatePage(userRecord)
+        val downPage = findPageByOffset(offset, page.ext.belongIndex)
+        downPage.ext.parent = page
+        return downPage.locatePage(userRecord)
     }
 
     private fun compactIndexReadRow(compact: Compact, index: InnodbIndex): ReadRow {

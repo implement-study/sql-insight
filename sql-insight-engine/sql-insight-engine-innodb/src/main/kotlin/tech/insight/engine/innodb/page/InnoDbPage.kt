@@ -9,7 +9,6 @@ import tech.insight.engine.innodb.core.InnodbSessionContext
 import tech.insight.engine.innodb.core.buffer.BufferPool
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.type.PageType
-import tech.insight.engine.innodb.utils.PageSupport
 import java.nio.ByteBuffer
 import java.util.*
 
@@ -251,14 +250,15 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
             remainLength <= half
         }
         if (ext.parent == null) {
-            PageSupport.flushPage(this)
-            //  is root page
             val (leftPage, rightPage) = splitToSubPage(pageUserRecord, middleIndex, this)
             return this.pageType().rootUpgrade(leftPage, rightPage)
         }
-        TODO()
-        val (firstDataPage, secondDataPage) = splitToSubPage(pageUserRecord, middleIndex, this)
-        upgrade(firstDataPage, secondDataPage)
+        val remainRecords = pageUserRecord.subList(0, middleIndex)
+        fillInnodbUserRecords(remainRecords, this)
+        val otherPage = BufferPool.allocatePage(this.ext.belongIndex)
+        val otherRecords = pageUserRecord.subList(middleIndex, pageUserRecord.size)
+        fillInnodbUserRecords(otherRecords, otherPage)
+        return this.pageType().upgrade(otherPage)
     }
 
 

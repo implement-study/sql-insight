@@ -1,13 +1,11 @@
 package tech.insight.share.data
 
-import javax.swing.text.html.HTML.Tag.P
 
 
 /**
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-
 
 fun dropTable(
     tableName: String,

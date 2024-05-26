@@ -10,34 +10,43 @@ import tech.insight.core.environment.DefaultProperty
 import tech.insight.core.environment.GlobalContext
 import tech.insight.share.data.*
 import java.io.File
+import kotlin.test.assertEquals
 
-
-class DruidAnalyzerTest {
+/**
+ * Make sure the analyzer is correct
+ * @author gongxuanzhangmelt@gmail.com
+ */
+class AnalyzerTest {
 
     @BeforeEach
     fun prepare() {
-        prepareDatabase()
+        SqlPipeline.executeSql(createDatabase(testDb))
     }
 
     @Test
     fun createDatabaseTest() {
-        val command = DruidAnalyzer.analysisSql(createDatabase)
-        assert(command is CreateDatabase)
-        check(command is CreateDatabase)
-        assert(command.ifNotExists)
-        assert(command.dbName == testDb)
+
+        DruidAnalyzer.analysisSql(createDatabase(testDb, true)).apply {
+            require(this is CreateDatabase)
+            assert(ifNotExists)
+            assertEquals(dbName, testDb)
+        }
+        DruidAnalyzer.analysisSql(createDatabase(testDb)).apply {
+            require(this is CreateDatabase)
+            assert(!ifNotExists)
+            assertEquals(dbName, testDb)
+        }
     }
 
 
     @Test
     fun createTableTest() {
-        var createTable = DruidAnalyzer.analysisSql(createTableDine) as CreateTable
-        assert(!createTable.ifNotExists)
-        assert(DruidAnalyzer.analysisSql(createTableDine) is CreateTable)
-        createTable = DruidAnalyzer.analysisSql(createTableIne) as CreateTable
-        assert(createTable.ifNotExists)
-        assert(createTable.table.databaseName == testDb)
-        assert(createTable.table.name == test_table)
+        DruidAnalyzer.analysisSql(createTable(test_table,testDb)).apply {
+            require(this is CreateTable)
+            assert(!this.ifNotExists)
+            assertEquals(table.databaseName, testDb)
+            assertEquals(table.name, test_table)
+        }
     }
 
     @Test
