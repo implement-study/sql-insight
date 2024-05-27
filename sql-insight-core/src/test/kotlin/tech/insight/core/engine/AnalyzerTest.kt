@@ -41,7 +41,7 @@ class AnalyzerTest {
 
     @Test
     fun createTableTest() {
-        DruidAnalyzer.analysisSql(createTable(test_table,testDb)).apply {
+        DruidAnalyzer.analysisSql(createTable(test_table, testDb)).apply {
             require(this is CreateTable)
             assert(!this.ifNotExists)
             assertEquals(table.databaseName, testDb)

@@ -13,8 +13,8 @@ import tech.insight.core.exception.DuplicationEngineNameException
 import tech.insight.core.exception.EngineNotFoundException
 import tech.insight.core.exception.TableNotExistsException
 import tech.insight.core.extension.GuavaTable
-import tech.insight.core.extension.timeReport
 import tech.insight.core.logging.Logging
+import tech.insight.core.logging.TimeReport.timeReport
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 

@@ -15,8 +15,8 @@
  */
 package tech.insight.core.environment
 
-import tech.insight.core.extension.timeReport
 import tech.insight.core.logging.Logging
+import tech.insight.core.logging.TimeReport.timeReport
 import java.io.FileNotFoundException
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap

@@ -200,7 +200,7 @@ class InsertFiller : ExplainableFiller<InsertCommand>() {
         x.columns.forEach { it.accept(columnVisitor) }
         val valueVisitor = ValuesClauseVisitor()
         x.valuesList.forEach { it.accept(valueVisitor) }
-        return true
+        return false
     }
 
 

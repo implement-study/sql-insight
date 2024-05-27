@@ -39,6 +39,7 @@ abstract class Logging {
 
     companion object {
         const val SECOND = "second"
+        const val THIRD = "third"
     }
 
 

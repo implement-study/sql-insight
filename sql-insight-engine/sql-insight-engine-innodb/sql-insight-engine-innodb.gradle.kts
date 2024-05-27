@@ -7,7 +7,6 @@ repositories {
     mavenCentral()
 }
 
-
 dependencies {
     implementation(project(":sql-insight-core"))
     testImplementation(project(":share:share-data"))

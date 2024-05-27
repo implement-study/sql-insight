@@ -19,7 +19,13 @@
     </appender>
 
 
-    <logger name="tech.insight" level="DEBUG"/>
+    <logger name="tech.insight.core" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="tech.insight" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
 
     <root level="info">
         <appender-ref ref="STDOUT"/>

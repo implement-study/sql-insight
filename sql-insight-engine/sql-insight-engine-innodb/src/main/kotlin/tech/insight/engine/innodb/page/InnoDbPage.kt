@@ -25,38 +25,66 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     /**
      * 38 bytes
      */
-    lateinit var fileHeader: FileHeader
+    var fileHeader: FileHeader = FileHeader.create(this)
+        set(value) {
+            field = value
+            ext.change = true
+        }
 
     /**
      * 56 bytes
      */
-    lateinit var pageHeader: PageHeader
+    var pageHeader: PageHeader = PageHeader.create(this)
+        set(value) {
+            field = value
+            ext.change = true
+        }
 
     /**
      * 13 bytes
      */
-    lateinit var infimum: Infimum
+    var infimum: Infimum = Infimum.create(this)
+        set(value) {
+            field = value
+            ext.change = true
+        }
 
     /**
      * 13 bytes
      */
-    lateinit var supremum: Supremum
+    var supremum: Supremum = Supremum.create(this)
+        set(value) {
+            field = value
+            ext.change = true
+        }
 
     /**
      * uncertain bytes.
      * user records bytes + freeSpace = page size - other fixed size
      */
-    lateinit var userRecords: UserRecords
+    var userRecords: UserRecords = UserRecords.create(this)
+        set(value) {
+            field = value
+            ext.change = true
+        }
 
     /**
      * uncertain bytes.
      */
-    lateinit var pageDirectory: PageDirectory
+    var pageDirectory: PageDirectory = PageDirectory.create(this)
+        set(value) {
+            field = value
+            ext.change = true
+        }
 
     /**
      * 8 bytes
      */
-    lateinit var fileTrailer: FileTrailer
+    var fileTrailer: FileTrailer = FileTrailer.create(this)
+        set(value) {
+            field = value
+            ext.change = true
+        }
 
     /**
      * some extra info for page
@@ -69,16 +97,19 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     }
 
     override fun toBytes(): ByteArray {
-        val buffer: DynamicByteBuffer = DynamicByteBuffer.allocate()
-        buffer.append(fileHeader.toBytes())
-        buffer.append(pageHeader.toBytes())
-        buffer.append(infimum.toBytes())
-        buffer.append(supremum.toBytes())
-        buffer.append(userRecords.toBytes())
-        buffer.append(ByteArray(freeSpace.toInt()))
-        buffer.append(pageDirectory.toBytes())
-        buffer.append(fileTrailer.toBytes())
-        return buffer.toBytes()
+        if (ext.change) {
+            val buffer: DynamicByteBuffer = DynamicByteBuffer.allocate()
+            buffer.append(fileHeader.toBytes())
+            buffer.append(pageHeader.toBytes())
+            buffer.append(infimum.toBytes())
+            buffer.append(supremum.toBytes())
+            buffer.append(userRecords.toBytes())
+            buffer.append(ByteArray(freeSpace.toInt()))
+            buffer.append(pageDirectory.toBytes())
+            buffer.append(fileTrailer.toBytes())
+            ext.bytes = buffer.toBytes()
+        }
+        return ext.bytes
     }
 
     fun pageType(): PageType {
@@ -441,13 +472,18 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
 
     }
 
-    class PageExt {
+    inner class PageExt {
 
         lateinit var belongIndex: InnodbIndex
 
         var parent: InnoDbPage? = null
 
         var pageType: PageType? = null
+
+        var change: Boolean = true
+
+        var bytes: ByteArray = ByteArray(0)
+
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -504,15 +540,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
             page.fileTrailer = FileTrailer.create(page)
         }
 
-        fun createRootPage(index: InnodbIndex) = InnoDbPage(index).apply {
-            this.fileHeader = FileHeader.create(this)
-            this.pageHeader = PageHeader.create(this)
-            this.infimum = Infimum.create(this)
-            this.supremum = Supremum.create(this)
-            this.userRecords = UserRecords.create(this)
-            this.pageDirectory = PageDirectory.create(this)
-            this.fileTrailer = FileTrailer.create(this)
-        }
+        fun createRootPage(index: InnodbIndex) = InnoDbPage(index)
 
         /**
          * swap byte array to page

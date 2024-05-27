@@ -26,5 +26,9 @@ class InsertPlan(private val command: InsertCommand) : DMLExecutionPlan(command)
         return MessageResult("insert ${command.insertRows.size} rows")
     }
 
+    override fun toString(): String {
+        return "Insert[${command.insertRows.size} rows]"
+    }
+
 }
 

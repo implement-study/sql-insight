@@ -2,9 +2,9 @@ package tech.insight.core.engine
 
 import tech.insight.core.environment.GlobalContext
 import tech.insight.core.logging.Logging
+import tech.insight.core.logging.TimeReport.timeReport
 import tech.insight.core.plan.DDLExecutionPlan
 import tech.insight.core.plan.DMLExecutionPlan
-import tech.insight.core.plan.ExecutionPlan
 import tech.insight.core.result.ResultInterface
 import tech.insight.core.util.truncateStringIfTooLong
 
@@ -36,31 +36,29 @@ object SqlPipeline : Logging() {
 
 
     fun executeSql(sql: String): ResultInterface {
-        val startTime = System.currentTimeMillis()
-        info("start analysis sql \n ${truncateStringIfTooLong(sql)}  ...")
-        val command = analyzer.analysisSql(sql)
-        info("start optimize command $command")
-        return when (val plan = optimizer.assign(command)) {
-            is DDLExecutionPlan -> {
-                doExecutePlan(plan, startTime)
-            }
-
-            is DMLExecutionPlan -> {
-                plan.engine.initSessionContext().use {
-                    doExecutePlan(plan, startTime)
+        val command = timeReport("analysis sql ${truncateStringIfTooLong(sql)}") {
+            analyzer.analysisSql(sql)
+        }
+        val plan = timeReport("optimize command $command") {
+            optimizer.assign(command)
+        }
+        return timeReport("execute plan $plan") {
+            when (plan) {
+                is DDLExecutionPlan -> {
+                    executeEngine.executePlan(plan)
                 }
-            }
 
-            else -> throw IllegalArgumentException("plan type error")
+                is DMLExecutionPlan -> {
+                    plan.engine.initSessionContext().use {
+                        executeEngine.executePlan(plan)
+                    }
+                }
+
+                else -> throw IllegalArgumentException("plan type error")
+            }
         }
     }
 
-    private fun doExecutePlan(plan: ExecutionPlan, startTime: Long): ResultInterface {
-        val resultInterface = executeEngine.executePlan(plan)
-        val sql = plan.originalSql.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
-        info("end sql \n $sql ...take time ${System.currentTimeMillis() - startTime}ms")
-        return resultInterface
-    }
 }
 
 

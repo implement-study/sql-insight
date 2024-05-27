@@ -16,9 +16,14 @@ class SqlInsightMethodConverter : ClassicConverter() {
         if (cda.isEmpty()) {
             return CoreConstants.NA
         }
-        if (event.argumentArray.isNotEmpty() && event.argumentArray[0] == Logging.SECOND) {
-            return cda[1].methodName
+        if (event.argumentArray.isEmpty()) {
+            return cda[0].methodName
         }
-        return cda[0].methodName
+        return when (event.argumentArray[0]) {
+            Logging.SECOND -> cda[1].methodName
+            Logging.THIRD -> cda[2].methodName
+            else -> cda[0].methodName
+        }
+
     }
 }

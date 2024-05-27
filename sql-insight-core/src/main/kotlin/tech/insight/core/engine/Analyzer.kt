@@ -6,7 +6,6 @@ import com.alibaba.druid.sql.visitor.SQLASTVisitor
 import tech.insight.core.command.*
 import tech.insight.core.engine.filler.DispatcherFiller
 
-
 /**
  * analysis sql to command
  *
@@ -31,7 +30,9 @@ fun interface Analyzer {
 object DruidAnalyzer : Analyzer {
 
     override fun analysisSql(sql: String): Command {
-        return CommandTypeVisitor(sql).command.apply { DispatcherFiller.fill(this) }
+        return CommandTypeVisitor(sql).command.apply {
+            DispatcherFiller.fill(this)
+        }
     }
 }
 

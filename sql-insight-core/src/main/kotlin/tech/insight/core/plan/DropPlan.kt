@@ -23,6 +23,7 @@ import kotlin.io.path.deleteRecursively
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 class DropDatabasePlan(private val command: DropDatabase) : DDLExecutionPlan(command) {
+
     override val originalSql: String
         get() = command.sql
 
@@ -42,6 +43,12 @@ class DropDatabasePlan(private val command: DropDatabase) : DDLExecutionPlan(com
             throw DatabaseNotExistsException(this.command.databaseName)
         }
         return MessageResult("skip drop ${command.databaseName} because database not exists")
+    }
+
+
+    override fun toString(): String {
+        return "DropDatabase[${command.databaseName}]"
+
     }
 
 }
@@ -72,7 +79,10 @@ class DropTablePlan(private val command: DropTable) : DDLExecutionPlan(command) 
             }
         }
         return MessageResult("finish drop ${dropTableNames.size} tables $dropTableNames,skip ${skipTableNames.size} tables $skipTableNames")
+    }
 
+    override fun toString(): String {
+        return "DropTable[${command.dropTables.joinToString { it.name }}]"
     }
 
 }
