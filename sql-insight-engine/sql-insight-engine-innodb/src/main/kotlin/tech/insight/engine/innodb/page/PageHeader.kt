@@ -26,7 +26,7 @@ import java.nio.ByteBuffer
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class PageHeader private constructor() : PageObject, ByteWrapper {
+class PageHeader private constructor(override val belongPage: InnoDbPage) : PageObject, ByteWrapper {
     /**
      * page slot count
      */
@@ -195,7 +195,7 @@ class PageHeader private constructor() : PageObject, ByteWrapper {
         /**
          * create a empty page header
          */
-        fun create() = PageHeader().apply {
+        fun create(belongPage: InnoDbPage) = PageHeader(belongPage).apply {
             this.slotCount = 2.toShort()
             this.heapTop = EMPTY_PAGE_HEAP_TOP
             this.absoluteRecordCount = 2.toShort()
@@ -214,7 +214,7 @@ class PageHeader private constructor() : PageObject, ByteWrapper {
             this.segTop = 0L
         }
 
-        fun wrap(pageHeaderArr: ByteArray) = PageHeader().apply {
+        fun wrap(pageHeaderArr: ByteArray, belongPage: InnoDbPage) = PageHeader(belongPage).apply {
             ConstantSize.PAGE_HEADER.checkSize(pageHeaderArr)
             val buffer = ByteBuffer.wrap(pageHeaderArr)
             this.slotCount = buffer.getShort()

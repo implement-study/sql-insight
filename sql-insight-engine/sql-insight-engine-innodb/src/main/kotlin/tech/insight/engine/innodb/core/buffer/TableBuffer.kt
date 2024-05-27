@@ -37,7 +37,7 @@ class TableBuffer(val table: Table) : PageBuffer, PageAllocator {
             randomAccessFile.setLength(expendLength)
             info("expend file [${index.file.name}] to $expendLength (${expendLength shr 14} page)")
             val allocatePage = InnoDbPage(index)
-            allocatePage.fileHeader = FileHeader.create()
+            allocatePage.fileHeader = FileHeader.create(allocatePage)
             allocatePage.fileHeader.offset = currentLength.toInt()
             pageBuffers[currentLength.toInt()] = allocatePage
             return allocatePage

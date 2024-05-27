@@ -15,16 +15,19 @@
  */
 package tech.insight.engine.innodb.page
 
+import tech.insight.engine.innodb.core.Lengthable
+
 
 /**
  * innodb engine page object
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-interface PageObject {
+interface PageObject : Lengthable {
+
     /**
-     * the component length
+     *  page that the object belongs to
      */
-    fun length(): Int
+    val belongPage: InnoDbPage
 
 }

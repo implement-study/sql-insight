@@ -57,12 +57,12 @@ class IndexPage(override val page: InnoDbPage) : PageType {
         }
         //  clear root page
         page.apply {
-            pageHeader = PageHeader.create()
+            pageHeader = PageHeader.create(this)
             pageHeader.level++
-            pageDirectory = PageDirectory()
-            userRecords = UserRecords()
-            infimum = Infimum.create(page)
-            supremum = Supremum.create(page)
+            pageDirectory = PageDirectory.create(this)
+            userRecords = UserRecords.create(this)
+            infimum = Infimum.create(this)
+            supremum = Supremum.create(this)
             insertData(leftPage.pageIndex())
             insertData(rightPage.pageIndex())
         }
@@ -134,7 +134,7 @@ class IndexPage(override val page: InnoDbPage) : PageType {
         }
         val varStart = nullBytesEnd - compact.nullList.length() - variableCount
         val variableArray = Arrays.copyOfRange(pageArr, varStart, nullBytesEnd - compact.nullList.length())
-        compact.variables = Variables(variableArray)
+        compact.variables = Variables.wrap(variableArray)
     }
 
 

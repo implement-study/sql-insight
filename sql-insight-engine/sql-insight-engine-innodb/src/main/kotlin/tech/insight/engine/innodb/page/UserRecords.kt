@@ -21,7 +21,9 @@ import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class UserRecords(var body: ByteArray = ByteArray(0)) : ByteWrapper, PageObject {
+class UserRecords private constructor(var body: ByteArray, override val belongPage: InnoDbPage) : ByteWrapper,
+    PageObject {
+
 
     override fun toBytes(): ByteArray {
         return body
@@ -56,6 +58,14 @@ class UserRecords(var body: ByteArray = ByteArray(0)) : ByteWrapper, PageObject 
 
     override fun toString(): String {
         return "UserRecords(length=${body.size})"
+    }
+
+    companion object UserRecordsFactory {
+
+        fun create(belongPage: InnoDbPage) = UserRecords(ByteArray(0), belongPage)
+
+        fun wrap(body: ByteArray, belongPage: InnoDbPage) = UserRecords(body, belongPage)
+
     }
 
 

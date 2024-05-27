@@ -17,8 +17,8 @@ package tech.insight.engine.innodb.page.compact
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import tech.insight.core.bean.Table
+import tech.insight.engine.innodb.core.Lengthable
 import tech.insight.engine.innodb.index.InnodbIndex
-import tech.insight.engine.innodb.page.PageObject
 
 /**
  * contains byte array.
@@ -31,7 +31,7 @@ class CompactNullList
  * the byte array is origin byte in page.
  * begin with right.
  * nullList length maybe 0
- */ private constructor(private var nullList: ByteArray) : ByteWrapper, PageObject {
+ */ private constructor(private var nullList: ByteArray) : ByteWrapper, Lengthable {
 
     /**
      * @param index start 0
@@ -85,9 +85,12 @@ class CompactNullList
         return nullList.contentHashCode()
     }
 
-    companion object {
+    companion object CompactNullListFactory {
 
-        fun allocate(table: Table) = CompactNullList(ByteArray(calcNullListLength(table.ext.nullableColCount)))
+        fun allocate(table: Table): CompactNullList {
+            val bytes = ByteArray(calcNullListLength(table.ext.nullableColCount))
+            return CompactNullList(bytes)
+        }
 
         fun allocate(index: InnodbIndex): CompactNullList {
             val nullableCount = index.columns().filter { !it.notNull }.size

@@ -25,7 +25,7 @@ import java.nio.ByteBuffer
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class FileTrailer private constructor() : ByteWrapper, PageObject {
+class FileTrailer private constructor(override val belongPage: InnoDbPage) : ByteWrapper, PageObject {
     /**
      * use it with [FileHeader.checkSum]
      */
@@ -64,12 +64,12 @@ class FileTrailer private constructor() : ByteWrapper, PageObject {
     }
 
 
-    companion object {
-        fun create() = FileTrailer()
+    companion object FileTrailerFactory {
+        fun create(belongPage: InnoDbPage) = FileTrailer(belongPage)
 
-        fun wrap(bytes: ByteArray) = run {
+        fun wrap(bytes: ByteArray, belongPage: InnoDbPage) = run {
             ConstantSize.FILE_TRAILER.checkSize(bytes)
-            FileTrailer()
+            FileTrailer(belongPage)
         }.apply {
             val buffer: DynamicByteBuffer = DynamicByteBuffer.wrap(bytes)
             this.checkSum = buffer.int

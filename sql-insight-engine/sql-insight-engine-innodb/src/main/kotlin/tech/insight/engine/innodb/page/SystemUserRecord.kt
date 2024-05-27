@@ -47,7 +47,7 @@ sealed interface SystemUserRecord : InnodbUserRecord {
     }
 }
 
-class Supremum private constructor(private val inPage: InnoDbPage) : SystemUserRecord {
+class Supremum private constructor(override val belongPage: InnoDbPage) : SystemUserRecord {
 
     /**
      * 5 bytes
@@ -81,16 +81,13 @@ class Supremum private constructor(private val inPage: InnoDbPage) : SystemUserR
     }
 
     override fun belongIndex(): InnodbIndex {
-        return inPage.ext.belongIndex
+        return belongPage.ext.belongIndex
     }
 
     override fun indexNode(): InnodbUserRecord {
         throw UnsupportedOperationException("this is supremum!")
     }
 
-    override fun belongPage(): InnoDbPage {
-        return inPage
-    }
 
     override fun length(): Int {
         return ConstantSize.SUPREMUM.size()
@@ -150,7 +147,7 @@ class Supremum private constructor(private val inPage: InnoDbPage) : SystemUserR
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class Infimum private constructor(private val belongToPage: InnoDbPage) : SystemUserRecord {
+class Infimum private constructor(override val belongPage: InnoDbPage) : SystemUserRecord {
 
     /**
      * 5 bytes.
@@ -172,15 +169,11 @@ class Infimum private constructor(private val belongToPage: InnoDbPage) : System
     }
 
     override fun belongIndex(): InnodbIndex {
-        return belongToPage.ext.belongIndex
+        return belongPage.ext.belongIndex
     }
 
     override fun indexNode(): InnodbUserRecord {
         throw UnsupportedOperationException("this is infimum!")
-    }
-
-    override fun belongPage(): InnoDbPage {
-        return belongToPage
     }
 
     override fun nextRecordOffset(): Int {
@@ -242,7 +235,6 @@ class Infimum private constructor(private val belongToPage: InnoDbPage) : System
                 val buffer: DynamicByteBuffer = DynamicByteBuffer.wrap(bytes)
                 val headBuffer: ByteArray = buffer.getLength(ConstantSize.RECORD_HEADER.size())
                 this.recordHeader = RecordHeader.wrap(headBuffer)
-                this.belongPage()
             }
 
     }

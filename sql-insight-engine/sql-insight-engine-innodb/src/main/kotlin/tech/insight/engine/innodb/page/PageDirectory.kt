@@ -29,20 +29,9 @@ import java.nio.ByteBuffer
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class PageDirectory : PageObject, ByteWrapper {
+class PageDirectory private constructor(override val belongPage: InnoDbPage) : PageObject, ByteWrapper {
 
-    var slots: ShortArray
-
-    /**
-     * non params constructor create a contains infimum and supremum offset slot.
-     */
-    constructor() {
-        slots = shortArrayOf(ConstantSize.SUPREMUM.offset().toShort(), ConstantSize.INFIMUM.offset().toShort())
-    }
-
-    constructor(slots: ShortArray) {
-        this.slots = slots
-    }
+    lateinit var slots: ShortArray
 
     /**
      * page directory split.
@@ -101,5 +90,24 @@ class PageDirectory : PageObject, ByteWrapper {
         return "PageDirectory(slot size: ${slots.size})"
     }
 
+
+    companion object PageDirectoryFactory {
+
+        /**
+         * non params constructor create a contains infimum and supremum offset slot.
+         */
+        fun create(belongPage: InnoDbPage) = PageDirectory(belongPage).apply {
+            slots = shortArrayOf(ConstantSize.SUPREMUM.offset().toShort(), ConstantSize.INFIMUM.offset().toShort())
+        }
+
+        fun wrap(slots: ShortArray, belongPage: InnoDbPage) = PageDirectory(belongPage).apply {
+            require(slots.size >= 2) { "slots size must be greater than 2" }
+            require(slots[0] == ConstantSize.SUPREMUM.offset().toShort()) { "first slot must be supremum" }
+            require(slots[slots.size - 1] == ConstantSize.INFIMUM.offset().toShort()) { "last slot must be infimum" }
+            this.slots = slots
+        }
+
+
+    }
 
 }

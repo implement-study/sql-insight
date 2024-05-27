@@ -87,11 +87,11 @@ class DataPage(override val page: InnoDbPage) : PageType {
         }
         //  transfer to index page and clear root page
         page.apply {
-            pageHeader = PageHeader.create()
+            pageHeader = PageHeader.create(this)
             pageHeader.level++
-            pageDirectory = PageDirectory()
+            pageDirectory = PageDirectory.create(this)
             fileHeader.pageType = FIL_PAGE_INODE
-            userRecords = UserRecords()
+            userRecords = UserRecords.create(this)
             infimum = Infimum.create(this)
             supremum = Supremum.create(this)
             PageSupport.flushPage(this)
@@ -135,7 +135,7 @@ class DataPage(override val page: InnoDbPage) : PageType {
         val variableCount = variableColumnCount(table, compactNullList)
         val varStart = nullStart - variableCount
         val variableArray = Arrays.copyOfRange(pageArr, varStart, nullStart)
-        compact.variables = (Variables(variableArray))
+        compact.variables = Variables.wrap(variableArray)
     }
 
 

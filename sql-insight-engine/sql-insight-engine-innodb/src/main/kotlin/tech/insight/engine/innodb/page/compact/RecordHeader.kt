@@ -3,8 +3,8 @@ package tech.insight.engine.innodb.page.compact
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import tech.insight.core.extension.setBit0
 import tech.insight.core.extension.setBit1
+import tech.insight.engine.innodb.core.Lengthable
 import tech.insight.engine.innodb.page.ConstantSize
-import tech.insight.engine.innodb.page.PageObject
 import java.nio.ByteBuffer
 import kotlin.experimental.and
 import kotlin.experimental.or
@@ -23,7 +23,7 @@ import kotlin.experimental.or
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class RecordHeader private constructor() : ByteWrapper, PageObject {
+class RecordHeader private constructor() : ByteWrapper, Lengthable {
 
 
     private val source: ByteArray = ByteArray(5)

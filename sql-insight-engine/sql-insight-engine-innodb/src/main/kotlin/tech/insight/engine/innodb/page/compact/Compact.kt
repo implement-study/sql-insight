@@ -63,7 +63,7 @@ class Compact : InnodbUserRecord {
 
     lateinit var belongIndex: InnodbIndex
 
-    lateinit var belongPage: InnoDbPage
+    override lateinit var belongPage: InnoDbPage
 
     override fun rowBytes(): ByteArray {
         val buffer: DynamicByteBuffer = DynamicByteBuffer.allocate()
@@ -132,9 +132,6 @@ class Compact : InnodbUserRecord {
         return ByteArray(0)
     }
 
-    override fun belongPage(): InnoDbPage {
-        return belongPage
-    }
 
     override fun absoluteOffset(): Int {
         require(offsetInPage != -1) { "unknown offset" }
@@ -189,7 +186,7 @@ class Compact : InnodbUserRecord {
      * variables that the compact transfer to index node
      */
     private fun indexVariables(): Variables {
-        val variables = Variables()
+        val variables = Variables.create()
         belongIndex.columns()
             .filter { it.variable }
             .map { this.getValueByColumnName(it.name) }

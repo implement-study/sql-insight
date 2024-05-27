@@ -16,23 +16,16 @@
 package tech.insight.engine.innodb.page.compact
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper
-import tech.insight.engine.innodb.page.PageObject
+import tech.insight.engine.innodb.core.Lengthable
 
 /**
  * variable data type like varchar
  *
  * @author gongxuanzhang
  */
-class Variables : ByteWrapper, PageObject, Iterable<Byte> {
-    var varBytes: ByteArray
+class Variables private constructor() : ByteWrapper, Lengthable, Iterable<Byte> {
 
-    constructor() {
-        varBytes = ByteArray(0)
-    }
-
-    constructor(varBytes: ByteArray) {
-        this.varBytes = varBytes
-    }
+    lateinit var varBytes: ByteArray
 
     /**
      * append variable length
@@ -108,5 +101,12 @@ class Variables : ByteWrapper, PageObject, Iterable<Byte> {
             cursor--
             return varBytes[i]
         }
+    }
+
+    companion object VariablesFactory {
+
+        fun create() = Variables().apply { this.varBytes = ByteArray(0) }
+
+        fun wrap(varBytes: ByteArray) = Variables().apply { this.varBytes = varBytes }
     }
 }

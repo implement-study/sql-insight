@@ -36,7 +36,7 @@ object RowFormatFactory {
      */
     fun compactFromInsertRow(row: InsertRow): Compact {
         val compact = Compact()
-        compact.variables = Variables()
+        compact.variables = Variables.create()
         compact.nullList = CompactNullList.allocate(row.belongTo())
         compact.sourceRow = row
         compact.recordHeader = RecordHeader.create(RecordType.NORMAL)

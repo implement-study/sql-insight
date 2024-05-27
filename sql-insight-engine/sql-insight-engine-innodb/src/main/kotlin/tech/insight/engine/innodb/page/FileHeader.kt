@@ -18,7 +18,6 @@ package tech.insight.engine.innodb.page
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VALUE
-import tech.insight.engine.innodb.page.type.PageType
 import java.nio.ByteBuffer
 
 
@@ -28,7 +27,7 @@ import java.nio.ByteBuffer
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class FileHeader private constructor() : ByteWrapper, PageObject {
+class FileHeader private constructor(override val belongPage: InnoDbPage) : ByteWrapper, PageObject {
 
 
     /**
@@ -120,7 +119,7 @@ class FileHeader private constructor() : ByteWrapper, PageObject {
 
     companion object FileHeaderFactory {
 
-        fun wrap(arr: ByteArray) = FileHeader().apply {
+        fun wrap(arr: ByteArray, belongPage: InnoDbPage) = FileHeader(belongPage).apply {
             ConstantSize.FILE_HEADER.checkSize(arr)
             val buffer = ByteBuffer.wrap(arr)
             this.checkSum = buffer.getInt()
@@ -136,7 +135,7 @@ class FileHeader private constructor() : ByteWrapper, PageObject {
         /**
          * create a empty file header
          */
-        fun create() = FileHeader().apply {
+        fun create(belongPage: InnoDbPage) = FileHeader(belongPage).apply {
             this.next = 0
             this.pre = 0
             this.offset = 0
