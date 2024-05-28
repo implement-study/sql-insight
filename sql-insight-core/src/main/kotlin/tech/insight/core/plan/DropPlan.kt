@@ -24,9 +24,6 @@ import kotlin.io.path.deleteRecursively
  **/
 class DropDatabasePlan(private val command: DropDatabase) : DDLExecutionPlan(command) {
 
-    override val originalSql: String
-        get() = command.sql
-
     @OptIn(ExperimentalPathApi::class)
     override fun run(): ResultInterface {
         val home = GlobalContext[DefaultProperty.DATA_DIR]
@@ -55,8 +52,6 @@ class DropDatabasePlan(private val command: DropDatabase) : DDLExecutionPlan(com
 
 class DropTablePlan(private val command: DropTable) : DDLExecutionPlan(command) {
     private val dropTables = command.dropTables
-    override val originalSql: String
-        get() = command.sql
 
     override fun run(): ResultInterface {
         val skipTableNames = mutableListOf<String>()

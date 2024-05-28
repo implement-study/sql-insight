@@ -30,6 +30,7 @@ object DispatcherFiller : CommandFiller<Command> {
         when (command) {
             is DDLCommand -> DDLFiller.fill(command)
             is DMLCommand -> DMLFiller.fill(command)
+            is DCLCommand -> DCLFiller.fill(command)
             is UnknownCommand -> command.unsupported()
         }
     }
@@ -52,6 +53,14 @@ object DMLFiller : CommandFiller<DMLCommand> {
             is InsertCommand -> InsertFiller().fill(command)
             is SelectCommand -> SelectFiller().fill(command)
             is UpdateCommand -> UpdateFiller().fill(command)
+        }
+    }
+}
+
+object DCLFiller : CommandFiller<DCLCommand> {
+    override fun fill(command: DCLCommand) {
+        when (command) {
+            is UseDatabaseCommand -> UseDatabaseFiller().fill(command)
         }
     }
 }
@@ -191,7 +200,6 @@ class DeleteFiller : ExplainableFiller<DeleteCommand>() {
 
 class InsertFiller : ExplainableFiller<InsertCommand>() {
 
-
     override fun visit(x: SQLInsertStatement): Boolean {
         val columnVisitor = ColumnVisitor()
         //  table source accept must before column accept
@@ -262,4 +270,12 @@ class UpdateFiller : ExplainableFiller<UpdateCommand>() {
         x.value.accept(ExpressionVisitor { command.updateField[column] = it })
         return false
     }
+}
+
+class UseDatabaseFiller : BaseFiller<UseDatabaseCommand>() {
+
+    override fun fill(command: UseDatabaseCommand) {
+        command.databaseName = (command.statement as SQLUseStatement).database.toString()
+    }
+
 }

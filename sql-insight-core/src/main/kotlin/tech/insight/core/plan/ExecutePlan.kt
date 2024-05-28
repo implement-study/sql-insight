@@ -1,5 +1,6 @@
 package tech.insight.core.plan
 
+import tech.insight.core.command.DCLCommand
 import tech.insight.core.command.DDLCommand
 import tech.insight.core.command.DMLCommand
 import tech.insight.core.engine.storage.StorageEngine
@@ -30,14 +31,22 @@ enum class ExplainType {
 }
 
 
-abstract class DDLExecutionPlan(val ddlCommand: DDLCommand) : ExecutionPlan {
+abstract class DCLExecutionPlan(dclCommand: DCLCommand) : ExecutionPlan {
+
+    override val originalSql: String = dclCommand.sql
 
 }
 
+abstract class DDLExecutionPlan(ddlCommand: DDLCommand) : ExecutionPlan{
 
-abstract class DMLExecutionPlan(val dmlCommand: DMLCommand) : ExecutionPlan {
+    override val originalSql: String = ddlCommand.sql
+}
+
+abstract class DMLExecutionPlan(dmlCommand: DMLCommand) : ExecutionPlan {
 
     lateinit var explain: PlanDetail
 
     abstract val engine: StorageEngine
+
+    override val originalSql: String = dmlCommand.sql
 }

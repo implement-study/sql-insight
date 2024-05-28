@@ -15,9 +15,6 @@ class DeletePlan(private val command: DeleteCommand) : DMLExecutionPlan(command)
 
     override val engine = table.engine
 
-    override val originalSql: String
-        get() = command.sql
-
     override fun run(): ResultInterface {
         engine.openTable(table)
         //  todo select the engine

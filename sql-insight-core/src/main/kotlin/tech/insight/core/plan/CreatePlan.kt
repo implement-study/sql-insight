@@ -22,9 +22,6 @@ import java.io.File
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 class CreateDatabasePlan(private val command: CreateDatabase) : DDLExecutionPlan(command) {
-    override val originalSql: String
-        get() = command.sql
-
 
     override fun run(): ResultInterface {
         val home = GlobalContext[DefaultProperty.DATA_DIR]
@@ -42,8 +39,6 @@ class CreateDatabasePlan(private val command: CreateDatabase) : DDLExecutionPlan
 
 class CreateTablePlan(private val command: CreateTable) : DDLExecutionPlan(command) {
     private val table: Table = command.table
-    override val originalSql: String
-        get() = command.sql
 
     override fun run(): ResultInterface {
         val dbFolder: File = table.database.dbFolder

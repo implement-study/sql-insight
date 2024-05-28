@@ -89,7 +89,10 @@ class CommandTypeVisitor(private val sql: String) : SQLASTVisitor {
         return false
     }
 
-
+    override fun visit(x: SQLUseStatement): Boolean {
+        command = UseDatabaseCommand(sql, x)
+        return false
+    }
 }
 
 

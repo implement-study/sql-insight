@@ -3,7 +3,6 @@ package tech.insight.core.engine
 import tech.insight.core.environment.GlobalContext
 import tech.insight.core.logging.Logging
 import tech.insight.core.logging.TimeReport.timeReport
-import tech.insight.core.plan.DDLExecutionPlan
 import tech.insight.core.plan.DMLExecutionPlan
 import tech.insight.core.result.ResultInterface
 import tech.insight.core.util.truncateStringIfTooLong
@@ -44,9 +43,6 @@ object SqlPipeline : Logging() {
         }
         return timeReport("execute plan $plan") {
             when (plan) {
-                is DDLExecutionPlan -> {
-                    executeEngine.executePlan(plan)
-                }
 
                 is DMLExecutionPlan -> {
                     plan.engine.initSessionContext().use {
@@ -54,7 +50,10 @@ object SqlPipeline : Logging() {
                     }
                 }
 
-                else -> throw IllegalArgumentException("plan type error")
+                else -> {
+                    executeEngine.executePlan(plan)
+                }
+
             }
         }
     }

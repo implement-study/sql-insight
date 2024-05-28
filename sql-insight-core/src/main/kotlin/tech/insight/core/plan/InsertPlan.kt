@@ -16,9 +16,6 @@ class InsertPlan(private val command: InsertCommand) : DMLExecutionPlan(command)
 
     private val table: Table = command.table
 
-    override val originalSql: String
-        get() = command.sql
-
     override fun run(): ResultInterface {
         engine.openTable(table)
         command.insertRows.forEach { engine.insertRow(it) }

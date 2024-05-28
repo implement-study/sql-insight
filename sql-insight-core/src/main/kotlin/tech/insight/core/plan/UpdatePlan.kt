@@ -17,9 +17,6 @@ class UpdatePlan(private val command: UpdateCommand) : DMLExecutionPlan(command)
 
     private val table: Table = command.table
 
-    override val originalSql: String
-        get() = command.sql
-
     override fun run(): ResultInterface {
         engine.openTable(table)
         //  todo select the engine

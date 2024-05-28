@@ -1,6 +1,7 @@
 package tech.insight.engine.innodb.execute
 
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import tech.insight.core.engine.SqlPipeline
 import tech.insight.core.environment.DatabaseManager
@@ -22,6 +23,7 @@ class UseDbTest : SqlTestCase {
     private val dbName = "test_db"
 
     @AfterEach
+    @BeforeEach
     fun clear() {
         dropDb(dbName)
     }

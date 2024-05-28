@@ -47,6 +47,10 @@ sealed class DMLCommand(override val sql: String, override val statement: SQLObj
     }
 }
 
+sealed class DCLCommand(override val sql: String, override val statement: SQLObject) : Command {
+
+}
+
 sealed class CreateCommand(sql: String, statement: SQLStatement) : DDLCommand(sql, statement)
 sealed class DropCommand(sql: String, statement: SQLStatement) : DDLCommand(sql, statement)
 sealed class AlterCommand(sql: String, statement: SQLStatement) : DDLCommand(sql, statement)
@@ -104,6 +108,11 @@ class UpdateCommand(sql: String, statement: SQLStatement) : DMLCommand(sql, stat
 }
 
 
+class UseDatabaseCommand(sql: String, statement: SQLUseStatement) : DCLCommand(sql, statement) {
+
+    lateinit var databaseName: String
+
+}
 
 
 
