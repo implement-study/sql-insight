@@ -71,11 +71,4 @@ fun insertBigDataCount(tableName: String, databaseName: String? = null, count: I
     """
 }
 
-private fun prepareDbPre(databaseName: String?): String {
-    val databaseNamePre = if (databaseName == null) {
-        ""
-    } else {
-        "$databaseName."
-    }
-    return databaseNamePre
-}
+

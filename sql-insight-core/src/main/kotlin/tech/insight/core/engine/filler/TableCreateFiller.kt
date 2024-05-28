@@ -6,6 +6,7 @@ import com.alibaba.druid.sql.visitor.SQLASTVisitor
 import tech.insight.core.bean.Table
 import tech.insight.core.environment.SessionManager
 import tech.insight.core.environment.TableManager
+import tech.insight.core.exception.DatabaseNotSelectedException
 import tech.insight.core.exception.TableNotExistsException
 
 /**
@@ -14,13 +15,15 @@ import tech.insight.core.exception.TableNotExistsException
  */
 
 class TableNameVisitor(private val action: (databaseName: String, tableName: String) -> Unit) : SQLASTVisitor {
+
     override fun visit(x: SQLPropertyExpr): Boolean {
         action.invoke(x.ownerName, x.name)
         return false
     }
 
     override fun visit(x: SQLIdentifierExpr): Boolean {
-        action.invoke(SessionManager.currentSession().database.name, x.name)
+        val databaseName = SessionManager.currentSession().database?.name ?: throw DatabaseNotSelectedException()
+        action.invoke(databaseName, x.name)
         return false
     }
 }
@@ -30,13 +33,15 @@ class TableNameVisitor(private val action: (databaseName: String, tableName: Str
  */
 class TableSelectVisitor(private val must: Boolean = false, private val action: (table: Table?) -> Unit) :
     SQLASTVisitor {
+
     override fun visit(x: SQLPropertyExpr): Boolean {
         action.invoke(selectTable(x.ownerName, x.name))
         return false
     }
 
     override fun visit(x: SQLIdentifierExpr): Boolean {
-        val table = selectTable(SessionManager.currentSession().database.name, x.name)
+        val databaseName = SessionManager.currentSession().database?.name ?: throw DatabaseNotSelectedException()
+        val table = selectTable(databaseName, x.name)
         action.invoke(table)
         return false
     }

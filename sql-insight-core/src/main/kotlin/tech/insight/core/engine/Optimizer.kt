@@ -38,6 +38,7 @@ object OptimizerImpl : Optimizer {
             is InsertCommand -> InsertPlan(command)
             is SelectCommand -> SelectPlan(command)
             is UpdateCommand -> UpdatePlan(command)
+            is UnknownCommand -> command.unsupported()
         }
 
     }

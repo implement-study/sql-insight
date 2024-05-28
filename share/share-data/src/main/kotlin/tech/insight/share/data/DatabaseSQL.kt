@@ -14,6 +14,8 @@ fun createDatabase(databaseName: String, ifNotExists: Boolean = false): String {
     return "CREATE DATABASE ${if (ifNotExists) "IF NOT EXISTS" else ""} $databaseName;"
 }
 
-
+fun useDatabase(databaseName: String): String {
+    return "USE $databaseName"
+}
 
 

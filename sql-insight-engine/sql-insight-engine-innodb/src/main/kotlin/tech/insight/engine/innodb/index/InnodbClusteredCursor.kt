@@ -12,15 +12,28 @@ import java.io.RandomAccessFile
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-class InnodbClusteredCursor(index: InnodbIndex, private val session: Session) : Logging(), Cursor {
-    val file: RandomAccessFile = RandomAccessFile(index.file, "rw")
+class InnodbClusteredCursor(index: InnodbIndex, private val session: Session) : Logging(), InnodbCursor {
 
     val root = index.rootPage
 
     var condition: Where = Always
 
+
+
+    override fun where(): Where {
+        return condition
+    }
+
+    override fun limit(): Long {
+        TODO("Not yet implemented")
+    }
+
+    override fun skip(): Long {
+        TODO("Not yet implemented")
+    }
+
+
     override fun close() {
-        file.close()
         debug { "close the cursor session id:[${session.id}]" }
     }
 

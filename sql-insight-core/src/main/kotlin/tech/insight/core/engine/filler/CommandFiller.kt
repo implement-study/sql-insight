@@ -30,6 +30,7 @@ object DispatcherFiller : CommandFiller<Command> {
         when (command) {
             is DDLCommand -> DDLFiller.fill(command)
             is DMLCommand -> DMLFiller.fill(command)
+            is UnknownCommand -> command.unsupported()
         }
     }
 }

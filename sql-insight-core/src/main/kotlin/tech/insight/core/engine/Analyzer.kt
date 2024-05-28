@@ -37,11 +37,16 @@ object DruidAnalyzer : Analyzer {
 }
 
 class CommandTypeVisitor(private val sql: String) : SQLASTVisitor {
+
     private val sqlStatement = SQLUtils.parseSingleMysqlStatement(sql)
-    lateinit var command: Command
+
+    var command: Command = UnknownCommand
 
     init {
         sqlStatement.accept(this)
+        if (command is UnknownCommand) {
+            throw UnsupportedOperationException("Unsupported sql type: $sql")
+        }
     }
 
     override fun visit(x: SQLCreateDatabaseStatement): Boolean {
@@ -83,6 +88,8 @@ class CommandTypeVisitor(private val sql: String) : SQLASTVisitor {
         command = SelectCommand(sql, x)
         return false
     }
+
+
 }
 
 

@@ -15,9 +15,21 @@ import tech.insight.core.util.truncateStringIfTooLong
 sealed interface Command {
     val statement: SQLObject
     val sql: String
-
 }
 
+data object UnknownCommand : Command {
+
+    override val statement: SQLObject
+        get() = TODO()
+
+    override val sql: String
+        get() = TODO()
+
+    fun unsupported(): Nothing {
+        throw UnsupportedOperationException("Unsupported command")
+    }
+
+}
 
 sealed class DDLCommand(override val sql: String, override val statement: SQLStatement) : Command {
     override fun toString(): String {

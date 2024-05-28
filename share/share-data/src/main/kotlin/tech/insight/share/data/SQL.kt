@@ -15,7 +15,6 @@ const val dropTableDine = "drop table $testDb.$test_table"
 const val dropTableIe = "drop table if exists $testDb.$test_table"
 
 
-
 val largeValue = (1..1000).joinToString(",") { "('${StringGenerator.generatorRandomString(10)}')" }
 
 val largeInsert = "insert into $testDb.$test_table (name) values $largeValue"
@@ -44,4 +43,14 @@ object StringGenerator {
             .map(charPool::get)
             .joinToString("")
     }
+}
+
+
+fun prepareDbPre(databaseName: String?): String {
+    val databaseNamePre = if (databaseName == null) {
+        ""
+    } else {
+        "$databaseName."
+    }
+    return databaseNamePre
 }

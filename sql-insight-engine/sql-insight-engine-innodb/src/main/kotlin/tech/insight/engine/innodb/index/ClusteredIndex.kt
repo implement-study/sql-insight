@@ -57,7 +57,6 @@ class ClusteredIndex(table: Table) : InnodbIndex() {
         if (table.ext.autoColIndex >= 0) {
             autoIncrementKeyCounter = InnodbIc(table)
         }
-
     }
 
     override val id: Int = 1
