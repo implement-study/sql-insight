@@ -1,7 +1,6 @@
 package tech.insight.core.plan
 
 import tech.insight.core.command.DeleteCommand
-import tech.insight.core.environment.SessionManager
 import tech.insight.core.result.DeleteResult
 import tech.insight.core.result.ResultInterface
 
@@ -20,7 +19,7 @@ class DeletePlan(private val command: DeleteCommand) : DMLExecutionPlan(command)
         //  todo select the engine
         val index = table.indexList[0]
         index.rndInit()
-        val cursor = index.find(SessionManager.currentSession())
+        val cursor = index.cursor()
         var deleteCount = 0
         while (cursor.hasNext()) {
             val row = cursor.next()

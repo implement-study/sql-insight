@@ -15,17 +15,15 @@
  */
 package tech.insight.core.engine.json
 
+import java.io.BufferedReader
 import tech.insight.core.bean.Cursor
 import tech.insight.core.bean.Row
-import tech.insight.core.environment.Session
 import tech.insight.core.extension.tree
-import java.io.BufferedReader
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class JsonCursor(private val reader: BufferedReader, private val session: Session, private val index: JsonPkIndex) :
-    Cursor {
+class JsonCursor(private val reader: BufferedReader, private val index: JsonPkIndex) : Cursor {
     private var current: Row? = null
     private var count = 0
 

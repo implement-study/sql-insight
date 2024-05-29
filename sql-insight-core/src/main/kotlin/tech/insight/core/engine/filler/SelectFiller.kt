@@ -20,9 +20,10 @@ class SelectFiller : ExplainableFiller<SelectCommand>() {
 
 
     override fun visit(x: SQLSelectQueryBlock): Boolean {
+
         x.from.accept(FromVisitor { command.table = it })
         x.where?.accept(WhereVisitor { command.where = it })
-        x.orderBy?.accept(OrderByVisitor { command.orderBy = it })
+        x.orderBy?.accept(OrderByVisitor { command.orderby = it })
         x.limit?.accept(this)
         return false
     }

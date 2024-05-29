@@ -15,7 +15,6 @@
  */
 package tech.insight.core.bean
 
-import tech.insight.core.environment.Session
 import java.io.File
 
 /**
@@ -37,13 +36,6 @@ interface Index {
      * which table index belong to
      */
     fun belongTo(): Table
-
-    /**
-     * find a cursor from session
-     *
-     * @return cursor
-     */
-    fun find(session: Session): Cursor
 
     /**
      * index name

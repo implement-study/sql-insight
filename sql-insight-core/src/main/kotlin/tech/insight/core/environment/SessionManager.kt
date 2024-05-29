@@ -1,6 +1,5 @@
 package tech.insight.core.environment
 
-import tech.insight.core.bean.Database
 import tech.insight.core.event.DropDatabaseEvent
 import tech.insight.core.event.EventListener
 
@@ -24,12 +23,12 @@ object SessionManager : EventListener<DropDatabaseEvent> {
         return Session(sessionId)
     }
 
-    fun getSession(sessionId: Long): Session {
+    private fun getSession(sessionId: Long): Session {
         return sessions.computeIfAbsent(sessionId) { createSession(sessionId) }
     }
 
-    fun closeSession(userId: Long) {
-        sessions.remove(userId)
+    fun closeSession(session: Session) {
+        sessions.remove(session.id)
     }
 
     override fun onEvent(event: DropDatabaseEvent) {
@@ -37,9 +36,3 @@ object SessionManager : EventListener<DropDatabaseEvent> {
     }
 }
 
-class Session(var id: Long) {
-
-    var database: Database? = null
-
-
-}

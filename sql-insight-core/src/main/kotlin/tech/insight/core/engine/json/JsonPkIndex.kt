@@ -1,10 +1,11 @@
 package tech.insight.core.engine.json
 
-import tech.insight.core.bean.*
-import tech.insight.core.environment.Session
 import java.io.File
-import java.nio.file.Files
 import java.nio.file.Path
+import tech.insight.core.bean.Column
+import tech.insight.core.bean.Index
+import tech.insight.core.bean.InsertRow
+import tech.insight.core.bean.Table
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -23,11 +24,6 @@ class JsonPkIndex(private val table: Table) : Index {
 
     override fun belongTo(): Table {
         return table
-    }
-
-    override fun find(session: Session): Cursor {
-        val reader = Files.newBufferedReader(jsonFilePath)
-        return JsonCursor(reader, session, this)
     }
 
     override val name: String

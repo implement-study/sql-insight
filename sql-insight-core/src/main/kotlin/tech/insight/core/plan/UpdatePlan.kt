@@ -3,7 +3,6 @@ package tech.insight.core.plan
 import tech.insight.core.bean.Table
 import tech.insight.core.command.UpdateCommand
 import tech.insight.core.engine.storage.StorageEngine
-import tech.insight.core.environment.SessionManager
 import tech.insight.core.result.ResultInterface
 import tech.insight.core.result.UpdateResult
 
@@ -22,7 +21,7 @@ class UpdatePlan(private val command: UpdateCommand) : DMLExecutionPlan(command)
         //  todo select the engine
         val index = table.indexList[0]
         index.rndInit()
-        val cursor = index.find(SessionManager.currentSession())
+        val cursor = index.cursor()
         var updateCount = 0
         while (cursor.hasNext()) {
             val row = cursor.next()

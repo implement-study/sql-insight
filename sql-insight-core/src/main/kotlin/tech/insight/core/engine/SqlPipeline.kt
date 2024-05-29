@@ -39,7 +39,7 @@ object SqlPipeline : Logging() {
             analyzer.analysisSql(sql)
         }
         val plan = timeReport("optimize command $command") {
-            optimizer.assign(command)
+            optimizer.optimize(command)
         }
         return timeReport("execute plan $plan") {
             when (plan) {

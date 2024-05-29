@@ -33,7 +33,7 @@ object TableLoader {
         return tableList
     }
 
-    fun loadTableMeta(frmFile: File): Table {
+    private fun loadTableMeta(frmFile: File): Table {
         val frmBytes = FileInputStream(frmFile).readAllBytes()
         val buffer = DynamicByteBuffer.wrap(frmBytes, SqlInsightConfig)
         return buffer.getObject(Table::class.java).also { it.checkMyself() }

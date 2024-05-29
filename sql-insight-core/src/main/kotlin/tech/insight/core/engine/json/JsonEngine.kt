@@ -39,6 +39,11 @@ import tech.insight.core.result.ResultInterface
 import java.io.File
 import java.nio.file.Files
 import java.util.concurrent.ConcurrentHashMap
+import tech.insight.core.bean.Cursor
+import tech.insight.core.bean.Index
+import tech.insight.core.bean.Where
+import tech.insight.core.command.SelectCommand
+import tech.insight.core.plan.ExplainType
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -54,6 +59,10 @@ class JsonEngine : Logging(), StorageEngine, MultipleEventListener {
     private val counter = JsonIncrementKeyCounter
     override val name: String
         get() = "json"
+
+    override fun initEngine() {
+        info("init json engine")
+    }
 
     override fun tableExtensions(): List<String> {
         return listOf("json")
@@ -148,6 +157,14 @@ class JsonEngine : Logging(), StorageEngine, MultipleEventListener {
 
     override fun initSessionContext(): SessionContext {
         return SessionContext.create()
+    }
+
+    override fun cursor(index: Index, command: SelectCommand, explainType: ExplainType): Cursor {
+        if (index is JsonPkIndex) {
+            val reader = Files.newBufferedReader(index.file.toPath())
+            return JsonCursor(reader, index)
+        }
+        TODO("other index")
     }
 
     private fun getLinesCache(table: Table): MutableList<String> {

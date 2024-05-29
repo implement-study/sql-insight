@@ -2,8 +2,19 @@ package tech.insight.core.command
 
 import com.alibaba.druid.sql.ast.SQLObject
 import com.alibaba.druid.sql.ast.SQLStatement
-import com.alibaba.druid.sql.ast.statement.*
-import tech.insight.core.bean.*
+import com.alibaba.druid.sql.ast.statement.SQLCreateDatabaseStatement
+import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement
+import com.alibaba.druid.sql.ast.statement.SQLDropDatabaseStatement
+import com.alibaba.druid.sql.ast.statement.SQLDropTableStatement
+import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock
+import com.alibaba.druid.sql.ast.statement.SQLUseStatement
+import tech.insight.core.bean.Always
+import tech.insight.core.bean.Column
+import tech.insight.core.bean.InsertRow
+import tech.insight.core.bean.Limit
+import tech.insight.core.bean.OrderBy
+import tech.insight.core.bean.Table
+import tech.insight.core.bean.Where
 import tech.insight.core.bean.condition.Expression
 import tech.insight.core.util.truncateStringIfTooLong
 
@@ -93,9 +104,9 @@ class SelectCommand(sql: String, statement: SQLSelectQueryBlock) : DMLCommand(sq
 
     var where: Where = Always
 
-    lateinit var orderBy: OrderBy
-
     var limit: Limit = Limit()
+
+    var orderby: OrderBy? = null
 
 }
 

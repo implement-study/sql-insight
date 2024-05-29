@@ -5,6 +5,7 @@ import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
 import tech.insight.core.command.UpdateCommand
 import tech.insight.core.engine.storage.StorageEngine
+import tech.insight.core.extension.SqlInsightConfig
 import tech.insight.core.logging.Logging
 import tech.insight.core.result.MessageResult
 import tech.insight.core.result.ResultInterface
@@ -14,6 +15,12 @@ import tech.insight.engine.innodb.page.InnoDbPage
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
+import tech.insight.core.bean.Cursor
+import tech.insight.core.bean.Index
+import tech.insight.core.bean.Where
+import tech.insight.core.command.SelectCommand
+import tech.insight.core.plan.ExplainType
+import tech.insight.engine.innodb.index.InnodbClusteredCursor
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -22,6 +29,10 @@ class InnodbEngine : Logging(), StorageEngine {
 
     override val name: String = "innodb"
 
+    override fun initEngine() {
+        info("init innodb engine")
+    }
+
     override fun tableExtensions(): List<String> {
         return mutableListOf("ibd", "inf")
     }
@@ -29,7 +40,8 @@ class InnodbEngine : Logging(), StorageEngine {
     override fun openTable(table: Table) {
         if (table.indexList.isEmpty()) {
             val file = File(table.database.dbFolder, "${table.name}.inf")
-            table.indexList.add(ClusteredIndex(table))
+            val clusteredIndex = ClusteredIndex(table)
+            table.indexList.add(clusteredIndex)
             try {
                 val lines = Files.readAllLines(file.toPath())
                 //  todo load index
@@ -87,6 +99,13 @@ class InnodbEngine : Logging(), StorageEngine {
         for (index in table.indexList) {
             index.insert(row)
         }
+    }
+
+    override fun cursor(index: Index, command: SelectCommand, explainType: ExplainType): Cursor {
+        if (index is ClusteredIndex) {
+            return InnodbClusteredCursor(index, command, explainType)
+        }
+        TODO("second index ")
     }
 
     override fun toString(): String {

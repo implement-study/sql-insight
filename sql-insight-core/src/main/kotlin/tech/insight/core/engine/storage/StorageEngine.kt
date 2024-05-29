@@ -15,12 +15,17 @@
  */
 package tech.insight.core.engine.storage
 
+import tech.insight.core.bean.Cursor
+import tech.insight.core.bean.Index
 import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
+import tech.insight.core.command.SelectCommand
 import tech.insight.core.command.UpdateCommand
+import tech.insight.core.environment.EngineManager
 import tech.insight.core.environment.SessionContext
 import tech.insight.core.exception.DuplicationEngineNameException
+import tech.insight.core.plan.ExplainType
 import tech.insight.core.result.ResultInterface
 
 /**
@@ -36,6 +41,12 @@ interface StorageEngine {
      * @throws [DuplicationEngineNameException]
      */
     val name: String
+
+
+    /**
+     * init engine,use by [EngineManager]
+     */
+    fun initEngine()
 
     /**
      * the file extension that  storage engine create table
@@ -94,4 +105,9 @@ interface StorageEngine {
      * before do dml,init session context
      */
     fun initSessionContext(): SessionContext
+
+    /**
+     * engine get a cursor
+     */
+    fun cursor(index: Index, command: SelectCommand, explainType: ExplainType): Cursor
 }

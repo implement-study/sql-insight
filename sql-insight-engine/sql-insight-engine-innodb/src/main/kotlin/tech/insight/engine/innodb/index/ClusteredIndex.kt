@@ -15,9 +15,12 @@
  */
 package tech.insight.engine.innodb.index
 
-import tech.insight.core.bean.*
+import java.io.File
+import tech.insight.core.bean.Column
+import tech.insight.core.bean.InsertRow
+import tech.insight.core.bean.Row
+import tech.insight.core.bean.Table
 import tech.insight.core.engine.AutoIncrementKeyCounter
-import tech.insight.core.environment.Session
 import tech.insight.core.exception.DataTooLongException
 import tech.insight.engine.innodb.core.InnodbIc
 import tech.insight.engine.innodb.page.Constant
@@ -25,7 +28,6 @@ import tech.insight.engine.innodb.page.IndexKey
 import tech.insight.engine.innodb.page.PrimaryKey
 import tech.insight.engine.innodb.page.compact.Compact
 import tech.insight.engine.innodb.page.compact.RowFormatFactory
-import java.io.File
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -60,10 +62,6 @@ class ClusteredIndex(table: Table) : InnodbIndex() {
     }
 
     override val id: Int = 1
-
-    override fun find(session: Session): Cursor {
-        return InnodbClusteredCursor(this, session)
-    }
 
     override val name: String
         get() = ""

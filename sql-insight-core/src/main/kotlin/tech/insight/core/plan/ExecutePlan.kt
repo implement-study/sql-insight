@@ -1,5 +1,6 @@
 package tech.insight.core.plan
 
+import tech.insight.core.bean.Where
 import tech.insight.core.command.DCLCommand
 import tech.insight.core.command.DDLCommand
 import tech.insight.core.command.DMLCommand
@@ -14,7 +15,6 @@ import tech.insight.core.result.ResultInterface
 interface ExecutionPlan {
 
     val originalSql: String
-
 
     /**
      * execution
@@ -37,7 +37,7 @@ abstract class DCLExecutionPlan(dclCommand: DCLCommand) : ExecutionPlan {
 
 }
 
-abstract class DDLExecutionPlan(ddlCommand: DDLCommand) : ExecutionPlan{
+abstract class DDLExecutionPlan(ddlCommand: DDLCommand) : ExecutionPlan {
 
     override val originalSql: String = ddlCommand.sql
 }
@@ -49,4 +49,13 @@ abstract class DMLExecutionPlan(dmlCommand: DMLCommand) : ExecutionPlan {
     abstract val engine: StorageEngine
 
     override val originalSql: String = dmlCommand.sql
+}
+
+abstract class WhereExecutionPlan(dmlCommand: DMLCommand) : DMLExecutionPlan(dmlCommand) {
+
+    /**
+     * query or delete update condition
+     */
+    abstract fun where(): Where
+
 }
