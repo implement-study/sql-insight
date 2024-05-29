@@ -4,8 +4,10 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import tech.insight.core.engine.SqlPipeline
+import tech.insight.core.result.SelectResult
 import tech.insight.engine.innodb.dropDb
-import tech.insight.share.data.*
+import tech.insight.share.data.insertDataCount
+import tech.insight.share.data.selectAll
 
 
 /**
@@ -27,7 +29,9 @@ class SelectTest {
     fun select() {
         CreateTableTest().correctTest()
         SqlPipeline.executeSql(insertDataCount(tableName, dbName, 15))
-        SqlPipeline.executeSql(selectAll(tableName,dbName))
+        val selectResult = SqlPipeline.executeSql(selectAll(tableName, dbName))
+        assert(selectResult is SelectResult)
+        assert((selectResult as SelectResult).result.size == 15)
     }
 
 

@@ -38,7 +38,18 @@ class InnodbClusteredCursor(index: ClusteredIndex, command: SelectCommand, expla
     }
 
     override fun next(): Row {
-        return nextRow ?: throw NoSuchElementException("no next row")
+        if (nextRow != null) {
+            val result = nextRow!!
+            nextRow = null
+            return result
+        }
+        findNext()
+        if (nextRow == null) {
+            throw NoSuchElementException("no next row")
+        }
+        val result = nextRow!!
+        nextRow = null
+        return result
     }
 
     private fun findNext() {

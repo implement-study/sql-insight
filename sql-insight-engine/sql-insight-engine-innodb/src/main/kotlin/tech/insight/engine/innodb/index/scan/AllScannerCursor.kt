@@ -8,7 +8,6 @@ import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.InnoDbPage
 import tech.insight.engine.innodb.page.InnoDbPage.Companion.findPageByOffset
 import tech.insight.engine.innodb.page.InnodbUserRecord
-import tech.insight.engine.innodb.page.Supremum
 import tech.insight.engine.innodb.page.compact.Compact
 import tech.insight.engine.innodb.page.type.DataPage
 
@@ -22,7 +21,10 @@ class AllScannerCursor(override val index: InnodbIndex) : ScannerCursor {
 
     private var currentPage: InnoDbPage
 
-    private var currentOffset: Short = 0
+    /**
+     * next row's offset, currentRow may be null.
+     */
+    private var nextOffset: Short = 0
 
     private var currentRow: InnodbUserRecord? = null
 
@@ -34,7 +36,7 @@ class AllScannerCursor(override val index: InnodbIndex) : ScannerCursor {
             page = findPageByOffset(offset, page.ext.belongIndex)
         }
         this.currentPage = page
-        this.currentOffset = ConstantSize.INFIMUM.offset().toShort()
+        this.nextOffset = ConstantSize.INFIMUM.offset().toShort()
     }
 
 
@@ -52,12 +54,19 @@ class AllScannerCursor(override val index: InnodbIndex) : ScannerCursor {
 
     override fun next(): Row {
         if (currentRow != null) {
-            val result = currentRow
+            val result = currentRow!!
             currentRow = null
-            return result!!
+            nextOffset = (result.absoluteOffset() + result.nextRecordOffset()).toShort()
+            return (result as Compact).sourceRow
         }
         findNext()
-        return currentRow?: throw NoSuchElementException("no next row")
+        if (currentRow == null) {
+            throw NoSuchElementException("no next row")
+        }
+        val result = currentRow!!
+        currentRow = null
+        nextOffset = (result.absoluteOffset() + result.nextRecordOffset()).toShort()
+        return (result as Compact).sourceRow
     }
 
     private fun findNext() {
@@ -68,21 +77,22 @@ class AllScannerCursor(override val index: InnodbIndex) : ScannerCursor {
             }
             currentPage = findPageByOffset(currentPage.fileHeader.next, currentPage.ext.belongIndex)
         }
-        if (currentOffset == ConstantSize.INFIMUM.offset().toShort()) {
+        if (nextOffset == ConstantSize.INFIMUM.offset().toShort()) {
             val row = currentPage.getFirstUserRecord()
             currentRow = row
-            currentOffset = row.absoluteOffset().toShort()
+            nextOffset = row.absoluteOffset().toShort()
             return
         }
-        if (currentOffset == ConstantSize.SUPREMUM.offset().toShort()) {
+        if (nextOffset == ConstantSize.SUPREMUM.offset().toShort()) {
+            if (currentPage.fileHeader.next == 0) {
+                return
+            }
             currentPage = findPageByOffset(currentPage.fileHeader.next, currentPage.ext.belongIndex)
-            currentOffset = ConstantSize.INFIMUM.offset().toShort()
+            nextOffset = ConstantSize.INFIMUM.offset().toShort()
             return findNext()
         }
-        val nextRow = currentPage.getUserRecordByOffset(currentOffset.toInt())
-        if (nextRow is Supremum) {
-
-        }
-
+        val nextRow = currentPage.getUserRecordByOffset(nextOffset.toInt())
+        currentRow = nextRow
+        nextOffset = (nextRow.absoluteOffset() + nextRow.nextRecordOffset()).toShort()
     }
 }

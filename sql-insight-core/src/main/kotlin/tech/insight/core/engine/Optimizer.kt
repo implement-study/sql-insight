@@ -19,6 +19,7 @@ import tech.insight.core.plan.DeletePlan
 import tech.insight.core.plan.DropDatabasePlan
 import tech.insight.core.plan.DropTablePlan
 import tech.insight.core.plan.ExecutionPlan
+import tech.insight.core.plan.ExplainType
 import tech.insight.core.plan.InsertPlan
 import tech.insight.core.plan.SelectPlan
 import tech.insight.core.plan.UpdatePlan
@@ -71,7 +72,7 @@ object OptimizerImpl : Optimizer {
     private fun optimizeSelect(selectCommand: SelectCommand): SelectPlan {
         val engine = selectCommand.table.engine
         engine.openTable(selectCommand.table)
-        return SelectPlan(selectCommand, selectIndex(selectCommand))
+        return SelectPlan(selectCommand, selectIndex(selectCommand),ExplainType.ALL)
     }
 
     private fun selectIndex(selectCommand: SelectCommand): Index {

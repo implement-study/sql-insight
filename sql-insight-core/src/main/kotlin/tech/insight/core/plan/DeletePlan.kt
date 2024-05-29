@@ -15,21 +15,21 @@ class DeletePlan(private val command: DeleteCommand) : DMLExecutionPlan(command)
     override val engine = table.engine
 
     override fun run(): ResultInterface {
-        engine.openTable(table)
-        //  todo select the engine
-        val index = table.indexList[0]
-        index.rndInit()
-        val cursor = index.cursor()
-        var deleteCount = 0
-        while (cursor.hasNext()) {
-            val row = cursor.next()
-            if (command.where.getBooleanValue(row)) {
-                engine.delete(row)
-                deleteCount++
-            }
-        }
-        engine.refresh(table)
-        return DeleteResult(deleteCount, table)
+        TODO()
+//        engine.openTable(table)
+//        val index = table.indexList[0]
+//        index.rndInit()
+//        val cursor = index.cursor()
+//        var deleteCount = 0
+//        while (cursor.hasNext()) {
+//            val row = cursor.next()
+//            if (command.where.getBooleanValue(row)) {
+//                engine.delete(row)
+//                deleteCount++
+//            }
+//        }
+//        engine.refresh(table)
+//        return DeleteResult(deleteCount, table)
     }
 
 }
