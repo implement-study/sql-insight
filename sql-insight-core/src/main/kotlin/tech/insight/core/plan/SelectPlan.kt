@@ -24,11 +24,12 @@ class SelectPlan(
         val cursor = engine.cursor(assignIndex, command, explainType)
         var skipped = 0
         val rows = arrayListOf<Row>()
-        val limit = command.limit
+        val limit = command.queryCondition.limit
+        val where = where()
         //   todo where cover the index?
         while (rows.size < limit.rowCount && cursor.hasNext()) {
             val next: Row = cursor.next()
-            if (command.where.getBooleanValue(next)) {
+            if (where.getBooleanValue(next)) {
                 if (skipped != limit.offset) {
                     skipped++
                     continue
@@ -37,12 +38,12 @@ class SelectPlan(
             }
         }
         cursor.close()
-        command.orderby?.run { rows.sortWith(this) }
+        command.queryCondition.orderBy?.run { rows.sortWith(this) }
         return SelectResult(rows)
     }
 
     override fun where(): Where {
-        return command.where
+        return command.queryCondition.where
     }
 
 }

@@ -15,9 +15,9 @@
  */
 package tech.insight.engine.innodb.page
 
+import java.nio.ByteBuffer
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
-import java.nio.ByteBuffer
 
 /**
  * use it with [FileHeader]

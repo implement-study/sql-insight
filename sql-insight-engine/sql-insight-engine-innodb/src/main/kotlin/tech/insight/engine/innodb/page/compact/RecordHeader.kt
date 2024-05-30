@@ -1,11 +1,11 @@
 package tech.insight.engine.innodb.page.compact
 
+import java.nio.ByteBuffer
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import tech.insight.core.extension.setBit0
 import tech.insight.core.extension.setBit1
 import tech.insight.engine.innodb.core.Lengthable
 import tech.insight.engine.innodb.page.ConstantSize
-import java.nio.ByteBuffer
 import kotlin.experimental.and
 import kotlin.experimental.or
 

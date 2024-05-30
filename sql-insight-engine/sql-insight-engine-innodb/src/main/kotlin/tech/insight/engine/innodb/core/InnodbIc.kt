@@ -16,6 +16,7 @@
 
 package tech.insight.engine.innodb.core
 
+import java.util.concurrent.atomic.AtomicLong
 import tech.insight.core.bean.Database
 import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Table
@@ -23,7 +24,6 @@ import tech.insight.core.bean.value.ValueInt
 import tech.insight.core.bean.value.ValueNull
 import tech.insight.core.engine.AutoIncrementKeyCounter
 import tech.insight.core.logging.Logging
-import java.util.concurrent.atomic.AtomicLong
 
 /**
  * @author gongxuanzhangmelt@gmail.com

@@ -13,7 +13,12 @@ import tech.insight.engine.innodb.page.InnodbUserRecord
 import tech.insight.engine.innodb.page.Supremum
 import tech.insight.engine.innodb.page.compact.RecordType
 import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VALUE
-import tech.insight.share.data.*
+import tech.insight.share.data.insertBigDataCount
+import tech.insight.share.data.insertData
+import tech.insight.share.data.insertDataCount
+import tech.insight.share.data.insertOneData
+import tech.insight.share.data.testDb
+import tech.insight.share.data.test_table
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 

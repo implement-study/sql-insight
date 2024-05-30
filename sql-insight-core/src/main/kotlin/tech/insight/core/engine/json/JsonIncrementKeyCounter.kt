@@ -15,6 +15,9 @@
  */
 package tech.insight.core.engine.json
 
+import java.nio.file.Files
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicLong
 import tech.insight.core.bean.Database
 import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Table
@@ -23,9 +26,6 @@ import tech.insight.core.bean.value.ValueNull
 import tech.insight.core.engine.AutoIncrementKeyCounter
 import tech.insight.core.extension.tree
 import tech.insight.core.logging.Logging
-import java.nio.file.Files
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicLong
 
 /**
  * @author gongxuanzhangmelt@gmail.com

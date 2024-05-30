@@ -17,10 +17,10 @@
 
 package tech.insight.core.event
 
+import java.lang.reflect.ParameterizedType
 import tech.insight.core.environment.DatabaseManager
 import tech.insight.core.environment.TableManager
 import tech.insight.core.logging.Logging
-import java.lang.reflect.ParameterizedType
 
 /**
  * @author gongxuanzhangmelt@gmail.com

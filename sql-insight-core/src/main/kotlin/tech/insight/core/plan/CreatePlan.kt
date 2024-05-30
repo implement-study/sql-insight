@@ -1,5 +1,6 @@
 package tech.insight.core.plan
 
+import java.io.File
 import tech.insight.core.bean.Database
 import tech.insight.core.bean.Table
 import tech.insight.core.command.CreateDatabase
@@ -15,7 +16,6 @@ import tech.insight.core.exception.DatabaseNotExistsException
 import tech.insight.core.exception.TableExistsException
 import tech.insight.core.result.MessageResult
 import tech.insight.core.result.ResultInterface
-import java.io.File
 
 
 /**

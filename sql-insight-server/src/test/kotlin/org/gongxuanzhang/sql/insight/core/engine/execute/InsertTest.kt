@@ -36,7 +36,7 @@ import org.junit.jupiter.api.assertThrows
 class InsertTest {
 
     @AfterEach
-    fun clear(){
+    fun clear() {
         clearDatabase("aa")
     }
 
@@ -50,7 +50,7 @@ class InsertTest {
         table.indexList
 
 
-//        clearDatabase("aa")
+        //        clearDatabase("aa")
     }
 
 

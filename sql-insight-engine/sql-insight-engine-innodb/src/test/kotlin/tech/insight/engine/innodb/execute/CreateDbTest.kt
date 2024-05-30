@@ -1,5 +1,6 @@
 package tech.insight.engine.innodb.execute
 
+import java.io.File
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -11,7 +12,6 @@ import tech.insight.core.exception.DatabaseExistsException
 import tech.insight.core.result.ExceptionResult
 import tech.insight.engine.innodb.dropDb
 import tech.insight.share.data.createDatabase
-import java.io.File
 import kotlin.test.assertEquals
 
 

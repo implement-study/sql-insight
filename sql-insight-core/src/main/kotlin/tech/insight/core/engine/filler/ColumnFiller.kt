@@ -1,12 +1,16 @@
 package tech.insight.core.engine.filler
 
 import com.alibaba.druid.sql.ast.SQLDataType
-import com.alibaba.druid.sql.ast.statement.*
+import com.alibaba.druid.sql.ast.statement.SQLCharacterDataType
+import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition
+import com.alibaba.druid.sql.ast.statement.SQLColumnPrimaryKey
+import com.alibaba.druid.sql.ast.statement.SQLColumnUniqueKey
+import com.alibaba.druid.sql.ast.statement.SQLNotNullConstraint
 import com.alibaba.druid.sql.visitor.SQLASTVisitor
+import java.util.*
 import tech.insight.core.bean.Column
 import tech.insight.core.bean.DataType
 import tech.insight.core.bean.value.ValueVisitor
-import java.util.*
 
 /**
  * @author gongxuanzhangmelt@gmail.com

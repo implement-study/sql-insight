@@ -17,7 +17,12 @@ package tech.insight.core.bean.condition
 
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.SQLBean
-import tech.insight.core.bean.value.*
+import tech.insight.core.bean.value.Value
+import tech.insight.core.bean.value.ValueBoolean
+import tech.insight.core.bean.value.ValueChar
+import tech.insight.core.bean.value.ValueInt
+import tech.insight.core.bean.value.ValueNull
+import tech.insight.core.bean.value.ValueVarchar
 
 
 /**

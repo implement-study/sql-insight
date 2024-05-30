@@ -7,13 +7,13 @@ import ch.qos.logback.classic.joran.JoranConfigurator
 import ch.qos.logback.classic.jul.LevelChangePropagator
 import ch.qos.logback.classic.turbo.TurboFilter
 import ch.qos.logback.core.spi.FilterReply
+import java.net.URL
+import java.util.logging.ConsoleHandler
+import java.util.logging.LogManager
 import org.slf4j.LoggerFactory
 import org.slf4j.Marker
 import org.slf4j.bridge.SLF4JBridgeHandler
 import org.slf4j.helpers.SubstituteLoggerFactory
-import java.net.URL
-import java.util.logging.ConsoleHandler
-import java.util.logging.LogManager
 
 
 /**

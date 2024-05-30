@@ -2,6 +2,8 @@
 
 package tech.insight.core.environment
 
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import tech.insight.core.engine.storage.StorageEngine
 import tech.insight.core.event.EventListener
 import tech.insight.core.event.EventPublisher
@@ -10,8 +12,6 @@ import tech.insight.core.event.MultipleEventListener
 import tech.insight.core.exception.DuplicationEngineNameException
 import tech.insight.core.exception.EngineNotFoundException
 import tech.insight.core.logging.Logging
-import java.util.Locale
-import java.util.concurrent.ConcurrentHashMap
 
 
 /**

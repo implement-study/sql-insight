@@ -11,11 +11,10 @@ import com.alibaba.druid.sql.ast.statement.SQLUseStatement
 import tech.insight.core.bean.Always
 import tech.insight.core.bean.Column
 import tech.insight.core.bean.InsertRow
-import tech.insight.core.bean.Limit
-import tech.insight.core.bean.OrderBy
 import tech.insight.core.bean.Table
 import tech.insight.core.bean.Where
 import tech.insight.core.bean.condition.Expression
+import tech.insight.core.bean.condition.QueryCondition
 import tech.insight.core.util.truncateStringIfTooLong
 
 
@@ -102,11 +101,7 @@ class InsertCommand(sql: String, statement: SQLStatement) : DMLCommand(sql, stat
 
 class SelectCommand(sql: String, statement: SQLSelectQueryBlock) : DMLCommand(sql, statement) {
 
-    var where: Where = Always
-
-    var limit: Limit = Limit()
-
-    var orderby: OrderBy? = null
+    val queryCondition = QueryCondition()
 
 }
 

@@ -1,10 +1,10 @@
 package tech.insight.engine.innodb.index
 
+import java.io.RandomAccessFile
 import tech.insight.core.bean.Cursor
 import tech.insight.core.bean.Row
 import tech.insight.core.environment.Session
 import tech.insight.core.logging.Logging
-import java.io.RandomAccessFile
 
 
 /**

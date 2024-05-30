@@ -20,7 +20,7 @@ class InnodbClusteredCursor(index: ClusteredIndex, command: SelectCommand, expla
 
     private val scanCursor: ScannerCursor = ScannerCursor.create(index, command, explainType)
 
-    private val where: Where = command.where
+    private val where: Where = command.queryCondition.where
 
     private var nextRow: Row? = null
 

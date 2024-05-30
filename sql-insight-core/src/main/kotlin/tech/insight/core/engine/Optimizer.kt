@@ -65,22 +65,19 @@ object OptimizerImpl : Optimizer {
             is UseDatabaseCommand -> UseDatabasePlan(command)
             is UnknownCommand -> command.unsupported()
         }
-
     }
 
 
     private fun optimizeSelect(selectCommand: SelectCommand): SelectPlan {
         val engine = selectCommand.table.engine
         engine.openTable(selectCommand.table)
-        return SelectPlan(selectCommand, selectIndex(selectCommand),ExplainType.ALL)
+        val (index, explainType) = selectIndex(selectCommand)
+        return SelectPlan(selectCommand, index, explainType)
     }
 
-    private fun selectIndex(selectCommand: SelectCommand): Index {
-        val indexList = selectCommand.table.indexList
-        if (indexList.size == 1) {
-            return indexList[0]
-        }
-        TODO()
+    private fun selectIndex(selectCommand: SelectCommand): Pair<Index, ExplainType> {
+        val leastCostObject = selectCommand.table.indexList.maxOf { IndexSelectReport(it,selectCommand.queryCondition) }
+        return Pair(leastCostObject.index, leastCostObject.type())
     }
 
 

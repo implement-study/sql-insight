@@ -1,5 +1,6 @@
 package tech.insight.core.engine
 
+import java.io.File
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import tech.insight.core.command.CreateDatabase
@@ -8,8 +9,12 @@ import tech.insight.core.command.DropDatabase
 import tech.insight.core.command.DropTable
 import tech.insight.core.environment.DefaultProperty
 import tech.insight.core.environment.GlobalContext
-import tech.insight.share.data.*
-import java.io.File
+import tech.insight.share.data.createDatabase
+import tech.insight.share.data.createTable
+import tech.insight.share.data.dropDatabaseIe
+import tech.insight.share.data.dropTableIe
+import tech.insight.share.data.testDb
+import tech.insight.share.data.test_table
 import kotlin.test.assertEquals
 
 /**

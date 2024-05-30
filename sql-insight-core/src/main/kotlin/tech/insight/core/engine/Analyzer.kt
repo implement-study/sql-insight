@@ -1,9 +1,27 @@
 package tech.insight.core.engine
 
 import com.alibaba.druid.sql.SQLUtils
-import com.alibaba.druid.sql.ast.statement.*
+import com.alibaba.druid.sql.ast.statement.SQLCreateDatabaseStatement
+import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement
+import com.alibaba.druid.sql.ast.statement.SQLDeleteStatement
+import com.alibaba.druid.sql.ast.statement.SQLDropDatabaseStatement
+import com.alibaba.druid.sql.ast.statement.SQLDropTableStatement
+import com.alibaba.druid.sql.ast.statement.SQLInsertStatement
+import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock
+import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement
+import com.alibaba.druid.sql.ast.statement.SQLUseStatement
 import com.alibaba.druid.sql.visitor.SQLASTVisitor
-import tech.insight.core.command.*
+import tech.insight.core.command.Command
+import tech.insight.core.command.CreateDatabase
+import tech.insight.core.command.CreateTable
+import tech.insight.core.command.DeleteCommand
+import tech.insight.core.command.DropDatabase
+import tech.insight.core.command.DropTable
+import tech.insight.core.command.InsertCommand
+import tech.insight.core.command.SelectCommand
+import tech.insight.core.command.UnknownCommand
+import tech.insight.core.command.UpdateCommand
+import tech.insight.core.command.UseDatabaseCommand
 import tech.insight.core.engine.filler.DispatcherFiller
 
 /**

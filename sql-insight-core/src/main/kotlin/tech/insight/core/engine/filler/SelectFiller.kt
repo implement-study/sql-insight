@@ -22,15 +22,15 @@ class SelectFiller : ExplainableFiller<SelectCommand>() {
     override fun visit(x: SQLSelectQueryBlock): Boolean {
 
         x.from.accept(FromVisitor { command.table = it })
-        x.where?.accept(WhereVisitor { command.where = it })
-        x.orderBy?.accept(OrderByVisitor { command.orderby = it })
+        x.where?.accept(WhereVisitor { command.queryCondition.where = it })
+        x.orderBy?.accept(OrderByVisitor { command.queryCondition.orderBy = it })
         x.limit?.accept(this)
         return false
     }
 
     override fun visit(x: SQLLimit): Boolean {
-        x.offset?.accept(IntegerVisitor { command.limit.offset = it })
-        x.rowCount?.accept(IntegerVisitor { command.limit.rowCount = it })
+        x.offset?.accept(IntegerVisitor { command.queryCondition.limit.offset = it })
+        x.rowCount?.accept(IntegerVisitor { command.queryCondition.limit.rowCount = it })
         return false
     }
 

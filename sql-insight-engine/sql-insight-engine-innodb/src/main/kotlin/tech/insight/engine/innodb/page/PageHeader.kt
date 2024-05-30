@@ -15,10 +15,10 @@
  */
 package tech.insight.engine.innodb.page
 
+import java.nio.ByteBuffer
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.annotation.Unused
-import java.nio.ByteBuffer
 
 /**
  * 56 bytes.

@@ -1,5 +1,6 @@
 package tech.insight.core.environment
 
+import java.util.concurrent.ConcurrentHashMap
 import tech.insight.core.bean.Database
 import tech.insight.core.event.CreateDatabaseEvent
 import tech.insight.core.event.DropDatabaseEvent
@@ -7,7 +8,6 @@ import tech.insight.core.event.InsightEvent
 import tech.insight.core.event.MultipleEventListener
 import tech.insight.core.exception.DatabaseNotExistsException
 import tech.insight.core.logging.TimeReport.timeReport
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * database manager

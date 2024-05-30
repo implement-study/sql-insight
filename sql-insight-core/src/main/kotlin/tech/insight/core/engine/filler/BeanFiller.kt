@@ -5,7 +5,11 @@ import com.alibaba.druid.sql.ast.expr.SQLBooleanExpr
 import com.alibaba.druid.sql.ast.expr.SQLCharExpr
 import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr
 import com.alibaba.druid.sql.visitor.SQLASTVisitor
-import tech.insight.core.bean.*
+import tech.insight.core.bean.Always
+import tech.insight.core.bean.ExpressionVisitor
+import tech.insight.core.bean.Never
+import tech.insight.core.bean.SQLBean
+import tech.insight.core.bean.Where
 import tech.insight.core.engine.storage.StorageEngine
 import tech.insight.core.environment.EngineManager
 

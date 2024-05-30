@@ -1,5 +1,7 @@
 package tech.insight.engine.innodb.core.buffer
 
+import java.io.File
+import java.io.RandomAccessFile
 import tech.insight.core.annotation.Temporary
 import tech.insight.core.bean.Table
 import tech.insight.engine.innodb.index.InnodbIndex
@@ -8,8 +10,6 @@ import tech.insight.engine.innodb.page.FileHeader
 import tech.insight.engine.innodb.page.InnoDbPage
 import tech.insight.engine.innodb.page.InnoDbPage.Companion.swap
 import tech.insight.engine.innodb.utils.PageSupport.info
-import java.io.File
-import java.io.RandomAccessFile
 
 
 /**

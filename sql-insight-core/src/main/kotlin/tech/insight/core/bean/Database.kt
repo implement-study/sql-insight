@@ -16,9 +16,9 @@
 package tech.insight.core.bean
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import java.io.File
 import tech.insight.core.environment.DefaultProperty
 import tech.insight.core.environment.GlobalContext
-import java.io.File
 
 /**
  * @author gongxuanzhangmelt@gmail.com

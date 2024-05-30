@@ -16,6 +16,7 @@
 package tech.insight.core.engine.json
 
 import com.fasterxml.jackson.databind.JsonNode
+import java.io.File
 import tech.insight.core.bean.Column
 import tech.insight.core.bean.DataType
 import tech.insight.core.bean.ReadRow
@@ -24,7 +25,6 @@ import tech.insight.core.bean.value.Value
 import tech.insight.core.bean.value.ValueInt
 import tech.insight.core.bean.value.ValueVarchar
 import tech.insight.core.exception.DateTypeCastException
-import java.io.File
 
 /**
  * some static method support json engine

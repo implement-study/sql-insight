@@ -15,9 +15,9 @@
  */
 package tech.insight.core.bean
 
+import java.util.*
 import tech.insight.core.bean.value.Value
 import tech.insight.core.util.truncateStringIfTooLong
-import java.util.*
 
 /**
  * @author gongxuanzhangmelt@gmail.com

@@ -15,6 +15,7 @@
  */
 package tech.insight.engine.innodb.page.compact
 
+import java.util.*
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.bean.Column
 import tech.insight.core.bean.InsertRow
@@ -23,7 +24,6 @@ import tech.insight.core.bean.value.ValueNull
 import tech.insight.core.exception.SqlInsightException
 import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.InnoDbPage
-import java.util.*
 
 /**
  * @author gongxuanzhangmelt@gmail.com

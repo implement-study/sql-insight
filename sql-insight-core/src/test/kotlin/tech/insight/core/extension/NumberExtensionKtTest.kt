@@ -1,9 +1,9 @@
 package tech.insight.core.extension
 
+import java.nio.ByteBuffer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.nio.ByteBuffer
 
 
 class NumberExtensionKtTest {

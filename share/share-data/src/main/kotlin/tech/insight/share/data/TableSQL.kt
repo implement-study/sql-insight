@@ -1,7 +1,6 @@
 package tech.insight.share.data
 
 
-
 /**
  *
  * @author gxz gongxuanzhangmelt@gmail.com
@@ -37,7 +36,7 @@ fun createTable(
 
 
 fun insertOneData(tableName: String, databaseName: String? = null): String {
-    return insertDataCount(tableName,databaseName,1)
+    return insertDataCount(tableName, databaseName, 1)
 }
 
 fun insertData(tableName: String, databaseName: String? = null): String {

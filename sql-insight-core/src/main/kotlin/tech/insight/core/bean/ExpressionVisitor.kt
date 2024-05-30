@@ -15,10 +15,41 @@
  */
 package tech.insight.core.bean
 
-import com.alibaba.druid.sql.ast.expr.*
-import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator.*
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator.Add
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator.BooleanAnd
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator.BooleanOr
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator.Divide
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator.Equality
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator.GreaterThan
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator.GreaterThanOrEqual
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator.LessThan
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator.LessThanOrEqual
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator.LessThanOrGreater
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator.Multiply
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator.NotEqual
+import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator.Subtract
+import com.alibaba.druid.sql.ast.expr.SQLCharExpr
+import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr
+import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr
+import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr
 import com.alibaba.druid.sql.visitor.SQLASTVisitor
-import tech.insight.core.bean.condition.*
+import tech.insight.core.bean.condition.AddExpression
+import tech.insight.core.bean.condition.AndExpression
+import tech.insight.core.bean.condition.DivideExpression
+import tech.insight.core.bean.condition.EqualsExpression
+import tech.insight.core.bean.condition.Expression
+import tech.insight.core.bean.condition.GreatEqualsExpression
+import tech.insight.core.bean.condition.GreatExpression
+import tech.insight.core.bean.condition.IdentifierExpression
+import tech.insight.core.bean.condition.IntExpression
+import tech.insight.core.bean.condition.LessEqualsExpression
+import tech.insight.core.bean.condition.LessExpression
+import tech.insight.core.bean.condition.NotEqualsExpression
+import tech.insight.core.bean.condition.OrExpression
+import tech.insight.core.bean.condition.PlusExpression
+import tech.insight.core.bean.condition.StringExpression
+import tech.insight.core.bean.condition.SubtractExpression
 
 /**
  * analysis a expression
