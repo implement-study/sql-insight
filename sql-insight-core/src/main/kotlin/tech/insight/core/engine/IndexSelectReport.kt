@@ -10,12 +10,21 @@ import tech.insight.core.plan.ExplainType
  **/
 class IndexSelectReport(val index: Index, val queryCondition: QueryCondition) : Comparable<IndexSelectReport> {
 
+    init {
+        calcCost()
+    }
+
+    private fun calcCost(): Int {
+        return 0
+    }
+
+    private var cost: Int = Int.MAX_VALUE
 
     /**
      * select the index will cost (estimated)
      */
-    fun cost(): Int {
-        return 0
+    private fun cost(): Int {
+        return cost
     }
 
     fun type(): ExplainType {
@@ -27,6 +36,7 @@ class IndexSelectReport(val index: Index, val queryCondition: QueryCondition) : 
     }
 
     companion object {
+
     }
 
 }

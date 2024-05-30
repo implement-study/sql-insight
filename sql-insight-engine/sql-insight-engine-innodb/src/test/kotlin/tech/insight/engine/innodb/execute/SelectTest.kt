@@ -36,7 +36,6 @@ class SelectTest {
         CreateTableTest().correctTest()
         SqlPipeline.executeSql(insertDataCount(tableName, dbName, 15))
         val selectResult = SqlPipeline.executeSql(selectAll(tableName, dbName))
-        assert(selectResult is SelectResult)
         assert((selectResult as SelectResult).result.size == 15)
     }
 
@@ -45,7 +44,6 @@ class SelectTest {
         CreateTableTest().correctTest()
         SqlPipeline.executeSql(insertDataCount(tableName, dbName, 15))
         val selectResult = SqlPipeline.executeSql(selectWhereId(4, tableName, dbName))
-        assert(selectResult is SelectResult)
         assert((selectResult as SelectResult).result.size == 1)
         assertEquals(ValueInt(4), ((selectResult.result)[0] as ReadRow).getValueByColumnName("id"))
     }
@@ -55,10 +53,10 @@ class SelectTest {
         CreateTableTest().correctTest()
         SqlPipeline.executeSql(insertDataCount(tableName, dbName, 15))
         val selectResult = SqlPipeline.executeSql(selectComplexWhere(4, "a4", tableName, dbName))
-        assert(selectResult is SelectResult)
         assert((selectResult as SelectResult).result.size == 1)
         assertEquals(ValueInt(4), ((selectResult.result)[0] as ReadRow).getValueByColumnName("id"))
         assertEquals(ValueVarchar("a4"), ((selectResult.result)[0] as ReadRow).getValueByColumnName("name"))
+        SqlPipeline.executeSql(selectComplexWhere(4, "a4", tableName, dbName))
     }
 
 

@@ -46,5 +46,8 @@ class SelectPlan(
         return command.queryCondition.where
     }
 
+    override fun toString(): String {
+        return "Select plan: ${command.sql}"
+    }
 }
 
