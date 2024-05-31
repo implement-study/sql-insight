@@ -71,8 +71,13 @@ object OptimizerImpl : Optimizer {
     private fun optimizeSelect(selectCommand: SelectCommand): SelectPlan {
         val engine = selectCommand.table.engine
         engine.openTable(selectCommand.table)
+        verifyCondition(selectCommand)
         val (index, explainType) = selectIndex(selectCommand)
         return SelectPlan(selectCommand, index, explainType)
+    }
+
+    private fun verifyCondition(selectCommand: SelectCommand) {
+        selectCommand.table
     }
 
     private fun selectIndex(selectCommand: SelectCommand): Pair<Index, ExplainType> {

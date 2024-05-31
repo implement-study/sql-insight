@@ -17,8 +17,9 @@ fun selectWhereId(id: Int, tableName: String, databaseName: String? = null): Str
 }
 
 
-fun selectComplexWhere(id: Int, name: String, tableName: String, databaseName: String? = null): String {
+fun selectIdNameWhere(id: Int, name: String, tableName: String, databaseName: String? = null): String {
     val db = prepareDbPre(databaseName)
     return "select * from $db$tableName where id = $id and name = '$name'"
 }
+
 

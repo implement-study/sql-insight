@@ -17,5 +17,3 @@ fun createDatabase(databaseName: String, ifNotExists: Boolean = false): String {
 fun useDatabase(databaseName: String): String {
     return "USE $databaseName"
 }
-
-

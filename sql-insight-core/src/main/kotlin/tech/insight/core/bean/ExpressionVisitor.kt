@@ -60,6 +60,7 @@ class ExpressionVisitor(private val expressionAction: (Expression) -> Unit = {})
 
     private lateinit var expression: Expression
 
+    private val mutableList = mutableListOf<String>()
 
     override fun visit(x: SQLBinaryOpExpr): Boolean {
         val leftVisitor = ExpressionVisitor()

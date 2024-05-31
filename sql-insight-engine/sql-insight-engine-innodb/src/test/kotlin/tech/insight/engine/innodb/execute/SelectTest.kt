@@ -11,7 +11,7 @@ import tech.insight.core.result.SelectResult
 import tech.insight.engine.innodb.dropDb
 import tech.insight.share.data.insertDataCount
 import tech.insight.share.data.selectAll
-import tech.insight.share.data.selectComplexWhere
+import tech.insight.share.data.selectIdNameWhere
 import tech.insight.share.data.selectWhereId
 import kotlin.test.assertEquals
 
@@ -19,7 +19,7 @@ import kotlin.test.assertEquals
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-class SelectTest {
+class SelectTest : SqlTestCase {
 
     private val dbName = "test_db"
 
@@ -49,14 +49,35 @@ class SelectTest {
     }
 
     @Test
-    fun selectComplexWhere() {
+    fun selectIdNameWhere() {
         CreateTableTest().correctTest()
         SqlPipeline.executeSql(insertDataCount(tableName, dbName, 15))
-        val selectResult = SqlPipeline.executeSql(selectComplexWhere(4, "a4", tableName, dbName))
+        val selectResult = SqlPipeline.executeSql(selectIdNameWhere(4, "a4", tableName, dbName))
         assert((selectResult as SelectResult).result.size == 1)
         assertEquals(ValueInt(4), ((selectResult.result)[0] as ReadRow).getValueByColumnName("id"))
         assertEquals(ValueVarchar("a4"), ((selectResult.result)[0] as ReadRow).getValueByColumnName("name"))
-        SqlPipeline.executeSql(selectComplexWhere(4, "a4", tableName, dbName))
+        SqlPipeline.executeSql(selectIdNameWhere(4, "a4", tableName, dbName))
+    }
+
+    @Test
+    fun selectComplexWhere() {
+        CreateTableTest().correctTest()
+        SqlPipeline.executeSql(insertDataCount(tableName, dbName, 15))
+        val selectResult = SqlPipeline.executeSql(selectIdNameWhere(4, "a4", tableName, dbName))
+        assert((selectResult as SelectResult).result.size == 1)
+    }
+
+    override fun correctTest() {
+        TODO("Not yet implemented")
+    }
+
+
+    @Test
+    override fun errorTest() {
+        CreateTableTest().correctTest()
+        SqlPipeline.executeSql(insertDataCount(tableName, dbName, 15))
+        val selectResult = SqlPipeline.executeSql(selectIdNameWhere(4, "a4", tableName, dbName))
+        assert((selectResult as SelectResult).result.size == 1)
     }
 
 

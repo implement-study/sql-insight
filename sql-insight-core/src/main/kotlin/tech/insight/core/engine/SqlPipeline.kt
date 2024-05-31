@@ -29,9 +29,9 @@ object SqlPipeline : Logging() {
         GlobalContext
     }
 
-    private val optimizer: Optimizer = OptimizerImpl
-    private val analyzer: Analyzer = DruidAnalyzer
-    private val executeEngine: ExecuteEngine = ExecuteEngineImpl
+    val optimizer: Optimizer = OptimizerImpl
+    val analyzer: Analyzer = DruidAnalyzer
+    val executeEngine: ExecuteEngine = ExecuteEngineImpl
 
 
     fun executeSql(sql: String): ResultInterface {

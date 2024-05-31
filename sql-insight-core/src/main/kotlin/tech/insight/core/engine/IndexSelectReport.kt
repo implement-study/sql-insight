@@ -14,8 +14,8 @@ class IndexSelectReport(val index: Index, val queryCondition: QueryCondition) : 
         calcCost()
     }
 
-    private fun calcCost(): Int {
-        return 0
+    private fun calcCost() {
+        this.cost = 0
     }
 
     private var cost: Int = Int.MAX_VALUE

@@ -33,6 +33,7 @@ interface BooleanExpression : Expression {
      * @param row
      */
     override fun getExpressionValue(row: Row): Value<Boolean>
+
 }
 
 interface BooleanOperatorFunction : BooleanExpression {
@@ -62,7 +63,24 @@ sealed class BaseBooleanExpression(private val left: Expression, private val rig
 
 class AndExpression(left: Expression, right: Expression) : BaseBooleanExpression(left, right) {
 
+    private var impossible = false
+    
+
+    init {
+        if (left.impossible() || right.impossible()) {
+            this.impossible = true
+        }
+        this.identifiers().addAll(left.identifiers())
+    }
+
+    override fun impossible(): Boolean {
+        return impossible
+    }
+
     override fun process(left: Expression, right: Expression, row: Row): Boolean {
+        if (this.impossible()) {
+            return false
+        }
         return left.getBooleanValue(row) && right.getBooleanValue(row)
     }
 
@@ -75,5 +93,7 @@ class OrExpression(left: Expression, right: Expression) : BaseBooleanExpression(
     }
 
 }
+
+
 
 

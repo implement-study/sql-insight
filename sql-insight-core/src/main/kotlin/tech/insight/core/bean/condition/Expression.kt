@@ -38,10 +38,27 @@ interface Expression : SQLBean {
      */
     fun getExpressionValue(row: Row): Value<*>
 
+
+    /**
+     * the expression is impossible, in other words, the expression getBoolean Value is always false
+     */
+    fun impossible(): Boolean = false
+
+    /**
+     * the expression contains  identifiers that must be satisfied.
+     * for example, "a = 1 and b = 3", the identifiers is a and b because a and b have same importance
+     *  "a = 1 or b = 3" return empty list,because a and b neither necessarily satisfied
+     *
+     */
+    val identifiers: List<String>
+
     /**
      * value to boolean support expression
      */
     fun getBooleanValue(row: Row): Boolean {
+        if (impossible()) {
+            return false
+        }
         return when (val value = getExpressionValue(row)) {
             is ValueBoolean -> value.source
             is ValueChar -> value.source.isNotEmpty()
