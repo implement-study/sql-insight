@@ -14,24 +14,32 @@ class IntExpression(private val value: Int) : Expression {
         return ValueInt(value)
     }
 
-    override val identifiers = emptyList<String>()
-    
+    override fun identifiers(): List<String> {
+        return emptyList()
+    }
+
+
 }
 
 class StringExpression(private val value: String) : Expression {
 
-    override val identifiers = emptyList<String>()
-    
+
     override fun getExpressionValue(row: Row): ValueVarchar {
         return ValueVarchar(value)
+    }
+
+    override fun identifiers(): List<String> {
+        return emptyList()
     }
 }
 
 class IdentifierExpression(private val name: String) : Expression {
 
-    override val identifiers = listOf(name)
-    
     override fun getExpressionValue(row: Row): Value<*> {
         return row.getValueByColumnName(name)
+    }
+
+    override fun identifiers(): List<String> {
+        return emptyList()
     }
 }
