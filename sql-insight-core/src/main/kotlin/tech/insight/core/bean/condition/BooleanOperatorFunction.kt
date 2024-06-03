@@ -64,17 +64,24 @@ sealed class BaseBooleanExpression(private val left: Expression, private val rig
 class AndExpression(left: Expression, right: Expression) : BaseBooleanExpression(left, right) {
 
     private var impossible = false
-    
+
+    private val identifiers = mutableListOf<String>()
 
     init {
         if (left.impossible() || right.impossible()) {
             this.impossible = true
         }
-        this.identifiers().addAll(left.identifiers())
+        identifiers.addAll(left.identifiers())
+        identifiers.addAll(right.identifiers())
     }
+
 
     override fun impossible(): Boolean {
         return impossible
+    }
+
+    override fun identifiers(): List<String> {
+        return identifiers
     }
 
     override fun process(left: Expression, right: Expression, row: Row): Boolean {
@@ -88,8 +95,25 @@ class AndExpression(left: Expression, right: Expression) : BaseBooleanExpression
 
 class OrExpression(left: Expression, right: Expression) : BaseBooleanExpression(left, right) {
 
+    private var impossible = false
+
+    private val identifiers = mutableListOf<String>()
+
+    init {
+        if (left.impossible() && right.impossible()) {
+            this.impossible = true
+        }
+        identifiers.addAll(left.identifiers())
+        identifiers.addAll(right.identifiers())
+    }
+
+
     override fun process(left: Expression, right: Expression, row: Row): Boolean {
         return left.getBooleanValue(row) || right.getBooleanValue(row)
+    }
+
+    override fun identifiers(): List<String> {
+        return identifiers
     }
 
 }

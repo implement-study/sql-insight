@@ -48,9 +48,9 @@ interface Expression : SQLBean {
      * the expression contains  identifiers that must be satisfied.
      * for example, "a = 1 and b = 3", the identifiers is a and b because a and b have same importance
      *  "a = 1 or b = 3" return empty list,because a and b neither necessarily satisfied
-     *
+     * support optimizer 
      */
-    val identifiers: List<String>
+    fun identifiers(): List<String>
 
     /**
      * value to boolean support expression

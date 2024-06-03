@@ -27,6 +27,15 @@ import tech.insight.core.bean.value.ValueBoolean
  * @author gongxuanzhangmelt@gmail.com
  */
 sealed class ValueOperatorExpression(private val left: Expression, private val right: Expression) : Expression {
+
+
+    protected val identifiers = mutableListOf<String>()
+    
+    init {
+        identifiers.addAll(left.identifiers())
+        identifiers.addAll(right.identifiers())
+    }
+    
     /**
      * calculate a result from left and right value
      *
@@ -37,12 +46,18 @@ sealed class ValueOperatorExpression(private val left: Expression, private val r
     override fun getExpressionValue(row: Row): Value<*> {
         return operator(left.getExpressionValue(row), right.getExpressionValue(row))
     }
+    
+    override fun identifiers(): List<String> {
+        return identifiers
+    }
+
 }
 
 class AddExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return left + right
     }
+
 }
 
 class DivideExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
