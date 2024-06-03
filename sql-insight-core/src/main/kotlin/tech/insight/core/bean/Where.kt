@@ -33,17 +33,31 @@ open class Where(val condition: Expression) : BooleanExpression {
         return ValueBoolean(condition.getBooleanValue(row))
     }
 
+    override fun identifiers(): List<String> {
+        return emptyList()
+    }
+    
 }
 
 object Always : Where(object : BooleanExpression {
+    
     override fun getExpressionValue(row: Row): Value<Boolean> {
         return ValueTrue
+    }
+
+    override fun identifiers(): List<String> {
+        return emptyList()
     }
 })
 
 object Never : Where(object : BooleanExpression {
+    
     override fun getExpressionValue(row: Row): Value<Boolean> {
         return ValueFalse
+    }
+
+    override fun identifiers(): List<String> {
+        return emptyList()
     }
 })
 
