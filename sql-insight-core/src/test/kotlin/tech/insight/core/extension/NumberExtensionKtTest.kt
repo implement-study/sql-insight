@@ -1,6 +1,7 @@
 package tech.insight.core.extension
 
 import java.nio.ByteBuffer
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -13,7 +14,7 @@ class NumberExtensionKtTest {
     fun toBytesTest() {
         val i = 123123
         val expect = ByteBuffer.allocate(Int.SIZE_BYTES).putInt(i).array()
-        assertEquals(expect, i.toByteArray())
+        assertArrayEquals(expect, i.toByteArray())
     }
 
     @Test

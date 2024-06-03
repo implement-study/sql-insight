@@ -196,8 +196,10 @@ class DropTableFiller : BaseFiller<DropTable>() {
         command.ifExists = x.isIfExists
         with(command.dropTables) {
             x.tableSources.forEach {
-                it.accept(TableSelectVisitor(true) { table ->
-                    this.add(table!!)
+                it.accept(TableSelectVisitor( !command.ifExists ) { table ->
+                    if(table != null){
+                        this.add(table)    
+                    }
                 })
             }
         }
