@@ -10,21 +10,24 @@ import tech.insight.core.plan.ExplainType
  **/
 class IndexSelectReport(val index: Index, val queryCondition: QueryCondition) : Comparable<IndexSelectReport> {
 
+    private var matchDegree = 0
+
     init {
-        calcCost()
+        index.columns().forEach {
+            if (queryCondition.where.identifiers().contains(it.name)) {
+                //   todo judge query type 
+            } else {
+                return@forEach
+            }
+        }
     }
 
-    private fun calcCost() {
-        this.cost = 0
-    }
-
-    private var cost: Int = Int.MAX_VALUE
 
     /**
      * select the index will cost (estimated)
      */
     private fun cost(): Int {
-        return cost
+        return Int.MAX_VALUE - matchDegree
     }
 
     fun type(): ExplainType {

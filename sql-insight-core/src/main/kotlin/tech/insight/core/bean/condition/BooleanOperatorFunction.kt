@@ -66,7 +66,7 @@ class AndExpression(left: Expression, right: Expression) : BaseBooleanExpression
 
     private var impossible = false
 
-    private val identifiers = mutableListOf<String>()
+    private val identifiers = mutableSetOf<String>()
 
     init {
         if (left.impossible() || right.impossible()) {
@@ -81,7 +81,7 @@ class AndExpression(left: Expression, right: Expression) : BaseBooleanExpression
         return impossible
     }
 
-    override fun identifiers(): List<String> {
+    override fun identifiers(): Set<String> {
         return identifiers
     }
 
@@ -102,7 +102,7 @@ class OrExpression(left: Expression, right: Expression) : BaseBooleanExpression(
 
     private var impossible = false
 
-    private val identifiers = mutableListOf<String>()
+    private val identifiers = mutableSetOf<String>()
 
     init {
         if (left.impossible() && right.impossible()) {
@@ -117,7 +117,7 @@ class OrExpression(left: Expression, right: Expression) : BaseBooleanExpression(
         return left.getBooleanValue(row) || right.getBooleanValue(row)
     }
 
-    override fun identifiers(): List<String> {
+    override fun identifiers(): Set<String> {
         return identifiers
     }
 

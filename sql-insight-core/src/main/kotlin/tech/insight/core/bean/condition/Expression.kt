@@ -50,7 +50,7 @@ interface Expression : SQLBean {
      *  "a = 1 or b = 3" return empty list,because a and b neither necessarily satisfied
      * support optimizer
      */
-    fun identifiers(): List<String>
+    fun identifiers(): Set<String>
 
     /**
      * before analyze expression

@@ -29,7 +29,7 @@ import tech.insight.core.bean.value.ValueBoolean
 sealed class ValueOperatorExpression(protected val left: Expression, protected val right: Expression) : Expression {
 
 
-    protected val identifiers = mutableListOf<String>()
+    protected val identifiers = mutableSetOf<String>()
 
     protected abstract val operatorType: OperatorType
 
@@ -50,7 +50,7 @@ sealed class ValueOperatorExpression(protected val left: Expression, protected v
         return operator(left.getExpressionValue(row), right.getExpressionValue(row))
     }
 
-    override fun identifiers(): List<String> {
+    override fun identifiers(): Set<String> {
         return identifiers
     }
 
