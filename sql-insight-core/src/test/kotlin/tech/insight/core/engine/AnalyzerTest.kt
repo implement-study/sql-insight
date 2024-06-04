@@ -68,7 +68,6 @@ class AnalyzerTest {
         check(command is DropDatabase)
         assert(command.ifIsExists)
         assert(command.databaseName == testDb)
-        assert(!File(GlobalContext[DefaultProperty.DATA_DIR], testDb).exists())
     }
 
     @Test

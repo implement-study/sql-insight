@@ -13,6 +13,7 @@ import tech.insight.core.command.SelectCommand
 import tech.insight.core.command.UnknownCommand
 import tech.insight.core.command.UpdateCommand
 import tech.insight.core.command.UseDatabaseCommand
+import tech.insight.core.exception.UnknownColumnException
 import tech.insight.core.plan.CreateDatabasePlan
 import tech.insight.core.plan.CreateTablePlan
 import tech.insight.core.plan.DeletePlan
@@ -25,11 +26,9 @@ import tech.insight.core.plan.SelectPlan
 import tech.insight.core.plan.UpdatePlan
 import tech.insight.core.plan.UseDatabasePlan
 
-
 /**
- * like mysql query optimizer.
- * but implementation is so difficult.
- * perhaps this optimizer only a very simple function
+ * like mysql query optimizer. but implementation is so difficult. perhaps this optimizer only a
+ * very simple function
  *
  * @author gongxuanzhangmelt@gmail.com
  */
@@ -44,12 +43,11 @@ fun interface Optimizer {
     fun optimize(command: Command): ExecutionPlan
 }
 
-
 /**
  * the default implement optimizer
+ *
  */
 object OptimizerImpl : Optimizer {
-
 
     @Temporary("how to optimizer?")
     override fun optimize(command: Command): ExecutionPlan {
@@ -67,7 +65,6 @@ object OptimizerImpl : Optimizer {
         }
     }
 
-
     private fun optimizeSelect(selectCommand: SelectCommand): SelectPlan {
         val engine = selectCommand.table.engine
         engine.openTable(selectCommand.table)
@@ -77,17 +74,19 @@ object OptimizerImpl : Optimizer {
     }
 
     private fun verifyCondition(selectCommand: SelectCommand) {
-        selectCommand.table
+        val nameSet = selectCommand.table.indexList.map { it.name }.toSet()
+        val errorIdentifier = selectCommand.queryCondition.where.identifiers().firstOrNull { !nameSet.contains(it) }
+        if(errorIdentifier != null){
+            throw UnknownColumnException(errorIdentifier)
+        }
+
     }
 
     private fun selectIndex(selectCommand: SelectCommand): Pair<Index, ExplainType> {
-        val leastCostObject = selectCommand.table.indexList.maxOf { IndexSelectReport(it,selectCommand.queryCondition) }
+        val leastCostObject =
+            selectCommand.table.indexList.maxOf {
+                IndexSelectReport(it, selectCommand.queryCondition)
+            }
         return Pair(leastCostObject.index, leastCostObject.type())
     }
-
-
 }
-
-
-
-

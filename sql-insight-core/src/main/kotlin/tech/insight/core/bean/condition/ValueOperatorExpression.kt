@@ -30,12 +30,15 @@ sealed class ValueOperatorExpression(private val left: Expression, private val r
 
 
     protected val identifiers = mutableListOf<String>()
-    
+
+    protected abstract val operatorType: OperatorType
+
+
     init {
         identifiers.addAll(left.identifiers())
         identifiers.addAll(right.identifiers())
     }
-    
+
     /**
      * calculate a result from left and right value
      *
@@ -46,7 +49,7 @@ sealed class ValueOperatorExpression(private val left: Expression, private val r
     override fun getExpressionValue(row: Row): Value<*> {
         return operator(left.getExpressionValue(row), right.getExpressionValue(row))
     }
-    
+
     override fun identifiers(): List<String> {
         return identifiers
     }
@@ -54,6 +57,9 @@ sealed class ValueOperatorExpression(private val left: Expression, private val r
 }
 
 class AddExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+
+    override val operatorType: OperatorType = OperatorType.ADD
+
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return left + right
     }
@@ -61,42 +67,63 @@ class AddExpression(left: Expression, right: Expression) : ValueOperatorExpressi
 }
 
 class DivideExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+
+    override val operatorType: OperatorType = OperatorType.DIVIDE
+
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return left / right
     }
 }
 
 class PlusExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+
+    override val operatorType: OperatorType = OperatorType.PLUS
+
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return left * right
     }
 }
 
 class SubtractExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+
+    override val operatorType: OperatorType = OperatorType.SUBTRACT
+
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return left - right
     }
 }
 
 class GreatExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+
+    override val operatorType: OperatorType = OperatorType.GREAT_THAN
+
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return ValueBoolean(left > right)
     }
 }
 
 class GreatEqualsExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+
+    override val operatorType: OperatorType = OperatorType.GREAT_THAN_OR_EQUAL
+
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return ValueBoolean(left >= right)
     }
 }
 
 class LessExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+
+    override val operatorType: OperatorType = OperatorType.LESS_THAN
+
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return ValueBoolean(left < right)
     }
 }
 
 class LessEqualsExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+
+    override val operatorType: OperatorType = OperatorType.LESS_THAN_OR_EQUAL
+
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return ValueBoolean(left <= right)
     }
@@ -104,12 +131,18 @@ class LessEqualsExpression(left: Expression, right: Expression) : ValueOperatorE
 
 
 class EqualsExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+
+    override val operatorType: OperatorType = OperatorType.EQUAL
+
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return ValueBoolean(left == right)
     }
 }
 
 class NotEqualsExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
+
+    override val operatorType: OperatorType = OperatorType.NOT_EQUAL
+
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return ValueBoolean(left != right)
     }

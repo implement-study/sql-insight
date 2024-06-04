@@ -28,11 +28,13 @@ import tech.insight.core.bean.value.ValueTrue
 open class Where(val condition: Expression) : BooleanExpression {
 
     lateinit var table: Table
+    
 
     override fun getExpressionValue(row: Row): ValueBoolean {
         return ValueBoolean(condition.getBooleanValue(row))
     }
-
+    
+    
     override fun identifiers(): List<String> {
         return emptyList()
     }
