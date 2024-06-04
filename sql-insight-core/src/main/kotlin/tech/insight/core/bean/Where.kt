@@ -28,21 +28,25 @@ import tech.insight.core.bean.value.ValueTrue
 open class Where(val condition: Expression) : BooleanExpression {
 
     lateinit var table: Table
-    
+
 
     override fun getExpressionValue(row: Row): ValueBoolean {
         return ValueBoolean(condition.getBooleanValue(row))
     }
-    
-    
+
+
     override fun identifiers(): List<String> {
         return emptyList()
     }
-    
+
+    override fun originExpressionString(): String {
+        return condition.originExpressionString()
+    }
+
 }
 
-object Always : Where(object : BooleanExpression {
-    
+
+object WhereTrue : BooleanExpression {
     override fun getExpressionValue(row: Row): Value<Boolean> {
         return ValueTrue
     }
@@ -50,10 +54,13 @@ object Always : Where(object : BooleanExpression {
     override fun identifiers(): List<String> {
         return emptyList()
     }
-})
 
-object Never : Where(object : BooleanExpression {
-    
+    override fun originExpressionString(): String {
+        return "1=1"
+    }
+}
+
+object WhereFalse : BooleanExpression {
     override fun getExpressionValue(row: Row): Value<Boolean> {
         return ValueFalse
     }
@@ -61,6 +68,24 @@ object Never : Where(object : BooleanExpression {
     override fun identifiers(): List<String> {
         return emptyList()
     }
-})
+
+    override fun originExpressionString(): String {
+        return "1=0"
+    }
+}
+
+object Always : Where(WhereTrue) {
+
+    override fun originExpressionString(): String {
+        return "1=1"
+    }
+
+}
+
+object Never : Where(WhereFalse) {
+    override fun originExpressionString(): String {
+        return "1=0"
+    }
+}
 
 

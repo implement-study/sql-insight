@@ -18,6 +18,10 @@ class IntExpression(private val value: Int) : Expression {
         return emptyList()
     }
 
+    override fun originExpressionString(): String {
+        return "$value"
+    }
+
 
 }
 
@@ -31,6 +35,10 @@ class StringExpression(private val value: String) : Expression {
     override fun identifiers(): List<String> {
         return emptyList()
     }
+
+    override fun originExpressionString(): String {
+        return "'$value'"
+    }
 }
 
 class IdentifierExpression(private val name: String) : Expression {
@@ -41,5 +49,9 @@ class IdentifierExpression(private val name: String) : Expression {
 
     override fun identifiers(): List<String> {
         return emptyList()
+    }
+
+    override fun originExpressionString(): String {
+        return name
     }
 }

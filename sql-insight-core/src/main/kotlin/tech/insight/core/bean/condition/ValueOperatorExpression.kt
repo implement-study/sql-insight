@@ -26,7 +26,7 @@ import tech.insight.core.bean.value.ValueBoolean
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-sealed class ValueOperatorExpression(private val left: Expression, private val right: Expression) : Expression {
+sealed class ValueOperatorExpression(protected val left: Expression, protected val right: Expression) : Expression {
 
 
     protected val identifiers = mutableListOf<String>()
@@ -64,6 +64,10 @@ class AddExpression(left: Expression, right: Expression) : ValueOperatorExpressi
         return left + right
     }
 
+    override fun originExpressionString(): String {
+        return "${left.originExpressionString()} + ${right.originExpressionString()}"
+    }
+
 }
 
 class DivideExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
@@ -72,6 +76,10 @@ class DivideExpression(left: Expression, right: Expression) : ValueOperatorExpre
 
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return left / right
+    }
+
+    override fun originExpressionString(): String {
+        return "${left.originExpressionString()} / ${right.originExpressionString()}"
     }
 }
 
@@ -82,6 +90,10 @@ class PlusExpression(left: Expression, right: Expression) : ValueOperatorExpress
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return left * right
     }
+
+    override fun originExpressionString(): String {
+        return "${left.originExpressionString()} * ${right.originExpressionString()}"
+    }
 }
 
 class SubtractExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
@@ -90,6 +102,10 @@ class SubtractExpression(left: Expression, right: Expression) : ValueOperatorExp
 
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return left - right
+    }
+
+    override fun originExpressionString(): String {
+        return "${left.originExpressionString()} - ${right.originExpressionString()}"
     }
 }
 
@@ -100,6 +116,10 @@ class GreatExpression(left: Expression, right: Expression) : ValueOperatorExpres
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return ValueBoolean(left > right)
     }
+
+    override fun originExpressionString(): String {
+        return "${left.originExpressionString()} > ${right.originExpressionString()}"
+    }
 }
 
 class GreatEqualsExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
@@ -108,6 +128,10 @@ class GreatEqualsExpression(left: Expression, right: Expression) : ValueOperator
 
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return ValueBoolean(left >= right)
+    }
+
+    override fun originExpressionString(): String {
+        return "${left.originExpressionString()} >= ${right.originExpressionString()}"
     }
 }
 
@@ -118,6 +142,10 @@ class LessExpression(left: Expression, right: Expression) : ValueOperatorExpress
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return ValueBoolean(left < right)
     }
+
+    override fun originExpressionString(): String {
+        return "${left.originExpressionString()} < ${right.originExpressionString()}"
+    }
 }
 
 class LessEqualsExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
@@ -126,6 +154,10 @@ class LessEqualsExpression(left: Expression, right: Expression) : ValueOperatorE
 
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return ValueBoolean(left <= right)
+    }
+
+    override fun originExpressionString(): String {
+        return "${left.originExpressionString()} <= ${right.originExpressionString()}"
     }
 }
 
@@ -137,6 +169,10 @@ class EqualsExpression(left: Expression, right: Expression) : ValueOperatorExpre
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return ValueBoolean(left == right)
     }
+
+    override fun originExpressionString(): String {
+        return "${left.originExpressionString()} = ${right.originExpressionString()}"
+    }
 }
 
 class NotEqualsExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
@@ -145,6 +181,10 @@ class NotEqualsExpression(left: Expression, right: Expression) : ValueOperatorEx
 
     override fun operator(left: Value<*>, right: Value<*>): Value<*> {
         return ValueBoolean(left != right)
+    }
+
+    override fun originExpressionString(): String {
+        return "${left.originExpressionString()} != ${right.originExpressionString()}"
     }
 }
 

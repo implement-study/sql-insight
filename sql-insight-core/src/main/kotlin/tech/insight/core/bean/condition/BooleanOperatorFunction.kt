@@ -15,6 +15,7 @@
  */
 package tech.insight.core.bean.condition
 
+import com.alibaba.druid.sql.visitor.functions.Left
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.value.Value
 import tech.insight.core.bean.value.ValueBoolean
@@ -49,7 +50,7 @@ interface BooleanOperatorFunction : BooleanExpression {
 }
 
 
-sealed class BaseBooleanExpression(private val left: Expression, private val right: Expression) :
+sealed class BaseBooleanExpression(protected val left: Expression, protected val right: Expression) :
     BooleanOperatorFunction {
 
     override fun getExpressionValue(row: Row): Value<Boolean> {
@@ -84,6 +85,10 @@ class AndExpression(left: Expression, right: Expression) : BaseBooleanExpression
         return identifiers
     }
 
+    override fun originExpressionString(): String {
+        return "(${left.originExpressionString()}) AND (${right.originExpressionString()})"
+    }
+
     override fun process(left: Expression, right: Expression, row: Row): Boolean {
         if (this.impossible()) {
             return false
@@ -116,6 +121,10 @@ class OrExpression(left: Expression, right: Expression) : BaseBooleanExpression(
         return identifiers
     }
 
+    override fun originExpressionString(): String {
+        return "(${left.originExpressionString()}) OR (${right.originExpressionString()})"
+    }
+    
 }
 
 
