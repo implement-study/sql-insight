@@ -14,7 +14,7 @@ class IntExpression(private val value: Int) : Expression {
         return ValueInt(value)
     }
 
-    override fun identifiers(): Set<String> {
+    override fun identifierNames(): Set<String> {
         return emptySet()
     }
 
@@ -32,7 +32,7 @@ class StringExpression(private val value: String) : Expression {
         return ValueVarchar(value)
     }
 
-    override fun identifiers(): Set<String> {
+    override fun identifierNames(): Set<String> {
         return emptySet()
     }
 
@@ -47,7 +47,7 @@ class IdentifierExpression(private val name: String) : Expression {
         return row.getValueByColumnName(name)
     }
 
-    override fun identifiers(): Set<String> {
+    override fun identifierNames(): Set<String> {
         return setOf(name)
     }
 

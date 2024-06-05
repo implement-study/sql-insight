@@ -14,7 +14,7 @@ class IndexSelectReport(val index: Index, val queryCondition: QueryCondition) : 
 
     init {
         index.columns().forEach {
-            if (queryCondition.where.identifiers().contains(it.name)) {
+            if (queryCondition.where.identifierNames().contains(it.name)) {
                 //   todo judge query type 
             } else {
                 return@forEach

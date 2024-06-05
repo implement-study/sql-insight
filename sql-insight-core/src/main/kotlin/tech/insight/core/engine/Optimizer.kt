@@ -55,7 +55,7 @@ object OptimizerImpl : Optimizer {
 
     private fun verifyCondition(selectCommand: SelectCommand) {
         val nameSet = selectCommand.table.indexList.map { it.name }.toSet()
-        val errorIdentifier = selectCommand.queryCondition.where.identifiers().firstOrNull { !nameSet.contains(it) }
+        val errorIdentifier = selectCommand.queryCondition.where.identifierNames().firstOrNull { !nameSet.contains(it) }
         if (errorIdentifier != null) {
             throw UnknownColumnException(errorIdentifier)
         }

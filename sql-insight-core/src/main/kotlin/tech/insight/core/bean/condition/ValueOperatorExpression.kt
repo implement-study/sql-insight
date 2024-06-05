@@ -35,8 +35,8 @@ sealed class ValueOperatorExpression(protected val left: Expression, protected v
 
 
     init {
-        identifiers.addAll(left.identifiers())
-        identifiers.addAll(right.identifiers())
+        identifiers.addAll(left.identifierNames())
+        identifiers.addAll(right.identifierNames())
     }
 
     /**
@@ -50,7 +50,7 @@ sealed class ValueOperatorExpression(protected val left: Expression, protected v
         return operator(left.getExpressionValue(row), right.getExpressionValue(row))
     }
 
-    override fun identifiers(): Set<String> {
+    override fun identifierNames(): Set<String> {
         return identifiers
     }
 

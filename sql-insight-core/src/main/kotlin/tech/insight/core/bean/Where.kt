@@ -35,12 +35,16 @@ open class Where(val condition: Expression) : BooleanExpression {
     }
 
 
-    override fun identifiers(): Set<String> {
-        return condition.identifiers()
+    override fun identifierNames(): Set<String> {
+        return condition.identifierNames()
     }
 
     override fun originExpressionString(): String {
         return condition.originExpressionString()
+    }
+
+    override fun toString(): String {
+        return originExpressionString()
     }
 
 }
@@ -51,7 +55,7 @@ object WhereTrue : BooleanExpression {
         return ValueTrue
     }
 
-    override fun identifiers(): Set<String> {
+    override fun identifierNames(): Set<String> {
         return emptySet()
     }
 
@@ -65,7 +69,7 @@ object WhereFalse : BooleanExpression {
         return ValueFalse
     }
 
-    override fun identifiers(): Set<String> {
+    override fun identifierNames(): Set<String> {
         return emptySet()
     }
 

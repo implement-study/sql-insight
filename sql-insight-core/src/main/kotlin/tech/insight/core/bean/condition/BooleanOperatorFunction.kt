@@ -15,7 +15,6 @@
  */
 package tech.insight.core.bean.condition
 
-import com.alibaba.druid.sql.visitor.functions.Left
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.value.Value
 import tech.insight.core.bean.value.ValueBoolean
@@ -72,8 +71,8 @@ class AndExpression(left: Expression, right: Expression) : BaseBooleanExpression
         if (left.impossible() || right.impossible()) {
             this.impossible = true
         }
-        identifiers.addAll(left.identifiers())
-        identifiers.addAll(right.identifiers())
+        identifiers.addAll(left.identifierNames())
+        identifiers.addAll(right.identifierNames())
     }
 
 
@@ -81,7 +80,7 @@ class AndExpression(left: Expression, right: Expression) : BaseBooleanExpression
         return impossible
     }
 
-    override fun identifiers(): Set<String> {
+    override fun identifierNames(): Set<String> {
         return identifiers
     }
 
@@ -108,8 +107,8 @@ class OrExpression(left: Expression, right: Expression) : BaseBooleanExpression(
         if (left.impossible() && right.impossible()) {
             this.impossible = true
         }
-        identifiers.addAll(left.identifiers())
-        identifiers.addAll(right.identifiers())
+        identifiers.addAll(left.identifierNames())
+        identifiers.addAll(right.identifierNames())
     }
 
 
@@ -117,14 +116,14 @@ class OrExpression(left: Expression, right: Expression) : BaseBooleanExpression(
         return left.getBooleanValue(row) || right.getBooleanValue(row)
     }
 
-    override fun identifiers(): Set<String> {
+    override fun identifierNames(): Set<String> {
         return identifiers
     }
 
     override fun originExpressionString(): String {
         return "(${left.originExpressionString()}) OR (${right.originExpressionString()})"
     }
-    
+
 }
 
 
