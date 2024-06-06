@@ -32,7 +32,7 @@ sealed class ValueOperatorExpression(protected val left: Expression, protected v
     protected val identifiers = mutableSetOf<String>()
 
     protected abstract val operatorType: OperatorType
-
+    
 
     init {
         identifiers.addAll(left.identifierNames())
@@ -49,6 +49,7 @@ sealed class ValueOperatorExpression(protected val left: Expression, protected v
     override fun getExpressionValue(row: Row): Value<*> {
         return operator(left.getExpressionValue(row), right.getExpressionValue(row))
     }
+    
 
     override fun identifierNames(): Set<String> {
         return identifiers

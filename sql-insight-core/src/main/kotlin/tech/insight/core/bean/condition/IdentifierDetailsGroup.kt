@@ -4,16 +4,11 @@ package tech.insight.core.bean.condition
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-class IdentifierDetailsGroup {
+interface IdentifierDetailsGroup : Iterable<IdentifierDetails> {
 
-    private val identifierDetailsMap = mutableMapOf<String, IdentifierDetails>()
+    fun merge(identifierDetails: IdentifierDetails)
 
+    fun merge(otherGroup: IdentifierDetailsGroup)
 
-    fun append(identifierDetails: IdentifierDetails) {
-        identifierDetailsMap.merge(identifierDetails.name, identifierDetails) { old, new ->
-            old.merge(new)
-        }
-    }
-
-
+    fun get(identifierName: String): IdentifierDetails?
 }

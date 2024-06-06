@@ -6,10 +6,19 @@ import tech.insight.core.engine.IdentifierSelectType
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-interface IdentifierDetails {
+interface IdentifierDetails : IdentifierDetailsGroup {
 
     val name: String
-    
-    val selectType:IdentifierSelectType
+
+    val selectType: IdentifierSelectType
+
+
+    override fun merge(identifierDetails: IdentifierDetails) {
+        throw UnsupportedOperationException("identifierDetails can not merge identifierDetails")
+    }
+
+    override fun merge(otherGroup: IdentifierDetailsGroup) {
+        throw UnsupportedOperationException("identifierDetails can not merge identifierDetailsGroup")
+    }
 
 }

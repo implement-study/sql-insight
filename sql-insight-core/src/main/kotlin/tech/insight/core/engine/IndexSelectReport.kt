@@ -2,6 +2,11 @@ package tech.insight.core.engine
 
 import tech.insight.core.bean.Index
 import tech.insight.core.bean.condition.QueryCondition
+import tech.insight.core.engine.IdentifierSelectType.COMPLEX
+import tech.insight.core.engine.IdentifierSelectType.CONST
+import tech.insight.core.engine.IdentifierSelectType.IMPOSSIBLE
+import tech.insight.core.engine.IdentifierSelectType.MULTI_CONST
+import tech.insight.core.engine.IdentifierSelectType.RANGE
 import tech.insight.core.plan.ExplainType
 
 
@@ -13,13 +18,7 @@ class IndexSelectReport(val index: Index, val queryCondition: QueryCondition) : 
     private var matchDegree = 0
 
     init {
-        index.columns().forEach {
-            if (queryCondition.where.identifierNames().contains(it.name)) {
-                //   todo judge query type 
-            } else {
-                return@forEach
-            }
-        }
+        //  todo cost calc
     }
 
 

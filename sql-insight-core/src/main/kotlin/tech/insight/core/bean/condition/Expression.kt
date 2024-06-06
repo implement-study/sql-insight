@@ -54,11 +54,6 @@ interface Expression : SQLBean {
 
 
     /**
-     * all identifiers details
-     */
-//    fun identifierDetails(): List<IdentifierDetails>
-
-    /**
      * before analyze expression
      */
     fun originExpressionString(): String
