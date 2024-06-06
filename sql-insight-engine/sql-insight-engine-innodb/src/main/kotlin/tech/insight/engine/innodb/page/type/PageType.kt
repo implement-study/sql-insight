@@ -65,6 +65,11 @@ interface PageType : Comparator<InnodbUserRecord> {
      */
     fun upgrade(otherPage: InnoDbPage)
 
+    /**
+     * delete row 
+     */
+    fun delete(deletedRow: InnodbUserRecord) 
+
 
     companion object {
         fun valueOf(value: Int, innoDbPage: InnoDbPage): PageType {

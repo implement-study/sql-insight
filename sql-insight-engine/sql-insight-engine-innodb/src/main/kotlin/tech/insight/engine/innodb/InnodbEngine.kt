@@ -8,7 +8,7 @@ import tech.insight.core.bean.Index
 import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
-import tech.insight.core.command.SelectCommand
+import tech.insight.core.bean.Where
 import tech.insight.core.command.UpdateCommand
 import tech.insight.core.engine.storage.StorageEngine
 import tech.insight.core.logging.Logging
@@ -19,6 +19,7 @@ import tech.insight.engine.innodb.core.InnodbSessionContext
 import tech.insight.engine.innodb.index.ClusteredIndex
 import tech.insight.engine.innodb.index.InnodbClusteredCursor
 import tech.insight.engine.innodb.page.InnoDbPage
+import tech.insight.engine.innodb.page.InnodbUserRecord
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -79,7 +80,10 @@ class InnodbEngine : Logging(), StorageEngine {
     }
 
     override fun delete(deletedRow: Row) {
-        TODO("Not yet implemented")
+        require(deletedRow is InnodbUserRecord){
+            "innodb engine only support innodb user record"
+        }
+        deletedRow.belongPage.delete(deletedRow)
     }
 
     override fun refresh(table: Table) {
@@ -99,9 +103,9 @@ class InnodbEngine : Logging(), StorageEngine {
         }
     }
 
-    override fun cursor(index: Index, command: SelectCommand, explainType: ExplainType): Cursor {
+    override fun cursor(index: Index, where: Where, explainType: ExplainType): Cursor {
         if (index is ClusteredIndex) {
-            return InnodbClusteredCursor(index, command, explainType)
+            return InnodbClusteredCursor(index, where, explainType)
         }
         TODO("second index ")
     }

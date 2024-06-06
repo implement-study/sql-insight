@@ -28,3 +28,11 @@ json引擎开发完成，接下来实现innodb 的非事务版本
 
 ==  贡献代码
 项目在开发中.. 不知道啥时候能写完第一版
+
+
+== 感谢
+
+image::https://resources.jetbrains.com/storage/products/company/brand/logos/IntelliJ_IDEA.png?_ga=2.35201698.206597478.1717662829-1213599977.1710300567&_gl=1*1mah6ly*_ga*MTIxMzU5OTk3Ny4xNzEwMzAwNTY3*_ga_9J976DJZ68*MTcxNzY2MjgyOC4yMi4xLjE3MTc2NjI4NzEuMTcuMC4w[JetBrains Logo]
+
+
+ 感谢JetBrains提供的IntelliJ IDEA开发工具,本项目所有的代码都是在上面开发的.

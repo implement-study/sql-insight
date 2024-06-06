@@ -4,7 +4,6 @@ import tech.insight.core.annotation.Temporary
 import tech.insight.core.bean.Cursor
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Where
-import tech.insight.core.command.SelectCommand
 import tech.insight.core.logging.Logging
 import tech.insight.core.plan.ExplainType
 import tech.insight.engine.innodb.index.scan.ScannerCursor
@@ -13,14 +12,12 @@ import tech.insight.engine.innodb.index.scan.ScannerCursor
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-class InnodbClusteredCursor(index: ClusteredIndex, command: SelectCommand, explainType: ExplainType) : Logging(),
+class InnodbClusteredCursor(index: ClusteredIndex, private val where: Where, explainType: ExplainType) : Logging(),
     Cursor {
 
     val root = index.rootPage
 
-    private val scanCursor: ScannerCursor = ScannerCursor.create(index, command, explainType)
-
-    private val where: Where = command.queryCondition.where
+    private val scanCursor: ScannerCursor = ScannerCursor.create(index, where, explainType)
 
     private var nextRow: Row? = null
 

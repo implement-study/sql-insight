@@ -20,7 +20,7 @@ import tech.insight.core.bean.Index
 import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
-import tech.insight.core.command.SelectCommand
+import tech.insight.core.bean.Where
 import tech.insight.core.command.UpdateCommand
 import tech.insight.core.environment.EngineManager
 import tech.insight.core.environment.SessionContext
@@ -109,5 +109,5 @@ interface StorageEngine {
     /**
      * engine get a cursor
      */
-    fun cursor(index: Index, command: SelectCommand, explainType: ExplainType): Cursor
+    fun cursor(index: Index, where: Where, explainType: ExplainType): Cursor
 }

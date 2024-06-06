@@ -80,6 +80,10 @@ class IndexPage(override val page: InnoDbPage) : PageType {
         TODO("Not yet implemented")
     }
 
+    override fun delete(deletedRow: InnodbUserRecord) {
+        TODO("Not yet implemented")
+    }
+
 
     override fun convertUserRecord(offsetInPage: Int): InnodbUserRecord {
         if (ConstantSize.INFIMUM.offset() == offsetInPage) {
@@ -177,7 +181,7 @@ class IndexPage(override val page: InnoDbPage) : PageType {
 
     private fun doLocateDown(userRecord: InnodbUserRecord): InnoDbPage {
         val targetSlot = page.findTargetSlot(userRecord)
-        val firstIndex = page.targetSlotFirstUserRecord(targetSlot)
+        val firstIndex = page.targetSlotMinUserRecord(targetSlot)
         var preRecord = firstIndex
         //   todo Whether it is better to allow nodes to implement comparison functions?
         while (compare(userRecord, preRecord) > 0) {

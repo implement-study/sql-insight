@@ -21,7 +21,7 @@ class SelectPlan(
     override val engine: StorageEngine = command.table.engine
 
     override fun run(): ResultInterface {
-        val cursor = engine.cursor(assignIndex, command, explainType)
+        val cursor = engine.cursor(assignIndex, command.queryCondition.where, explainType)
         var skipped = 0
         val rows = arrayListOf<Row>()
         val limit = command.queryCondition.limit

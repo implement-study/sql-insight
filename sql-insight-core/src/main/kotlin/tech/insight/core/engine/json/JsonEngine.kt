@@ -26,7 +26,7 @@ import tech.insight.core.bean.Index
 import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
-import tech.insight.core.command.SelectCommand
+import tech.insight.core.bean.Where
 import tech.insight.core.command.UpdateCommand
 import tech.insight.core.engine.storage.StorageEngine
 import tech.insight.core.environment.SessionContext
@@ -158,7 +158,7 @@ class JsonEngine : Logging(), StorageEngine, MultipleEventListener {
         return SessionContext.create()
     }
 
-    override fun cursor(index: Index, command: SelectCommand, explainType: ExplainType): Cursor {
+    override fun cursor(index: Index, where: Where, explainType: ExplainType): Cursor {
         if (index is JsonPkIndex) {
             val reader = Files.newBufferedReader(index.file.toPath())
             return JsonCursor(reader, index)

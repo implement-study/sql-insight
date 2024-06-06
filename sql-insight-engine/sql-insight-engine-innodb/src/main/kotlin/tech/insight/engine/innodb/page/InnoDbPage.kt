@@ -182,7 +182,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
      * get the first user record in  page directory slot .
      * @param targetSlot which slot in page directory
      */
-    fun targetSlotFirstUserRecord(targetSlot: Int): InnodbUserRecord {
+    fun targetSlotMinUserRecord(targetSlot: Int): InnodbUserRecord {
         val pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot + 1).toInt())
         return getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
     }
@@ -227,6 +227,10 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
             return right
         }
         return left
+    }
+
+    fun delete(deletedRow: InnodbUserRecord) {
+        this.pageType().delete(deletedRow)
     }
 
 
@@ -347,6 +351,22 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         return getUserRecordByOffset(infimum.absoluteOffset() + infimum.nextRecordOffset())
     }
 
+    fun getPreUserRecord(userRecord: InnodbUserRecord): InnodbUserRecord {
+        check(userRecord !is Infimum) {
+            "infimum has no pre"
+        }
+        val targetSlot = findTargetSlot(userRecord)
+        val slotFirstRecord = targetSlotMinUserRecord(targetSlot)
+        if (slotFirstRecord.absoluteOffset() == userRecord.absoluteOffset()) {
+            return getUserRecordByOffset(pageDirectory.indexSlot(targetSlot + 1).toInt())
+        }
+        var pre = slotFirstRecord
+        while (pre.nextRecordOffset() + pre.absoluteOffset() != userRecord.absoluteOffset()) {
+            pre = getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+        }
+        return pre
+    }
+
 
     /**
      * get the first index node to parent node insert
@@ -400,7 +420,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     /**
      * you should rewrote to page when you update user record that resolve by [getUserRecordByOffset]
      */
-    private fun refreshRecordHeader(record: InnodbUserRecord) {
+    fun refreshRecordHeader(record: InnodbUserRecord) {
         if (record is Infimum) {
             return
         }
