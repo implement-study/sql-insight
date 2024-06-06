@@ -1,6 +1,6 @@
 package tech.insight.core.bean.condition
 
-import java.util.*
+import java.util.EnumMap
 import tech.insight.core.engine.IdentifierSelectType
 
 
@@ -15,7 +15,7 @@ fun interface MergeStrategy {
     /**
      * merge two IdentifierDetails
      */
-    fun merge(details1: IdentifierDetails, details2: IdentifierDetails): IdentifierDetails
+    fun merge(aDetails: IdentifierDetails, otherDetails: IdentifierDetails): IdentifierDetails
 
 
     companion object MergeStrategyFactory {
@@ -38,6 +38,9 @@ fun interface MergeStrategy {
             strategyMap[IdentifierSelectType.MULTI_CONST] = multiConstMap
 
             val rangeMap = EnumMap<IdentifierSelectType, MergeStrategy>(IdentifierSelectType::class.java)
+            rangeMap[IdentifierSelectType.CONST] = RangeMergeConst
+            rangeMap[IdentifierSelectType.RANGE] = RangeMergeRange
+            rangeMap[IdentifierSelectType.MULTI_CONST] = RangeMergeMultiConst
         }
 
         fun getMergeStrategy(type: IdentifierSelectType, otherType: IdentifierSelectType): MergeStrategy {
@@ -52,34 +55,34 @@ fun interface MergeStrategy {
 
 
 object ImpossibleMergeStrategy : MergeStrategy {
-    override fun merge(details1: IdentifierDetails, details2: IdentifierDetails): IdentifierDetails {
-        require(details1.name == details2.name) {
-            "merge IdentifierDetails with different name ${details1.name} and ${details2.name}"
+    override fun merge(aDetails: IdentifierDetails, otherDetails: IdentifierDetails): IdentifierDetails {
+        require(aDetails.name == otherDetails.name) {
+            "merge IdentifierDetails with different name ${aDetails.name} and ${otherDetails.name}"
         }
-        return ImpossibleIdentifierDetails(details1.name)
+        return ImpossibleIdentifierDetails(aDetails.name)
     }
 }
 
 object ConstMergeConst : MergeStrategy {
-    override fun merge(constDetails: IdentifierDetails, otherDetails: IdentifierDetails): IdentifierDetails {
-        require(constDetails.name == otherDetails.name) {
-            "merge IdentifierDetails with different name ${constDetails.name} and ${otherDetails.name}"
+    override fun merge(aDetails: IdentifierDetails, otherDetails: IdentifierDetails): IdentifierDetails {
+        require(aDetails.name == otherDetails.name) {
+            "merge IdentifierDetails with different name ${aDetails.name} and ${otherDetails.name}"
         }
-        if ((constDetails as ConstIdentifierDetails).value == (otherDetails as ConstIdentifierDetails).value) {
-            return constDetails
+        if ((aDetails as ConstIdentifierDetails).value == (otherDetails as ConstIdentifierDetails).value) {
+            return aDetails
         }
-        return ImpossibleIdentifierDetails(constDetails.name)
+        return ImpossibleIdentifierDetails(aDetails.name)
     }
 }
 
 object ConstMergeMultiConst : MergeStrategy {
 
-    override fun merge(details1: IdentifierDetails, details2: IdentifierDetails): IdentifierDetails {
-        require(details1.name == details2.name) {
-            "merge IdentifierDetails with different name ${details1.name} and ${details2.name}"
+    override fun merge(aDetails: IdentifierDetails, otherDetails: IdentifierDetails): IdentifierDetails {
+        require(aDetails.name == otherDetails.name) {
+            "merge IdentifierDetails with different name ${aDetails.name} and ${otherDetails.name}"
         }
-        val constDetails = details1 as ConstIdentifierDetails
-        if (constDetails.value in (details2 as MultiConstIdentifierDetails).points) {
+        val constDetails = aDetails as ConstIdentifierDetails
+        if (constDetails.value in (otherDetails as MultiConstIdentifierDetails).points) {
             return constDetails
         }
         return ImpossibleIdentifierDetails(constDetails.name)
@@ -88,12 +91,12 @@ object ConstMergeMultiConst : MergeStrategy {
 
 object ConstMergeRange : MergeStrategy {
 
-    override fun merge(details1: IdentifierDetails, details2: IdentifierDetails): IdentifierDetails {
-        require(details1.name == details2.name) {
-            "merge IdentifierDetails with different name ${details1.name} and ${details2.name}"
+    override fun merge(aDetails: IdentifierDetails, otherDetails: IdentifierDetails): IdentifierDetails {
+        require(aDetails.name == otherDetails.name) {
+            "merge IdentifierDetails with different name ${aDetails.name} and ${otherDetails.name}"
         }
-        val constDetails = details1 as ConstIdentifierDetails
-        val range = details2 as RangeIdentifierDetails
+        val constDetails = aDetails as ConstIdentifierDetails
+        val range = otherDetails as RangeIdentifierDetails
         if (constDetails.value in range.range) {
             return constDetails
         }
@@ -104,82 +107,77 @@ object ConstMergeRange : MergeStrategy {
 
 object MultiConstMergeConst : MergeStrategy {
 
-    override fun merge(details1: IdentifierDetails, details2: IdentifierDetails): IdentifierDetails {
-        return ConstMergeMultiConst.merge(details2, details1)
+    override fun merge(aDetails: IdentifierDetails, otherDetails: IdentifierDetails): IdentifierDetails {
+        return ConstMergeMultiConst.merge(otherDetails, aDetails)
     }
 
 }
 
 object MultiConstMergeMultiConst : MergeStrategy {
 
-    override fun merge(details1: IdentifierDetails, details2: IdentifierDetails): IdentifierDetails {
-        val points1 = (details1 as MultiConstIdentifierDetails).points
-        val points2 = (details2 as MultiConstIdentifierDetails).points
+    override fun merge(aDetails: IdentifierDetails, otherDetails: IdentifierDetails): IdentifierDetails {
+        val points1 = (aDetails as MultiConstIdentifierDetails).points
+        val points2 = (otherDetails as MultiConstIdentifierDetails).points
         val retainPoints = points1.intersect(points2.toSet())
         if (retainPoints.isEmpty()) {
-            return ImpossibleIdentifierDetails(details1.name)
+            return ImpossibleIdentifierDetails(aDetails.name)
         }
         if (retainPoints.size == 1) {
-            return ConstIdentifierDetails(details1.name, retainPoints.first())
+            return ConstIdentifierDetails(aDetails.name, retainPoints.first())
         }
-        return MultiConstIdentifierDetails(details1.name, retainPoints.toList())
+        return MultiConstIdentifierDetails(aDetails.name, retainPoints.toList())
     }
 }
 
 object MultiConstMergeRange : MergeStrategy {
 
-    override fun merge(details1: IdentifierDetails, details2: IdentifierDetails): IdentifierDetails {
-        val points = (details1 as MultiConstIdentifierDetails).points
-        val range = (details2 as RangeIdentifierDetails).range
+    override fun merge(aDetails: IdentifierDetails, otherDetails: IdentifierDetails): IdentifierDetails {
+        val points = (aDetails as MultiConstIdentifierDetails).points
+        val range = (otherDetails as RangeIdentifierDetails).range
         val retain = points.filter { range.contains(it) }
         if (retain.isEmpty()) {
-            return ImpossibleIdentifierDetails(details1.name)
+            return ImpossibleIdentifierDetails(aDetails.name)
         }
         if (retain.size == 1) {
-            return ConstIdentifierDetails(details1.name, retain.first())
+            return ConstIdentifierDetails(aDetails.name, retain.first())
         }
-        return MultiConstIdentifierDetails(details1.name, retain.toList())
+        return MultiConstIdentifierDetails(aDetails.name, retain.toList())
     }
 }
 
 object RangeMergeConst : MergeStrategy {
 
-    override fun merge(details1: IdentifierDetails, details2: IdentifierDetails): IdentifierDetails {
-        return ConstMergeRange.merge(details2, details1)
+    override fun merge(aDetails: IdentifierDetails, otherDetails: IdentifierDetails): IdentifierDetails {
+        return ConstMergeRange.merge(otherDetails, aDetails)
     }
 
 }
 
 object RangeMergeMultiConst : MergeStrategy {
 
-    override fun merge(details1: IdentifierDetails, details2: IdentifierDetails): IdentifierDetails {
-        return MultiConstMergeRange.merge(details2, details1)
+    override fun merge(aDetails: IdentifierDetails, otherDetails: IdentifierDetails): IdentifierDetails {
+        return MultiConstMergeRange.merge(otherDetails, aDetails)
     }
 
 }
 
 object RangeMergeRange : MergeStrategy {
 
-    override fun merge(details1: IdentifierDetails, details2: IdentifierDetails): IdentifierDetails {
-        val range1 = (details1 as RangeIdentifierDetails).range
-        val range2 = (details2 as RangeIdentifierDetails).range
-        val start = maxOf(range1.start, range2.start)
-        val end = minOf(range1.endExclusive, range2.endExclusive)
-        return ImpossibleIdentifierDetails(details1.name)
-        //        if (start < end) {
-        //           // OpenEndRange<Value<*>>(start,end)
-        //          //  return RangeIdentifierDetails(details1.name, start..end)
-        //        }
-        //
-        //
-        //        val retain = range1.intersect(range2)
-        //        if (retain.isEmpty()) {
-        //            return ImpossibleIdentifierDetails(details1.name)
-        //        }
-        //        if (retain.size == 1) {
-        //            return ConstIdentifierDetails(details1.name, retain.first())
-        //        }
-        //        return RangeIdentifierDetails(details1.name, retain)
+    override fun merge(aDetails: IdentifierDetails, otherDetails: IdentifierDetails): IdentifierDetails {
+        require(aDetails is RangeIdentifierDetails) {
+            "details is not RangeIdentifierDetails"
+        }
+        require(otherDetails is RangeIdentifierDetails) {
+            "details is not RangeIdentifierDetails"
+        }
+        val newRange = aDetails.range.union(otherDetails.range)
+        if (newRange.type == RangeType.IMPOSSIBLE) {
+            return ImpossibleIdentifierDetails(aDetails.name)
+        }
+        if (newRange.unique()) {
+            return ConstIdentifierDetails(aDetails.name, newRange.start)
+        }
+        return RangeIdentifierDetails(aDetails.name, newRange)
     }
 }
 
