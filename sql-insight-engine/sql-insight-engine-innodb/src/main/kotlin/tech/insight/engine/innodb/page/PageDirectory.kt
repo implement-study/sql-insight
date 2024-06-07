@@ -50,6 +50,16 @@ class PageDirectory private constructor(override val belongPage: InnoDbPage) : P
             }
         }
     }
+    
+    fun removeSlot(removedIndex : Int){
+        slots = ShortArray(slots.size - 1) {
+            if (it < removedIndex) {
+                slots[it]
+            } else {
+                slots[it + 1]
+            }
+        }
+    }
 
     override fun length(): Int {
         return slots.size * Short.SIZE_BYTES

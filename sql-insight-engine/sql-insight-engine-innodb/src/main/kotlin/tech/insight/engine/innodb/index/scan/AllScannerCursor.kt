@@ -57,7 +57,7 @@ class AllScannerCursor(override val index: InnodbIndex) : ScannerCursor {
             val result = currentRow!!
             currentRow = null
             nextOffset = (result.absoluteOffset() + result.nextRecordOffset()).toShort()
-            return (result as Compact).sourceRow
+            return (result as Compact)/*.sourceRow*/
         }
         findNext()
         if (currentRow == null) {
@@ -66,7 +66,7 @@ class AllScannerCursor(override val index: InnodbIndex) : ScannerCursor {
         val result = currentRow!!
         currentRow = null
         nextOffset = (result.absoluteOffset() + result.nextRecordOffset()).toShort()
-        return (result as Compact).sourceRow
+        return (result as Compact)/*.sourceRow*/
     }
 
     private fun findNext() {

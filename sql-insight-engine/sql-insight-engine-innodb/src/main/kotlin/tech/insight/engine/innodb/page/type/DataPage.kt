@@ -120,37 +120,6 @@ class DataPage(override val page: InnoDbPage) : PageType {
         page.ext.parent!!.insertData(otherPage.pageIndex())
     }
 
-    override fun delete(deletedRow: InnodbUserRecord) {
-        val isFirstRecord = page.getFirstUserRecord().absoluteOffset() == deletedRow.absoluteOffset()
-        val targetSlot = page.findTargetSlot(deletedRow)
-        val preRecord = run {
-            val slotMinRecord = page.targetSlotMinUserRecord(targetSlot)
-            if (slotMinRecord.absoluteOffset() == deletedRow.absoluteOffset()) {
-                page.getUserRecordByOffset(page.pageDirectory.indexSlot(targetSlot + 1).toInt())
-            }
-            var pre = slotMinRecord
-            while (pre.nextRecordOffset() + pre.absoluteOffset() != deletedRow.absoluteOffset()) {
-                pre = page.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
-            }
-            pre
-        }
-        val maxSlotRecord = page.getUserRecordByOffset(page.pageDirectory.indexSlot(targetSlot).toInt())
-        if (maxSlotRecord.absoluteOffset() == deletedRow.absoluteOffset()) {
-            //  delete slot max 
-            preRecord.recordHeader.nOwned = deletedRow.recordHeader.nOwned - 1
-            page.pageDirectory.slots[targetSlot] = preRecord.absoluteOffset().toShort()
-        }
-        maxSlotRecord.recordHeader.nOwned--
-
-        page.refreshRecordHeader(preRecord)
-        page.refreshRecordHeader(deletedRow)
-        page.refreshRecordHeader(maxSlotRecord)
-        if (isFirstRecord) {
-            this.page.ext.parent?.delete(deletedRow.indexNode())
-        }
-
-
-    }
 
     override fun compare(o1: InnodbUserRecord, o2: InnodbUserRecord): Int {
         return RowComparator.primaryKeyComparator().compare(o1, o2)

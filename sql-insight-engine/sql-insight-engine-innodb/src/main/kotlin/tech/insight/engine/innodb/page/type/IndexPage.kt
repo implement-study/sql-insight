@@ -80,10 +80,6 @@ class IndexPage(override val page: InnoDbPage) : PageType {
         TODO("Not yet implemented")
     }
 
-    override fun delete(deletedRow: InnodbUserRecord) {
-        TODO("Not yet implemented")
-    }
-
 
     override fun convertUserRecord(offsetInPage: Int): InnodbUserRecord {
         if (ConstantSize.INFIMUM.offset() == offsetInPage) {

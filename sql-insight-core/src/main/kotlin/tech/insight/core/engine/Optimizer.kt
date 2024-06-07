@@ -85,7 +85,7 @@ object OptimizerImpl : Optimizer {
     }
 
     private fun verifyCondition(table: Table, where: Where) {
-        val nameSet = table.indexList.map { it.name }.toSet()
+        val nameSet = table.columnList.map { it.name }.toSet()
         val errorIdentifier = where.identifierNames().firstOrNull { !nameSet.contains(it) }
         if (errorIdentifier != null) {
             throw UnknownColumnException(errorIdentifier)

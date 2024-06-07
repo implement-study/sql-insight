@@ -230,7 +230,39 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     }
 
     fun delete(deletedRow: InnodbUserRecord) {
-        this.pageType().delete(deletedRow)
+        val isFirstRecord = getFirstUserRecord().absoluteOffset() == deletedRow.absoluteOffset()
+        val targetSlot = findTargetSlot(deletedRow)
+        val preRecord = run {
+            val slotMinRecord = targetSlotMinUserRecord(targetSlot)
+            if (slotMinRecord.absoluteOffset() == deletedRow.absoluteOffset()) {
+                return@run getUserRecordByOffset(pageDirectory.indexSlot(targetSlot + 1).toInt())
+            }
+            var pre = slotMinRecord
+            while (pre.nextRecordOffset() + pre.absoluteOffset() != deletedRow.absoluteOffset()) {
+                pre = getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+            }
+            pre
+        }
+        val maxSlotRecord = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot).toInt())
+        
+        if (maxSlotRecord.absoluteOffset() == deletedRow.absoluteOffset()) {
+            if(deletedRow.recordHeader.nOwned == 0){
+                pageDirectory.removeSlot(targetSlot)
+            }else{
+                preRecord.recordHeader.nOwned = deletedRow.recordHeader.nOwned - 1
+                pageDirectory.slots[targetSlot] = preRecord.absoluteOffset().toShort()
+            }
+        }
+        maxSlotRecord.recordHeader.nOwned--
+        val nextAbsoluteOffset = deletedRow.nextRecordOffset() + deletedRow.absoluteOffset()
+        preRecord.recordHeader.nextRecordOffset = (nextAbsoluteOffset - preRecord.absoluteOffset()).toShort()
+        //  todo Link the deleted row to the deleted linked list.
+        refreshRecordHeader(preRecord)
+        refreshRecordHeader(deletedRow)
+        refreshRecordHeader(maxSlotRecord)
+        if (isFirstRecord) {
+            this.ext.parent?.delete(deletedRow.indexNode())
+        }
     }
 
 

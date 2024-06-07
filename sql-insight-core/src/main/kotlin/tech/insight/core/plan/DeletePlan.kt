@@ -32,6 +32,7 @@ class DeletePlan(private val command: DeleteCommand, private val explainType: Ex
             }
             deleteCount = indexDeleteCount
         }
+        engine.refresh(table)
         return DeleteResult(deleteCount, table)
     }
 
