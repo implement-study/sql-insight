@@ -15,6 +15,7 @@
  */
 package tech.insight.core.engine.storage
 
+import tech.insight.core.annotation.Temporary
 import tech.insight.core.bean.Cursor
 import tech.insight.core.bean.Index
 import tech.insight.core.bean.InsertRow
@@ -94,6 +95,7 @@ interface StorageEngine {
      *
      * @param deletedRow hit delete condition
      */
+    @Temporary("delegate to index")
     fun delete(deletedRow: Row)
 
     /**

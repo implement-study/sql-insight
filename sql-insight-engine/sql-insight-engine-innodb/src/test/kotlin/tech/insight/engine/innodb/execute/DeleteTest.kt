@@ -19,7 +19,7 @@ import kotlin.test.assertEquals
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-class DeleteTest : SqlTestCase {
+class DeleteTest  {
 
     private val dbName = "test_db"
 
@@ -41,43 +41,11 @@ class DeleteTest : SqlTestCase {
     }
 
     @Test
-    fun selectWhere() {
+    fun deleteWhere() {
         CreateTableTest().correctTest()
         SqlPipeline.executeSql(insertDataCount(tableName, dbName, 15))
-        val selectResult = SqlPipeline.executeSql(selectWhereId(4, tableName, dbName))
-        assert((selectResult as SelectResult).result.size == 1)
-        assertEquals(ValueInt(4), ((selectResult.result)[0] as ReadRow).getValueByColumnName("id"))
-    }
-
-    @Test
-    fun selectIdNameWhere() {
-        CreateTableTest().correctTest()
-        SqlPipeline.executeSql(insertDataCount(tableName, dbName, 15))
-        val selectResult = SqlPipeline.executeSql(selectIdNameWhere(4, "a4", tableName, dbName))
-        assert((selectResult as SelectResult).result.size == 1)
-        assertEquals(ValueInt(4), ((selectResult.result)[0] as ReadRow).getValueByColumnName("id"))
-        assertEquals(ValueVarchar("a4"), ((selectResult.result)[0] as ReadRow).getValueByColumnName("name"))
-        SqlPipeline.executeSql(selectIdNameWhere(4, "a4", tableName, dbName))
-    }
-
-    @Test
-    fun selectComplexWhere() {
-        CreateTableTest().correctTest()
-        SqlPipeline.executeSql(insertDataCount(tableName, dbName, 15))
-        val selectResult = SqlPipeline.executeSql(selectIdNameWhere(4, "a4", tableName, dbName))
-        assert((selectResult as SelectResult).result.size == 1)
-    }
-
-    override fun correctTest() {
-        TODO("Not yet implemented")
-    }
-
-
-    @Test
-    override fun errorTest() {
-        CreateTableTest().correctTest()
-        SqlPipeline.executeSql(insertDataCount(tableName, dbName, 15))
-        val selectResult = SqlPipeline.executeSql(selectIdNameWhere(4, "a4", tableName, dbName))
+        SqlPipeline.executeSql("delete from $dbName.$tableName where id > 1")
+        val selectResult = SqlPipeline.executeSql(selectAll(tableName, dbName))
         assert((selectResult as SelectResult).result.size == 1)
     }
 
