@@ -9,6 +9,8 @@ import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
 import tech.insight.core.bean.Where
+import tech.insight.core.bean.value.Value
+import tech.insight.core.bean.value.ValueNull
 import tech.insight.core.command.UpdateCommand
 import tech.insight.core.engine.storage.StorageEngine
 import tech.insight.core.logging.Logging
@@ -20,6 +22,7 @@ import tech.insight.engine.innodb.index.ClusteredIndex
 import tech.insight.engine.innodb.index.InnodbClusteredCursor
 import tech.insight.engine.innodb.page.InnoDbPage
 import tech.insight.engine.innodb.page.InnodbUserRecord
+import tech.insight.engine.innodb.page.compact.Compact
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -76,11 +79,28 @@ class InnodbEngine : Logging(), StorageEngine {
 
 
     override fun update(oldRow: Row, update: UpdateCommand) {
-        TODO("Not yet implemented")
+        val page = (oldRow as Compact).belongPage
+        val table = update.table
+        var incrementLength = 0
+        val updateFields = mutableMapOf<String, Value<*>>()
+        update.updateField.forEach { (colName, expression) ->
+            val oldValue = oldRow.getValueByColumnName(colName)
+            val newValue = expression.getExpressionValue(oldRow)
+            incrementLength += newValue.length - oldValue.length
+            if (oldValue is ValueNull) {
+                incrementLength += Int.SIZE_BYTES
+            }
+            updateFields[colName] = newValue
+        }
+        if (incrementLength > 0) {
+            page.deleteAndInsertUpdate(oldRow, updateFields)
+        } else {
+            page.replaceUpdate(oldRow, updateFields)
+        }
     }
 
     override fun delete(deletedRow: Row) {
-        require(deletedRow is InnodbUserRecord){
+        require(deletedRow is InnodbUserRecord) {
             "innodb engine only support innodb user record"
         }
         deletedRow.belongPage.delete(deletedRow)

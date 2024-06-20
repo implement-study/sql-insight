@@ -5,10 +5,12 @@ import java.util.*
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.annotation.Temporary
+import tech.insight.core.bean.value.Value
 import tech.insight.core.logging.Logging
 import tech.insight.engine.innodb.core.InnodbSessionContext
 import tech.insight.engine.innodb.core.buffer.BufferPool
 import tech.insight.engine.innodb.index.InnodbIndex
+import tech.insight.engine.innodb.page.compact.Compact
 import tech.insight.engine.innodb.page.type.PageType
 
 
@@ -244,11 +246,11 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
             pre
         }
         val maxSlotRecord = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot).toInt())
-        
+
         if (maxSlotRecord.absoluteOffset() == deletedRow.absoluteOffset()) {
-            if(deletedRow.recordHeader.nOwned == 0){
+            if (deletedRow.recordHeader.nOwned == 0) {
                 pageDirectory.removeSlot(targetSlot)
-            }else{
+            } else {
                 preRecord.recordHeader.nOwned = deletedRow.recordHeader.nOwned - 1
                 pageDirectory.slots[targetSlot] = preRecord.absoluteOffset().toShort()
             }
@@ -408,6 +410,22 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         return pageType().pageIndex()
     }
 
+
+    /**
+     * row have no extra length after it updated
+     * 
+     */
+    fun replaceUpdate(oldRow: Compact, updateFields: Map<String, Value<*>>) {
+            
+    }
+
+    /**
+     * row have extra length after it updated,delete old row and insert new row
+     */
+    fun deleteAndInsertUpdate(oldRow: Compact, updateFields: Map<String, Value<*>>){
+        
+    }
+
     private fun linkedAndAdjust(pre: InnodbUserRecord, insertRecord: InnodbUserRecord, next: InnodbUserRecord) {
         insertRecord.apply {
             setAbsoluteOffset(pageHeader.heapTop + insertRecord.beforeSplitOffset())
@@ -449,10 +467,11 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
         pageDirectory.split(nextGroupIndex, preMaxRecord.absoluteOffset().toShort())
     }
 
+
     /**
      * you should rewrote to page when you update user record that resolve by [getUserRecordByOffset]
      */
-    fun refreshRecordHeader(record: InnodbUserRecord) {
+    private fun refreshRecordHeader(record: InnodbUserRecord) {
         if (record is Infimum) {
             return
         }
