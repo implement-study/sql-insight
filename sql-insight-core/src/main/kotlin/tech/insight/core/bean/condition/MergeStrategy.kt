@@ -1,6 +1,6 @@
 package tech.insight.core.bean.condition
 
-import java.util.EnumMap
+import java.util.*
 import tech.insight.core.engine.IdentifierSelectType
 
 

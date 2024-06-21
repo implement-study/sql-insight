@@ -18,7 +18,7 @@ package tech.insight.engine.innodb.page.compact
 import java.util.*
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.bean.Column
-import tech.insight.core.bean.InsertRow
+import tech.insight.core.bean.NormalRow
 import tech.insight.core.bean.value.Value
 import tech.insight.core.bean.value.ValueNull
 import tech.insight.core.exception.SqlInsightException
@@ -30,11 +30,11 @@ import tech.insight.engine.innodb.page.InnoDbPage
  */
 object RowFormatFactory {
     /**
-     * create row format from insert row.
+     * create row format from normal row.
      *
      * @return the compact don't have record header
      */
-    fun compactFromInsertRow(row: InsertRow): Compact {
+    fun compactFromNormalRow(row: NormalRow): Compact {
         val compact = Compact()
         compact.variables = Variables.create()
         compact.nullList = CompactNullList.allocate(row.belongTo())

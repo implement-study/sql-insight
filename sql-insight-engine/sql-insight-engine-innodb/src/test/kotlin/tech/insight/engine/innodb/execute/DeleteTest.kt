@@ -3,17 +3,11 @@ package tech.insight.engine.innodb.execute
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import tech.insight.core.bean.ReadRow
-import tech.insight.core.bean.value.ValueInt
-import tech.insight.core.bean.value.ValueVarchar
 import tech.insight.core.engine.SqlPipeline
 import tech.insight.core.result.SelectResult
 import tech.insight.engine.innodb.dropDb
 import tech.insight.share.data.insertDataCount
 import tech.insight.share.data.selectAll
-import tech.insight.share.data.selectIdNameWhere
-import tech.insight.share.data.selectWhereId
-import kotlin.test.assertEquals
 
 
 /**

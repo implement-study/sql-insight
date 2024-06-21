@@ -15,12 +15,17 @@
  */
 package tech.insight.core.bean
 
+import tech.insight.core.bean.value.Value
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class InsertRow(override val rowId: Long, val table: Table) : NormalRow(rowId, table) {
-
+class UpdateRow(override val rowId: Long, val table: Table, afterValueList: List<Value<*>>) : NormalRow(rowId, table) {
+    init {
+        afterValueList.forEach {
+            this.candidateValues.add(it)
+        }
+    }
 }
 
 

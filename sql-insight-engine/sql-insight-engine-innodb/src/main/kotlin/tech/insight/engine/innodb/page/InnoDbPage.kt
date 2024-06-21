@@ -5,12 +5,13 @@ import java.util.*
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.annotation.Temporary
-import tech.insight.core.bean.value.Value
+import tech.insight.core.bean.condition.Expression
 import tech.insight.core.logging.Logging
 import tech.insight.engine.innodb.core.InnodbSessionContext
 import tech.insight.engine.innodb.core.buffer.BufferPool
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.compact.Compact
+import tech.insight.engine.innodb.page.compact.UpdateCompact
 import tech.insight.engine.innodb.page.type.PageType
 
 
@@ -411,19 +412,19 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     }
 
 
-    /**
-     * row have no extra length after it updated
-     * 
-     */
-    fun replaceUpdate(oldRow: Compact, updateFields: Map<String, Value<*>>) {
-            
-    }
-
-    /**
-     * row have extra length after it updated,delete old row and insert new row
-     */
-    fun deleteAndInsertUpdate(oldRow: Compact, updateFields: Map<String, Value<*>>){
-        
+    fun update(oldRow: Compact, updateFields: MutableMap<String, Expression>) {
+        val (pre,next) = findPreAndNext(oldRow)
+        val updateCompact = UpdateCompact(oldRow, updateFields)
+        if (oldRow.length() >= updateCompact.length()) {
+            updateCompact.recordHeader.nextRecordOffset = (next.absoluteOffset() - updateCompact.absoluteOffset()).toShort()
+            pre.recordHeader.nextRecordOffset = updateCompact.absoluteOffset().toShort()
+            return
+        }
+        if (oldRow.recordHeader.nOwned != 0) {
+            this.pageDirectory.replace(oldRow.absoluteOffset().toShort(), updateCompact.absoluteOffset().toShort())
+        }
+        refreshRecordHeader(pre)
+        refreshRecordHeader(next)
     }
 
     private fun linkedAndAdjust(pre: InnodbUserRecord, insertRecord: InnodbUserRecord, next: InnodbUserRecord) {

@@ -9,8 +9,6 @@ import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
 import tech.insight.core.bean.Where
-import tech.insight.core.bean.value.Value
-import tech.insight.core.bean.value.ValueNull
 import tech.insight.core.command.UpdateCommand
 import tech.insight.core.engine.storage.StorageEngine
 import tech.insight.core.logging.Logging
@@ -80,23 +78,7 @@ class InnodbEngine : Logging(), StorageEngine {
 
     override fun update(oldRow: Row, update: UpdateCommand) {
         val page = (oldRow as Compact).belongPage
-        val table = update.table
-        var incrementLength = 0
-        val updateFields = mutableMapOf<String, Value<*>>()
-        update.updateField.forEach { (colName, expression) ->
-            val oldValue = oldRow.getValueByColumnName(colName)
-            val newValue = expression.getExpressionValue(oldRow)
-            incrementLength += newValue.length - oldValue.length
-            if (oldValue is ValueNull) {
-                incrementLength += Int.SIZE_BYTES
-            }
-            updateFields[colName] = newValue
-        }
-        if (incrementLength > 0) {
-            page.deleteAndInsertUpdate(oldRow, updateFields)
-        } else {
-            page.replaceUpdate(oldRow, updateFields)
-        }
+        page.update(oldRow, update.updateField)
     }
 
     override fun delete(deletedRow: Row) {

@@ -17,7 +17,7 @@ import tech.insight.engine.innodb.page.InnodbUserRecord
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class Compact : InnodbUserRecord {
+open class Compact : InnodbUserRecord {
     /**
      * variable column list
      */

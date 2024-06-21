@@ -50,13 +50,22 @@ class PageDirectory private constructor(override val belongPage: InnoDbPage) : P
             }
         }
     }
-    
-    fun removeSlot(removedIndex : Int){
+
+    fun removeSlot(removedIndex: Int) {
         slots = ShortArray(slots.size - 1) {
             if (it < removedIndex) {
                 slots[it]
             } else {
                 slots[it + 1]
+            }
+        }
+    }
+
+    fun replace(oldOffset: Short, newOffset: Short) {
+        for (i in slots.indices) {
+            if (slots[i] == oldOffset) {
+                slots[i] = newOffset
+                return
             }
         }
     }

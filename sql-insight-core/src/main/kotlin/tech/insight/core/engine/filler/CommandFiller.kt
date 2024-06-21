@@ -252,8 +252,7 @@ class InsertFiller : ExplainableFiller<InsertCommand>() {
             if (x.values.size != command.insertColumns.size) {
                 throw InsertException(rowIndex, "Column count doesn't match value count")
             }
-            val row = InsertRow(rowIndex++)
-            row.table = command.table
+            val row = InsertRow(rowIndex++,command.table)
             command.insertRows.add(row)
             x.accept(InsertRowFiller(command.insertColumns, row))
             row.checkMyself()
