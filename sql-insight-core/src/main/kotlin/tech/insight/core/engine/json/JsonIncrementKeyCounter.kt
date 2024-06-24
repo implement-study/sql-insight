@@ -48,7 +48,7 @@ object JsonIncrementKeyCounter : Logging(), AutoIncrementKeyCounter {
         val atomicLong = loadMaxAutoIncrementKey(row.table)
         val autoIncrementValue = row.values[autoColIndex]
         if (autoIncrementValue is ValueNull) {
-            row.values[autoColIndex] = ValueInt(atomicLong.incrementAndGet().toInt())
+            row.setValue(autoColIndex, ValueInt(atomicLong.incrementAndGet().toInt()))
             return true
         }
         val insertValue = autoIncrementValue.source as Int

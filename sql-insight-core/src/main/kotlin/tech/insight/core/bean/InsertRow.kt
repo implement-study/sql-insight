@@ -15,11 +15,24 @@
  */
 package tech.insight.core.bean
 
+import tech.insight.core.bean.value.Value
+
 
 /**
+ *
+ * the values in insert row can update
+ *
  * @author gongxuanzhangmelt@gmail.com
  */
 class InsertRow(override val rowId: Long, val table: Table) : NormalRow(rowId, table) {
+
+    fun appendValue(value: Value<*>) {
+        candidateValues.add(value)
+    }
+
+    fun setValue(index: Int, value: Value<*>) {
+        candidateValues[index] = value
+    }
 
 }
 

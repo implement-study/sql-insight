@@ -34,10 +34,10 @@ class InnodbIc(private val table: Table) : Logging(), AutoIncrementKeyCounter {
 
 
     override fun dealAutoIncrement(row: InsertRow): Boolean {
-        val targetValue = row.valueList[incrementColIndex]
+        val targetValue = row.values[incrementColIndex]
         if (targetValue is ValueNull) {
             val valueInt = ValueInt(counter.incrementAndGet().toInt())
-            row.valueList[incrementColIndex] = valueInt
+            row.setValue(incrementColIndex, valueInt)
             debug { "auto increment primary key ${table.columnList[table.ext.autoColIndex].name} to ${valueInt.source}" }
             return true
         }

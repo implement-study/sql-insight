@@ -23,7 +23,7 @@ class InsertRowFiller(private val insertColumn: List<Column>, private val row: I
 
     init {
         val columnList = row.belongTo().columnList
-        columnList.map { it.defaultValue }.forEach { row.valueList.add(it) }
+        columnList.map { it.defaultValue }.forEach { row.appendValue(it) }
     }
 
     override fun visit(x: SQLIntegerExpr): Boolean {
@@ -32,7 +32,7 @@ class InsertRowFiller(private val insertColumn: List<Column>, private val row: I
         if (currentType != DataType.INT) {
             throw InsertException(row.rowId, "number $value can't cast to $currentType")
         }
-        row.valueList[currentColumnIndex()] = ValueInt(value)
+        row.setValue(currentColumnIndex(), ValueInt(value))
         return true
     }
 
@@ -40,15 +40,15 @@ class InsertRowFiller(private val insertColumn: List<Column>, private val row: I
         val text = x.text
         val column = currentColumn()
         when (val colType = column.dataType) {
-            DataType.VARCHAR -> row.valueList[currentColumnIndex()] = wrapVarchar(text)
-            DataType.CHAR -> row.valueList[currentColumnIndex()] = wrapChar(text)
+            DataType.VARCHAR -> row.setValue(currentColumnIndex(), wrapVarchar(text))
+            DataType.CHAR -> row.setValue(currentColumnIndex(), wrapChar(text)) 
             else -> throw InsertException(row.rowId, "$text can't cast to $colType")
         }
         return true
     }
 
     override fun visit(x: SQLNullExpr): Boolean {
-        row.valueList[currentColumnIndex()] = ValueNull
+        row.setValue(currentColumnIndex(), ValueNull)
         return true
     }
 
