@@ -33,7 +33,7 @@ class Column : SQLBean {
     var defaultValue: Value<*> = ValueNull
     var comment: String? = null
     var variable = false
-    var nullListIndex = 0
+    var nullListIndex = -1
 
 
     override fun checkMyself() {

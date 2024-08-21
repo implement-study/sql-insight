@@ -11,7 +11,7 @@ import tech.insight.engine.innodb.core.InnodbSessionContext
 import tech.insight.engine.innodb.core.buffer.BufferPool
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.compact.Compact
-import tech.insight.engine.innodb.page.compact.UpdateCompact
+import tech.insight.engine.innodb.page.compact.RowFormatFactory
 import tech.insight.engine.innodb.page.type.PageType
 
 
@@ -169,11 +169,21 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
      * find location where the record linked in page and return pre and next.
      * search only,don't affect the page .
      * @param userRecord target record
+     * @param skipMe will throw Error when find a record equals [userRecord] and this param is true
      */
-    private fun findPreAndNext(userRecord: InnodbUserRecord): Pair<InnodbUserRecord, InnodbUserRecord> {
+    fun findPreAndNext(userRecord: InnodbUserRecord, skipMe: Boolean = false): Pair<InnodbUserRecord, InnodbUserRecord> {
         val targetSlot = findTargetSlot(userRecord)
         var pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot + 1).toInt())
         var next = getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+        var compare = this.pageType().compare(userRecord, next)
+//        do {
+//            val compare = this.pageType().compare(userRecord, next)
+//            if (compare == 0 && !skipMe) {
+//                throw Error("find a record equals target record")
+//            }
+//            pre = next
+//            next = getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+//        } while (compare > 0)
         while (this.pageType().compare(userRecord, next) > 0) {
             pre = next
             next = getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
@@ -412,19 +422,10 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     }
 
 
-    fun update(oldRow: Compact, updateFields: MutableMap<String, Expression>) {
-        val (pre,next) = findPreAndNext(oldRow)
-        val updateCompact = UpdateCompact(oldRow, updateFields)
-        if (oldRow.length() >= updateCompact.length()) {
-            updateCompact.recordHeader.nextRecordOffset = (next.absoluteOffset() - updateCompact.absoluteOffset()).toShort()
-            pre.recordHeader.nextRecordOffset = updateCompact.absoluteOffset().toShort()
-            return
-        }
-        if (oldRow.recordHeader.nOwned != 0) {
-            this.pageDirectory.replace(oldRow.absoluteOffset().toShort(), updateCompact.absoluteOffset().toShort())
-        }
-        refreshRecordHeader(pre)
-        refreshRecordHeader(next)
+    fun update(oldRow: Compact, updateFields: Map<String, Expression>) {
+        InnodbSessionContext.getInnodbSessionContext().modifyPage(this)
+        val updateCompact = RowFormatFactory.compactFromUpdateRow(oldRow, updateFields)
+        return replace(oldRow, updateCompact)
     }
 
     private fun linkedAndAdjust(pre: InnodbUserRecord, insertRecord: InnodbUserRecord, next: InnodbUserRecord) {
@@ -472,7 +473,7 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
     /**
      * you should rewrote to page when you update user record that resolve by [getUserRecordByOffset]
      */
-    private fun refreshRecordHeader(record: InnodbUserRecord) {
+    fun refreshRecordHeader(record: InnodbUserRecord) {
         if (record is Infimum) {
             return
         }

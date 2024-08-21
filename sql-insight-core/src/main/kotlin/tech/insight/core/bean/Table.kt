@@ -50,6 +50,7 @@ class Table : SQLBean {
 
 
     override fun checkMyself() {
+        //   TODO  move to table factory? 
         this.columnList.forEachIndexed { index, col ->
             col.checkMyself()
             ext.columnMap[col.name] = col
@@ -65,6 +66,7 @@ class Table : SQLBean {
             if (col.notNull) {
                 ext.notNullIndex.add(index)
             } else {
+                col.nullListIndex = ext.nullableColCount
                 ext.nullableColCount++
             }
             if (col.variable) {

@@ -40,6 +40,20 @@ class UpdateTest {
             assertEquals(newName, it.getValueByColumnName("name"))
         }
     }
+    
+    @Test
+    fun updateSmallTest() {
+        InsertTest().insertOneRow()
+        val newName = "a"
+        val aaa = SqlPipeline.executeSql(selectAll(tableName, dbName))
+        SqlPipeline.executeSql(updateAllName(newName, tableName, dbName))
+        val selectResult = SqlPipeline.executeSql(selectAll(tableName, dbName))
+        val resultRows = (selectResult as SelectResult).result
+        assertEquals(1, resultRows.size)
+        resultRows.forEach {
+            assertEquals(newName, it.getValueByColumnName("name"))
+        }
+    }
 
 
 }

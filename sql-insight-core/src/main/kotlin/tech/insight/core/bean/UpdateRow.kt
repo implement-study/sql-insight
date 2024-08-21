@@ -15,15 +15,21 @@
  */
 package tech.insight.core.bean
 
-import tech.insight.core.bean.value.Value
+import tech.insight.core.bean.condition.Expression
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class UpdateRow(override val rowId: Long, val table: Table, afterValueList: List<Value<*>>) : NormalRow(rowId, table) {
+class UpdateRow(oldRow: Row, updateFields: Map<String, Expression>) : NormalRow(oldRow.rowId, oldRow.belongTo()) {
     init {
-        afterValueList.forEach {
-            this.candidateValues.add(it)
+        val table = oldRow.belongTo()
+        table.columnList.forEach { col ->
+            val expression = updateFields[col.name]
+            expression?.let {
+                this.candidateValues.add(expression.getExpressionValue(oldRow))
+                return@forEach
+            }
+            this.candidateValues.add(oldRow.getValueByColumnName(col.name))
         }
     }
 }

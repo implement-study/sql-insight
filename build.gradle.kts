@@ -1,6 +1,5 @@
 plugins {
     kotlin("jvm")
-    id("com.ncorti.ktfmt.gradle") version "0.18.0" apply false
 }
 
 subprojects {

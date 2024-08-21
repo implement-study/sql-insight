@@ -8,6 +8,7 @@ import tech.insight.core.util.truncateStringIfTooLong
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
+//   todo different from read row?
 open class NormalRow(override val rowId: Long, val belongTo: Table) : Row, SQLBean, Iterable<Cell> {
 
     /**

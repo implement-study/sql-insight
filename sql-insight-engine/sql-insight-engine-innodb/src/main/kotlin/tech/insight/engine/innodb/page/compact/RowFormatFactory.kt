@@ -19,6 +19,8 @@ import java.util.*
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.bean.Column
 import tech.insight.core.bean.NormalRow
+import tech.insight.core.bean.UpdateRow
+import tech.insight.core.bean.condition.Expression
 import tech.insight.core.bean.value.Value
 import tech.insight.core.bean.value.ValueNull
 import tech.insight.core.exception.SqlInsightException
@@ -62,6 +64,11 @@ object RowFormatFactory {
         }
         compact.body = (bodyBuffer.toBytes())
         return compact
+    }
+
+    fun compactFromUpdateRow(row: Compact, updateFields:Map<String, Expression>): Compact {
+        val newRow = UpdateRow(row, updateFields)
+        return compactFromNormalRow(newRow)
     }
 
 
