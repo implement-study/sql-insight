@@ -18,7 +18,7 @@ import tech.insight.engine.innodb.page.compact.Compact
  * if new [Compact] length is less than old [Compact] length, in-place replace but maybe retain dirty space.
  */
 fun InnoDbPage.replace(oldCompact: Compact, newCompact: Compact) {
-    val (pre, next) = findPreAndNext(oldCompact)
+    val (pre, next) = findPreAndNext(oldCompact, true)
     if (oldCompact.length() >= newCompact.length()) {
         System.arraycopy(
             newCompact.toBytes(),
@@ -29,15 +29,10 @@ fun InnoDbPage.replace(oldCompact: Compact, newCompact: Compact) {
         )
         newCompact.offsetInPage =
             oldCompact.offsetInPage - oldCompact.beforeSplitOffset() + newCompact.beforeSplitOffset()
-    }else{
-        System.arraycopy(
-            newCompact.toBytes(),
-            0,
-            userRecords.body,
-            this.pageHeader.lastInsertOffset.toInt(),
-            newCompact.length()
-        )
-        newCompact.offsetInPage = this.pageHeader.lastInsertOffset.toInt() + ConstantSize.USER_RECORDS.offset()
+    } else {
+        userRecords.addRecord(newCompact)
+        newCompact.offsetInPage = this.pageHeader.heapTop.toInt() + newCompact.beforeSplitOffset()
+        this.pageHeader.lastInsertOffset = (this.pageHeader.lastInsertOffset + newCompact.length()).toShort()
     }
     val oldOffset = oldCompact.offsetInPage
     val newOffset = newCompact.offsetInPage

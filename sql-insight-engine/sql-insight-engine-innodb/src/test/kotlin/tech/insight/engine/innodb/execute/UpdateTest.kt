@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import tech.insight.core.bean.value.ValueVarchar
 import tech.insight.core.engine.SqlPipeline
 import tech.insight.core.result.SelectResult
 import tech.insight.engine.innodb.dropDb
@@ -29,7 +30,7 @@ class UpdateTest {
     }
 
     @Test
-    fun updateTest() {
+    fun updateTestLarge() {
         InsertTest().insertOneRow()
         val newName = UUID.randomUUID().toString()
         SqlPipeline.executeSql(updateAllName(newName, tableName, dbName))
@@ -37,21 +38,20 @@ class UpdateTest {
         val resultRows = (selectResult as SelectResult).result
         assertEquals(1, resultRows.size)
         resultRows.forEach {
-            assertEquals(newName, it.getValueByColumnName("name"))
+            assertEquals(ValueVarchar(newName), it.getValueByColumnName("name"))
         }
     }
-    
+
     @Test
     fun updateSmallTest() {
         InsertTest().insertOneRow()
         val newName = "a"
-        val aaa = SqlPipeline.executeSql(selectAll(tableName, dbName))
         SqlPipeline.executeSql(updateAllName(newName, tableName, dbName))
         val selectResult = SqlPipeline.executeSql(selectAll(tableName, dbName))
         val resultRows = (selectResult as SelectResult).result
         assertEquals(1, resultRows.size)
         resultRows.forEach {
-            assertEquals(newName, it.getValueByColumnName("name"))
+            assertEquals(ValueVarchar(newName), it.getValueByColumnName("name"))
         }
     }
 

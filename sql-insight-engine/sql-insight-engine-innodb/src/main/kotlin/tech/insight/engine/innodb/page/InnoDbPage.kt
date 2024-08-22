@@ -171,22 +171,28 @@ class InnoDbPage(index: InnodbIndex) : Logging(), ByteWrapper,
      * @param userRecord target record
      * @param skipMe will throw Error when find a record equals [userRecord] and this param is true
      */
-    fun findPreAndNext(userRecord: InnodbUserRecord, skipMe: Boolean = false): Pair<InnodbUserRecord, InnodbUserRecord> {
+    fun findPreAndNext(
+        userRecord: InnodbUserRecord,
+        skipMe: Boolean = false
+    ): Pair<InnodbUserRecord, InnodbUserRecord> {
         val targetSlot = findTargetSlot(userRecord)
         var pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot + 1).toInt())
         var next = getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
-        var compare = this.pageType().compare(userRecord, next)
-//        do {
-//            val compare = this.pageType().compare(userRecord, next)
-//            if (compare == 0 && !skipMe) {
-//                throw Error("find a record equals target record")
-//            }
-//            pre = next
-//            next = getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
-//        } while (compare > 0)
-        while (this.pageType().compare(userRecord, next) > 0) {
-            pre = next
-            next = getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+        while (true) {
+            val compare = this.pageType().compare(userRecord, next)
+            if (compare < 0) {
+                break
+            }
+            if (compare > 0) {
+                pre = next
+                next = getUserRecordByOffset(next.nextRecordOffset() + next.absoluteOffset())
+                continue
+            }
+            if (skipMe) {
+                val myNext = getUserRecordByOffset(next.nextRecordOffset() + next.absoluteOffset())
+                return Pair(pre, myNext)
+            }
+            throw Error("find a record equals target record")
         }
         return Pair(pre, next)
     }
