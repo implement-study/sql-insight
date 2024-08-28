@@ -41,21 +41,3 @@ fun ByteArray.toInt(): Int {
             (this[3].toInt() and 0xFF)
 }
 
-
-/**
- * set a byte of binary to 1
- * @param offset rightmost is 0 ,so must less than 8
- */
-fun Byte.setBit1(offset: Int): Byte {
-    check(offset < 8) {
-        "offset rightmost is 0 ,so must less than 8"
-    }
-    return this or ((1 shl offset).toByte())
-}
-
-fun Byte.setBit0(offset: Int): Byte {
-    check(offset < 8) {
-        "offset rightmost is 0 ,so must less than 8"
-    }
-    return this and (1 shl offset).toByte().inv()
-}

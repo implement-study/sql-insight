@@ -45,7 +45,7 @@ fun InnoDbPage.replace(oldCompact: Compact, newCompact: Compact) {
     refreshRecordHeader(next)
     refreshRecordHeader(newCompact)
     if (oldCompact.length() < newCompact.length()) {
-        oldCompact.recordHeader.delete = true
+        oldCompact.recordHeader.deleteMask = true
         pageHeader.apply {
             heapTop = (heapTop + newCompact.length()).toShort()
             absoluteRecordCount = (absoluteRecordCount + 1).toShort()

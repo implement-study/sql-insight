@@ -2,8 +2,10 @@ package tech.insight.engine.innodb.page.compact
 
 import java.nio.ByteBuffer
 import org.gongxuanzhang.easybyte.core.ByteWrapper
-import tech.insight.core.extension.setBit0
-import tech.insight.core.extension.setBit1
+import tech.insight.buffer.isOne
+import tech.insight.buffer.setOne
+import tech.insight.buffer.setZero
+import tech.insight.core.annotation.Unused
 import tech.insight.engine.innodb.core.Lengthable
 import tech.insight.engine.innodb.page.ConstantSize
 import kotlin.experimental.and
@@ -23,32 +25,32 @@ import kotlin.experimental.or
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class RecordHeader private constructor() : ByteWrapper, Lengthable {
+class RecordHeader private constructor(val source: ByteArray = ByteArray(5)) : ByteWrapper, Lengthable {
 
-
-    private val source: ByteArray = ByteArray(5)
-    var delete = false
+    var deleteMask: Boolean = source[0].isOne(5)
         set(value) {
             if (field == value) {
                 return
             }
             field = value
             if (value) {
-                source[0] = source[0].setBit1(5)
+                source[0] = source[0].setOne(5)
             } else {
-                source[0] = source[0].setBit0(5)
+                source[0] = source[0].setZero(5)
             }
         }
-    var minRec = false
+
+    @Unused
+    var minRec = source[0].isOne(4)
         set(value) {
             if (field == value) {
                 return
             }
             field = value
             if (value) {
-                source[0] = source[0].setBit1(4)
+                source[0] = source[0].setOne(4)
             } else {
-                source[0] = source[0].setBit0(5)
+                source[0] = source[0].setZero(4)
             }
         }
 
@@ -95,7 +97,7 @@ class RecordHeader private constructor() : ByteWrapper, Lengthable {
 
     private fun refreshProperties() {
         val deleteMask = 1 shl 5
-        delete = source[0].toInt() and deleteMask == deleteMask
+        this.deleteMask = source[0].toInt() and deleteMask == deleteMask
         val minRecMask = 1 shl 4
         minRec = source[0].toInt() and minRecMask == minRecMask
         val nOwnedBase = 0x0F
@@ -159,7 +161,7 @@ class RecordHeader private constructor() : ByteWrapper, Lengthable {
             recordHeader.apply {
                 recordType = RecordType.UNKNOWN
                 heapNo = 2U
-                delete = false
+                deleteMask = false
                 nOwned = 0
                 nextRecordOffset = 0
             }
@@ -169,7 +171,7 @@ class RecordHeader private constructor() : ByteWrapper, Lengthable {
             recordHeader.apply {
                 recordType = RecordType.NORMAL
                 heapNo = 2U
-                delete = false
+                deleteMask = false
                 nOwned = 0
                 nextRecordOffset = 0
             }
@@ -179,7 +181,7 @@ class RecordHeader private constructor() : ByteWrapper, Lengthable {
             recordHeader.apply {
                 recordType = RecordType.PAGE
                 heapNo = 1U
-                delete = false
+                deleteMask = false
                 nOwned = 0
                 nextRecordOffset = 0
             }
@@ -189,7 +191,7 @@ class RecordHeader private constructor() : ByteWrapper, Lengthable {
             recordHeader.apply {
                 recordType = RecordType.INFIMUM
                 heapNo = 0U
-                delete = false
+                deleteMask = false
                 nOwned = 1
                 nextRecordOffset = ConstantSize.INFIMUM.size().toShort()
             }
@@ -199,7 +201,7 @@ class RecordHeader private constructor() : ByteWrapper, Lengthable {
             recordHeader.apply {
                 recordType = RecordType.SUPREMUM
                 heapNo = 1U
-                delete = false
+                deleteMask = false
                 nOwned = 1
                 nextRecordOffset = 0
             }

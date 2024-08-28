@@ -42,7 +42,6 @@ class FileHeader private constructor(override val belongPage: InnoDbPage) : Byte
 
     /**
      * page type
-     * [PageType]
      */
     var pageType: Short = 0
 

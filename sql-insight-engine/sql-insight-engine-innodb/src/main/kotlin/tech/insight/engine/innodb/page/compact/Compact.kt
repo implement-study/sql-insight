@@ -147,7 +147,7 @@ open class Compact : InnodbUserRecord {
     }
 
     override fun deleteSign(): Boolean {
-        return recordHeader.delete
+        return recordHeader.deleteMask
     }
 
     override fun toString(): String {

@@ -75,7 +75,7 @@ class InsertTest {
             assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
             assertEquals(0, userRecord.recordHeader.nOwned)
             assertEquals(2U, userRecord.recordHeader.heapNo)
-            assertEquals(false, userRecord.recordHeader.delete)
+            assertEquals(false, userRecord.recordHeader.deleteMask)
         }
         rootPage.supremum.apply {
             assertEquals(1U, this.recordHeader.heapNo)
@@ -130,7 +130,7 @@ class InsertTest {
             assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
             assertEquals(0, userRecord.recordHeader.nOwned)
             assertEquals(2U + i.toUInt(), userRecord.recordHeader.heapNo)
-            assertEquals(false, userRecord.recordHeader.delete)
+            assertEquals(false, userRecord.recordHeader.deleteMask)
             pre = userRecord
         }
         val lastUserRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
@@ -138,7 +138,7 @@ class InsertTest {
         assertEquals(RecordType.NORMAL, lastUserRecord.recordHeader.recordType)
         assertEquals(0, lastUserRecord.recordHeader.nOwned)
         assertEquals(6U, lastUserRecord.recordHeader.heapNo)
-        assertEquals(false, lastUserRecord.recordHeader.delete)
+        assertEquals(false, lastUserRecord.recordHeader.deleteMask)
         assertEquals(
             rootPage.supremum.absoluteOffset(),
             lastUserRecord.nextRecordOffset() + lastUserRecord.absoluteOffset()
@@ -188,7 +188,7 @@ class InsertTest {
             assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
             assertEquals(if (i == 3) 4 else 0, userRecord.recordHeader.nOwned)
             assertEquals(2U + i.toUInt(), userRecord.recordHeader.heapNo)
-            assertEquals(false, userRecord.recordHeader.delete)
+            assertEquals(false, userRecord.recordHeader.deleteMask)
             pre = userRecord
         }
         val lastUserRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
@@ -196,7 +196,7 @@ class InsertTest {
         assertEquals(RecordType.NORMAL, lastUserRecord.recordHeader.recordType)
         assertEquals(0, lastUserRecord.recordHeader.nOwned)
         assertEquals(11U, lastUserRecord.recordHeader.heapNo)
-        assertEquals(false, lastUserRecord.recordHeader.delete)
+        assertEquals(false, lastUserRecord.recordHeader.deleteMask)
         assertEquals(
             rootPage.supremum.absoluteOffset(),
             lastUserRecord.nextRecordOffset() + lastUserRecord.absoluteOffset()
@@ -234,7 +234,7 @@ class InsertTest {
             assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
             assertEquals(if (i == 3) 4 else 0, userRecord.recordHeader.nOwned)
             assertEquals(2U + i.toUInt(), userRecord.recordHeader.heapNo)
-            assertEquals(false, userRecord.recordHeader.delete)
+            assertEquals(false, userRecord.recordHeader.deleteMask)
             pre = userRecord
         }
 
@@ -245,7 +245,7 @@ class InsertTest {
             assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
             assertEquals(if (i == 3) 4 else 0, userRecord.recordHeader.nOwned)
             assertEquals(6U + i.toUInt(), userRecord.recordHeader.heapNo)
-            assertEquals(false, userRecord.recordHeader.delete)
+            assertEquals(false, userRecord.recordHeader.deleteMask)
             pre = userRecord
         }
 
@@ -256,7 +256,7 @@ class InsertTest {
             assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
             assertEquals(0, userRecord.recordHeader.nOwned)
             assertEquals(10U + i.toUInt(), userRecord.recordHeader.heapNo)
-            assertEquals(false, userRecord.recordHeader.delete)
+            assertEquals(false, userRecord.recordHeader.deleteMask)
             pre = userRecord
         }
 
@@ -266,7 +266,7 @@ class InsertTest {
         assertEquals(RecordType.SUPREMUM, lastUserRecord.recordHeader.recordType)
         assertEquals(8, lastUserRecord.recordHeader.nOwned)
         assertEquals(1U, lastUserRecord.recordHeader.heapNo)
-        assertEquals(false, lastUserRecord.recordHeader.delete)
+        assertEquals(false, lastUserRecord.recordHeader.deleteMask)
     }
 
 

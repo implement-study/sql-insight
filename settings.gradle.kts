@@ -2,13 +2,16 @@ rootProject.name = "sql-insight"
 
 pluginManagement {
     plugins {
-        java
-        kotlin("jvm") version "2.0.0"
+        kotlin("jvm") version "2.0.20"
     }
+}
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
 
 include(":sql-insight-core")
+include(":sql-insight-buffer")
 include(":sql-insight-engine")
 
 include(":sql-insight-engine:sql-insight-engine-innodb")
