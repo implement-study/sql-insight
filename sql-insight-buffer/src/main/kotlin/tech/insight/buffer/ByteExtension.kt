@@ -1,6 +1,7 @@
 package tech.insight.buffer
 
 import kotlin.experimental.and
+import kotlin.experimental.inv
 import kotlin.experimental.or
 
 
@@ -50,14 +51,14 @@ fun Byte.isZero(index: Int): Boolean {
  * @param length must >0 and <8
  */
 fun Byte.subByte(length: Int): Int {
-    return this.subByte(0,length)
+    return this.subByte(0, length)
 }
 
 /**
  * split the byte from the from index to the to index
  * example:
  * the byte is 0b01011100,subByte(0,4) will return 0b1100
- * * the byte is 0b01011100,subByte(1,5) will return 0b1110
+ * the byte is 0b01011100,subByte(1,5) will return 0b1110
  */
 fun Byte.subByte(from: Int, to: Int): Int {
     require(from in 0..<to && to <= Byte.SIZE_BITS) {
@@ -67,9 +68,25 @@ fun Byte.subByte(from: Int, to: Int): Int {
     return (this.toInt() and toBase) shr from
 }
 
+/**
+ * cover the bits from the rightmost bit
+ * example:
+ * the byte is 0b01011100,coverBits(0b0101,4) will return 0b0101_0101
+ */
+fun Byte.coverBits(cover: Int, length: Int = Byte.SIZE_BITS): Byte {
+    checkLength(length)
+    if (length == Byte.SIZE_BITS) {
+        return (cover and 0xff).toByte()
+    }
+    val base = ((1 shl length) - 1)
+    val left = this and (base.toByte().inv())
+    val right = (cover and base).toByte()
+    return left or right
+}
+
 private fun checkLength(length: Int) {
-    require(length > 0 && length < Byte.SIZE_BITS) {
-        "length must >0 and <8"
+    require(length > 0 && length <= Byte.SIZE_BITS) {
+        "length must >0 and <=${Byte.SIZE_BITS}"
     }
 }
 

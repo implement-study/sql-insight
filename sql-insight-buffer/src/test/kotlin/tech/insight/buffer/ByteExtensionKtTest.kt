@@ -41,7 +41,15 @@ class ByteExtensionKtTest {
         assertEquals(0b100, byte.subByte(3))
         assertEquals(0b011, byte.subByte(3,6))
         assertEquals(0b0111, byte.subByte(2,6))
-        
+    }
+    
+    @Test
+    fun testCoverBits(){
+        val byte = 0b1101_0101.toByte()
+        assertEquals(0b1101_0000.toByte(), byte.coverBits(0, 4))
+        assertEquals(0b1100_0000.toByte(), byte.coverBits(0, 5))
+        assertEquals(0b0.toByte(), 0b01111111.toByte().coverBits(0, 7))
+        assertEquals(0b10000000.toByte(), 0b11111111.toByte().coverBits(0, 7))
     }
 
     @Test

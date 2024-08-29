@@ -2,14 +2,17 @@ package tech.insight.engine.innodb.page.compact
 
 import java.nio.ByteBuffer
 import org.gongxuanzhang.easybyte.core.ByteWrapper
+import tech.insight.buffer.byteArray
+import tech.insight.buffer.compose
+import tech.insight.buffer.coverBits
 import tech.insight.buffer.isOne
 import tech.insight.buffer.setOne
 import tech.insight.buffer.setZero
+import tech.insight.buffer.subByte
+import tech.insight.buffer.subShort
 import tech.insight.core.annotation.Unused
 import tech.insight.engine.innodb.core.Lengthable
 import tech.insight.engine.innodb.page.ConstantSize
-import kotlin.experimental.and
-import kotlin.experimental.or
 
 /**
  * 5 bytes 40 bits.
@@ -41,7 +44,7 @@ class RecordHeader private constructor(val source: ByteArray = ByteArray(5)) : B
         }
 
     @Unused
-    var minRec = source[0].isOne(4)
+    var minRec: Boolean = source[0].isOne(4)
         set(value) {
             if (field == value) {
                 return
@@ -54,63 +57,49 @@ class RecordHeader private constructor(val source: ByteArray = ByteArray(5)) : B
             }
         }
 
-    var nOwned = 0
+    var nOwned: Int = source[0].subByte(4)
         set(value) {
             if (field == value) {
                 return
             }
+            require(value in OWNED_RANGE) { "nOwned must in $OWNED_RANGE" }
             field = value
-            source[0] = (source[0].toInt() and 0xF0).toByte()
-            source[0] = (source[0].toInt() or value).toByte()
+            source[0] = source[0].coverBits(value, 4)
         }
-    var heapNo: UInt = 0U
+
+    var heapNo: Int = compose(source[1], source[2]).subShort(3, 16)
         set(value) {
             if (field == value) {
                 return
             }
+            require(value in HEAP_NO_RANGE) { "heapNo must in $HEAP_NO_RANGE" }
             field = value
-            val buffer = ByteBuffer.allocate(Int.SIZE_BYTES)
-            val bytes = buffer.putShort((value.toInt() shl 3).toShort()).array()
-            source[1] = bytes[0]
-            source[2] = source[2] and 0b00000111.toByte()
-            source[2] = source[2] or bytes[1]
+            val newByteArray = compose(source[1], source[2]).coverBits(value, 3, 16).byteArray()
+            source[1] = newByteArray[0]
+            source[2] = newByteArray[1]
         }
-    var nextRecordOffset: Short = 0
-        set(value) {
-            if (field == value) {
-                return
-            }
-            field = value
-            val array = ByteBuffer.allocate(Short.SIZE_BYTES).putShort(value).array()
-            source[3] = array[0]
-            source[4] = array[1]
-            return
-        }
+
     var recordType: RecordType = RecordType.UNKNOWN
         set(value) {
+            if (value == field) {
+                return
+            }
             field = value
-            // 后三位置0
-            source[2] = (source[2].toInt() and 0b11111000).toByte()
-            source[2] = (source[2].toInt() or recordType.value).toByte()
+            source[2] = source[2].coverBits(value.value, 3)
         }
 
-
-    private fun refreshProperties() {
-        val deleteMask = 1 shl 5
-        this.deleteMask = source[0].toInt() and deleteMask == deleteMask
-        val minRecMask = 1 shl 4
-        minRec = source[0].toInt() and minRecMask == minRecMask
-        val nOwnedBase = 0x0F
-        nOwned = source[0].toInt() and nOwnedBase
-
-        ByteBuffer.wrap(byteArrayOf(source[1], source[2])).let {
-            val s = it.getShort()
-            heapNo = (s.toInt() shr 3).toUInt()
-            recordType = RecordType.entries[s.toInt() and 0b00000111]
+    var nextRecordOffset: Int = compose(source[3], source[4]).toInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            require(value in NEXT_RECORD_RANGE) { "nextRecordOffset must in $NEXT_RECORD_RANGE" }
+            field = value
+            val newByteArray = value.toShort().byteArray()
+            source[3] = newByteArray[0]
+            source[4] = newByteArray[1]
+            return
         }
-        nextRecordOffset = ByteBuffer.wrap(byteArrayOf(source[3], source[4])).getShort()
-    }
-
 
     override fun toBytes(): ByteArray {
         return source
@@ -137,6 +126,10 @@ class RecordHeader private constructor(val source: ByteArray = ByteArray(5)) : B
 
     companion object {
 
+        val HEAP_NO_RANGE = IntRange(0, (1 shl 13) - 1)
+        val OWNED_RANGE = IntRange(0, (1 shl 4) - 1)
+        val NEXT_RECORD_RANGE = IntRange(0, UShort.MAX_VALUE.toInt())
+
         fun create(type: RecordType) = RecordHeader().apply {
             when (type) {
                 RecordType.PAGE -> indexHeader(this)
@@ -145,13 +138,10 @@ class RecordHeader private constructor(val source: ByteArray = ByteArray(5)) : B
                 RecordType.NORMAL -> normalHeader(this)
                 else -> unknownHeader(this)
             }
-            refreshProperties()
         }
 
-        fun wrap(source: ByteArray) = RecordHeader().apply {
+        fun wrap(source: ByteArray) = RecordHeader(source).apply {
             ConstantSize.RECORD_HEADER.checkSize(source)
-            source.copyInto(this.source)
-            refreshProperties()
         }
 
         fun copy(source: RecordHeader) = wrap(source.toBytes())
@@ -160,7 +150,7 @@ class RecordHeader private constructor(val source: ByteArray = ByteArray(5)) : B
         private fun unknownHeader(recordHeader: RecordHeader) {
             recordHeader.apply {
                 recordType = RecordType.UNKNOWN
-                heapNo = 2U
+                heapNo = 2
                 deleteMask = false
                 nOwned = 0
                 nextRecordOffset = 0
@@ -170,7 +160,7 @@ class RecordHeader private constructor(val source: ByteArray = ByteArray(5)) : B
         private fun normalHeader(recordHeader: RecordHeader) {
             recordHeader.apply {
                 recordType = RecordType.NORMAL
-                heapNo = 2U
+                heapNo = 2
                 deleteMask = false
                 nOwned = 0
                 nextRecordOffset = 0
@@ -180,7 +170,7 @@ class RecordHeader private constructor(val source: ByteArray = ByteArray(5)) : B
         private fun indexHeader(recordHeader: RecordHeader) {
             recordHeader.apply {
                 recordType = RecordType.PAGE
-                heapNo = 1U
+                heapNo = 1
                 deleteMask = false
                 nOwned = 0
                 nextRecordOffset = 0
@@ -190,17 +180,17 @@ class RecordHeader private constructor(val source: ByteArray = ByteArray(5)) : B
         private fun infimumHeader(recordHeader: RecordHeader) {
             recordHeader.apply {
                 recordType = RecordType.INFIMUM
-                heapNo = 0U
+                heapNo = 0
                 deleteMask = false
                 nOwned = 1
-                nextRecordOffset = ConstantSize.INFIMUM.size().toShort()
+                nextRecordOffset = ConstantSize.INFIMUM.size()
             }
         }
 
         private fun supremumHeader(recordHeader: RecordHeader) {
             recordHeader.apply {
                 recordType = RecordType.SUPREMUM
-                heapNo = 1U
+                heapNo = 1
                 deleteMask = false
                 nOwned = 1
                 nextRecordOffset = 0
