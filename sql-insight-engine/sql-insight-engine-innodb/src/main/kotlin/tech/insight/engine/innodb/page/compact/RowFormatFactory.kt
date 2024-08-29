@@ -66,7 +66,7 @@ object RowFormatFactory {
         return compact
     }
 
-    fun compactFromUpdateRow(row: Compact, updateFields:Map<String, Expression>): Compact {
+    fun compactFromUpdateRow(row: Compact, updateFields: Map<String, Expression>): Compact {
         val newRow = UpdateRow(row, updateFields)
         return compactFromNormalRow(newRow)
     }

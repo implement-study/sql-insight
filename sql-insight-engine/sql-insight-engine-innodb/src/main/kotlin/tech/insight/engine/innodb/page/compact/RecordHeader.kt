@@ -1,6 +1,5 @@
 package tech.insight.engine.innodb.page.compact
 
-import java.nio.ByteBuffer
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import tech.insight.buffer.byteArray
 import tech.insight.buffer.compose
@@ -28,7 +27,7 @@ import tech.insight.engine.innodb.page.ConstantSize
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class RecordHeader private constructor(val source: ByteArray = ByteArray(5)) : ByteWrapper, Lengthable {
+class RecordHeader private constructor(private val source: ByteArray = ByteArray(5)) : ByteWrapper, Lengthable {
 
     var deleteMask: Boolean = source[0].isOne(5)
         set(value) {

@@ -1,6 +1,5 @@
 package tech.insight.engine.innodb.page.compact
 
-import tech.insight.core.bean.NormalRow
 import tech.insight.core.bean.UpdateRow
 import tech.insight.core.bean.condition.Expression
 
