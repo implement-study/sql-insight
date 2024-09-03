@@ -13,7 +13,7 @@ import tech.insight.share.data.selectAll
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-class DeleteTest  {
+class DeleteTest {
 
     private val dbName = "test_db"
 

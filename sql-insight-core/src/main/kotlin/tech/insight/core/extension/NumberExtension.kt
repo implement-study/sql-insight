@@ -1,9 +1,5 @@
 package tech.insight.core.extension
 
-import kotlin.experimental.and
-import kotlin.experimental.inv
-import kotlin.experimental.or
-
 
 fun Long.toByteArray(): ByteArray {
     return ByteArray(8) { i ->

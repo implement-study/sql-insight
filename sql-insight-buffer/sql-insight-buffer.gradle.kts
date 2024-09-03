@@ -5,7 +5,7 @@ plugins {
 
 
 dependencies {
-    implementation("io.netty:netty-buffer:4.1.112.Final")
+    api("io.netty:netty-buffer:4.1.112.Final")
     testImplementation(kotlin("test"))
 }
 

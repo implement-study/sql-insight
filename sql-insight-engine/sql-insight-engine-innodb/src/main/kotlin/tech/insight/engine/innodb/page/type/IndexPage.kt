@@ -29,8 +29,7 @@ import tech.insight.engine.innodb.utils.ValueNegotiator
  **/
 class IndexPage(override val page: InnoDbPage) : PageType {
 
-
-    override val value: Short = FIL_PAGE_INODE
+    override val value = FIL_PAGE_INODE
 
     override fun locatePage(userRecord: InnodbUserRecord): InnoDbPage {
         return when (userRecord.recordHeader.recordType) {
@@ -65,12 +64,8 @@ class IndexPage(override val page: InnoDbPage) : PageType {
         }
         //  clear root page
         page.apply {
-            pageHeader = PageHeader.create(this)
+            page.clear()
             pageHeader.level++
-            pageDirectory = PageDirectory.create(this)
-            userRecords = UserRecords.create(this)
-            infimum = Infimum.create(this)
-            supremum = Supremum.create(this)
             insertData(leftPage.pageIndex())
             insertData(rightPage.pageIndex())
         }
@@ -223,7 +218,7 @@ class IndexPage(override val page: InnoDbPage) : PageType {
     }
 
     companion object {
-        const val FIL_PAGE_INODE = 0x0003.toShort()
+        const val FIL_PAGE_INODE = 0x0003
     }
 
 }

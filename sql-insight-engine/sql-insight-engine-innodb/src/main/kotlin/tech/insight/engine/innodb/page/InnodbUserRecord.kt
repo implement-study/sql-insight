@@ -37,6 +37,25 @@ interface InnodbUserRecord : UserRecord, PageObject {
      */
     fun indexNode(): InnodbUserRecord
 
+    /**
+     * remove myself from page
+     */
+    fun remove()
+
+    /**
+     * @return record that has the max value in group,that is nOwn not 0,may be is myself
+     */
+    fun groupMax(): InnodbUserRecord
+
+    /**
+     * @return next record in page
+     */
+    fun nextRecord(): InnodbUserRecord
+
+    /**
+     * @return pre record in page
+     */
+    fun preRecord(): InnodbUserRecord
 
     override fun compareTo(other: Row): Int {
         if (other is SystemUserRecord) {

@@ -1,14 +1,14 @@
 package tech.insight.engine.innodb.core.buffer
 
+import io.netty.buffer.Unpooled
 import java.io.File
 import java.io.RandomAccessFile
 import tech.insight.core.annotation.Temporary
 import tech.insight.core.bean.Table
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.ConstantSize
-import tech.insight.engine.innodb.page.FileHeader
 import tech.insight.engine.innodb.page.InnoDbPage
-import tech.insight.engine.innodb.page.InnoDbPage.Companion.swap
+import tech.insight.engine.innodb.page.initPageArray
 import tech.insight.engine.innodb.utils.PageSupport.info
 
 
@@ -36,8 +36,7 @@ class TableBuffer(val table: Table) : PageBuffer, PageAllocator {
             val expendLength = currentLength + ConstantSize.PAGE.size().toLong()
             randomAccessFile.setLength(expendLength)
             info("expend file [${index.file.name}] to $expendLength (${expendLength shr 14} page)")
-            val allocatePage = InnoDbPage(index)
-            allocatePage.fileHeader = FileHeader.create(allocatePage)
+            val allocatePage = InnoDbPage(Unpooled.wrappedBuffer(initPageArray), index)
             allocatePage.fileHeader.offset = currentLength.toInt()
             pageBuffers[currentLength.toInt()] = allocatePage
             return allocatePage
@@ -50,7 +49,7 @@ class TableBuffer(val table: Table) : PageBuffer, PageAllocator {
             randomAccessFile.seek(pageOffset.toLong())
             val pageArr: ByteArray = ConstantSize.PAGE.emptyBuff()
             randomAccessFile.readFully(pageArr)
-            return swap(pageArr, index)
+            return InnoDbPage(Unpooled.wrappedBuffer(pageArr), index)
         }
     }
 

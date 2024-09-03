@@ -15,9 +15,8 @@
  */
 package tech.insight.engine.innodb.page
 
-import java.nio.ByteBuffer
 import org.gongxuanzhang.easybyte.core.ByteWrapper
-import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
+import tech.insight.buffer.readUShort
 import tech.insight.core.annotation.Unused
 
 /**
@@ -26,186 +25,158 @@ import tech.insight.core.annotation.Unused
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class PageHeader private constructor(override val belongPage: InnoDbPage) : PageObject, ByteWrapper {
+class PageHeader(override val belongPage: InnoDbPage) : PageObject, ByteWrapper {
+    //  todo field update adjust bytebuffer
+    val source = belongPage.source.slice(ConstantSize.PAGE_HEADER.offset(), ConstantSize.PAGE_HEADER.size())
+
     /**
      * page slot count
+     * 2 bytes
      */
-    var slotCount: Short = 0
+    var slotCount: Int = source.readUShort().toInt()
 
     /**
      * offset of free space start
+     * 2 bytes
      */
-    var heapTop: Short = 0
+    var heapTop: Int = source.readUShort().toInt()
 
     /**
      * page record count include infimum and supremum and deleted record
+     * 2 bytes
      */
-    var absoluteRecordCount: Short = 0
+    var absoluteRecordCount: Int = source.readUShort().toInt()
 
     /**
      * page record count exclude infimum and supremum and deleted record
+     * 2 bytes
      */
-    var recordCount: Short = 0
+    var recordCount: Int = source.readUShort().toInt()
 
     /**
      * the first deleted record in page. use next_record field can find delete linked list, init is 0
+     * 2 bytes
      */
-    var free: Short = 0
+    var free: Int = source.readUShort().toInt()
 
     /**
      * deleted record occupy space
+     * 2 bytes
      */
-    var garbage: Short = 0
+    var garbage: Int = source.readUShort().toInt()
 
     /**
-     * last insert record offset
+     * last insert record offset,init is 0
+     * 2 bytes
      */
-    var lastInsertOffset: Short = 0
+    var lastInsertOffset: Int = source.readUShort().toInt()
 
     /**
      * insert direction that use for support insert.
      * 0 is left.
      * 1 is right.
+     * 2 bytes
      */
-    var direction: Short = 0
+    var direction: Int = source.readShort().toInt()
 
     /**
      * number of inserts in the same direction
+     * 2 bytes
      */
-    var directionCount: Short = 0
+    var directionCount: Int = source.readUShort().toInt()
 
     /**
      * the max transaction id in page
      */
     @Unused
-    var maxTransactionId: Long = 0
+    var maxTransactionId: Long = source.readLong()
 
     /**
      * this page in b-tree layer level
      * leaf node level is 0.
+     * 2 bytes
      */
-    var level: Short = 0
+    var level: Int = source.readShort().toInt()
 
     /**
      * which index the page belong to
      */
-    var indexId: Long = 0
+    var indexId: Long = source.readLong()
 
     /**
      * join seg leaf 10 bytes
      */
     @Unused
-    var segLeafPre: Short = 0
+    var segLeafPre: Short = source.readShort()
 
     /**
      * 10 bytes.
      * b-tree leaf-node header info . only root page have.
      */
     @Unused
-    var segLeaf: Long = 0
+    var segLeaf: Long = source.readLong()
 
     /**
      * join seg top 10 bytes
      */
     @Unused
-    var segTopPre: Short = 0
+    var segTopPre: Short = source.readShort()
 
     /**
      * 10 bytes.
      * b-tree non-leaf-node header info . only root page have.
      */
-    var segTop: Long = 0
+    var segTop: Long = source.readLong()
+
     override fun length(): Int {
         return ConstantSize.PAGE_HEADER.size()
     }
 
     override fun toBytes(): ByteArray {
-        val buffer: DynamicByteBuffer = DynamicByteBuffer.allocate()
-        buffer.appendShort(slotCount)
-        buffer.appendShort(heapTop)
-        buffer.appendShort(absoluteRecordCount)
-        buffer.appendShort(recordCount)
-        buffer.appendShort(free)
-        buffer.appendShort(garbage)
-        buffer.appendShort(lastInsertOffset)
-        buffer.appendShort(direction)
-        buffer.appendShort(directionCount)
-        buffer.appendLong(maxTransactionId)
-        buffer.appendShort(level)
-        buffer.appendLong(indexId)
-        buffer.appendShort(segLeafPre)
-        buffer.appendLong(segLeaf)
-        buffer.appendShort(segTopPre)
-        buffer.appendLong(segTop)
-        return buffer.toBytes()
+        return source.array()
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
-
         other as PageHeader
-
-        return (slotCount == other.slotCount &&
-                heapTop == other.heapTop &&
-                absoluteRecordCount == other.absoluteRecordCount &&
-                recordCount == other.recordCount &&
-                free == other.free &&
-                garbage == other.garbage &&
-                lastInsertOffset == other.lastInsertOffset &&
-                direction == other.direction &&
-                directionCount == other.directionCount &&
-                maxTransactionId == other.maxTransactionId &&
-                level == other.level &&
-                indexId == other.indexId &&
-                segLeafPre == other.segLeafPre &&
-                segLeaf == other.segLeaf &&
-                segTopPre == other.segTopPre &&
-                segTop == other.segTop)
+        return source == other.source
     }
 
     override fun hashCode(): Int {
-        var result = slotCount.toInt()
-        result = 31 * result + heapTop
-        result = 31 * result + absoluteRecordCount
-        result = 31 * result + recordCount
-        result = 31 * result + free
-        result = 31 * result + garbage
-        result = 31 * result + lastInsertOffset
-        result = 31 * result + direction
-        result = 31 * result + directionCount
-        result = 31 * result + maxTransactionId.hashCode()
-        result = 31 * result + level
-        result = 31 * result + indexId.hashCode()
-        result = 31 * result + segLeafPre
-        result = 31 * result + segLeaf.hashCode()
-        result = 31 * result + segTopPre
-        result = 31 * result + segTop.hashCode()
-        return result
+        return source.hashCode()
     }
 
+    /**
+     * add a record page header will update
+     */
+    fun addRecord(userRecord: InnodbUserRecord) {
+        this.absoluteRecordCount++
+        this.recordCount++
+        this.heapTop += userRecord.length()
+    }
 
     companion object PageHeaderFactory {
 
-        val EMPTY_PAGE_HEAP_TOP = (ConstantSize.FILE_HEADER.size() +
+        val EMPTY_PAGE_HEAP_TOP = ConstantSize.FILE_HEADER.size() +
                 ConstantSize.PAGE_HEADER.size() +
                 ConstantSize.INFIMUM.size() +
-                ConstantSize.SUPREMUM.size()).toShort()
+                ConstantSize.SUPREMUM.size()
 
         /**
          * create a empty page header
          */
         fun create(belongPage: InnoDbPage) = PageHeader(belongPage).apply {
-            this.slotCount = 2.toShort()
+            this.slotCount = 2
             this.heapTop = EMPTY_PAGE_HEAP_TOP
-            this.absoluteRecordCount = 2.toShort()
-            this.recordCount = 0.toShort()
-            this.free = 0.toShort()
-            this.garbage = 0.toShort()
+            this.absoluteRecordCount = 2
+            this.recordCount = 0
+            this.free = 0
+            this.garbage = 0
             this.lastInsertOffset = EMPTY_PAGE_HEAP_TOP
-            this.level = 0.toShort()
-            this.direction = 0.toShort()
-            this.directionCount = 0.toShort()
+            this.level = 0
+            this.direction = 0
+            this.directionCount = 0
             this.maxTransactionId = 0L
             this.indexId = 0
             this.segLeafPre = 0.toShort()
@@ -214,25 +185,5 @@ class PageHeader private constructor(override val belongPage: InnoDbPage) : Page
             this.segTop = 0L
         }
 
-        fun wrap(pageHeaderArr: ByteArray, belongPage: InnoDbPage) = PageHeader(belongPage).apply {
-            ConstantSize.PAGE_HEADER.checkSize(pageHeaderArr)
-            val buffer = ByteBuffer.wrap(pageHeaderArr)
-            this.slotCount = buffer.getShort()
-            this.heapTop = buffer.getShort()
-            this.absoluteRecordCount = buffer.getShort()
-            this.recordCount = buffer.getShort()
-            this.free = buffer.getShort()
-            this.garbage = buffer.getShort()
-            this.lastInsertOffset = buffer.getShort()
-            this.direction = buffer.getShort()
-            this.directionCount = buffer.getShort()
-            this.maxTransactionId = buffer.getLong()
-            this.level = buffer.getShort()
-            this.indexId = buffer.getLong()
-            this.segLeafPre = buffer.getShort()
-            this.segLeaf = buffer.getLong()
-            this.segTopPre = buffer.getShort()
-            this.segTop = buffer.getLong()
-        }
     }
 }

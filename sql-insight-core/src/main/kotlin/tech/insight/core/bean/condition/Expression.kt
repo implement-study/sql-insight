@@ -58,7 +58,7 @@ interface Expression : SQLBean {
      */
     fun originExpressionString(): String
 
-    
+
     /**
      * value to boolean support expression
      */

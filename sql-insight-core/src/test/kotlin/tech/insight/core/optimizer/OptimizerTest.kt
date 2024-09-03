@@ -31,7 +31,7 @@ class OptimizerTest {
     fun selectUnknownCol() {
         SqlPipeline.executeSql(createDatabase(dbName))
         SqlPipeline.executeSql(createTable(tableName, dbName, "", false))
-        val sql =  """
+        val sql = """
             select * from $dbName.$tableName 
             where 
             (aaa = 1 or ddd = 2) and (bbb = 2 or ccc = 3)

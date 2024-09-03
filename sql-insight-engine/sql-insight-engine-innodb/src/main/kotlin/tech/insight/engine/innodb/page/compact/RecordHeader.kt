@@ -9,7 +9,6 @@ import tech.insight.buffer.setOne
 import tech.insight.buffer.setZero
 import tech.insight.buffer.subByte
 import tech.insight.buffer.subShort
-import tech.insight.core.annotation.Unused
 import tech.insight.engine.innodb.core.Lengthable
 import tech.insight.engine.innodb.page.ConstantSize
 
@@ -25,9 +24,9 @@ import tech.insight.engine.innodb.page.ConstantSize
  * record_type:0 normal record 1 non leaf node (index) 2 infimum 3 supremum
  * next_record:next record offset in this page. supremum next_record is 0
  *
- * @author gxz gongxuanzhangmelt@gmail.com
+ * @author gongxuanzhangmelt@gmail.com
  */
-class RecordHeader private constructor(private val source: ByteArray = ByteArray(5)) : ByteWrapper, Lengthable {
+class RecordHeader(private val source: ByteArray = ByteArray(5)) : ByteWrapper, Lengthable {
 
     var deleteMask: Boolean = source[0].isOne(5)
         set(value) {
@@ -42,7 +41,6 @@ class RecordHeader private constructor(private val source: ByteArray = ByteArray
             }
         }
 
-    @Unused
     var minRec: Boolean = source[0].isOne(4)
         set(value) {
             if (field == value) {
@@ -125,9 +123,9 @@ class RecordHeader private constructor(private val source: ByteArray = ByteArray
 
     companion object {
 
-        val HEAP_NO_RANGE = IntRange(0, (1 shl 13) - 1)
-        val OWNED_RANGE = IntRange(0, (1 shl 4) - 1)
-        val NEXT_RECORD_RANGE = IntRange(0, UShort.MAX_VALUE.toInt())
+        private val HEAP_NO_RANGE = IntRange(0, (1 shl 13) - 1)
+        private val OWNED_RANGE = IntRange(0, (1 shl 4) - 1)
+        private val NEXT_RECORD_RANGE = IntRange(0, UShort.MAX_VALUE.toInt())
 
         fun create(type: RecordType) = RecordHeader().apply {
             when (type) {

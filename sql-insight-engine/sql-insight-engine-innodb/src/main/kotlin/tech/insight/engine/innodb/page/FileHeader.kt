@@ -15,9 +15,8 @@
  */
 package tech.insight.engine.innodb.page
 
-import java.nio.ByteBuffer
+import io.netty.buffer.ByteBuf
 import org.gongxuanzhang.easybyte.core.ByteWrapper
-import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VALUE
 
 
@@ -27,109 +26,76 @@ import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VA
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class FileHeader private constructor(override val belongPage: InnoDbPage) : ByteWrapper, PageObject {
+class FileHeader(override val belongPage: InnoDbPage) : ByteWrapper, PageObject {
 
+    val source: ByteBuf = belongPage.source.slice(ConstantSize.FILE_HEADER.offset(), ConstantSize.FILE_HEADER.size())
 
     /**
      * use it with [FileTrailer.checkSum]
      */
-    var checkSum: Int = 0
+    var checkSum: Int = source.readInt()
 
     /**
      * page offset
+     * 4 bytes
      */
-    var offset = 0
+    var offset: Int = source.readInt()
 
     /**
      * page type
+     * 2 bytes
      */
-    var pageType: Short = 0
+    var pageType: Int = source.readShort().toInt()
 
     /**
      * pre page offset
      */
-    var pre = 0
+    var pre: Int = source.readInt()
 
     /**
      * next page offset
      */
-    var next = 0
+    var next: Int = source.readInt()
 
     /**
      * Log Sequence Number 8字节
      * [FileTrailer.lsn]
      */
-    var lsn: Long = 0
+    var lsn: Long = source.readLong()
 
     /**
      * system table space
      */
-    var flushLsn: Long = 0
+    var flushLsn: Long = source.readLong()
 
     /**
      * table space id
      */
-    var spaceId = 0
-
+    var spaceId = source.readInt()
 
     override fun length(): Int {
         return ConstantSize.FILE_HEADER.size()
     }
 
     override fun toBytes(): ByteArray {
-        val buffer: DynamicByteBuffer = DynamicByteBuffer.allocate()
-        buffer.appendInt(checkSum)
-        buffer.appendInt(offset)
-        buffer.appendShort(pageType)
-        buffer.appendInt(pre)
-        buffer.appendInt(next)
-        buffer.appendLong(lsn)
-        buffer.appendLong(flushLsn)
-        buffer.appendInt(spaceId)
-        return buffer.toBytes()
+        return source.array()
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is FileHeader) return false
-
-        return (checkSum == other.checkSum &&
-                offset == other.offset &&
-                pageType == other.pageType &&
-                pre == other.pre &&
-                next == other.next &&
-                lsn == other.lsn &&
-                flushLsn == other.flushLsn &&
-                spaceId == other.spaceId)
+        return this.source == other.source
     }
 
     override fun hashCode(): Int {
-        var result = checkSum
-        result = 31 * result + offset
-        result = 31 * result + pageType
-        result = 31 * result + pre
-        result = 31 * result + next
-        result = 31 * result + lsn.hashCode()
-        result = 31 * result + flushLsn.hashCode()
-        result = 31 * result + spaceId
-        return result
+        return source.hashCode()
     }
-
 
     companion object FileHeaderFactory {
 
-        fun wrap(arr: ByteArray, belongPage: InnoDbPage) = FileHeader(belongPage).apply {
-            ConstantSize.FILE_HEADER.checkSize(arr)
-            val buffer = ByteBuffer.wrap(arr)
-            this.checkSum = buffer.getInt()
-            this.offset = buffer.getInt()
-            this.pageType = buffer.getShort()
-            this.pre = buffer.getInt()
-            this.next = buffer.getInt()
-            this.lsn = buffer.getLong()
-            this.flushLsn = buffer.getLong()
-            this.spaceId = buffer.getInt()
-        }
+        const val checkSum = 0X12345678
+
+        fun wrap(arr: ByteArray, belongPage: InnoDbPage) = FileHeader(belongPage)
 
         /**
          * create a empty file header

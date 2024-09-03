@@ -15,7 +15,6 @@
  */
 package tech.insight.engine.innodb.page
 
-import java.nio.ByteBuffer
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 
@@ -25,26 +24,26 @@ import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class FileTrailer private constructor(override val belongPage: InnoDbPage) : ByteWrapper, PageObject {
+class FileTrailer(override val belongPage: InnoDbPage) : ByteWrapper, PageObject {
+
+    val source = belongPage.source.slice(ConstantSize.FILE_TRAILER.offset(), ConstantSize.FILE_TRAILER.size())
+
     /**
      * use it with [FileHeader.checkSum]
      */
-    var checkSum = 0
+    var checkSum = source.readInt()
 
     /**
      * use it with [FileHeader.lsn]
      */
-    var lsn = 0
+    var lsn = source.readInt()
 
     override fun length(): Int {
-        return ConstantSize.FILE_TRAILER.size()
+        return ConstantSize.FILE_TRAILER.size
     }
 
     override fun toBytes(): ByteArray {
-        val buffer = ByteBuffer.allocate(length())
-        buffer.putInt(checkSum)
-        buffer.putInt(lsn)
-        return buffer.array()
+        return source.array()
     }
 
     override fun equals(other: Any?): Boolean {

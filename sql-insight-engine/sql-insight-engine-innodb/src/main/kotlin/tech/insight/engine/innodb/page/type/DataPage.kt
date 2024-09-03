@@ -30,7 +30,7 @@ import tech.insight.engine.innodb.utils.ValueNegotiator
  **/
 class DataPage(override val page: InnoDbPage) : PageType {
 
-    override val value: Short = FIL_PAGE_INDEX_VALUE
+    override val value = FIL_PAGE_INDEX_VALUE
 
 
     /**
@@ -94,13 +94,9 @@ class DataPage(override val page: InnoDbPage) : PageType {
         }
         //  transfer to index page and clear root page
         page.apply {
-            pageHeader = PageHeader.create(this)
+            clear()
             pageHeader.level++
-            pageDirectory = PageDirectory.create(this)
             fileHeader.pageType = FIL_PAGE_INODE
-            userRecords = UserRecords.create(this)
-            infimum = Infimum.create(this)
-            supremum = Supremum.create(this)
             PageSupport.flushPage(this)
             insertData(leftPage.pageIndex())
             insertData(rightPage.pageIndex())
@@ -200,7 +196,7 @@ class DataPage(override val page: InnoDbPage) : PageType {
     }
 
     companion object {
-        const val FIL_PAGE_INDEX_VALUE = 0X45bf.toShort()
+        const val FIL_PAGE_INDEX_VALUE = 0X45bf
 
     }
 

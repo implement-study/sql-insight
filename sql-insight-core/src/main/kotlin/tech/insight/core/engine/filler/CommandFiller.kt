@@ -196,9 +196,9 @@ class DropTableFiller : BaseFiller<DropTable>() {
         command.ifExists = x.isIfExists
         with(command.dropTables) {
             x.tableSources.forEach {
-                it.accept(TableSelectVisitor( !command.ifExists ) { table ->
-                    if(table != null){
-                        this.add(table)    
+                it.accept(TableSelectVisitor(!command.ifExists) { table ->
+                    if (table != null) {
+                        this.add(table)
                     }
                 })
             }
@@ -252,7 +252,7 @@ class InsertFiller : ExplainableFiller<InsertCommand>() {
             if (x.values.size != command.insertColumns.size) {
                 throw InsertException(rowIndex, "Column count doesn't match value count")
             }
-            val row = InsertRow(rowIndex++,command.table)
+            val row = InsertRow(rowIndex++, command.table)
             command.insertRows.add(row)
             x.accept(InsertRowFiller(command.insertColumns, row))
             row.checkMyself()

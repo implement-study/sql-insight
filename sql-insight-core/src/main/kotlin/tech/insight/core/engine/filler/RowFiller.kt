@@ -41,7 +41,7 @@ class InsertRowFiller(private val insertColumn: List<Column>, private val row: I
         val column = currentColumn()
         when (val colType = column.dataType) {
             DataType.VARCHAR -> row.setValue(currentColumnIndex(), wrapVarchar(text))
-            DataType.CHAR -> row.setValue(currentColumnIndex(), wrapChar(text)) 
+            DataType.CHAR -> row.setValue(currentColumnIndex(), wrapChar(text))
             else -> throw InsertException(row.rowId, "$text can't cast to $colType")
         }
         return true

@@ -1,5 +1,6 @@
 package tech.insight.engine.innodb
 
+import io.netty.buffer.Unpooled
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
@@ -21,6 +22,7 @@ import tech.insight.engine.innodb.index.InnodbClusteredCursor
 import tech.insight.engine.innodb.page.InnoDbPage
 import tech.insight.engine.innodb.page.InnodbUserRecord
 import tech.insight.engine.innodb.page.compact.Compact
+import tech.insight.engine.innodb.page.initPageArray
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -60,7 +62,7 @@ class InnodbEngine : Logging(), StorageEngine {
         if (!primaryFile.createNewFile()) {
             warn("${primaryFile.getAbsoluteFile()} already exists , execute create table will overwrite file")
         }
-        val root = InnoDbPage.createRootPage(clusteredIndex)
+        val root = InnoDbPage(Unpooled.wrappedBuffer(initPageArray), clusteredIndex)
         Files.write(primaryFile.toPath(), root.toBytes())
         info("create table ${table.name} with innodb,create ibd file")
         val file = File(table.database.dbFolder, "${table.name}.inf")

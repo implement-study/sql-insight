@@ -25,7 +25,7 @@ import tech.insight.engine.innodb.page.InnodbUserRecord
  */
 interface PageType : Comparator<InnodbUserRecord> {
 
-    val value: Short
+    val value: Int
 
     val page: InnoDbPage
 
@@ -67,7 +67,7 @@ interface PageType : Comparator<InnodbUserRecord> {
 
     companion object {
         fun valueOf(value: Int, innoDbPage: InnoDbPage): PageType {
-            return when (value.toShort()) {
+            return when (value) {
                 DataPage.FIL_PAGE_INDEX_VALUE -> DataPage(innoDbPage)
                 IndexPage.FIL_PAGE_INODE -> IndexPage(innoDbPage)
                 UndoPage.FIL_PAGE_TYPE_UNDO_LOG -> UndoPage(innoDbPage)

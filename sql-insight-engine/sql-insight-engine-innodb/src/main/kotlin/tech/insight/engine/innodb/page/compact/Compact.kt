@@ -121,6 +121,18 @@ open class Compact : InnodbUserRecord {
         return indexCompact
     }
 
+    override fun remove() {
+        this.recordHeader.deleteMask = true
+    }
+
+    override fun groupMax(): InnodbUserRecord {
+        var candidate: InnodbUserRecord = this
+        while (candidate.recordHeader.nOwned == 0) {
+            candidate = candidate.nextRecord()
+        }
+        return candidate
+    }
+
     /**
      * in cluster index,if compact record is index node , the point means sub page offset, otherwise is empty.
      * in second index ,if compact record is index node , the point means sub page offset, otherwise is primary key.
@@ -143,11 +155,25 @@ open class Compact : InnodbUserRecord {
     }
 
     override fun nextRecordOffset(): Int {
-        return recordHeader.nextRecordOffset.toInt()
+        return recordHeader.nextRecordOffset
     }
 
     override fun deleteSign(): Boolean {
         return recordHeader.deleteMask
+    }
+
+    override fun nextRecord(): InnodbUserRecord {
+        return this.belongPage.getUserRecordByOffset(this.absoluteOffset() + nextRecordOffset())
+    }
+
+    override fun preRecord(): InnodbUserRecord {
+        val groupMaxRecord = groupMax()
+        val preGroupMaxOffset = belongPage.pageDirectory.preTargetOffset(groupMaxRecord.absoluteOffset())
+        var pre = this.belongPage.getUserRecordByOffset(preGroupMaxOffset)
+        while (pre.nextRecordOffset() + pre.absoluteOffset() != groupMaxRecord.absoluteOffset()) {
+            pre = pre.nextRecord()
+        }
+        return pre
     }
 
     override fun toString(): String {

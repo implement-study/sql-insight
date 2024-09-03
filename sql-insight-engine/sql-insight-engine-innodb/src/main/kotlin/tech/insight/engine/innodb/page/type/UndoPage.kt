@@ -9,7 +9,7 @@ import tech.insight.engine.innodb.page.InnodbUserRecord
  **/
 class UndoPage(override val page: InnoDbPage) : PageType {
 
-    override val value: Short = FIL_PAGE_TYPE_UNDO_LOG
+    override val value = FIL_PAGE_TYPE_UNDO_LOG
 
     override fun locatePage(userRecord: InnodbUserRecord): InnoDbPage {
         TODO("Not yet implemented")
@@ -37,6 +37,6 @@ class UndoPage(override val page: InnoDbPage) : PageType {
 
 
     companion object {
-        const val FIL_PAGE_TYPE_UNDO_LOG = 0X0001.toShort()
+        const val FIL_PAGE_TYPE_UNDO_LOG = 0X0001
     }
 }

@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    //    implementation("com.intellij:annotations:latest.release")
 }
 
 gradlePlugin {

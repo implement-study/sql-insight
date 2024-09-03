@@ -56,7 +56,7 @@ object Console {
         dump.append(BLANK.repeat(9))
         dump.append("| offset: [${innoDbPage.fileHeader.offset}]$BLANK")
         dump.append("user record: [${innoDbPage.pageHeader.recordCount}]$BLANK")
-        dump.append("page directory: [${innoDbPage.pageDirectory.slotCount()}]$BLANK")
+        dump.append("page directory: [${innoDbPage.pageHeader.slotCount}]$BLANK")
         dump.append(LINE)
         dump.append(BLANK.repeat(9))
         dump.append(

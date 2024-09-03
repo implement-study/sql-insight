@@ -1,5 +1,6 @@
 package tech.insight.engine.innodb.page
 
+import io.netty.buffer.Unpooled
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -14,7 +15,6 @@ import tech.insight.engine.innodb.core.buffer.BufferPool
 import tech.insight.engine.innodb.dropDb
 import tech.insight.engine.innodb.execute.CreateTableTest
 import tech.insight.engine.innodb.index.InnodbIndex
-import tech.insight.engine.innodb.page.InnoDbPage.Companion.fillInnodbUserRecords
 import tech.insight.engine.innodb.page.compact.RecordHeader
 import tech.insight.share.data.insertDataCount
 import kotlin.test.assertEquals
@@ -69,7 +69,7 @@ class InnodbPageTest {
         for (id in 1..5) {
             recordList.add(mockUserRecord(id, table))
         }
-        fillInnodbUserRecords(recordList, innodbPage)
+        innodbPage.coverRecords(recordList)
         assertEquals(2, innodbPage.pageDirectory.slots.size)
         assertEquals(innodbPage.supremum.absoluteOffset().toShort(), innodbPage.pageDirectory.slots[0])
         assertEquals(innodbPage.infimum.absoluteOffset().toShort(), innodbPage.pageDirectory.slots[1])
@@ -78,16 +78,16 @@ class InnodbPageTest {
         for (id in 6..15) {
             recordList.add(mockUserRecord(id, table))
         }
-        innodbPage = InnoDbPage.swap(pageBytes, table.indexList[0] as InnodbIndex)
-        fillInnodbUserRecords(recordList, innodbPage)
+        innodbPage = InnoDbPage(Unpooled.wrappedBuffer(pageBytes), table.indexList[0] as InnodbIndex)
+        innodbPage.coverRecords(recordList)
         assertEquals(3, innodbPage.pageDirectory.slots.size)
         assertEquals(innodbPage.supremum.absoluteOffset().toShort(), innodbPage.pageDirectory.slots[0])
         assertEquals(innodbPage.infimum.absoluteOffset().toShort(), innodbPage.pageDirectory.slots[2])
 
         recordList.add(mockUserRecord(16, table))
-        innodbPage = InnoDbPage.swap(pageBytes, table.indexList[0] as InnodbIndex)
+        innodbPage = InnoDbPage(Unpooled.wrappedBuffer(pageBytes), table.indexList[0] as InnodbIndex)
 
-        fillInnodbUserRecords(recordList, innodbPage)
+        innodbPage.coverRecords(recordList)
         assertEquals(4, innodbPage.pageDirectory.slots.size)
         assertEquals(supremumOffset, innodbPage.pageDirectory.slots[0].toInt())
         assertEquals(innodbPage.infimum.absoluteOffset().toShort(), innodbPage.pageDirectory.slots[3])

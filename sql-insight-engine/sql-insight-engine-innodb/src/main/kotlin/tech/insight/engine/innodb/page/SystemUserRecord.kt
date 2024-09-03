@@ -1,12 +1,13 @@
 package tech.insight.engine.innodb.page
 
-import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
+import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
+import java.nio.charset.Charset
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.Value
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.compact.RecordHeader
-import tech.insight.engine.innodb.page.compact.RecordType
 
 
 /**
@@ -42,38 +43,61 @@ sealed interface SystemUserRecord : InnodbUserRecord {
         systemUserRecordUnsupported()
     }
 
+    override fun remove() {
+        throw UnsupportedOperationException("infimum and supremum not support remove!")
+    }
+
     private fun systemUserRecordUnsupported(): Nothing {
         throw UnsupportedOperationException("infimum and supremum not support operator!")
     }
 }
 
-class Supremum private constructor(override val belongPage: InnoDbPage) : SystemUserRecord {
+class Supremum(override val belongPage: InnoDbPage) : SystemUserRecord {
+
+    val source: ByteBuf = belongPage.source.slice(ConstantSize.SUPREMUM.offset(), ConstantSize.SUPREMUM.size())
 
     /**
      * 5 bytes
      */
-    override lateinit var recordHeader: RecordHeader
+    override val recordHeader = RecordHeader(source.slice(0, ConstantSize.RECORD_HEADER.size).array())
 
     /**
      * 8 bytes as "supremum"
      */
-    private val body = SUPREMUM_BODY.toByteArray()
+    private val body: ByteBuf = source.slice(ConstantSize.RECORD_HEADER.size, ConstantSize.SUPREMUM_BODY.size)
 
+    init {
+        val expect = body.getCharSequence(0, ConstantSize.SUPREMUM_BODY.size, Charset.defaultCharset())
+        require(SUPREMUM_BODY == expect) { "supremum body must be $SUPREMUM_BODY" }
+    }
 
     override fun rowBytes(): ByteArray {
-        return DynamicByteBuffer.wrap(recordHeader.toBytes()).append(body).toBytes()
+        return source.array()
     }
 
     override fun absoluteOffset(): Int {
-        return ConstantSize.SUPREMUM.offset()
+        return ConstantSize.SUPREMUM.offset
     }
-
 
     /**
      * supremum next is infimum
+     * todo next offset is ?
      */
     override fun nextRecordOffset(): Int {
-        return 0
+        throw UnsupportedOperationException("supremum next is infimum")
+    }
+
+    override fun nextRecord(): InnodbUserRecord {
+        return this.belongPage.infimum
+    }
+
+    override fun preRecord(): InnodbUserRecord {
+        val preMaxRecord = belongPage.pageDirectory[belongPage.pageHeader.slotCount - 2]
+        var candidate = this.belongPage.getUserRecordByOffset(preMaxRecord)
+        while (candidate.nextRecordOffset() + candidate.absoluteOffset() != this.absoluteOffset()) {
+            candidate = candidate.nextRecord()
+        }
+        return candidate
     }
 
     override fun beforeSplitOffset(): Int {
@@ -88,13 +112,17 @@ class Supremum private constructor(override val belongPage: InnoDbPage) : System
         throw UnsupportedOperationException("this is supremum!")
     }
 
+    override fun groupMax(): InnodbUserRecord {
+        return this
+    }
+
 
     override fun length(): Int {
-        return ConstantSize.SUPREMUM.size()
+        return ConstantSize.SUPREMUM.size
     }
 
     override fun toString(): String {
-        return "[body:" + String(body) + "]"
+        return "[body:$SUPREMUM_BODY]"
     }
 
     override operator fun compareTo(other: Row): Int {
@@ -107,19 +135,12 @@ class Supremum private constructor(override val belongPage: InnoDbPage) : System
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
-
         other as Supremum
-
-        if (recordHeader != other.recordHeader) return false
-        if (!body.contentEquals(other.body)) return false
-
-        return true
+        return source == other.source
     }
 
     override fun hashCode(): Int {
-        var result = recordHeader.hashCode()
-        result = 31 * result + body.contentHashCode()
-        return result
+        return source.hashCode()
     }
 
 
@@ -127,16 +148,9 @@ class Supremum private constructor(override val belongPage: InnoDbPage) : System
 
         const val SUPREMUM_BODY = "supremum"
 
-        fun create(belongToPage: InnoDbPage) = Supremum(belongToPage).apply {
-            this.recordHeader = RecordHeader.create(RecordType.SUPREMUM)
-        }
+        val SUPREMUM_BODY_ARRAY: ByteArray = SUPREMUM_BODY.toByteArray()
 
-        fun wrap(bytes: ByteArray, belongToPage: InnoDbPage) = Supremum(belongToPage).apply {
-            ConstantSize.SUPREMUM.checkSize(bytes)
-            val buffer: DynamicByteBuffer = DynamicByteBuffer.wrap(bytes)
-            val headBuffer: ByteArray = buffer.getLength(ConstantSize.RECORD_HEADER.size())
-            this.recordHeader = RecordHeader.wrap(headBuffer)
-        }
+        fun wrap(bytes: ByteArray, belongToPage: InnoDbPage) = Supremum(belongToPage)
     }
 
 }
@@ -147,21 +161,27 @@ class Supremum private constructor(override val belongPage: InnoDbPage) : System
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class Infimum private constructor(override val belongPage: InnoDbPage) : SystemUserRecord {
+class Infimum(override val belongPage: InnoDbPage) : SystemUserRecord {
+
+
+    val source: ByteBuf = belongPage.source.slice(ConstantSize.INFIMUM.offset(), ConstantSize.INFIMUM.size())
 
     /**
      * 5 bytes.
      */
-    override lateinit var recordHeader: RecordHeader
+    override val recordHeader = RecordHeader(source.slice(0, ConstantSize.RECORD_HEADER.size).array())
 
     /**
      * fixed 8 bytes. "infimum" is 7 bytes . fill 0 zero occupy the space
      */
-    private val body: ByteArray = DynamicByteBuffer.wrap(INFIMUM_BODY.toByteArray()).append(0.toByte()).toBytes()
+    private val body: ByteBuf = source.slice(ConstantSize.RECORD_HEADER.size, ConstantSize.INFIMUM_BODY.size)
 
+    init {
+        require(INFIMUM_BODY_ARRAY.contentEquals(body.array())) { "infimum body must be $INFIMUM_BODY" }
+    }
 
     override fun rowBytes(): ByteArray {
-        return DynamicByteBuffer.wrap(recordHeader.toBytes()).append(body).toBytes()
+        return source.array()
     }
 
     override fun beforeSplitOffset(): Int {
@@ -176,17 +196,30 @@ class Infimum private constructor(override val belongPage: InnoDbPage) : SystemU
         throw UnsupportedOperationException("this is infimum!")
     }
 
-    override fun nextRecordOffset(): Int {
-        return recordHeader.nextRecordOffset.toInt()
+    override fun groupMax(): InnodbUserRecord {
+        return this
     }
 
+    override fun nextRecordOffset(): Int {
+        return recordHeader.nextRecordOffset
+    }
+
+    override fun nextRecord(): InnodbUserRecord {
+        return this.belongPage.getUserRecordByOffset(this.absoluteOffset() + nextRecordOffset())
+    }
+
+    override fun preRecord(): InnodbUserRecord {
+        throw UnsupportedOperationException("infimum dont have pre record")
+    }
+
+
     override fun absoluteOffset(): Int {
-        return ConstantSize.INFIMUM.offset()
+        return ConstantSize.INFIMUM.offset
     }
 
 
     override fun length(): Int {
-        return ConstantSize.INFIMUM.size()
+        return ConstantSize.INFIMUM.size
     }
 
 
@@ -200,42 +233,27 @@ class Infimum private constructor(override val belongPage: InnoDbPage) : SystemU
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
-
         other as Infimum
-
-        if (recordHeader != other.recordHeader) return false
-        if (!body.contentEquals(other.body)) return false
-
-        return true
+        return source == other.source
     }
 
 
     override fun hashCode(): Int {
-        var result = recordHeader.hashCode()
-        result = 31 * result + body.contentHashCode()
-        return result
+        return source.hashCode()
     }
 
     override fun toString(): String {
-        return "[body:" + String(body) + "]"
+        return "[body:$INFIMUM_BODY]"
     }
 
 
     companion object {
 
-        private const val INFIMUM_BODY = "infimum"
+        const val INFIMUM_BODY = "infimum"
 
-        fun create(belongToPage: InnoDbPage) = Infimum(belongToPage).apply {
-            this.recordHeader = RecordHeader.create(RecordType.INFIMUM)
-        }
+        val INFIMUM_BODY_ARRAY: ByteArray = Unpooled.copiedBuffer(INFIMUM_BODY.toByteArray()).writeByte(0).array()
 
-        fun wrap(bytes: ByteArray, belongToPage: InnoDbPage) =
-            Infimum(belongToPage).apply {
-                ConstantSize.SUPREMUM.checkSize(bytes)
-                val buffer: DynamicByteBuffer = DynamicByteBuffer.wrap(bytes)
-                val headBuffer: ByteArray = buffer.getLength(ConstantSize.RECORD_HEADER.size())
-                this.recordHeader = RecordHeader.wrap(headBuffer)
-            }
+        fun wrap(bytes: ByteArray, belongToPage: InnoDbPage) = Infimum(belongToPage)
 
     }
 

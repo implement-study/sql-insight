@@ -30,11 +30,11 @@ enum class ConstantSize {
     SUPREMUM_BODY(8),
     INFIMUM_BODY(8),
     USER_RECORDS(-1, SUPREMUM.offset + SUPREMUM_BODY.size),
-    FILE_TRAILER(8),
+    FILE_TRAILER(8, PAGE.size - 8),
     COMPACT_NULL(8);
 
-    private val size: Int
-    private val offset: Int
+    val size: Int
+    val offset: Int
 
     constructor(size: Int, offset: Int) {
         this.size = size
