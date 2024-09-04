@@ -18,7 +18,7 @@ package tech.insight.engine.innodb.page
 import io.netty.buffer.ByteBuf
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import tech.insight.buffer.readAllBytes
-import tech.insight.engine.innodb.page.PageHeader.PageHeaderFactory.EMPTY_PAGE_HEAP_TOP
+import tech.insight.engine.innodb.page.PageHeader.Companion.EMPTY_PAGE_HEAP_TOP
 
 /**
  *

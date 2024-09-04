@@ -1,6 +1,5 @@
 package tech.insight.engine.innodb.core.buffer
 
-import io.netty.buffer.Unpooled
 import java.io.File
 import java.io.RandomAccessFile
 import tech.insight.core.annotation.Temporary
@@ -36,7 +35,7 @@ class TableBuffer(val table: Table) : PageBuffer, PageAllocator {
             val expendLength = currentLength + ConstantSize.PAGE.size.toLong()
             randomAccessFile.setLength(expendLength)
             info("expend file [${index.file.name}] to $expendLength (${expendLength shr 14} page)")
-            val allocatePage = InnoDbPage(Unpooled.wrappedBuffer(initPageArray), index)
+            val allocatePage = InnoDbPage(wrappedBuf(initPageArray), index)
             allocatePage.fileHeader.offset = currentLength.toInt()
             pageBuffers[currentLength.toInt()] = allocatePage
             return allocatePage
@@ -49,7 +48,7 @@ class TableBuffer(val table: Table) : PageBuffer, PageAllocator {
             randomAccessFile.seek(pageOffset.toLong())
             val pageArr: ByteArray = ConstantSize.PAGE.emptyBuff()
             randomAccessFile.readFully(pageArr)
-            return InnoDbPage(Unpooled.wrappedBuffer(pageArr), index)
+            return InnoDbPage(wrappedBuf(pageArr), index)
         }
     }
 

@@ -17,7 +17,7 @@ package tech.insight.engine.innodb.page
 
 import io.netty.buffer.ByteBuf
 import org.gongxuanzhang.easybyte.core.ByteWrapper
-import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VALUE
+import tech.insight.core.annotation.Unused
 
 
 /**
@@ -34,44 +34,102 @@ class FileHeader(override val belongPage: InnoDbPage) : ByteWrapper, PageObject 
      * use it with [FileTrailer.checkSum]
      */
     var checkSum: Int = source.readInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setInt(0, value)
+        }
 
     /**
      * page offset
      * 4 bytes
      */
     var offset: Int = source.readInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setInt(4, value)
+        }
 
     /**
      * page type
      * 2 bytes
      */
     var pageType: Int = source.readShort().toInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setShort(8, value)
+        }
 
     /**
      * pre page offset
      */
     var pre: Int = source.readInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setInt(10, value)
+        }
 
     /**
      * next page offset
      */
     var next: Int = source.readInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setInt(14, value)
+        }
 
     /**
      * Log Sequence Number 8字节
      * [FileTrailer.lsn]
      */
     var lsn: Long = source.readLong()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setLong(18, value)
+        }
 
     /**
      * system table space
      */
+    @Unused
     var flushLsn: Long = source.readLong()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setLong(26, value)
+        }
 
     /**
      * table space id
      */
+    @Unused
     var spaceId = source.readInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setInt(34, value)
+        }
 
     override fun length(): Int {
         return ConstantSize.FILE_HEADER.size
@@ -91,20 +149,8 @@ class FileHeader(override val belongPage: InnoDbPage) : ByteWrapper, PageObject 
         return source.hashCode()
     }
 
-    companion object FileHeaderFactory {
+    companion object {
 
         const val checkSum = 0X12345678
-
-        fun wrap(arr: ByteArray, belongPage: InnoDbPage) = FileHeader(belongPage)
-
-        /**
-         * create a empty file header
-         */
-        fun create(belongPage: InnoDbPage) = FileHeader(belongPage).apply {
-            this.next = 0
-            this.pre = 0
-            this.offset = 0
-            this.pageType = FIL_PAGE_INDEX_VALUE
-        }
     }
 }

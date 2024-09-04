@@ -1,6 +1,6 @@
 package tech.insight.engine.innodb.page
 
-import io.netty.buffer.Unpooled
+import tech.insight.buffer.byteBuf
 import tech.insight.engine.innodb.page.compact.RecordType
 import tech.insight.engine.innodb.page.type.DataPage
 
@@ -9,7 +9,7 @@ import tech.insight.engine.innodb.page.type.DataPage
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 val initFileHeaderArray: ByteArray = run {
-    Unpooled.buffer(ConstantSize.FILE_HEADER.size)
+    byteBuf(ConstantSize.FILE_HEADER.size)
         .writeInt(FileHeader.checkSum)
         .writeInt(0)  //  offset
         //  todo allocate page type
@@ -23,7 +23,7 @@ val initFileHeaderArray: ByteArray = run {
 }
 
 val initPageHeaderArray: ByteArray = run {
-    Unpooled.buffer(ConstantSize.PAGE_HEADER.size)
+    byteBuf(ConstantSize.PAGE_HEADER.size)
         .writeShort(0) //  slot count
         .writeShort(ConstantSize.USER_RECORDS.offset) //  heap top
         .writeShort(2) //  absolute record count
@@ -44,7 +44,7 @@ val initPageHeaderArray: ByteArray = run {
 }
 
 val initInfimumArray: ByteArray = run {
-    Unpooled.buffer(ConstantSize.INFIMUM.size)
+    byteBuf(ConstantSize.INFIMUM.size)
         //  record header
         .writeByte(1)
         .writeByte(0)
@@ -55,7 +55,7 @@ val initInfimumArray: ByteArray = run {
 }
 
 val initSupremumArray: ByteArray = run {
-    Unpooled.buffer(ConstantSize.SUPREMUM.size)
+    byteBuf(ConstantSize.SUPREMUM.size)
         //  record header
         .writeByte(1)
         .writeByte(0)
@@ -71,11 +71,11 @@ val initPageDirectoryArray: ByteArray = run {
 
 
 val initFileTrailerArray: ByteArray = run {
-    Unpooled.buffer(ConstantSize.FILE_TRAILER.size).writeInt(FileHeader.checkSum).writeInt(0).array()
+    byteBuf(ConstantSize.FILE_TRAILER.size).writeInt(FileHeader.checkSum).writeInt(0).array()
 }
 
 val initPageArray: ByteArray = run {
-    Unpooled.buffer(ConstantSize.PAGE.size).apply {
+    byteBuf(ConstantSize.PAGE.size).apply {
         writeBytes(initFileHeaderArray)
         writeBytes(initPageHeaderArray)
         writeBytes(initInfimumArray)

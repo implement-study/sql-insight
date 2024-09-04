@@ -9,6 +9,12 @@ class ByteExtensionKtTest {
 
 
     @Test
+    fun testSetBoolean() {
+        val result = 0.toByte().setBoolean(0, true).setBoolean(3, true)
+        assertEquals(0b1001.toByte(), result)
+    }
+    
+    @Test
     fun testSetOne() {
         val result = 0.toByte().setOne(0)
         assertEquals(0b00000001.toByte(), result)

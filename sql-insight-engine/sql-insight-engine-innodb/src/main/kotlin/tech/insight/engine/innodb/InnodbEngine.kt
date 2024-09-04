@@ -1,6 +1,5 @@
 package tech.insight.engine.innodb
 
-import io.netty.buffer.Unpooled
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
@@ -62,7 +61,7 @@ class InnodbEngine : Logging(), StorageEngine {
         if (!primaryFile.createNewFile()) {
             warn("${primaryFile.getAbsoluteFile()} already exists , execute create table will overwrite file")
         }
-        val root = InnoDbPage(Unpooled.wrappedBuffer(initPageArray), clusteredIndex)
+        val root = InnoDbPage(wrappedBuf(initPageArray), clusteredIndex)
         Files.write(primaryFile.toPath(), root.toBytes())
         info("create table ${table.name} with innodb,create ibd file")
         val file = File(table.database.dbFolder, "${table.name}.inf")

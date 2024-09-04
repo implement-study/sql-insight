@@ -1,6 +1,8 @@
 package tech.insight.buffer
 
 import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
+import java.nio.charset.Charset
 
 
 /**
@@ -17,8 +19,54 @@ fun ByteBuf.readUIntLE() = this.readIntLE().toUInt()
 fun ByteBuf.readULongLE() = this.readLongLE().toULong()
 
 
+fun Boolean.toByteArray() = byteArrayOf(if (this) 1 else 0)
+
 fun ByteBuf.readAllBytes(): ByteArray {
     val allBytes = ByteArray(this.readableBytes())
     this.readBytes(allBytes)
     return allBytes
+}
+
+fun ByteBuf.writeLengthAndString(value: String?): ByteBuf {
+    if (value == null) {
+        return this.writeInt(-1)
+    }
+    val byteArray = value.toByteArray(Charset.defaultCharset())
+    return this.writeInt(byteArray.size).writeBytes(byteArray)
+}
+
+fun ByteBuf.readLengthAndString(): String? {
+    val length = readInt()
+    if (length == -1) {
+        return null
+    }
+    return readCharSequence(length, Charset.defaultCharset()).toString()
+}
+
+fun ByteBuf.writeLengthAndBytes(bytes: ByteArray): ByteBuf {
+    return writeInt(bytes.size).writeBytes(bytes)
+}
+
+fun ByteBuf.readLengthAndBytes(): ByteArray {
+    val length = readInt()
+    val bytes = ByteArray(length)
+    readBytes(bytes)
+    return bytes
+}
+
+const val MIN_BUFF_LENGTH = 256
+
+fun byteBuf(length: Int = 256): ByteBuf {
+    if (length < MIN_BUFF_LENGTH) {
+        return Unpooled.buffer()
+    }
+    return Unpooled.buffer(length)
+}
+
+fun wrappedBuf(array: ByteArray): ByteBuf {
+    return Unpooled.wrappedBuffer(array)
+}
+
+fun copyBuf(array: ByteArray): ByteBuf {
+    return Unpooled.copiedBuffer(array)
 }

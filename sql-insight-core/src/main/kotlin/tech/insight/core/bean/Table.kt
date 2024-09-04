@@ -79,20 +79,26 @@ class Table : SQLBean {
         return "Table=[$name] ${columnList.size} columns"
     }
 
+    class TableExt {
+        val columnMap: MutableMap<String, Column> = HashMap()
+        val columnIndex: MutableMap<String, Int> = HashMap()
+
+        /**
+         * not null column index list
+         */
+        val notNullIndex: MutableList<Int> = ArrayList()
+        val variableIndex: MutableList<Int> = ArrayList()
+        var autoColIndex = -1
+        var primaryKeyIndex = -1
+        var nullableColCount = 0
+        var primaryKeyName: String? = null
+    }
+
+    companion object {
+        
+    }
+    
 }
 
 
-class TableExt {
-    val columnMap: MutableMap<String, Column> = HashMap()
-    val columnIndex: MutableMap<String, Int> = HashMap()
 
-    /**
-     * not null column index list
-     */
-    val notNullIndex: MutableList<Int> = ArrayList()
-    val variableIndex: MutableList<Int> = ArrayList()
-    var autoColIndex = -1
-    var primaryKeyIndex = -1
-    var nullableColCount = 0
-    var primaryKeyName: String? = null
-}

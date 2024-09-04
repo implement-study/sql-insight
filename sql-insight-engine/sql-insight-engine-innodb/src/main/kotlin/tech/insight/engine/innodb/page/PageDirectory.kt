@@ -131,7 +131,7 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject, ByteWrapp
         this.belongPage.pageHeader.slotCount++
     }
 
-    
+
     fun preTargetOffset(thisOffset: Int): Int {
         return findTargetOffsetIndex(thisOffset) - 1
     }

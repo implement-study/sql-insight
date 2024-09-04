@@ -9,6 +9,7 @@ import tech.insight.buffer.setOne
 import tech.insight.buffer.setZero
 import tech.insight.buffer.subByte
 import tech.insight.buffer.subShort
+import tech.insight.core.annotation.Unused
 import tech.insight.engine.innodb.core.Lengthable
 import tech.insight.engine.innodb.page.ConstantSize
 
@@ -41,6 +42,7 @@ class RecordHeader(private val source: ByteArray = ByteArray(5)) : ByteWrapper, 
             }
         }
 
+    @Unused
     var minRec: Boolean = source[0].isOne(4)
         set(value) {
             if (field == value) {

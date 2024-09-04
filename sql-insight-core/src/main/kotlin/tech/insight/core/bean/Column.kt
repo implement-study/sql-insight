@@ -15,6 +15,16 @@
  */
 package tech.insight.core.bean
 
+import tech.insight.buffer.ObjectReader
+import tech.insight.buffer.SerializableObject
+import tech.insight.buffer.byteBuf
+import tech.insight.buffer.isOne
+import tech.insight.buffer.readLengthAndBytes
+import tech.insight.buffer.readLengthAndString
+import tech.insight.buffer.setBoolean
+import tech.insight.buffer.wrappedBuf
+import tech.insight.buffer.writeLengthAndBytes
+import tech.insight.buffer.writeLengthAndString
 import tech.insight.core.bean.value.Value
 import tech.insight.core.bean.value.ValueNull
 
@@ -22,7 +32,7 @@ import tech.insight.core.bean.value.ValueNull
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class Column : SQLBean {
+class Column : SQLBean, SerializableObject {
     lateinit var name: String
     lateinit var dataType: DataType
     var length: Int = -1
@@ -44,9 +54,49 @@ class Column : SQLBean {
         }
     }
 
+    override fun toBytes(): ByteArray {
+        val flag = 0.toByte()
+            .setBoolean(0, autoIncrement)
+            .setBoolean(1, notNull)
+            .setBoolean(2, primaryKey)
+            .setBoolean(3, unique)
+            .setBoolean(4, variable)
+        return byteBuf()
+            .writeLengthAndString(name)
+            .writeBytes(dataType.toBytes())
+            .writeInt(length)
+            .writeLengthAndString(comment)
+            .writeLengthAndBytes(defaultValue.toBytes())
+            .writeByte(flag.toInt())
+            .array()
+    }
+
 
     override fun toString(): String {
         return "Column($name $dataType $length)"
+    }
+
+    companion object ColumnReader : ObjectReader<Column> {
+
+        override fun readObject(bytes: ByteArray): Column {
+            val column = Column()
+            val buf = wrappedBuf(bytes)
+            column.name = buf.readLengthAndString() ?: throw IllegalArgumentException("column name can't be null")
+            column.dataType = DataType.entries[buf.readByte().toInt()]
+            column.length = buf.readInt()
+            column.comment = buf.readLengthAndString()
+            buf.readLengthAndBytes().apply { column.defaultValue = Value.readObject(this) }
+            buf.readByte().apply {
+                column.autoIncrement = this.isOne(0)
+                column.notNull = this.isOne(1)
+                column.primaryKey = this.isOne(2)
+                column.unique = this.isOne(3)
+                column.variable = this.isOne(4)
+            }
+            return column
+        }
+
+
     }
 
 }

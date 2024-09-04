@@ -1,8 +1,8 @@
 package tech.insight.engine.innodb.page
 
 import io.netty.buffer.ByteBuf
-import io.netty.buffer.Unpooled
 import java.nio.charset.Charset
+import tech.insight.buffer.copyBuf
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.Value
@@ -251,7 +251,7 @@ class Infimum(override val belongPage: InnoDbPage) : SystemUserRecord {
 
         const val INFIMUM_BODY = "infimum"
 
-        val INFIMUM_BODY_ARRAY: ByteArray = Unpooled.copiedBuffer(INFIMUM_BODY.toByteArray()).writeByte(0).array()
+        val INFIMUM_BODY_ARRAY: ByteArray = copyBuf(INFIMUM_BODY.toByteArray()).writeByte(0).array()
 
         fun wrap(bytes: ByteArray, belongToPage: InnoDbPage) = Infimum(belongToPage)
 

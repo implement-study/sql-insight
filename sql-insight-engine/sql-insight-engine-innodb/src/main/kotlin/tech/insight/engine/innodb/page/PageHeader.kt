@@ -34,42 +34,91 @@ class PageHeader(override val belongPage: InnoDbPage) : PageObject, ByteWrapper 
      * 2 bytes
      */
     var slotCount: Int = source.readUShort().toInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setShort(0, value)
+        }
 
     /**
      * offset of free space start
      * 2 bytes
      */
     var heapTop: Int = source.readUShort().toInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setShort(2, value)
+        }
 
     /**
      * page record count include infimum and supremum and deleted record
      * 2 bytes
      */
     var absoluteRecordCount: Int = source.readUShort().toInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setShort(4, value)
+        }
 
     /**
      * page record count exclude infimum and supremum and deleted record
      * 2 bytes
      */
     var recordCount: Int = source.readUShort().toInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setShort(6, value)
+        }
 
     /**
      * the first deleted record in page. use next_record field can find delete linked list, init is 0
      * 2 bytes
      */
     var free: Int = source.readUShort().toInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setShort(8, value)
+        }
 
     /**
      * deleted record occupy space
      * 2 bytes
      */
     var garbage: Int = source.readUShort().toInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setShort(10, value)
+        }
 
     /**
      * last insert record offset,init is 0
      * 2 bytes
      */
     var lastInsertOffset: Int = source.readUShort().toInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setShort(12, value)
+        }
 
     /**
      * insert direction that use for support insert.
@@ -78,18 +127,39 @@ class PageHeader(override val belongPage: InnoDbPage) : PageObject, ByteWrapper 
      * 2 bytes
      */
     var direction: Int = source.readShort().toInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setShort(14, value)
+        }
 
     /**
      * number of inserts in the same direction
      * 2 bytes
      */
     var directionCount: Int = source.readUShort().toInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setShort(16, value)
+        }
 
     /**
      * the max transaction id in page
      */
     @Unused
     var maxTransactionId: Long = source.readLong()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setLong(18, value)
+        }
 
     /**
      * this page in b-tree layer level
@@ -97,36 +167,51 @@ class PageHeader(override val belongPage: InnoDbPage) : PageObject, ByteWrapper 
      * 2 bytes
      */
     var level: Int = source.readShort().toInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setShort(26, value)
+        }
 
     /**
      * which index the page belong to
      */
     var indexId: Long = source.readLong()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setLong(28, value)
+        }
 
     /**
      * join seg leaf 10 bytes
      */
     @Unused
-    var segLeafPre: Short = source.readShort()
+    val segLeafPre: Short = source.readShort()
 
     /**
      * 10 bytes.
      * b-tree leaf-node header info . only root page have.
      */
     @Unused
-    var segLeaf: Long = source.readLong()
+    val segLeaf: Long = source.readLong()
 
     /**
      * join seg top 10 bytes
      */
     @Unused
-    var segTopPre: Short = source.readShort()
+    val segTopPre: Short = source.readShort()
 
     /**
      * 10 bytes.
      * b-tree non-leaf-node header info . only root page have.
      */
-    var segTop: Long = source.readLong()
+    @Unused
+    val segTop: Long = source.readLong()
 
     override fun length(): Int {
         return ConstantSize.PAGE_HEADER.size
@@ -156,34 +241,11 @@ class PageHeader(override val belongPage: InnoDbPage) : PageObject, ByteWrapper 
         this.heapTop += userRecord.length()
     }
 
-    companion object PageHeaderFactory {
+    companion object {
 
         val EMPTY_PAGE_HEAP_TOP = ConstantSize.FILE_HEADER.size +
                 ConstantSize.PAGE_HEADER.size +
                 ConstantSize.INFIMUM.size +
                 ConstantSize.SUPREMUM.size
-
-        /**
-         * create a empty page header
-         */
-        fun create(belongPage: InnoDbPage) = PageHeader(belongPage).apply {
-            this.slotCount = 2
-            this.heapTop = EMPTY_PAGE_HEAP_TOP
-            this.absoluteRecordCount = 2
-            this.recordCount = 0
-            this.free = 0
-            this.garbage = 0
-            this.lastInsertOffset = EMPTY_PAGE_HEAP_TOP
-            this.level = 0
-            this.direction = 0
-            this.directionCount = 0
-            this.maxTransactionId = 0L
-            this.indexId = 0
-            this.segLeafPre = 0.toShort()
-            this.segLeaf = 0L
-            this.segTopPre = 0.toShort()
-            this.segTop = 0L
-        }
-
     }
 }

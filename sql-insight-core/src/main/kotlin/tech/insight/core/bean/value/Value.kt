@@ -15,7 +15,14 @@
  */
 package tech.insight.core.bean.value
 
-import tech.insight.core.extension.toByteArray
+import java.nio.charset.Charset
+import tech.insight.buffer.ObjectReader
+import tech.insight.buffer.SerializableObject
+import tech.insight.buffer.byteBuf
+import tech.insight.buffer.readLengthAndString
+import tech.insight.buffer.toByteArray
+import tech.insight.buffer.wrappedBuf
+import tech.insight.buffer.writeLengthAndString
 
 
 /**
@@ -23,7 +30,7 @@ import tech.insight.core.extension.toByteArray
  * [T] is value type.
  * @author gongxuanzhangmelt@gmail.com
  */
-sealed interface Value<T> : Comparable<Value<*>> {
+sealed interface Value<T> : Comparable<Value<*>>, SerializableObject {
     /**
      * length for value
      *
@@ -48,7 +55,7 @@ sealed interface Value<T> : Comparable<Value<*>> {
      *
      * @return byte array equals getLength()
      */
-    fun toBytes(): ByteArray
+    override fun toBytes(): ByteArray
 
     operator fun plus(other: Value<*>): Value<T> {
         throw UnsupportedOperationException("${javaClass.name} not support plus")
@@ -66,6 +73,26 @@ sealed interface Value<T> : Comparable<Value<*>> {
         throw UnsupportedOperationException("${javaClass.name} not support div")
     }
 
+    companion object ValueReader : ObjectReader<Value<*>> {
+
+        override fun readObject(bytes: ByteArray): Value<*> {
+            val buffer = wrappedBuf(bytes)
+            return when (val type = buffer.readByte().toInt()) {
+                1 -> buffer.readBoolean().let { if (it) ValueTrue else ValueFalse }
+                2 -> {
+                    val charLength = buffer.readInt()
+                    buffer.readCharSequence(charLength, Charset.defaultCharset()).toString().let {
+                        ValueChar(it, charLength)
+                    }
+                }
+
+                3 -> ValueInt(buffer.readInt())
+                4 -> ValueNull
+                5 -> ValueVarchar(buffer.readLengthAndString()!!)
+                else -> throw IllegalArgumentException("value type :$type error")
+            }
+        }
+    }
 }
 
 class ValueChar(value: String, length: Int) : Value<String> {
@@ -85,7 +112,7 @@ class ValueChar(value: String, length: Int) : Value<String> {
     }
 
     override fun toBytes(): ByteArray {
-        return source.toByteArray()
+        return byteBuf().writeByte(2).writeInt(length).writeBytes(source.toByteArray()).array()
     }
 
     override fun plus(other: Value<*>): Value<String> {
@@ -111,7 +138,7 @@ data class ValueVarchar(override val source: String) : Value<String> {
 
 
     override fun toBytes(): ByteArray {
-        return source.toByteArray()
+        return byteBuf().writeByte(5).writeLengthAndString(source).array()
     }
 
     override fun compareTo(other: Value<*>): Int {
@@ -137,7 +164,7 @@ data class ValueInt(override val source: Int) : Value<Int> {
 
 
     override fun toBytes(): ByteArray {
-        return source.toByteArray()
+        return byteArrayOf(3) + source.toByteArray()
     }
 
     override fun toString(): String {
@@ -181,7 +208,7 @@ open class ValueBoolean(override val source: Boolean) : Value<Boolean> {
 
 
     override fun toBytes(): ByteArray {
-        return source.toByteArray()
+        return byteArrayOf(1, if (source) 1 else 0)
     }
 
 
@@ -225,7 +252,7 @@ data object ValueNull : Value<Unit> {
 
 
     override fun toBytes(): ByteArray {
-        return ByteArray(0)
+        return byteArrayOf(4)
     }
 
     override fun compareTo(other: Value<*>): Int {

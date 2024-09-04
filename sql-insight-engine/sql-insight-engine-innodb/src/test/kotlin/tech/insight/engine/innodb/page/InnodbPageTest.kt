@@ -1,6 +1,6 @@
 package tech.insight.engine.innodb.page
 
-import io.netty.buffer.Unpooled
+import io.netty.buffer.Unpooled.wrappedBuffer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -78,14 +78,14 @@ class InnodbPageTest {
         for (id in 6..15) {
             recordList.add(mockUserRecord(id, table))
         }
-        innodbPage = InnoDbPage(Unpooled.wrappedBuffer(pageBytes), table.indexList[0] as InnodbIndex)
+        innodbPage = InnoDbPage(wrappedBuffer(pageBytes), table.indexList[0] as InnodbIndex)
         innodbPage.coverRecords(recordList)
         assertEquals(3, innodbPage.pageDirectory.slots.size)
         assertEquals(innodbPage.supremum.absoluteOffset().toShort(), innodbPage.pageDirectory.slots[0])
         assertEquals(innodbPage.infimum.absoluteOffset().toShort(), innodbPage.pageDirectory.slots[2])
 
         recordList.add(mockUserRecord(16, table))
-        innodbPage = InnoDbPage(Unpooled.wrappedBuffer(pageBytes), table.indexList[0] as InnodbIndex)
+        innodbPage = InnoDbPage(wrappedBuf(pageBytes), table.indexList[0] as InnodbIndex)
 
         innodbPage.coverRecords(recordList)
         assertEquals(4, innodbPage.pageDirectory.slots.size)

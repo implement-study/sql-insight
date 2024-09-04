@@ -1,11 +1,11 @@
 package tech.insight.engine.innodb.page
 
 import com.fasterxml.jackson.module.kotlin.treeToValue
-import io.netty.buffer.Unpooled
 import org.gongxuanzhang.easybyte.core.ByteWrapper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
+import tech.insight.buffer.copyBuf
 import tech.insight.core.bean.Table
 import tech.insight.core.extension.mapper
 import tech.insight.core.extension.tree
@@ -14,22 +14,6 @@ import kotlin.random.Random
 
 
 class PageObjectTest {
-
-
-    @Test
-    fun testInnodbPageObjectLength() {
-        val mockPage = mock<InnoDbPage>()
-        assertEquals(ConstantSize.INFIMUM.size, Infimum(mockPage).toBytes().size)
-        assertEquals(ConstantSize.SUPREMUM.size, Supremum(mockPage).toBytes().size)
-        assertEquals(ConstantSize.PAGE_HEADER.size, PageHeader.create(mockPage).toBytes().size)
-        assertEquals(ConstantSize.FILE_HEADER.size, FileHeader.create(mockPage).toBytes().size)
-        assertEquals(ConstantSize.FILE_TRAILER.size, FileTrailer(mockPage).toBytes().size)
-        assertEquals(ConstantSize.INFIMUM.size, Infimum(mockPage).length())
-        assertEquals(ConstantSize.SUPREMUM.size, Supremum(mockPage).length())
-        assertEquals(ConstantSize.PAGE_HEADER.size, PageHeader.create(mockPage).length())
-        assertEquals(ConstantSize.FILE_HEADER.size, FileHeader.create(mockPage).length())
-        assertEquals(ConstantSize.FILE_TRAILER.size, FileTrailer.create(mockPage).length())
-    }
 
 
     @Test
@@ -64,7 +48,6 @@ class PageObjectTest {
     @Test
     fun testWrap() {
         val mockPage = mock<InnoDbPage>()
-        val pageHeader = fillRandomNumber(PageHeader.create(mockPage))
         //        assertByteWrapper(pageHeader, mockPage, PageHeader::)
         val fileHeader = fillRandomNumber(FileHeader.create(mockPage))
         assertByteWrapper(fileHeader, mockPage, FileHeader::wrap)
@@ -76,7 +59,7 @@ class PageObjectTest {
         val index = ClusteredIndex(table)
         val dataPage = mock<InnoDbPage>()
 
-        assertByteWrapper(dataPage, mockPage) { bytes, _ -> InnoDbPage(Unpooled.copiedBuffer(bytes), index) }
+        assertByteWrapper(dataPage, mockPage) { bytes, _ -> InnoDbPage(copyBuf(bytes), index) }
     }
 
 

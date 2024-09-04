@@ -8,13 +8,8 @@ import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.Value
 import tech.insight.core.bean.value.ValueInt
 import tech.insight.engine.innodb.page.ConstantSize
-import tech.insight.engine.innodb.page.Infimum
 import tech.insight.engine.innodb.page.InnoDbPage
 import tech.insight.engine.innodb.page.InnodbUserRecord
-import tech.insight.engine.innodb.page.PageDirectory
-import tech.insight.engine.innodb.page.PageHeader
-import tech.insight.engine.innodb.page.Supremum
-import tech.insight.engine.innodb.page.UserRecords
 import tech.insight.engine.innodb.page.compact.Compact
 import tech.insight.engine.innodb.page.compact.CompactNullList
 import tech.insight.engine.innodb.page.compact.RowFormatFactory.readRecordHeader

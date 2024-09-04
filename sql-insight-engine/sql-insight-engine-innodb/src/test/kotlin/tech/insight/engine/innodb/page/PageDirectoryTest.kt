@@ -1,10 +1,10 @@
 package tech.insight.engine.innodb.page
 
-import io.netty.buffer.Unpooled
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import tech.insight.buffer.byteBuf
 
 
 class PageDirectoryTest {
@@ -13,7 +13,7 @@ class PageDirectoryTest {
     fun split() {
         val dir = mock<PageDirectory>()
         val byteBuf = run {
-            Unpooled.buffer()
+            byteBuf()
                 .writeShort(50)
                 .writeShort(40)
                 .writeShort(30)

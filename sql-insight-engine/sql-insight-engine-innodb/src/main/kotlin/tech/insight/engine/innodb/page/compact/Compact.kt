@@ -238,6 +238,7 @@ open class Compact : InnodbUserRecord {
     }
 
     private fun indexBody(): ByteArray {
+
         val bodyBuffer = DynamicByteBuffer.allocate()
         belongIndex.columns().forEach {
             bodyBuffer.append(getValueByColumnName(it.name).toBytes())

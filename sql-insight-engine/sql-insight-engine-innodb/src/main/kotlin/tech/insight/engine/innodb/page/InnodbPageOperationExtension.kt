@@ -25,7 +25,7 @@ fun InnoDbPage.replace(oldCompact: Compact, newCompact: Compact) {
     val pre = oldCompact.preRecord()
     val next = oldCompact.nextRecord()
     this.pageDirectory.replace(oldCompact.offsetInPage, newCompact.offsetInPage)
-    userRecords.addRecord(newCompact,false)
+    userRecords.addRecord(newCompact, false)
     pre.recordHeader.nextRecordOffset = newCompact.offsetInPage - pre.absoluteOffset()
     newCompact.recordHeader.nextRecordOffset = next.absoluteOffset() - newCompact.absoluteOffset()
     oldCompact.recordHeader.deleteMask = true

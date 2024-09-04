@@ -1,6 +1,6 @@
 package tech.insight.core.bean
 
-import org.gongxuanzhang.easybyte.core.ByteWrapper
+import tech.insight.buffer.SerializableObject
 
 
 /**
@@ -9,7 +9,7 @@ import org.gongxuanzhang.easybyte.core.ByteWrapper
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-interface UserRecord : ByteWrapper, Row {
+interface UserRecord : SerializableObject, Row {
     /**
      * the record to byte array.
      */

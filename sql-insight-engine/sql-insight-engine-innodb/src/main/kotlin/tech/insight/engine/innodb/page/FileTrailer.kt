@@ -16,7 +16,7 @@
 package tech.insight.engine.innodb.page
 
 import org.gongxuanzhang.easybyte.core.ByteWrapper
-import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
+import tech.insight.core.annotation.Unused
 
 /**
  * use it with [FileHeader]
@@ -32,11 +32,26 @@ class FileTrailer(override val belongPage: InnoDbPage) : ByteWrapper, PageObject
      * use it with [FileHeader.checkSum]
      */
     var checkSum = source.readInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setInt(0, value)
+        }
 
     /**
      * use it with [FileHeader.lsn]
      */
+    @Unused
     var lsn = source.readInt()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            source.setInt(4, value)
+        }
 
     override fun length(): Int {
         return ConstantSize.FILE_TRAILER.size
@@ -62,17 +77,4 @@ class FileTrailer(override val belongPage: InnoDbPage) : ByteWrapper, PageObject
         return result
     }
 
-
-    companion object FileTrailerFactory {
-        fun create(belongPage: InnoDbPage) = FileTrailer(belongPage)
-
-        fun wrap(bytes: ByteArray, belongPage: InnoDbPage) = run {
-            ConstantSize.FILE_TRAILER.checkSize(bytes)
-            FileTrailer(belongPage)
-        }.apply {
-            val buffer: DynamicByteBuffer = DynamicByteBuffer.wrap(bytes)
-            this.checkSum = buffer.int
-            this.lsn = buffer.int
-        }
-    }
 }

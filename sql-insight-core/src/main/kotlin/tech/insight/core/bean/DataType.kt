@@ -15,13 +15,20 @@
  */
 package tech.insight.core.bean
 
+import tech.insight.buffer.SerializableObject
+
 
 /**
  * Currently supported data types
  * @author gongxuanzhangmelt@gmail.com
  */
-enum class DataType(val defaultLength: Int) {
+enum class DataType(val defaultLength: Int) : SerializableObject {
     INT(4),
     VARCHAR(255),
-    CHAR(255)
+    CHAR(255);
+
+
+    override fun toBytes(): ByteArray {
+        return byteArrayOf(ordinal.toByte())
+    }
 }

@@ -26,6 +26,15 @@ fun Byte.setZero(index: Int): Byte {
     return this and (1 shl index).inv().toByte()
 }
 
+fun Byte.setBoolean(index: Int, boolean: Boolean): Byte {
+    checkIndex(index)
+    return if (boolean) {
+        setOne(index)
+    } else {
+        setZero(index)
+    }
+}
+
 /**
  * get the index bit value is 1,index 0 is the rightmost bit
  */
