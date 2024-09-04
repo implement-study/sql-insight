@@ -54,7 +54,7 @@ sealed interface SystemUserRecord : InnodbUserRecord {
 
 class Supremum(override val belongPage: InnoDbPage) : SystemUserRecord {
 
-    val source: ByteBuf = belongPage.source.slice(ConstantSize.SUPREMUM.offset(), ConstantSize.SUPREMUM.size())
+    val source: ByteBuf = belongPage.source.slice(ConstantSize.SUPREMUM.offset, ConstantSize.SUPREMUM.size)
 
     /**
      * 5 bytes
@@ -164,7 +164,7 @@ class Supremum(override val belongPage: InnoDbPage) : SystemUserRecord {
 class Infimum(override val belongPage: InnoDbPage) : SystemUserRecord {
 
 
-    val source: ByteBuf = belongPage.source.slice(ConstantSize.INFIMUM.offset(), ConstantSize.INFIMUM.size())
+    val source: ByteBuf = belongPage.source.slice(ConstantSize.INFIMUM.offset, ConstantSize.INFIMUM.size)
 
     /**
      * 5 bytes.

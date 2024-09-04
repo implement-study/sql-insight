@@ -31,8 +31,9 @@ class UserRecords(override val belongPage: InnoDbPage) : ByteWrapper, PageObject
     val source: ByteBuf
 
     init {
-        val userRecordsLength = belongPage.pageHeader.heapTop - ConstantSize.USER_RECORDS.offset
-        source = belongPage.source.slice(ConstantSize.USER_RECORDS.offset, userRecordsLength)
+        val pageDirOffset = ConstantSize.FILE_TRAILER.offset - Short.SIZE_BYTES * belongPage.pageHeader.slotCount
+        source =
+            belongPage.source.slice(ConstantSize.USER_RECORDS.offset, pageDirOffset - ConstantSize.USER_RECORDS.offset)
         source.writerIndex(belongPage.pageHeader.heapTop)
     }
 

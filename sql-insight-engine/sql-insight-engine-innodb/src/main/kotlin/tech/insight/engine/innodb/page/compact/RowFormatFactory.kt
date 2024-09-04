@@ -78,7 +78,7 @@ object RowFormatFactory {
      * @return record
      */
     fun readRecordHeader(page: InnoDbPage, offset: Int): RecordHeader {
-        val recordHeaderSize: Int = ConstantSize.RECORD_HEADER.size()
+        val recordHeaderSize: Int = ConstantSize.RECORD_HEADER.size
         val headerArr: ByteArray = Arrays.copyOfRange(page.toBytes(), offset - recordHeaderSize, offset)
         return RecordHeader.wrap(headerArr)
     }

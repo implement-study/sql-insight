@@ -46,10 +46,10 @@ class DataPage(override val page: InnoDbPage) : PageType {
      * offset is after record header .in other words offset - record header size  means record header offset
      */
     override fun convertUserRecord(offsetInPage: Int): InnodbUserRecord {
-        if (ConstantSize.INFIMUM.offset() == offsetInPage) {
+        if (ConstantSize.INFIMUM.offset == offsetInPage) {
             return page.infimum
         }
-        if (ConstantSize.SUPREMUM.offset() == offsetInPage) {
+        if (ConstantSize.SUPREMUM.offset == offsetInPage) {
             return page.supremum
         }
         val compact = Compact()
@@ -127,7 +127,7 @@ class DataPage(override val page: InnoDbPage) : PageType {
      * depend on table info.
      */
     private fun fillNullAndVar(page: InnoDbPage, offset: Int, compact: Compact, table: Table) {
-        val nullBytesEnd = offset - ConstantSize.RECORD_HEADER.size()
+        val nullBytesEnd = offset - ConstantSize.RECORD_HEADER.size
         val nullLength: Int = CompactNullList.calcNullListLength(table.ext.nullableColCount)
         val pageArr: ByteArray = page.toBytes()
         val nullStart = nullBytesEnd - nullLength

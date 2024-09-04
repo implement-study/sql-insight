@@ -20,7 +20,7 @@ object PageSupport : Logging() {
         val indexFile: File = belongIndex.file
         try {
             RandomAccessFile(indexFile, "rw").use { randomAccessFile ->
-                val minLength: Long = (page.fileHeader.offset + ConstantSize.PAGE.size()).toLong()
+                val minLength: Long = (page.fileHeader.offset + ConstantSize.PAGE.size).toLong()
                 if (randomAccessFile.length() < minLength) {
                     randomAccessFile.setLength(minLength)
                 }

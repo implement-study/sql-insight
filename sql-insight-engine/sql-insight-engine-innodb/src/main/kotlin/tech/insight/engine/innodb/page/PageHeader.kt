@@ -27,7 +27,7 @@ import tech.insight.core.annotation.Unused
  */
 class PageHeader(override val belongPage: InnoDbPage) : PageObject, ByteWrapper {
     //  todo field update adjust bytebuffer
-    val source = belongPage.source.slice(ConstantSize.PAGE_HEADER.offset(), ConstantSize.PAGE_HEADER.size())
+    val source = belongPage.source.slice(ConstantSize.PAGE_HEADER.offset, ConstantSize.PAGE_HEADER.size)
 
     /**
      * page slot count
@@ -129,7 +129,7 @@ class PageHeader(override val belongPage: InnoDbPage) : PageObject, ByteWrapper 
     var segTop: Long = source.readLong()
 
     override fun length(): Int {
-        return ConstantSize.PAGE_HEADER.size()
+        return ConstantSize.PAGE_HEADER.size
     }
 
     override fun toBytes(): ByteArray {
@@ -158,10 +158,10 @@ class PageHeader(override val belongPage: InnoDbPage) : PageObject, ByteWrapper 
 
     companion object PageHeaderFactory {
 
-        val EMPTY_PAGE_HEAP_TOP = ConstantSize.FILE_HEADER.size() +
-                ConstantSize.PAGE_HEADER.size() +
-                ConstantSize.INFIMUM.size() +
-                ConstantSize.SUPREMUM.size()
+        val EMPTY_PAGE_HEAP_TOP = ConstantSize.FILE_HEADER.size +
+                ConstantSize.PAGE_HEADER.size +
+                ConstantSize.INFIMUM.size +
+                ConstantSize.SUPREMUM.size
 
         /**
          * create a empty page header

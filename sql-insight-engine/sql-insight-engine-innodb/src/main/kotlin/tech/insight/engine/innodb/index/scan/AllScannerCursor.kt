@@ -36,7 +36,7 @@ class AllScannerCursor(override val index: InnodbIndex) : ScannerCursor {
             page = findPageByOffset(offset, page.ext.belongIndex)
         }
         this.currentPage = page
-        this.nextOffset = ConstantSize.INFIMUM.offset().toShort()
+        this.nextOffset = ConstantSize.INFIMUM.offset.toShort()
     }
 
 
@@ -77,18 +77,18 @@ class AllScannerCursor(override val index: InnodbIndex) : ScannerCursor {
             }
             currentPage = findPageByOffset(currentPage.fileHeader.next, currentPage.ext.belongIndex)
         }
-        if (nextOffset == ConstantSize.INFIMUM.offset().toShort()) {
+        if (nextOffset == ConstantSize.INFIMUM.offset.toShort()) {
             val row = currentPage.getFirstUserRecord()
             currentRow = row
             nextOffset = row.absoluteOffset().toShort()
             return
         }
-        if (nextOffset == ConstantSize.SUPREMUM.offset().toShort()) {
+        if (nextOffset == ConstantSize.SUPREMUM.offset.toShort()) {
             if (currentPage.fileHeader.next == 0) {
                 return
             }
             currentPage = findPageByOffset(currentPage.fileHeader.next, currentPage.ext.belongIndex)
-            nextOffset = ConstantSize.INFIMUM.offset().toShort()
+            nextOffset = ConstantSize.INFIMUM.offset.toShort()
             return findNext()
         }
         val nextRow = currentPage.getUserRecordByOffset(nextOffset.toInt())

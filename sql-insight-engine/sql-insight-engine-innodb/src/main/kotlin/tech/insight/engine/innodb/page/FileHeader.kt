@@ -28,7 +28,7 @@ import tech.insight.engine.innodb.page.type.DataPage.Companion.FIL_PAGE_INDEX_VA
  */
 class FileHeader(override val belongPage: InnoDbPage) : ByteWrapper, PageObject {
 
-    val source: ByteBuf = belongPage.source.slice(ConstantSize.FILE_HEADER.offset(), ConstantSize.FILE_HEADER.size())
+    val source: ByteBuf = belongPage.source.slice(ConstantSize.FILE_HEADER.offset, ConstantSize.FILE_HEADER.size)
 
     /**
      * use it with [FileTrailer.checkSum]
@@ -74,7 +74,7 @@ class FileHeader(override val belongPage: InnoDbPage) : ByteWrapper, PageObject 
     var spaceId = source.readInt()
 
     override fun length(): Int {
-        return ConstantSize.FILE_HEADER.size()
+        return ConstantSize.FILE_HEADER.size
     }
 
     override fun toBytes(): ByteArray {

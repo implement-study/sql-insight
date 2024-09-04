@@ -62,8 +62,8 @@ class InsertTest {
 
         rootPage.infimum.apply {
             assertEquals(0U, this.recordHeader.heapNo)
-            // 16 means 8 + ConstantSize.INFIMUM_BODY.size()
-            assertEquals(16 + ConstantSize.SUPREMUM.size(), this.recordHeader.nextRecordOffset.toInt())
+            // 16 means 8 + ConstantSize.INFIMUM_BODY.size
+            assertEquals(16 + ConstantSize.SUPREMUM.size, this.recordHeader.nextRecordOffset.toInt())
             assertEquals(1, this.recordHeader.nOwned)
             assertEquals(RecordType.INFIMUM, this.recordHeader.recordType)
             val userRecord = rootPage.getUserRecordByOffset(this.nextRecordOffset() + this.absoluteOffset())
@@ -110,8 +110,8 @@ class InsertTest {
         val infimum = rootPage.infimum
         infimum.apply {
             assertEquals(0U, this.recordHeader.heapNo)
-            // 16 means 8 + ConstantSize.INFIMUM_BODY.size()
-            assertEquals(16 + ConstantSize.SUPREMUM.size(), nextRecordOffset())
+            // 16 means 8 + ConstantSize.INFIMUM_BODY.size
+            assertEquals(16 + ConstantSize.SUPREMUM.size, nextRecordOffset())
             assertEquals(1, this.recordHeader.nOwned)
             assertEquals(RecordType.INFIMUM, this.recordHeader.recordType)
         }
@@ -168,8 +168,8 @@ class InsertTest {
         val infimum = rootPage.infimum
         infimum.apply {
             assertEquals(0U, this.recordHeader.heapNo)
-            // 16 means 8 + ConstantSize.INFIMUM_BODY.size()
-            assertEquals(16 + ConstantSize.SUPREMUM.size(), nextRecordOffset())
+            // 16 means 8 + ConstantSize.INFIMUM_BODY.size
+            assertEquals(16 + ConstantSize.SUPREMUM.size, nextRecordOffset())
             assertEquals(1, this.recordHeader.nOwned)
             assertEquals(RecordType.INFIMUM, this.recordHeader.recordType)
         }

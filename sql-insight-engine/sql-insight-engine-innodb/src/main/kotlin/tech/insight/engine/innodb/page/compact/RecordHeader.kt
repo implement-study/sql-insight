@@ -180,7 +180,7 @@ class RecordHeader(private val source: ByteArray = ByteArray(5)) : ByteWrapper, 
                 heapNo = 0
                 deleteMask = false
                 nOwned = 1
-                nextRecordOffset = ConstantSize.INFIMUM.size()
+                nextRecordOffset = ConstantSize.INFIMUM.size
             }
         }
 

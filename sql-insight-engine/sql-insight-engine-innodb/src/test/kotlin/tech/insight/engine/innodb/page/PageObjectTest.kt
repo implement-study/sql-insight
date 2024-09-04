@@ -19,16 +19,16 @@ class PageObjectTest {
     @Test
     fun testInnodbPageObjectLength() {
         val mockPage = mock<InnoDbPage>()
-        assertEquals(ConstantSize.INFIMUM.size(), Infimum(mockPage).toBytes().size)
-        assertEquals(ConstantSize.SUPREMUM.size(), Supremum(mockPage).toBytes().size)
-        assertEquals(ConstantSize.PAGE_HEADER.size(), PageHeader.create(mockPage).toBytes().size)
-        assertEquals(ConstantSize.FILE_HEADER.size(), FileHeader.create(mockPage).toBytes().size)
-        assertEquals(ConstantSize.FILE_TRAILER.size(), FileTrailer(mockPage).toBytes().size)
-        assertEquals(ConstantSize.INFIMUM.size(), Infimum(mockPage).length())
-        assertEquals(ConstantSize.SUPREMUM.size(), Supremum(mockPage).length())
-        assertEquals(ConstantSize.PAGE_HEADER.size(), PageHeader.create(mockPage).length())
-        assertEquals(ConstantSize.FILE_HEADER.size(), FileHeader.create(mockPage).length())
-        assertEquals(ConstantSize.FILE_TRAILER.size(), FileTrailer.create(mockPage).length())
+        assertEquals(ConstantSize.INFIMUM.size, Infimum(mockPage).toBytes().size)
+        assertEquals(ConstantSize.SUPREMUM.size, Supremum(mockPage).toBytes().size)
+        assertEquals(ConstantSize.PAGE_HEADER.size, PageHeader.create(mockPage).toBytes().size)
+        assertEquals(ConstantSize.FILE_HEADER.size, FileHeader.create(mockPage).toBytes().size)
+        assertEquals(ConstantSize.FILE_TRAILER.size, FileTrailer(mockPage).toBytes().size)
+        assertEquals(ConstantSize.INFIMUM.size, Infimum(mockPage).length())
+        assertEquals(ConstantSize.SUPREMUM.size, Supremum(mockPage).length())
+        assertEquals(ConstantSize.PAGE_HEADER.size, PageHeader.create(mockPage).length())
+        assertEquals(ConstantSize.FILE_HEADER.size, FileHeader.create(mockPage).length())
+        assertEquals(ConstantSize.FILE_TRAILER.size, FileTrailer.create(mockPage).length())
     }
 
 

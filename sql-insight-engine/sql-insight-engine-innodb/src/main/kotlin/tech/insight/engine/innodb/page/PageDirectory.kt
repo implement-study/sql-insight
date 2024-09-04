@@ -203,13 +203,13 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject, ByteWrapp
          * non params constructor create a contains infimum and supremum offset slot.
          */
         fun create(belongPage: InnoDbPage) = PageDirectory(belongPage).apply {
-            slots = shortArrayOf(ConstantSize.SUPREMUM.offset().toShort(), ConstantSize.INFIMUM.offset().toShort())
+            slots = shortArrayOf(ConstantSize.SUPREMUM.offset.toShort(), ConstantSize.INFIMUM.offset.toShort())
         }
 
         fun wrap(slots: ShortArray, belongPage: InnoDbPage) = PageDirectory(belongPage).apply {
             require(slots.size >= 2) { "slots size must be greater than 2" }
-            require(slots[0] == ConstantSize.SUPREMUM.offset().toShort()) { "first slot must be supremum" }
-            require(slots[slots.size - 1] == ConstantSize.INFIMUM.offset().toShort()) { "last slot must be infimum" }
+            require(slots[0] == ConstantSize.SUPREMUM.offset.toShort()) { "first slot must be supremum" }
+            require(slots[slots.size - 1] == ConstantSize.INFIMUM.offset.toShort()) { "last slot must be infimum" }
             this.slots = slots
         }
 

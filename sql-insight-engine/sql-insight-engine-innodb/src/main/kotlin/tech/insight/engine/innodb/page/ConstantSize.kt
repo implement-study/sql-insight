@@ -46,16 +46,8 @@ enum class ConstantSize {
         offset = -1
     }
 
-    fun size(): Int {
-        return size
-    }
-
-    fun offset(): Int {
-        return offset
-    }
-
     fun checkSize(bytes: ByteArray) {
-        require(bytes.size == size()) { this.toString() + " size must " + size() + "byte" }
+        require(bytes.size == size) { this.toString() + " size must " + size + "byte" }
     }
 
     fun emptyBuff(): ByteArray {

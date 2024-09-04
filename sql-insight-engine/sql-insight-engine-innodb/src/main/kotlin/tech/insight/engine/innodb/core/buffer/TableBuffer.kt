@@ -33,7 +33,7 @@ class TableBuffer(val table: Table) : PageBuffer, PageAllocator {
     override fun allocatePage(index: InnodbIndex): InnoDbPage {
         RandomAccessFile(index.file, "rw").use { randomAccessFile ->
             val currentLength: Long = randomAccessFile.length()
-            val expendLength = currentLength + ConstantSize.PAGE.size().toLong()
+            val expendLength = currentLength + ConstantSize.PAGE.size.toLong()
             randomAccessFile.setLength(expendLength)
             info("expend file [${index.file.name}] to $expendLength (${expendLength shr 14} page)")
             val allocatePage = InnoDbPage(Unpooled.wrappedBuffer(initPageArray), index)

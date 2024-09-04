@@ -26,7 +26,7 @@ import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
  */
 class FileTrailer(override val belongPage: InnoDbPage) : ByteWrapper, PageObject {
 
-    val source = belongPage.source.slice(ConstantSize.FILE_TRAILER.offset(), ConstantSize.FILE_TRAILER.size())
+    val source = belongPage.source.slice(ConstantSize.FILE_TRAILER.offset, ConstantSize.FILE_TRAILER.size)
 
     /**
      * use it with [FileHeader.checkSum]

@@ -87,13 +87,13 @@ open class Compact : InnodbUserRecord {
     }
 
     override fun length(): Int {
-        //    record header must write "ConstantSize.RECORD_HEADER.size()"
+        //    record header must write "ConstantSize.RECORD_HEADER.size"
         //    because  the compact may come from insert row result in NullPointException
-        return variables.length() + nullList.length() + ConstantSize.RECORD_HEADER.size() + body.size
+        return variables.length() + nullList.length() + ConstantSize.RECORD_HEADER.size + body.size
     }
 
     override fun beforeSplitOffset(): Int {
-        return variables.length() + nullList.length() + ConstantSize.RECORD_HEADER.size()
+        return variables.length() + nullList.length() + ConstantSize.RECORD_HEADER.size
     }
 
     override fun indexKey(): Array<Value<*>> {

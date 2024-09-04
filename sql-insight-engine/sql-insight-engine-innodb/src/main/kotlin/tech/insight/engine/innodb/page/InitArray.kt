@@ -9,7 +9,7 @@ import tech.insight.engine.innodb.page.type.DataPage
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
 val initFileHeaderArray: ByteArray = run {
-    Unpooled.buffer(ConstantSize.FILE_HEADER.size())
+    Unpooled.buffer(ConstantSize.FILE_HEADER.size)
         .writeInt(FileHeader.checkSum)
         .writeInt(0)  //  offset
         //  todo allocate page type
@@ -23,7 +23,7 @@ val initFileHeaderArray: ByteArray = run {
 }
 
 val initPageHeaderArray: ByteArray = run {
-    Unpooled.buffer(ConstantSize.PAGE_HEADER.size())
+    Unpooled.buffer(ConstantSize.PAGE_HEADER.size)
         .writeShort(0) //  slot count
         .writeShort(ConstantSize.USER_RECORDS.offset) //  heap top
         .writeShort(2) //  absolute record count
@@ -44,7 +44,7 @@ val initPageHeaderArray: ByteArray = run {
 }
 
 val initInfimumArray: ByteArray = run {
-    Unpooled.buffer(ConstantSize.INFIMUM.size())
+    Unpooled.buffer(ConstantSize.INFIMUM.size)
         //  record header
         .writeByte(1)
         .writeByte(0)
@@ -55,7 +55,7 @@ val initInfimumArray: ByteArray = run {
 }
 
 val initSupremumArray: ByteArray = run {
-    Unpooled.buffer(ConstantSize.SUPREMUM.size())
+    Unpooled.buffer(ConstantSize.SUPREMUM.size)
         //  record header
         .writeByte(1)
         .writeByte(0)
@@ -66,21 +66,21 @@ val initSupremumArray: ByteArray = run {
 }
 
 val initPageDirectoryArray: ByteArray = run {
-    byteArrayOf(0, ConstantSize.SUPREMUM.offset().toByte(), 0, ConstantSize.INFIMUM.offset().toByte())
+    byteArrayOf(0, ConstantSize.SUPREMUM.offset.toByte(), 0, ConstantSize.INFIMUM.offset.toByte())
 }
 
 
 val initFileTrailerArray: ByteArray = run {
-    Unpooled.buffer(ConstantSize.FILE_TRAILER.size()).writeInt(FileHeader.checkSum).writeInt(0).array()
+    Unpooled.buffer(ConstantSize.FILE_TRAILER.size).writeInt(FileHeader.checkSum).writeInt(0).array()
 }
 
 val initPageArray: ByteArray = run {
-    Unpooled.buffer(ConstantSize.PAGE.size()).apply {
+    Unpooled.buffer(ConstantSize.PAGE.size).apply {
         writeBytes(initFileHeaderArray)
         writeBytes(initPageHeaderArray)
         writeBytes(initInfimumArray)
         writeBytes(initSupremumArray)
-        setBytes(ConstantSize.FILE_TRAILER.offset(), initFileTrailerArray)
-        setBytes(ConstantSize.FILE_TRAILER.offset() - Short.SIZE_BYTES * 2, initPageDirectoryArray)
+        setBytes(ConstantSize.FILE_TRAILER.offset, initFileTrailerArray)
+        setBytes(ConstantSize.FILE_TRAILER.offset - Short.SIZE_BYTES * 2, initPageDirectoryArray)
     }.array()
 }

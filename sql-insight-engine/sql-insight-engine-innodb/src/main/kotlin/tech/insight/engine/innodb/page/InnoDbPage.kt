@@ -23,7 +23,7 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
     Iterable<InnodbUserRecord> {
 
     init {
-        require(source.capacity() == ConstantSize.PAGE.size()) {
+        require(source.capacity() == ConstantSize.PAGE.size) {
             "page size must be 16K"
         }
     }
@@ -82,7 +82,6 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
             buffer.append(infimum.toBytes())
             buffer.append(supremum.toBytes())
             buffer.append(userRecords.toBytes())
-            buffer.append(ByteArray(freeSpace.toInt()))
             buffer.append(pageDirectory.toBytes())
             buffer.append(fileTrailer.toBytes())
             ext.bytes = buffer.toBytes()
@@ -104,12 +103,12 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
     }
 
     val freeSpace: UShort
-        get() = (ConstantSize.PAGE.size() -
-                ConstantSize.PAGE_HEADER.size() -
-                ConstantSize.FILE_HEADER.size() -
-                ConstantSize.FILE_TRAILER.size() -
-                ConstantSize.SUPREMUM.size() -
-                ConstantSize.INFIMUM.size() -
+        get() = (ConstantSize.PAGE.size -
+                ConstantSize.PAGE_HEADER.size -
+                ConstantSize.FILE_HEADER.size -
+                ConstantSize.FILE_TRAILER.size -
+                ConstantSize.SUPREMUM.size -
+                ConstantSize.INFIMUM.size -
                 pageDirectory.length() - userRecords.length()).toUShort()
 
     /**
@@ -268,7 +267,7 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
      * data page will split when free space less than one in thirty-two page size
      */
     private fun pageSplitIfNecessary() {
-        if (freeSpace.toInt() > ConstantSize.PAGE.size() shr 4) {
+        if (freeSpace.toInt() > ConstantSize.PAGE.size shr 4) {
             return
         }
         val pageUserRecord: MutableList<InnodbUserRecord> = ArrayList(pageHeader.recordCount + 1)
@@ -359,10 +358,10 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
      * @return user record
      */
     fun getUserRecordByOffset(offsetInPage: Int): InnodbUserRecord {
-        if (offsetInPage == ConstantSize.INFIMUM.offset()) {
+        if (offsetInPage == ConstantSize.INFIMUM.offset) {
             return infimum
         }
-        if (offsetInPage == ConstantSize.SUPREMUM.offset()) {
+        if (offsetInPage == ConstantSize.SUPREMUM.offset) {
             return supremum
         }
         return this.pageType().convertUserRecord(offsetInPage)
@@ -458,7 +457,7 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
             slotCount = (records.size / Constant.SLOT_MAX_COUNT) + 2
         }
         var pre: InnodbUserRecord = this.infimum
-        var preOffset = ConstantSize.INFIMUM.offset()
+        var preOffset = ConstantSize.INFIMUM.offset
         records.forEachIndexed { index, record ->
             val currentOffset: Int = pageHeader.heapTop + record.beforeSplitOffset()
             record.setAbsoluteOffset(currentOffset)
@@ -470,7 +469,7 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
                 pageDirectory.insert(pageHeader.slotCount - 2, currentOffset)
             }
         }
-        pre.recordHeader.nextRecordOffset = ConstantSize.SUPREMUM.offset() - pre.absoluteOffset()
+        pre.recordHeader.nextRecordOffset = ConstantSize.SUPREMUM.offset - pre.absoluteOffset()
         this.userRecords.addRecords(records)
     }
 

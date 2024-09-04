@@ -77,10 +77,10 @@ class IndexPage(override val page: InnoDbPage) : PageType {
 
 
     override fun convertUserRecord(offsetInPage: Int): InnodbUserRecord {
-        if (ConstantSize.INFIMUM.offset() == offsetInPage) {
+        if (ConstantSize.INFIMUM.offset == offsetInPage) {
             return page.infimum
         }
-        if (ConstantSize.SUPREMUM.offset() == offsetInPage) {
+        if (ConstantSize.SUPREMUM.offset == offsetInPage) {
             return page.supremum
         }
         val belongIndex = page.ext.belongIndex
@@ -114,7 +114,7 @@ class IndexPage(override val page: InnoDbPage) : PageType {
     }
 
     private fun fillNullAndVar(page: InnoDbPage, offsetInPage: Int, compact: Compact, index: InnodbIndex) {
-        val nullBytesEnd = offsetInPage - ConstantSize.RECORD_HEADER.size()
+        val nullBytesEnd = offsetInPage - ConstantSize.RECORD_HEADER.size
         val pageArr: ByteArray = page.toBytes()
         compact.nullList = run {
             val nullListLength = CompactNullList.allocate(index).length()

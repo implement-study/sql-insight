@@ -21,7 +21,7 @@ object Console {
     private val BOX_BORDER = "${"-".repeat(9)}+${"-".repeat(64)}+${"-".repeat(63)}+"
     private const val BLANK = " "
     private const val LINE_COUNT = 1 shl 5 // aka 32
-    private val preLine: Array<String> = Array(ConstantSize.PAGE.size() / LINE_COUNT) {
+    private val preLine: Array<String> = Array(ConstantSize.PAGE.size / LINE_COUNT) {
         val buf = StringBuilder(12)
         buf.append(java.lang.Long.toHexString(it.toLong() shl 5 and 0xFFFFFFFFL or 0x100000000L))
         buf.setCharAt(buf.length - 9, '|')
@@ -46,7 +46,7 @@ object Console {
         val breakLength = with(innoDbPage) {
             bytes.size - freeSpace.toInt() - pageDirectory.toBytes().size - fileTrailer.toBytes().size
         }
-        val dump = StringBuilder(ConstantSize.PAGE.size() shr 2)
+        val dump = StringBuilder(ConstantSize.PAGE.size shr 2)
         dump.append(BLANK.repeat(9))
         when (innoDbPage.pageType().value) {
             FIL_PAGE_TYPE_UNDO_LOG -> dump.appendLine(createTitle("Page(log)"))
@@ -143,7 +143,7 @@ object Console {
     private fun appendSkipLine(dump: StringBuilder, beforeRow: Int, remainRow: Int) {
         val preStringBuilder = StringBuilder(12)
         preStringBuilder.append("|........|")
-        val omitBytes = ((ConstantSize.PAGE.size() shr 5) - beforeRow - remainRow) shl 5
+        val omitBytes = ((ConstantSize.PAGE.size shr 5) - beforeRow - remainRow) shl 5
         preStringBuilder.append("     omit free space length:[0${java.lang.Long.toHexString(omitBytes.toLong() and 0xFFFFFFFFL or 0x100000000L)}]")
         preStringBuilder.setCharAt(preStringBuilder.length - 9, 'X')
         preStringBuilder.append("[$omitBytes]")
