@@ -12,8 +12,6 @@ import tech.insight.buffer.subShort
 import tech.insight.core.annotation.Unused
 import tech.insight.engine.innodb.core.Lengthable
 import tech.insight.engine.innodb.page.ConstantSize
-import tech.insight.engine.innodb.page.InnoDbPage
-import tech.insight.engine.innodb.page.PageObject
 
 /**
  * 5 bytes 40 bits.
@@ -29,7 +27,13 @@ import tech.insight.engine.innodb.page.PageObject
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-class RecordHeader(private val source: ByteArray = ByteArray(5)) : SerializableObject, Lengthable {
+class RecordHeader(private val source: ByteArray) : SerializableObject, Lengthable {
+
+    init {
+        require(source.size == ConstantSize.RECORD_HEADER.size) {
+            "source size must be ${ConstantSize.RECORD_HEADER.size}"
+        }
+    }
 
     var deleteMask: Boolean = source[0].isOne(5)
         set(value) {
@@ -132,15 +136,7 @@ class RecordHeader(private val source: ByteArray = ByteArray(5)) : SerializableO
         private val OWNED_RANGE = IntRange(0, (1 shl 4) - 1)
         private val NEXT_RECORD_RANGE = IntRange(0, UShort.MAX_VALUE.toInt())
 
-        fun create(type: RecordType) = RecordHeader().apply {
-            when (type) {
-                RecordType.PAGE -> indexHeader(this)
-                RecordType.INFIMUM -> infimumHeader(this)
-                RecordType.SUPREMUM -> supremumHeader(this)
-                RecordType.NORMAL -> normalHeader(this)
-                else -> unknownHeader(this)
-            }
-        }
+        fun create(type: RecordType) = RecordHeader(type.initByteArray)
 
         fun wrap(source: ByteArray) = RecordHeader(source).apply {
             ConstantSize.RECORD_HEADER.checkSize(source)
@@ -148,55 +144,5 @@ class RecordHeader(private val source: ByteArray = ByteArray(5)) : SerializableO
 
         fun copy(source: RecordHeader) = wrap(source.toBytes())
 
-
-        private fun unknownHeader(recordHeader: RecordHeader) {
-            recordHeader.apply {
-                recordType = RecordType.UNKNOWN
-                heapNo = 2
-                deleteMask = false
-                nOwned = 0
-                nextRecordOffset = 0
-            }
-        }
-
-        private fun normalHeader(recordHeader: RecordHeader) {
-            recordHeader.apply {
-                recordType = RecordType.NORMAL
-                heapNo = 2
-                deleteMask = false
-                nOwned = 0
-                nextRecordOffset = 0
-            }
-        }
-
-        private fun indexHeader(recordHeader: RecordHeader) {
-            recordHeader.apply {
-                recordType = RecordType.PAGE
-                heapNo = 1
-                deleteMask = false
-                nOwned = 0
-                nextRecordOffset = 0
-            }
-        }
-
-        private fun infimumHeader(recordHeader: RecordHeader) {
-            recordHeader.apply {
-                recordType = RecordType.INFIMUM
-                heapNo = 0
-                deleteMask = false
-                nOwned = 1
-                nextRecordOffset = ConstantSize.INFIMUM.size
-            }
-        }
-
-        private fun supremumHeader(recordHeader: RecordHeader) {
-            recordHeader.apply {
-                recordType = RecordType.SUPREMUM
-                heapNo = 1
-                deleteMask = false
-                nOwned = 1
-                nextRecordOffset = 0
-            }
-        }
     }
 }

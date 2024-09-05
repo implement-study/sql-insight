@@ -15,36 +15,42 @@
  */
 package tech.insight.engine.innodb.page.compact
 
+import tech.insight.engine.innodb.page.initInfimumRecordHeader
+import tech.insight.engine.innodb.page.initNormalRecordHeader
+import tech.insight.engine.innodb.page.initPageRecordHeader
+import tech.insight.engine.innodb.page.initSupremumRecordHeader
+
 /**
  * Compact row format type
  *
  * @author gxz gongxuanzhang@foxmail.com
  */
-enum class RecordType(val value: Int) {
+enum class RecordType(val value: Int,val initByteArray: ByteArray) {
     /**
      * leaf-node
      */
-    NORMAL(0x00),
+    NORMAL(0x00,initNormalRecordHeader),
 
     /**
      * non-leaf-node(index)
      */
-    PAGE(0x01),
+    PAGE(0x01,initPageRecordHeader),
 
     /**
      * infimum
      */
-    INFIMUM(0x02),
+    INFIMUM(0x02,initInfimumRecordHeader),
 
     /**
      * supremum
      */
-    SUPREMUM(0x03),
+    SUPREMUM(0x03, initSupremumRecordHeader),
 
     /**
      * init unknown
      */
-    UNKNOWN(Int.MAX_VALUE);
+    UNKNOWN(Int.MAX_VALUE, TODO());
+
 
     companion object {
         fun valueOf(value: Int): RecordType {

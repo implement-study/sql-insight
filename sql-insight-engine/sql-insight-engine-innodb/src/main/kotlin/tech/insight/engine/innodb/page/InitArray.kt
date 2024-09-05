@@ -8,6 +8,47 @@ import tech.insight.engine.innodb.page.type.DataPage
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
+
+
+val initNormalRecordHeader: ByteArray = run {
+    byteBuf(ConstantSize.RECORD_HEADER.size).apply {
+        writeByte(0)
+        writeByte(0)
+        writeByte(RecordType.NORMAL.value)
+        writeShort(0)
+    }.array()
+}
+
+val initPageRecordHeader: ByteArray = run {
+    byteBuf(ConstantSize.RECORD_HEADER.size).apply {
+        writeByte(0)
+        writeByte(0)
+        writeByte(RecordType.PAGE.value)
+        writeShort(0)
+    }.array()
+}
+
+val initInfimumRecordHeader: ByteArray = run {
+    byteBuf(ConstantSize.RECORD_HEADER.size).apply {
+        writeByte(1)
+        writeByte(0)
+        writeByte(RecordType.INFIMUM.value)
+        writeShort(ConstantSize.SUPREMUM.offset - ConstantSize.INFIMUM.offset)
+    }.array()
+}
+
+val initSupremumRecordHeader: ByteArray = run {
+    byteBuf(ConstantSize.RECORD_HEADER.size).apply {
+        writeByte(1)
+        writeByte(0)
+        writeByte((1 shl 3) and RecordType.SUPREMUM.value)
+        writeShort(0)
+    }.array()
+}
+
+
+
+
 val initFileHeaderArray: ByteArray = run {
     byteBuf(ConstantSize.FILE_HEADER.size)
         .writeInt(FileHeader.checkSum)
@@ -45,10 +86,7 @@ val initPageHeaderArray: ByteArray = run {
 
 val initInfimumArray: ByteArray = run {
     byteBuf(ConstantSize.INFIMUM.size)
-        //  record header
-        .writeByte(1)
-        .writeByte(0)
-        .writeByte(RecordType.INFIMUM.value)
+        .writeBytes(initInfimumRecordHeader)
         .writeShort(ConstantSize.SUPREMUM.offset - ConstantSize.INFIMUM.offset)
         .writeBytes(Infimum.INFIMUM_BODY_ARRAY)
         .array()
@@ -56,11 +94,7 @@ val initInfimumArray: ByteArray = run {
 
 val initSupremumArray: ByteArray = run {
     byteBuf(ConstantSize.SUPREMUM.size)
-        //  record header
-        .writeByte(1)
-        .writeByte(0)
-        .writeByte((1 shl 3) and RecordType.SUPREMUM.value)
-        .writeShort(0)
+        .writeBytes(initSupremumRecordHeader)
         .writeBytes(Supremum.SUPREMUM_BODY_ARRAY)
         .array()
 }

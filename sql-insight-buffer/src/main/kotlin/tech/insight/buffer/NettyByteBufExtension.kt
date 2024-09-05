@@ -83,10 +83,9 @@ fun ByteBuf.readLengthAndBytes(): ByteArray {
     return bytes
 }
 
-const val MIN_BUFF_LENGTH = 256
 
-fun byteBuf(length: Int = 256): ByteBuf {
-    if (length < MIN_BUFF_LENGTH) {
+fun byteBuf(length: Int = -1): ByteBuf {
+    if (length <= 0) {
         return Unpooled.buffer()
     }
     return Unpooled.buffer(length)

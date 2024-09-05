@@ -2,7 +2,8 @@ package tech.insight.engine.innodb.page
 
 import io.netty.buffer.ByteBuf
 import java.nio.charset.Charset
-import tech.insight.buffer.copyBuf
+import tech.insight.buffer.byteBuf
+import tech.insight.buffer.readAllBytes
 import tech.insight.core.bean.Row
 import tech.insight.core.bean.Table
 import tech.insight.core.bean.value.Value
@@ -177,7 +178,7 @@ class Infimum(override val belongPage: InnoDbPage) : SystemUserRecord {
     private val body: ByteBuf = source.slice(ConstantSize.RECORD_HEADER.size, ConstantSize.INFIMUM_BODY.size)
 
     init {
-        require(INFIMUM_BODY_ARRAY.contentEquals(body.array())) { "infimum body must be $INFIMUM_BODY" }
+        require(INFIMUM_BODY_ARRAY.contentEquals(body.readAllBytes())) { "infimum body must be $INFIMUM_BODY" }
     }
 
     override fun rowBytes(): ByteArray {
@@ -251,7 +252,8 @@ class Infimum(override val belongPage: InnoDbPage) : SystemUserRecord {
 
         const val INFIMUM_BODY = "infimum"
 
-        val INFIMUM_BODY_ARRAY: ByteArray = copyBuf(INFIMUM_BODY.toByteArray()).writeByte(0).array()
+        val INFIMUM_BODY_ARRAY: ByteArray =
+            byteBuf(ConstantSize.SUPREMUM_BODY.size).writeBytes(INFIMUM_BODY.toByteArray()).writeByte(0).array()
 
         fun wrap(bytes: ByteArray, belongToPage: InnoDbPage) = Infimum(belongToPage)
 

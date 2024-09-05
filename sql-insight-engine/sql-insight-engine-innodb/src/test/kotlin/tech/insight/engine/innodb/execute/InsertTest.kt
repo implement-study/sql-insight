@@ -55,13 +55,13 @@ class InsertTest {
         assertEquals(3, pageHeader.absoluteRecordCount)
         assertEquals(1, pageHeader.recordCount)
         //  120(two header + two sys record) +17(user record length)
-        assertEquals((120 + 17).toShort(), pageHeader.heapTop)
+        assertEquals(120 + 17, pageHeader.heapTop)
         //  120(two header + two sys record) +8(vars 2 + null list 1 + header 5)
-        assertEquals((120 + 8).toShort(), pageHeader.lastInsertOffset)
+        assertEquals(120 + 8, pageHeader.lastInsertOffset)
         assertEquals(0, pageHeader.level)
 
         rootPage.infimum.apply {
-            assertEquals(0U, this.recordHeader.heapNo)
+            assertEquals(0, this.recordHeader.heapNo)
             // 16 means 8 + ConstantSize.INFIMUM_BODY.size
             assertEquals(16 + ConstantSize.SUPREMUM.size, this.recordHeader.nextRecordOffset.toInt())
             assertEquals(1, this.recordHeader.nOwned)
@@ -74,11 +74,11 @@ class InsertTest {
             )
             assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
             assertEquals(0, userRecord.recordHeader.nOwned)
-            assertEquals(2U, userRecord.recordHeader.heapNo)
+            assertEquals(2, userRecord.recordHeader.heapNo)
             assertEquals(false, userRecord.recordHeader.deleteMask)
         }
         rootPage.supremum.apply {
-            assertEquals(1U, this.recordHeader.heapNo)
+            assertEquals(1, this.recordHeader.heapNo)
             assertEquals(0, nextRecordOffset())
             assertEquals(2, this.recordHeader.nOwned)
             assertEquals(RecordType.SUPREMUM, this.recordHeader.recordType)
@@ -102,21 +102,21 @@ class InsertTest {
         assertEquals(7, pageHeader.absoluteRecordCount)
         assertEquals(5, pageHeader.recordCount)
         //  120(two header + two sys record) +16(user record length)
-        assertEquals((120 + 16 * 5).toShort(), pageHeader.heapTop)
+        assertEquals((120 + 16 * 5), pageHeader.heapTop)
         //  120(two header + two sys record) +8(vars 2 + null list 1 + header 5)
-        assertEquals((120 + 16 * 4 + 8).toShort(), pageHeader.lastInsertOffset)
+        assertEquals((120 + 16 * 4 + 8), pageHeader.lastInsertOffset)
         assertEquals(0, pageHeader.level)
 
         val infimum = rootPage.infimum
         infimum.apply {
-            assertEquals(0U, this.recordHeader.heapNo)
+            assertEquals(0, this.recordHeader.heapNo)
             // 16 means 8 + ConstantSize.INFIMUM_BODY.size
             assertEquals(16 + ConstantSize.SUPREMUM.size, nextRecordOffset())
             assertEquals(1, this.recordHeader.nOwned)
             assertEquals(RecordType.INFIMUM, this.recordHeader.recordType)
         }
         rootPage.supremum.apply {
-            assertEquals(1U, this.recordHeader.heapNo)
+            assertEquals(1, this.recordHeader.heapNo)
             assertEquals(0, nextRecordOffset())
             assertEquals(6, this.recordHeader.nOwned)
             assertEquals(RecordType.SUPREMUM, this.recordHeader.recordType)
@@ -129,7 +129,7 @@ class InsertTest {
             assertEquals(16, userRecord.length())
             assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
             assertEquals(0, userRecord.recordHeader.nOwned)
-            assertEquals(2U + i.toUInt(), userRecord.recordHeader.heapNo)
+            assertEquals(2 + i, userRecord.recordHeader.heapNo)
             assertEquals(false, userRecord.recordHeader.deleteMask)
             pre = userRecord
         }
@@ -137,7 +137,7 @@ class InsertTest {
         assertEquals(16, lastUserRecord.length())
         assertEquals(RecordType.NORMAL, lastUserRecord.recordHeader.recordType)
         assertEquals(0, lastUserRecord.recordHeader.nOwned)
-        assertEquals(6U, lastUserRecord.recordHeader.heapNo)
+        assertEquals(6, lastUserRecord.recordHeader.heapNo)
         assertEquals(false, lastUserRecord.recordHeader.deleteMask)
         assertEquals(
             rootPage.supremum.absoluteOffset(),
@@ -160,21 +160,21 @@ class InsertTest {
         assertEquals(10, pageHeader.recordCount)
         assertEquals(3, pageHeader.slotCount)
         //  120(two header + two sys record) +17(user record length)
-        assertEquals((120 + 17 * 9 + 18).toShort(), pageHeader.heapTop)
+        assertEquals((120 + 17 * 9 + 18), pageHeader.heapTop)
         //  120(two header + two sys record) +8(vars 2 + null list 1 + header 5)
-        assertEquals((120 + 17 * 9 + 8).toShort(), pageHeader.lastInsertOffset)
+        assertEquals((120 + 17 * 9 + 8), pageHeader.lastInsertOffset)
         assertEquals(0, pageHeader.level)
 
         val infimum = rootPage.infimum
         infimum.apply {
-            assertEquals(0U, this.recordHeader.heapNo)
+            assertEquals(0, this.recordHeader.heapNo)
             // 16 means 8 + ConstantSize.INFIMUM_BODY.size
             assertEquals(16 + ConstantSize.SUPREMUM.size, nextRecordOffset())
             assertEquals(1, this.recordHeader.nOwned)
             assertEquals(RecordType.INFIMUM, this.recordHeader.recordType)
         }
         rootPage.supremum.apply {
-            assertEquals(1U, this.recordHeader.heapNo)
+            assertEquals(1, this.recordHeader.heapNo)
             assertEquals(0, nextRecordOffset())
             assertEquals(7, this.recordHeader.nOwned)
             assertEquals(RecordType.SUPREMUM, this.recordHeader.recordType)
@@ -187,7 +187,7 @@ class InsertTest {
             assertEquals(17, userRecord.length())
             assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
             assertEquals(if (i == 3) 4 else 0, userRecord.recordHeader.nOwned)
-            assertEquals(2U + i.toUInt(), userRecord.recordHeader.heapNo)
+            assertEquals(2 + i, userRecord.recordHeader.heapNo)
             assertEquals(false, userRecord.recordHeader.deleteMask)
             pre = userRecord
         }
@@ -195,7 +195,7 @@ class InsertTest {
         assertEquals(18, lastUserRecord.length())
         assertEquals(RecordType.NORMAL, lastUserRecord.recordHeader.recordType)
         assertEquals(0, lastUserRecord.recordHeader.nOwned)
-        assertEquals(11U, lastUserRecord.recordHeader.heapNo)
+        assertEquals(11, lastUserRecord.recordHeader.heapNo)
         assertEquals(false, lastUserRecord.recordHeader.deleteMask)
         assertEquals(
             rootPage.supremum.absoluteOffset(),
@@ -213,13 +213,13 @@ class InsertTest {
         assertEquals(17, pageHeader.absoluteRecordCount)
         assertEquals(15, pageHeader.recordCount)
         //  120(two header + two sys record) +17(user record length)
-        assertEquals((120 + 17 * 9 + 18 * 6).toShort(), pageHeader.heapTop)
+        assertEquals((120 + 17 * 9 + 18 * 6), pageHeader.heapTop)
         //  120(two header + two sys record) +8(vars 2 + null list 1 + header 5)
-        assertEquals((120 + 17 * 9 + 18 * 5 + 8).toShort(), pageHeader.lastInsertOffset)
+        assertEquals((120 + 17 * 9 + 18 * 5 + 8), pageHeader.lastInsertOffset)
         assertEquals(0, pageHeader.level)
         assertEquals(4, pageHeader.slotCount)
         rootPage.supremum.apply {
-            assertEquals(1U, this.recordHeader.heapNo)
+            assertEquals(1, this.recordHeader.heapNo)
             assertEquals(0, nextRecordOffset())
             assertEquals(8, this.recordHeader.nOwned)
             assertEquals(RecordType.SUPREMUM, this.recordHeader.recordType)
@@ -233,7 +233,7 @@ class InsertTest {
             assertEquals(17, userRecord.length())
             assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
             assertEquals(if (i == 3) 4 else 0, userRecord.recordHeader.nOwned)
-            assertEquals(2U + i.toUInt(), userRecord.recordHeader.heapNo)
+            assertEquals(2 + i, userRecord.recordHeader.heapNo)
             assertEquals(false, userRecord.recordHeader.deleteMask)
             pre = userRecord
         }
@@ -244,7 +244,7 @@ class InsertTest {
             assertEquals(17, userRecord.length())
             assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
             assertEquals(if (i == 3) 4 else 0, userRecord.recordHeader.nOwned)
-            assertEquals(6U + i.toUInt(), userRecord.recordHeader.heapNo)
+            assertEquals(6 + i, userRecord.recordHeader.heapNo)
             assertEquals(false, userRecord.recordHeader.deleteMask)
             pre = userRecord
         }
@@ -255,7 +255,7 @@ class InsertTest {
             assertEquals(if (i == 0) 17 else 18, userRecord.length())
             assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
             assertEquals(0, userRecord.recordHeader.nOwned)
-            assertEquals(10U + i.toUInt(), userRecord.recordHeader.heapNo)
+            assertEquals(10 + i, userRecord.recordHeader.heapNo)
             assertEquals(false, userRecord.recordHeader.deleteMask)
             pre = userRecord
         }
@@ -265,7 +265,7 @@ class InsertTest {
         assertEquals(13, lastUserRecord.length())
         assertEquals(RecordType.SUPREMUM, lastUserRecord.recordHeader.recordType)
         assertEquals(8, lastUserRecord.recordHeader.nOwned)
-        assertEquals(1U, lastUserRecord.recordHeader.heapNo)
+        assertEquals(1, lastUserRecord.recordHeader.heapNo)
         assertEquals(false, lastUserRecord.recordHeader.deleteMask)
     }
 
