@@ -14,7 +14,6 @@ import tech.insight.engine.innodb.page.SystemUserRecord
 import tech.insight.engine.innodb.page.compact.Compact
 import tech.insight.engine.innodb.page.compact.CompactNullList
 import tech.insight.engine.innodb.page.compact.RecordType
-import tech.insight.engine.innodb.page.compact.RowFormatFactory.readRecordHeader
 import tech.insight.engine.innodb.page.compact.Variables
 import tech.insight.engine.innodb.utils.ValueNegotiator
 
@@ -81,7 +80,7 @@ class IndexPage(override val page: InnoDbPage) : PageType {
         val belongIndex = page.ext.belongIndex
         val compact = Compact()
         compact.offsetInPage = (offsetInPage)
-        compact.recordHeader = (readRecordHeader(page, offsetInPage))
+        compact.recordHeader = page.readRecordHeader(offsetInPage)
         fillNullAndVar(page, offsetInPage, compact, belongIndex)
         val variableLength: Int = compact.variables.variableLength()
         val fixLength = run {

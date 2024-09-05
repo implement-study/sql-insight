@@ -38,7 +38,7 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
      * order AES in order to support binary search
      */
     var slots = ShortArray(belongPage.pageHeader.slotCount) {
-        val offset: Int = ConstantSize.FILE_TRAILER.offset - (it + 1) * Short.SIZE_BYTES
+        val offset: Int = belongPage.pageHeader.slotCount * Short.SIZE_BYTES - (it + 1) * Short.SIZE_BYTES
         source.getShort(offset)
     }
 

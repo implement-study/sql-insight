@@ -1,6 +1,7 @@
 package tech.insight.engine.innodb.page
 
 import io.netty.buffer.ByteBuf
+import tech.insight.buffer.getLength
 import tech.insight.core.annotation.Temporary
 import tech.insight.core.bean.condition.Expression
 import tech.insight.core.logging.Logging
@@ -8,6 +9,7 @@ import tech.insight.engine.innodb.core.InnodbSessionContext
 import tech.insight.engine.innodb.core.buffer.BufferPool
 import tech.insight.engine.innodb.index.InnodbIndex
 import tech.insight.engine.innodb.page.compact.Compact
+import tech.insight.engine.innodb.page.compact.RecordHeader
 import tech.insight.engine.innodb.page.compact.RowFormatFactory
 import tech.insight.engine.innodb.page.type.PageType
 
@@ -144,7 +146,7 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
     ): Pair<InnodbUserRecord, InnodbUserRecord> {
         val targetSlot = findTargetSlot(userRecord)
         var pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot + 1).toInt())
-        var next = getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+        var next = pre.nextRecord()
         while (true) {
             val compare = this.pageType().compare(userRecord, next)
             if (compare < 0) {
@@ -152,11 +154,11 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
             }
             if (compare > 0) {
                 pre = next
-                next = getUserRecordByOffset(next.nextRecordOffset() + next.absoluteOffset())
+                next = pre.nextRecord()
                 continue
             }
             if (skipMe) {
-                val myNext = getUserRecordByOffset(next.nextRecordOffset() + next.absoluteOffset())
+                val myNext = next.nextRecord()
                 return Pair(pre, myNext)
             }
             throw Error("find a record equals target record")
@@ -381,6 +383,14 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
         return pre
     }
 
+    /**
+     * @param offset record offset, the record header offset = offset - record header size
+     * @return record
+     */
+    fun readRecordHeader(offset: Int): RecordHeader {
+        val recordHeaderSize: Int = ConstantSize.RECORD_HEADER.size
+        return RecordHeader(source.getLength(offset - recordHeaderSize, recordHeaderSize))
+    }
 
     /**
      * get the first index node to parent node insert
@@ -400,8 +410,8 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
     private fun linkedAndAdjust(pre: InnodbUserRecord, insertRecord: InnodbUserRecord, next: InnodbUserRecord) {
         insertRecord.apply {
             setAbsoluteOffset(pageHeader.heapTop + insertRecord.beforeSplitOffset())
-            this.recordHeader.heapNo = pageHeader.absoluteRecordCount.toInt()
-            this.recordHeader.nextRecordOffset = (next.absoluteOffset() - insertRecord.absoluteOffset())
+            this.recordHeader.heapNo = pageHeader.absoluteRecordCount
+            this.recordHeader.nextRecordOffset = next.absoluteOffset() - insertRecord.absoluteOffset()
         }
         pre.recordHeader.nextRecordOffset = (insertRecord.absoluteOffset() - pre.absoluteOffset())
 

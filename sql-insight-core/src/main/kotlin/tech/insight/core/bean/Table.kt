@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import tech.insight.buffer.ObjectReader
 import tech.insight.buffer.SerializableObject
 import tech.insight.buffer.byteBuf
+import tech.insight.buffer.getAllBytes
 import tech.insight.buffer.readCollection
 import tech.insight.buffer.readLengthAndString
 import tech.insight.buffer.wrappedBuf
@@ -92,7 +93,7 @@ class Table : SQLBean, SerializableObject {
             .writeCollection(columnList)
             .writeLengthAndString(engine.name)
             .writeLengthAndString(comment)
-            .array()
+            .getAllBytes()
     }
 
     override fun toString(): String {

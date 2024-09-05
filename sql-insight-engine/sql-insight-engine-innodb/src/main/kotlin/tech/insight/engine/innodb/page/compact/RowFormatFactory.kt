@@ -15,8 +15,8 @@
  */
 package tech.insight.engine.innodb.page.compact
 
-import java.util.*
 import tech.insight.buffer.byteBuf
+import tech.insight.buffer.getAllBytes
 import tech.insight.core.bean.Column
 import tech.insight.core.bean.NormalRow
 import tech.insight.core.bean.UpdateRow
@@ -24,8 +24,6 @@ import tech.insight.core.bean.condition.Expression
 import tech.insight.core.bean.value.Value
 import tech.insight.core.bean.value.ValueNull
 import tech.insight.core.exception.SqlInsightException
-import tech.insight.engine.innodb.page.ConstantSize
-import tech.insight.engine.innodb.page.InnoDbPage
 
 /**
  * @author gongxuanzhangmelt@gmail.com
@@ -62,25 +60,13 @@ object RowFormatFactory {
             }
             buf.writeBytes(value.toBytes())
         }
-        compact.body = buf.array()
+        compact.body = buf.getAllBytes()
         return compact
     }
 
     fun compactFromUpdateRow(row: Compact, updateFields: Map<String, Expression>): Compact {
         val newRow = UpdateRow(row, updateFields)
         return compactFromNormalRow(newRow)
-    }
-
-
-    /**
-     * @param page   innodb page
-     * @param offset record offset, the record header offset = offset - record header size
-     * @return record
-     */
-    fun readRecordHeader(page: InnoDbPage, offset: Int): RecordHeader {
-        val recordHeaderSize: Int = ConstantSize.RECORD_HEADER.size
-        val headerArr: ByteArray = Arrays.copyOfRange(page.toBytes(), offset - recordHeaderSize, offset)
-        return RecordHeader.wrap(headerArr)
     }
 
 

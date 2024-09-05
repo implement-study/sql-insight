@@ -19,7 +19,7 @@ fun ByteBuf.readUIntLE() = this.readIntLE().toUInt()
 fun ByteBuf.readULongLE() = this.readLongLE().toULong()
 
 
-fun Boolean.toByteArray() = byteArrayOf(if (this) 1 else 0)
+fun Boolean.byteArray() = byteArrayOf(if (this) 1 else 0)
 
 fun ByteBuf.readAllBytes(): ByteArray {
     val allBytes = ByteArray(this.readableBytes())
@@ -29,7 +29,7 @@ fun ByteBuf.readAllBytes(): ByteArray {
 
 fun ByteBuf.getAllBytes(): ByteArray {
     val allBytes = ByteArray(this.readableBytes())
-    this.getBytes(0,allBytes)
+    this.getBytes(0, allBytes)
     return allBytes
 }
 
@@ -83,12 +83,21 @@ fun ByteBuf.writeLengthAndBytes(bytes: ByteArray): ByteBuf {
 }
 
 fun ByteBuf.readLengthAndBytes(): ByteArray {
-    val length = readInt()
+    return readLength(readInt())
+
+}
+
+fun ByteBuf.getLength(index: Int, length: Int): ByteArray {
     val bytes = ByteArray(length)
-    readBytes(bytes)
+    getBytes(index,bytes)
     return bytes
 }
 
+fun ByteBuf.readLength(length: Int): ByteArray {
+    val bytes = ByteArray(length)
+    this.readBytes(bytes)
+    return bytes
+}
 
 fun byteBuf(length: Int = -1): ByteBuf {
     if (length <= 0) {

@@ -25,7 +25,6 @@ import tech.insight.core.annotation.Unused
  * @author gxz gongxuanzhangmelt@gmail.com
  */
 class PageHeader(override val belongPage: InnoDbPage) : PageObject {
-    //  todo field update adjust bytebuffer
     val source = belongPage.source.slice(ConstantSize.PAGE_HEADER.offset, ConstantSize.PAGE_HEADER.size)
 
     /**

@@ -12,7 +12,6 @@ import tech.insight.engine.innodb.page.InnoDbPage
 import tech.insight.engine.innodb.page.InnodbUserRecord
 import tech.insight.engine.innodb.page.compact.Compact
 import tech.insight.engine.innodb.page.compact.CompactNullList
-import tech.insight.engine.innodb.page.compact.RowFormatFactory.readRecordHeader
 import tech.insight.engine.innodb.page.compact.Variables
 import tech.insight.engine.innodb.page.type.IndexPage.Companion.FIL_PAGE_INODE
 import tech.insight.engine.innodb.utils.PageSupport
@@ -49,7 +48,7 @@ class DataPage(override val page: InnoDbPage) : PageType {
         }
         val compact = Compact()
         compact.offsetInPage = (offsetInPage)
-        compact.recordHeader = (readRecordHeader(page, offsetInPage))
+        compact.recordHeader = page.readRecordHeader(offsetInPage)
         val table = page.ext.belongIndex.belongTo()
         fillNullAndVar(page, offsetInPage, compact, table)
         val variableLength: Int = compact.variables.variableLength()

@@ -2,6 +2,7 @@ package tech.insight.engine.innodb.page.compact
 
 import java.util.*
 import tech.insight.buffer.byteBuf
+import tech.insight.buffer.getAllBytes
 import tech.insight.core.annotation.Unused
 import tech.insight.core.bean.ReadRow
 import tech.insight.core.bean.Row
@@ -71,7 +72,7 @@ open class Compact : InnodbUserRecord {
             .writeBytes(nullList.toBytes())
             .writeBytes(recordHeader.toBytes())
             .writeBytes(body)
-            .array()
+            .getAllBytes()
     }
 
     override val values: List<Value<*>>
@@ -245,7 +246,7 @@ open class Compact : InnodbUserRecord {
             bodyBuffer.writeBytes(it)
         }
         bodyBuffer.writeInt(belongPage.fileHeader.offset)
-        return bodyBuffer.array()
+        return bodyBuffer.getAllBytes()
     }
 
     private fun indexRow(): Row {

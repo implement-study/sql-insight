@@ -142,7 +142,7 @@ class RecordHeader(private val source: ByteArray) : SerializableObject, Lengthab
             ConstantSize.RECORD_HEADER.checkSize(source)
         }
 
-        fun copy(source: RecordHeader) = wrap(source.toBytes())
+        fun copy(source: RecordHeader) = RecordHeader(source.toBytes().copyOf())
 
     }
 }

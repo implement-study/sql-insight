@@ -1,5 +1,6 @@
 package tech.insight.engine.innodb.page
 
+import tech.insight.buffer.byteArray
 import tech.insight.buffer.byteBuf
 import tech.insight.engine.innodb.page.compact.RecordType
 import tech.insight.engine.innodb.page.type.DataPage
@@ -67,7 +68,7 @@ val initFileHeaderArray: () -> ByteArray = {
 
 val initPageHeaderArray: () -> ByteArray = {
     byteBuf(ConstantSize.PAGE_HEADER.size)
-        .writeShort(0) //  slot count
+        .writeShort(2) //  slot count
         .writeShort(ConstantSize.USER_RECORDS.offset) //  heap top
         .writeShort(2) //  absolute record count
         .writeShort(0) //  record count
@@ -101,7 +102,7 @@ val initSupremumArray: () -> ByteArray = {
 }
 
 val initPageDirectoryArray: () -> ByteArray = {
-    byteArrayOf(0, Supremum.OFFSET_IN_PAGE.toByte(), 0, Infimum.OFFSET_IN_PAGE.toByte())
+    Supremum.OFFSET_IN_PAGE.toShort().byteArray() + Infimum.OFFSET_IN_PAGE.toShort().byteArray()
 }
 
 

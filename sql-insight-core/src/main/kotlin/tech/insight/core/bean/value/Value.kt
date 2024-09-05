@@ -19,8 +19,9 @@ import java.nio.charset.Charset
 import tech.insight.buffer.ObjectReader
 import tech.insight.buffer.SerializableObject
 import tech.insight.buffer.byteBuf
+import tech.insight.buffer.getAllBytes
 import tech.insight.buffer.readLengthAndString
-import tech.insight.buffer.toByteArray
+import tech.insight.buffer.byteArray
 import tech.insight.buffer.wrappedBuf
 import tech.insight.buffer.writeLengthAndString
 
@@ -112,7 +113,7 @@ class ValueChar(value: String, length: Int) : Value<String> {
     }
 
     override fun toBytes(): ByteArray {
-        return byteBuf().writeByte(2).writeInt(length).writeBytes(source.toByteArray()).array()
+        return byteBuf().writeByte(2).writeInt(length).writeBytes(source.toByteArray()).getAllBytes()
     }
 
     override fun plus(other: Value<*>): Value<String> {
@@ -138,7 +139,7 @@ data class ValueVarchar(override val source: String) : Value<String> {
 
 
     override fun toBytes(): ByteArray {
-        return byteBuf().writeByte(5).writeLengthAndString(source).array()
+        return byteBuf().writeByte(5).writeLengthAndString(source).getAllBytes()
     }
 
     override fun compareTo(other: Value<*>): Int {
@@ -164,7 +165,7 @@ data class ValueInt(override val source: Int) : Value<Int> {
 
 
     override fun toBytes(): ByteArray {
-        return byteArrayOf(3) + source.toByteArray()
+        return byteArrayOf(3) + source.byteArray()
     }
 
     override fun toString(): String {
