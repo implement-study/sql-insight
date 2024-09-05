@@ -16,7 +16,6 @@
 package tech.insight.engine.innodb.page
 
 import io.netty.buffer.ByteBuf
-import org.gongxuanzhang.easybyte.core.ByteWrapper
 import tech.insight.buffer.readAllBytes
 import tech.insight.engine.innodb.page.PageHeader.Companion.EMPTY_PAGE_HEAP_TOP
 
@@ -26,7 +25,7 @@ import tech.insight.engine.innodb.page.PageHeader.Companion.EMPTY_PAGE_HEAP_TOP
  * contains all userRecords (include delete mask record) and free space
  * @author gongxuanzhangmelt@gmail.com
  */
-class UserRecords(override val belongPage: InnoDbPage) : ByteWrapper, PageObject {
+class UserRecords(override val belongPage: InnoDbPage) :  PageObject {
 
     val source: ByteBuf
 

@@ -15,7 +15,6 @@
  */
 package tech.insight.engine.innodb.page
 
-import org.gongxuanzhang.easybyte.core.ByteWrapper
 import tech.insight.core.annotation.Unused
 
 /**
@@ -24,7 +23,7 @@ import tech.insight.core.annotation.Unused
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class FileTrailer(override val belongPage: InnoDbPage) : ByteWrapper, PageObject {
+class FileTrailer(override val belongPage: InnoDbPage) :  PageObject {
 
     val source = belongPage.source.slice(ConstantSize.FILE_TRAILER.offset, ConstantSize.FILE_TRAILER.size)
 

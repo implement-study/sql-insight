@@ -1,6 +1,6 @@
 package tech.insight.engine.innodb.page.compact
 
-import org.gongxuanzhang.easybyte.core.ByteWrapper
+import tech.insight.buffer.SerializableObject
 import tech.insight.buffer.byteArray
 import tech.insight.buffer.compose
 import tech.insight.buffer.coverBits
@@ -12,6 +12,8 @@ import tech.insight.buffer.subShort
 import tech.insight.core.annotation.Unused
 import tech.insight.engine.innodb.core.Lengthable
 import tech.insight.engine.innodb.page.ConstantSize
+import tech.insight.engine.innodb.page.InnoDbPage
+import tech.insight.engine.innodb.page.PageObject
 
 /**
  * 5 bytes 40 bits.
@@ -27,7 +29,7 @@ import tech.insight.engine.innodb.page.ConstantSize
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-class RecordHeader(private val source: ByteArray = ByteArray(5)) : ByteWrapper, Lengthable {
+class RecordHeader(private val source: ByteArray = ByteArray(5)) : SerializableObject, Lengthable {
 
     var deleteMask: Boolean = source[0].isOne(5)
         set(value) {
@@ -118,6 +120,7 @@ class RecordHeader(private val source: ByteArray = ByteArray(5)) : ByteWrapper, 
     override fun hashCode(): Int {
         return source.contentHashCode()
     }
+
 
     override fun length(): Int {
         return source.size

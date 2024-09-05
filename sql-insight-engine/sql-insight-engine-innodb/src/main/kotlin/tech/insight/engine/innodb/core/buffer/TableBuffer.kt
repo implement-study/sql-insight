@@ -2,6 +2,7 @@ package tech.insight.engine.innodb.core.buffer
 
 import java.io.File
 import java.io.RandomAccessFile
+import tech.insight.buffer.wrappedBuf
 import tech.insight.core.annotation.Temporary
 import tech.insight.core.bean.Table
 import tech.insight.engine.innodb.index.InnodbIndex

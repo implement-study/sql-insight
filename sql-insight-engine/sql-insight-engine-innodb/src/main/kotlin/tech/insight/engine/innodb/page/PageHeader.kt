@@ -15,7 +15,6 @@
  */
 package tech.insight.engine.innodb.page
 
-import org.gongxuanzhang.easybyte.core.ByteWrapper
 import tech.insight.buffer.readUShort
 import tech.insight.core.annotation.Unused
 
@@ -25,7 +24,7 @@ import tech.insight.core.annotation.Unused
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class PageHeader(override val belongPage: InnoDbPage) : PageObject, ByteWrapper {
+class PageHeader(override val belongPage: InnoDbPage) : PageObject {
     //  todo field update adjust bytebuffer
     val source = belongPage.source.slice(ConstantSize.PAGE_HEADER.offset, ConstantSize.PAGE_HEADER.size)
 

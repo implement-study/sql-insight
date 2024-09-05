@@ -9,7 +9,6 @@ import tech.insight.core.annotation.Temporary
 import tech.insight.core.bean.Database
 import tech.insight.core.bean.Table
 import tech.insight.core.engine.storage.StorageEngine
-import tech.insight.core.extension.SqlInsightConfig
 
 
 /**
@@ -34,15 +33,12 @@ object TableLoader {
 
     private fun loadTableMeta(frmFile: File): Table {
         val frmBytes = FileInputStream(frmFile).readAllBytes()
-        val buffer = DynamicByteBuffer.wrap(frmBytes, SqlInsightConfig)
-        return buffer.getObject(Table::class.java).also { it.checkMyself() }
+        return Table.readObject(frmBytes)
     }
 
     fun writeTableMeta(table: Table) {
         val frm = File(table.database.dbFolder, "${table.name}.frm")
-        val buffer = DynamicByteBuffer.allocate(SqlInsightConfig)
-        buffer.appendObject(table)
-        frm.writeBytes(buffer.toBytes())
+        frm.writeBytes(table.toBytes())
     }
 
 }

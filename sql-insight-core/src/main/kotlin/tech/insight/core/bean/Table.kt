@@ -16,20 +16,30 @@
 package tech.insight.core.bean
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import tech.insight.buffer.ObjectReader
+import tech.insight.buffer.SerializableObject
+import tech.insight.buffer.byteBuf
+import tech.insight.buffer.readCollection
+import tech.insight.buffer.readLengthAndString
+import tech.insight.buffer.wrappedBuf
+import tech.insight.buffer.writeCollection
+import tech.insight.buffer.writeLengthAndString
 import tech.insight.core.engine.storage.StorageEngine
+import tech.insight.core.environment.DatabaseManager
+import tech.insight.core.environment.EngineManager
 import tech.insight.core.exception.UnknownColumnException
 
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class Table : SQLBean {
+class Table : SQLBean, SerializableObject {
     lateinit var database: Database
     lateinit var name: String
     var columnList: MutableList<Column> = mutableListOf()
     var indexList: MutableList<Index> = mutableListOf()
     lateinit var engine: StorageEngine
-    var comment: String = ""
+    var comment: String? = null
     val databaseName: String
         @JsonIgnore
         get() {
@@ -75,6 +85,16 @@ class Table : SQLBean {
         }
     }
 
+    override fun toBytes(): ByteArray {
+        return byteBuf()
+            .writeLengthAndString(name)
+            .writeLengthAndString(databaseName)
+            .writeCollection(columnList)
+            .writeLengthAndString(engine.name)
+            .writeLengthAndString(comment)
+            .array()
+    }
+
     override fun toString(): String {
         return "Table=[$name] ${columnList.size} columns"
     }
@@ -94,10 +114,23 @@ class Table : SQLBean {
         var primaryKeyName: String? = null
     }
 
-    companion object {
-        
+    companion object : ObjectReader<Table> {
+
+        override fun readObject(bytes: ByteArray): Table {
+            val table = Table()
+            val buf = wrappedBuf(bytes)
+            table.name = buf.readLengthAndString() ?: throw IllegalArgumentException("table name can't be null")
+            table.database = DatabaseManager.require(buf.readLengthAndString()!!)
+            table.columnList = buf.readCollection {
+                Column.readObject(it)
+            }.toMutableList()
+            table.engine = EngineManager.selectEngine(buf.readLengthAndString())
+            table.comment = buf.readLengthAndString()
+            return table
+        }
+
     }
-    
+
 }
 
 

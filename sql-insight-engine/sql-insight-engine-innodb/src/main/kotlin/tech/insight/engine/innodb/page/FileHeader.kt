@@ -16,7 +16,6 @@
 package tech.insight.engine.innodb.page
 
 import io.netty.buffer.ByteBuf
-import org.gongxuanzhang.easybyte.core.ByteWrapper
 import tech.insight.core.annotation.Unused
 
 
@@ -26,7 +25,7 @@ import tech.insight.core.annotation.Unused
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class FileHeader(override val belongPage: InnoDbPage) : ByteWrapper, PageObject {
+class FileHeader(override val belongPage: InnoDbPage) : PageObject {
 
     val source: ByteBuf = belongPage.source.slice(ConstantSize.FILE_HEADER.offset, ConstantSize.FILE_HEADER.size)
 

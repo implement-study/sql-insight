@@ -16,7 +16,7 @@
 package tech.insight.engine.innodb.page.compact
 
 import java.util.*
-import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
+import tech.insight.buffer.byteBuf
 import tech.insight.core.bean.Column
 import tech.insight.core.bean.NormalRow
 import tech.insight.core.bean.UpdateRow
@@ -42,7 +42,7 @@ object RowFormatFactory {
         compact.nullList = CompactNullList.allocate(row.belongTo())
         compact.sourceRow = row
         compact.recordHeader = RecordHeader.create(RecordType.NORMAL)
-        val bodyBuffer: DynamicByteBuffer = DynamicByteBuffer.allocate()
+        val buf = byteBuf()
         for (insertItem in row) {
             val column: Column = insertItem.column
             val value: Value<*> = insertItem.value
@@ -60,9 +60,9 @@ object RowFormatFactory {
                 }
                 compact.variables.appendVariableLength(value.length.toUByte())
             }
-            bodyBuffer.append(value.toBytes())
+            buf.writeBytes(value.toBytes())
         }
-        compact.body = (bodyBuffer.toBytes())
+        compact.body = buf.array()
         return compact
     }
 

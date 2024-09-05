@@ -1,7 +1,7 @@
 package tech.insight.engine.innodb.page.compact
 
 import java.util.*
-import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
+import tech.insight.buffer.byteBuf
 import tech.insight.core.annotation.Unused
 import tech.insight.core.bean.ReadRow
 import tech.insight.core.bean.Row
@@ -66,12 +66,12 @@ open class Compact : InnodbUserRecord {
     override lateinit var belongPage: InnoDbPage
 
     override fun rowBytes(): ByteArray {
-        val buffer: DynamicByteBuffer = DynamicByteBuffer.allocate()
-        buffer.append(variables.toBytes())
-        buffer.append(nullList.toBytes())
-        buffer.append(recordHeader.toBytes())
-        buffer.append(body)
-        return buffer.toBytes()
+        return byteBuf()
+            .writeBytes(variables.toBytes())
+            .writeBytes(nullList.toBytes())
+            .writeBytes(recordHeader.toBytes())
+            .writeBytes(body)
+            .array()
     }
 
     override val values: List<Value<*>>
@@ -238,13 +238,14 @@ open class Compact : InnodbUserRecord {
     }
 
     private fun indexBody(): ByteArray {
-
-        val bodyBuffer = DynamicByteBuffer.allocate()
-        belongIndex.columns().forEach {
-            bodyBuffer.append(getValueByColumnName(it.name).toBytes())
+        val bodyBuffer = byteBuf()
+        belongIndex.columns().map {
+            getValueByColumnName(it.name).toBytes()
+        }.forEach {
+            bodyBuffer.writeBytes(it)
         }
-        bodyBuffer.appendInt(belongPage.fileHeader.offset)
-        return bodyBuffer.toBytes()
+        bodyBuffer.writeInt(belongPage.fileHeader.offset)
+        return bodyBuffer.array()
     }
 
     private fun indexRow(): Row {

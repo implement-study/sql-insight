@@ -35,6 +35,35 @@ fun ByteBuf.writeLengthAndString(value: String?): ByteBuf {
     return this.writeInt(byteArray.size).writeBytes(byteArray)
 }
 
+
+fun ByteBuf.writeCollection(collection: Collection<SerializableObject>): ByteBuf {
+    this.writeInt(collection.size)
+    collection.forEach {
+        this.writeObject(it)
+    }
+    return this
+}
+
+
+fun <T> ByteBuf.readCollection(readConvert: (ByteArray) -> T): List<T> {
+    val size = this.readInt()
+    val list = mutableListOf<T>()
+    repeat(size) {
+        readConvert(readLengthAndBytes()).let { list.add(it) }
+    }
+    return list
+}
+
+fun ByteBuf.writeObject(o: SerializableObject): ByteBuf {
+    return this.writeLengthAndBytes(o.toBytes())
+}
+
+fun <T> ByteBuf.readObject(readConvert: (ByteArray) -> T): T {
+    this.readLengthAndBytes().let {
+        return readConvert(it)
+    }
+}
+
 fun ByteBuf.readLengthAndString(): String? {
     val length = readInt()
     if (length == -1) {

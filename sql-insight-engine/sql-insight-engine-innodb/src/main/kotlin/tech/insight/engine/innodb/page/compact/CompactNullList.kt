@@ -15,7 +15,7 @@
  */
 package tech.insight.engine.innodb.page.compact
 
-import org.gongxuanzhang.easybyte.core.ByteWrapper
+import tech.insight.buffer.SerializableObject
 import tech.insight.core.bean.Table
 import tech.insight.engine.innodb.core.Lengthable
 import tech.insight.engine.innodb.index.InnodbIndex
@@ -31,7 +31,7 @@ class CompactNullList
  * the byte array is origin byte in page.
  * begin with right.
  * nullList length maybe 0
- */ private constructor(private var nullList: ByteArray) : ByteWrapper, Lengthable {
+ */ private constructor(private var nullList: ByteArray) : SerializableObject, Lengthable {
 
     /**
      * @param index start 0

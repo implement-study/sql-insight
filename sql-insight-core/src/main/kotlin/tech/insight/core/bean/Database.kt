@@ -17,13 +17,14 @@ package tech.insight.core.bean
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.io.File
+import tech.insight.buffer.SerializableObject
 import tech.insight.core.environment.DefaultProperty
 import tech.insight.core.environment.GlobalContext
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class Database(val name: String) {
+class Database(val name: String) : SerializableObject {
 
     val dbFolder: File
         @JsonIgnore
@@ -34,6 +35,10 @@ class Database(val name: String) {
 
     override fun toString(): String {
         return "Database[$name]"
+    }
+
+    override fun toBytes(): ByteArray {
+        return name.toByteArray()
     }
 
     override fun equals(other: Any?): Boolean {

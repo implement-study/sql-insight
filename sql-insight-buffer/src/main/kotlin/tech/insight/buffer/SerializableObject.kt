@@ -4,7 +4,7 @@ package tech.insight.buffer
 /**
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-interface SerializableObject {
+fun interface SerializableObject {
     
     fun toBytes(): ByteArray
 }

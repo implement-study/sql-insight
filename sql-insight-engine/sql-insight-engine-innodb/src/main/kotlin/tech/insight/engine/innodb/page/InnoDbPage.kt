@@ -1,8 +1,6 @@
 package tech.insight.engine.innodb.page
 
 import io.netty.buffer.ByteBuf
-import org.gongxuanzhang.easybyte.core.ByteWrapper
-import org.gongxuanzhang.easybyte.core.DynamicByteBuffer
 import tech.insight.core.annotation.Temporary
 import tech.insight.core.bean.condition.Expression
 import tech.insight.core.logging.Logging
@@ -19,7 +17,7 @@ import tech.insight.engine.innodb.page.type.PageType
  * source is 16K bytes
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), ByteWrapper, PageObject,
+class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), PageObject,
     Iterable<InnodbUserRecord> {
 
     init {
@@ -75,18 +73,7 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
     }
 
     override fun toBytes(): ByteArray {
-        if (ext.change) {
-            val buffer: DynamicByteBuffer = DynamicByteBuffer.allocate()
-            buffer.append(fileHeader.toBytes())
-            buffer.append(pageHeader.toBytes())
-            buffer.append(infimum.toBytes())
-            buffer.append(supremum.toBytes())
-            buffer.append(userRecords.toBytes())
-            buffer.append(pageDirectory.toBytes())
-            buffer.append(fileTrailer.toBytes())
-            ext.bytes = buffer.toBytes()
-        }
-        return ext.bytes
+        return source.array()
     }
 
     /**
@@ -96,7 +83,7 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
 
     fun pageType(): PageType {
         val currentType = ext.pageType
-        if (currentType == null || currentType.value.toInt() != fileHeader.pageType) {
+        if (currentType == null || currentType.value != fileHeader.pageType) {
             ext.pageType = PageType.valueOf(fileHeader.pageType, this)
         }
         return ext.pageType!!

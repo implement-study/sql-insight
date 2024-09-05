@@ -15,7 +15,7 @@
  */
 package tech.insight.engine.innodb.page.compact
 
-import org.gongxuanzhang.easybyte.core.ByteWrapper
+import tech.insight.buffer.SerializableObject
 import tech.insight.engine.innodb.core.Lengthable
 
 /**
@@ -23,7 +23,7 @@ import tech.insight.engine.innodb.core.Lengthable
  *
  * @author gongxuanzhang
  */
-class Variables private constructor() : ByteWrapper, Lengthable, Iterable<Byte> {
+class Variables private constructor() : SerializableObject, Lengthable, Iterable<Byte> {
 
     lateinit var varBytes: ByteArray
 

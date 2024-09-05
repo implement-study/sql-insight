@@ -17,7 +17,6 @@ package tech.insight.engine.innodb.page
 
 import io.netty.buffer.ByteBuf
 import java.nio.ByteBuffer
-import org.gongxuanzhang.easybyte.core.ByteWrapper
 
 /**
  * a page has N * group.
@@ -30,7 +29,7 @@ import org.gongxuanzhang.easybyte.core.ByteWrapper
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class PageDirectory(override val belongPage: InnoDbPage) : PageObject, ByteWrapper {
+class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
 
     var source: ByteBuf = pageBuff()
 

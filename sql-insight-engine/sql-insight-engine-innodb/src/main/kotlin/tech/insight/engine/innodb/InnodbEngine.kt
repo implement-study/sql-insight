@@ -3,6 +3,7 @@ package tech.insight.engine.innodb
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
+import tech.insight.buffer.wrappedBuf
 import tech.insight.core.bean.Cursor
 import tech.insight.core.bean.Index
 import tech.insight.core.bean.InsertRow
