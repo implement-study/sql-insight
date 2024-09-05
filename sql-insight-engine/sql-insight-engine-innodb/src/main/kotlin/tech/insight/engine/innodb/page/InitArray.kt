@@ -10,7 +10,7 @@ import tech.insight.engine.innodb.page.type.DataPage
  **/
 
 
-val initNormalRecordHeader: ByteArray = run {
+val initNormalRecordHeader: () -> ByteArray = {
     byteBuf(ConstantSize.RECORD_HEADER.size).apply {
         writeByte(0)
         writeByte(0)
@@ -19,7 +19,7 @@ val initNormalRecordHeader: ByteArray = run {
     }.array()
 }
 
-val initPageRecordHeader: ByteArray = run {
+val initPageRecordHeader: () -> ByteArray = {
     byteBuf(ConstantSize.RECORD_HEADER.size).apply {
         writeByte(0)
         writeByte(0)
@@ -28,16 +28,16 @@ val initPageRecordHeader: ByteArray = run {
     }.array()
 }
 
-val initInfimumRecordHeader: ByteArray = run {
+val initInfimumRecordHeader: () -> ByteArray = {
     byteBuf(ConstantSize.RECORD_HEADER.size).apply {
         writeByte(1)
         writeByte(0)
         writeByte(RecordType.INFIMUM.value)
-        writeShort(ConstantSize.SUPREMUM.offset - ConstantSize.INFIMUM.offset)
+        writeShort(Supremum.OFFSET_IN_PAGE - Infimum.OFFSET_IN_PAGE)
     }.array()
 }
 
-val initSupremumRecordHeader: ByteArray = run {
+val initSupremumRecordHeader: () -> ByteArray = {
     byteBuf(ConstantSize.RECORD_HEADER.size).apply {
         writeByte(1)
         writeByte(0)
@@ -46,10 +46,12 @@ val initSupremumRecordHeader: ByteArray = run {
     }.array()
 }
 
+val initUnknownRecordHeader: () -> ByteArray = {
+    TODO()
+}
 
 
-
-val initFileHeaderArray: ByteArray = run {
+val initFileHeaderArray: () -> ByteArray = {
     byteBuf(ConstantSize.FILE_HEADER.size)
         .writeInt(FileHeader.checkSum)
         .writeInt(0)  //  offset
@@ -63,7 +65,7 @@ val initFileHeaderArray: ByteArray = run {
         .array()
 }
 
-val initPageHeaderArray: ByteArray = run {
+val initPageHeaderArray: () -> ByteArray = {
     byteBuf(ConstantSize.PAGE_HEADER.size)
         .writeShort(0) //  slot count
         .writeShort(ConstantSize.USER_RECORDS.offset) //  heap top
@@ -84,37 +86,36 @@ val initPageHeaderArray: ByteArray = run {
         .array()
 }
 
-val initInfimumArray: ByteArray = run {
+val initInfimumArray: () -> ByteArray = {
     byteBuf(ConstantSize.INFIMUM.size)
-        .writeBytes(initInfimumRecordHeader)
-        .writeShort(ConstantSize.SUPREMUM.offset - ConstantSize.INFIMUM.offset)
+        .writeBytes(initInfimumRecordHeader.invoke())
         .writeBytes(Infimum.INFIMUM_BODY_ARRAY)
         .array()
 }
 
-val initSupremumArray: ByteArray = run {
+val initSupremumArray: () -> ByteArray = {
     byteBuf(ConstantSize.SUPREMUM.size)
-        .writeBytes(initSupremumRecordHeader)
+        .writeBytes(initSupremumRecordHeader.invoke())
         .writeBytes(Supremum.SUPREMUM_BODY_ARRAY)
         .array()
 }
 
-val initPageDirectoryArray: ByteArray = run {
-    byteArrayOf(0, ConstantSize.SUPREMUM.offset.toByte(), 0, ConstantSize.INFIMUM.offset.toByte())
+val initPageDirectoryArray: () -> ByteArray = {
+    byteArrayOf(0, Supremum.OFFSET_IN_PAGE.toByte(), 0, Infimum.OFFSET_IN_PAGE.toByte())
 }
 
 
-val initFileTrailerArray: ByteArray = run {
+val initFileTrailerArray: () -> ByteArray = {
     byteBuf(ConstantSize.FILE_TRAILER.size).writeInt(FileHeader.checkSum).writeInt(0).array()
 }
 
-val initPageArray: ByteArray = run {
+val initPageArray: () -> ByteArray = {
     byteBuf(ConstantSize.PAGE.size).apply {
-        writeBytes(initFileHeaderArray)
-        writeBytes(initPageHeaderArray)
-        writeBytes(initInfimumArray)
-        writeBytes(initSupremumArray)
-        setBytes(ConstantSize.FILE_TRAILER.offset, initFileTrailerArray)
-        setBytes(ConstantSize.FILE_TRAILER.offset - Short.SIZE_BYTES * 2, initPageDirectoryArray)
+        writeBytes(initFileHeaderArray.invoke())
+        writeBytes(initPageHeaderArray.invoke())
+        writeBytes(initInfimumArray.invoke())
+        writeBytes(initSupremumArray.invoke())
+        setBytes(ConstantSize.FILE_TRAILER.offset, initFileTrailerArray.invoke())
+        setBytes(ConstantSize.FILE_TRAILER.offset - Short.SIZE_BYTES * 2, initPageDirectoryArray.invoke())
     }.array()
 }

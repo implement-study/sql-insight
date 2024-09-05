@@ -19,27 +19,28 @@ import tech.insight.engine.innodb.page.initInfimumRecordHeader
 import tech.insight.engine.innodb.page.initNormalRecordHeader
 import tech.insight.engine.innodb.page.initPageRecordHeader
 import tech.insight.engine.innodb.page.initSupremumRecordHeader
+import tech.insight.engine.innodb.page.initUnknownRecordHeader
 
 /**
  * Compact row format type
  *
  * @author gxz gongxuanzhang@foxmail.com
  */
-enum class RecordType(val value: Int,val initByteArray: ByteArray) {
+enum class RecordType(val value: Int, val arraySupplier: () -> ByteArray) {
     /**
      * leaf-node
      */
-    NORMAL(0x00,initNormalRecordHeader),
+    NORMAL(0x00, initNormalRecordHeader),
 
     /**
      * non-leaf-node(index)
      */
-    PAGE(0x01,initPageRecordHeader),
+    PAGE(0x01, initPageRecordHeader),
 
     /**
      * infimum
      */
-    INFIMUM(0x02,initInfimumRecordHeader),
+    INFIMUM(0x02, initInfimumRecordHeader),
 
     /**
      * supremum
@@ -49,7 +50,7 @@ enum class RecordType(val value: Int,val initByteArray: ByteArray) {
     /**
      * init unknown
      */
-    UNKNOWN(Int.MAX_VALUE, TODO());
+    UNKNOWN(Int.MAX_VALUE, initUnknownRecordHeader);
 
 
     companion object {

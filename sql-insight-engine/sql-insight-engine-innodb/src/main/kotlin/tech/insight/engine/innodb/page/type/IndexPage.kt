@@ -72,10 +72,10 @@ class IndexPage(override val page: InnoDbPage) : PageType {
 
 
     override fun convertUserRecord(offsetInPage: Int): InnodbUserRecord {
-        if (ConstantSize.INFIMUM.offset == offsetInPage) {
+        if (page.infimum.absoluteOffset() == offsetInPage) {
             return page.infimum
         }
-        if (ConstantSize.SUPREMUM.offset == offsetInPage) {
+        if (page.supremum.absoluteOffset() == offsetInPage) {
             return page.supremum
         }
         val belongIndex = page.ext.belongIndex

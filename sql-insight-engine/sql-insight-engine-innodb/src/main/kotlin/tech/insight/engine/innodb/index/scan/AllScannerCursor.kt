@@ -24,7 +24,7 @@ class AllScannerCursor(override val index: InnodbIndex) : ScannerCursor {
     /**
      * next row's offset, currentRow may be null.
      */
-    private var nextOffset: Short = 0
+    private var nextOffset: Int = 0
 
     private var currentRow: InnodbUserRecord? = null
 
@@ -36,7 +36,7 @@ class AllScannerCursor(override val index: InnodbIndex) : ScannerCursor {
             page = findPageByOffset(offset, page.ext.belongIndex)
         }
         this.currentPage = page
-        this.nextOffset = ConstantSize.INFIMUM.offset.toShort()
+        this.nextOffset = page.infimum.absoluteOffset()
     }
 
 
@@ -56,7 +56,7 @@ class AllScannerCursor(override val index: InnodbIndex) : ScannerCursor {
         if (currentRow != null) {
             val result = currentRow!!
             currentRow = null
-            nextOffset = (result.absoluteOffset() + result.nextRecordOffset()).toShort()
+            nextOffset = result.absoluteOffset() + result.nextRecordOffset()
             return (result as Compact)/*.sourceRow*/
         }
         findNext()
@@ -65,34 +65,34 @@ class AllScannerCursor(override val index: InnodbIndex) : ScannerCursor {
         }
         val result = currentRow!!
         currentRow = null
-        nextOffset = (result.absoluteOffset() + result.nextRecordOffset()).toShort()
+        nextOffset = result.absoluteOffset() + result.nextRecordOffset()
         return (result as Compact)/*.sourceRow*/
     }
 
     private fun findNext() {
-        while (currentPage.pageHeader.recordCount.toInt() == 0) {
+        while (currentPage.pageHeader.recordCount == 0) {
             if (currentPage.fileHeader.next == 0) {
                 //  empty root page node
                 return
             }
             currentPage = findPageByOffset(currentPage.fileHeader.next, currentPage.ext.belongIndex)
         }
-        if (nextOffset == ConstantSize.INFIMUM.offset.toShort()) {
+        if (nextOffset == currentPage.infimum.absoluteOffset()) {
             val row = currentPage.getFirstUserRecord()
             currentRow = row
-            nextOffset = row.absoluteOffset().toShort()
+            nextOffset = row.absoluteOffset()
             return
         }
-        if (nextOffset == ConstantSize.SUPREMUM.offset.toShort()) {
+        if (nextOffset == ConstantSize.SUPREMUM.offset) {
             if (currentPage.fileHeader.next == 0) {
                 return
             }
             currentPage = findPageByOffset(currentPage.fileHeader.next, currentPage.ext.belongIndex)
-            nextOffset = ConstantSize.INFIMUM.offset.toShort()
+            nextOffset = currentPage.infimum.absoluteOffset()
             return findNext()
         }
-        val nextRow = currentPage.getUserRecordByOffset(nextOffset.toInt())
+        val nextRow = currentPage.getUserRecordByOffset(nextOffset)
         currentRow = nextRow
-        nextOffset = (nextRow.absoluteOffset() + nextRow.nextRecordOffset()).toShort()
+        nextOffset = nextRow.absoluteOffset() + nextRow.nextRecordOffset()
     }
 }

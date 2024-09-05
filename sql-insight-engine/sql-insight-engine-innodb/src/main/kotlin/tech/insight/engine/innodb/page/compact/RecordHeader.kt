@@ -136,7 +136,7 @@ class RecordHeader(private val source: ByteArray) : SerializableObject, Lengthab
         private val OWNED_RANGE = IntRange(0, (1 shl 4) - 1)
         private val NEXT_RECORD_RANGE = IntRange(0, UShort.MAX_VALUE.toInt())
 
-        fun create(type: RecordType) = RecordHeader(type.initByteArray)
+        fun create(type: RecordType) = RecordHeader(type.arraySupplier())
 
         fun wrap(source: ByteArray) = RecordHeader(source).apply {
             ConstantSize.RECORD_HEADER.checkSize(source)

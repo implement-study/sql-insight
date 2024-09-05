@@ -25,7 +25,7 @@ import tech.insight.engine.innodb.page.PageHeader.Companion.EMPTY_PAGE_HEAP_TOP
  * contains all userRecords (include delete mask record) and free space
  * @author gongxuanzhangmelt@gmail.com
  */
-class UserRecords(override val belongPage: InnoDbPage) :  PageObject {
+class UserRecords(override val belongPage: InnoDbPage) : PageObject {
 
     val source: ByteBuf
 
@@ -80,9 +80,9 @@ class UserRecords(override val belongPage: InnoDbPage) :  PageObject {
 
 
     fun clear() {
-        belongPage.infimum.recordHeader.nextRecordOffset = ConstantSize.SUPREMUM.offset - ConstantSize.INFIMUM.offset
+        belongPage.infimum.recordHeader.nextRecordOffset = Supremum.OFFSET_IN_PAGE - Infimum.OFFSET_IN_PAGE
         belongPage.supremum.apply {
-            recordHeader.nextRecordOffset = ConstantSize.SUPREMUM.offset - ConstantSize.INFIMUM.offset
+            recordHeader.nextRecordOffset = 0
             recordHeader.nOwned = 1
         }
         belongPage.pageDirectory.clear()

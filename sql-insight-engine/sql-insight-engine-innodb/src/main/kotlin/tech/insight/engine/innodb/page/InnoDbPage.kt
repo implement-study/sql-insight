@@ -345,10 +345,10 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
      * @return user record
      */
     fun getUserRecordByOffset(offsetInPage: Int): InnodbUserRecord {
-        if (offsetInPage == ConstantSize.INFIMUM.offset) {
+        if (offsetInPage == this.infimum.absoluteOffset()) {
             return infimum
         }
-        if (offsetInPage == ConstantSize.SUPREMUM.offset) {
+        if (offsetInPage == this.supremum.absoluteOffset()) {
             return supremum
         }
         return this.pageType().convertUserRecord(offsetInPage)
@@ -444,7 +444,7 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
             slotCount = (records.size / Constant.SLOT_MAX_COUNT) + 2
         }
         var pre: InnodbUserRecord = this.infimum
-        var preOffset = ConstantSize.INFIMUM.offset
+        var preOffset = pre.absoluteOffset()
         records.forEachIndexed { index, record ->
             val currentOffset: Int = pageHeader.heapTop + record.beforeSplitOffset()
             record.setAbsoluteOffset(currentOffset)

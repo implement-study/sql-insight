@@ -24,7 +24,7 @@ import tech.insight.engine.innodb.core.Lengthable
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-interface PageObject : Lengthable ,SerializableObject{
+interface PageObject : Lengthable, SerializableObject {
 
     /**
      *  page that the object belongs to

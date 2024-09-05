@@ -41,10 +41,10 @@ class DataPage(override val page: InnoDbPage) : PageType {
      * offset is after record header .in other words offset - record header size  means record header offset
      */
     override fun convertUserRecord(offsetInPage: Int): InnodbUserRecord {
-        if (ConstantSize.INFIMUM.offset == offsetInPage) {
+        if (page.infimum.absoluteOffset() == offsetInPage) {
             return page.infimum
         }
-        if (ConstantSize.SUPREMUM.offset == offsetInPage) {
+        if (page.supremum.absoluteOffset() == offsetInPage) {
             return page.supremum
         }
         val compact = Compact()

@@ -144,9 +144,9 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
         for (i in 0 until this.slots.size) {
             this.source.writeShort(0)
         }
-        this.source.setShort(this.source.capacity() - Short.SIZE_BYTES, ConstantSize.INFIMUM.offset)
-        this.source.setShort(this.source.capacity() - Short.SIZE_BYTES * 2, ConstantSize.SUPREMUM.offset)
-        this.slots = shortArrayOf(ConstantSize.SUPREMUM.offset.toShort(), ConstantSize.INFIMUM.offset.toShort())
+        this.source.setShort(this.source.capacity() - Short.SIZE_BYTES, Infimum.OFFSET_IN_PAGE)
+        this.source.setShort(this.source.capacity() - Short.SIZE_BYTES * 2, Supremum.OFFSET_IN_PAGE)
+        this.slots = shortArrayOf(Infimum.OFFSET_IN_PAGE.toShort(), Supremum.OFFSET_IN_PAGE.toShort())
     }
 
     private fun pageBuff(): ByteBuf {

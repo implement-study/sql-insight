@@ -27,6 +27,12 @@ fun ByteBuf.readAllBytes(): ByteArray {
     return allBytes
 }
 
+fun ByteBuf.getAllBytes(): ByteArray {
+    val allBytes = ByteArray(this.readableBytes())
+    this.getBytes(0,allBytes)
+    return allBytes
+}
+
 fun ByteBuf.writeLengthAndString(value: String?): ByteBuf {
     if (value == null) {
         return this.writeInt(-1)

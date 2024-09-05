@@ -23,7 +23,7 @@ import tech.insight.core.annotation.Unused
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class FileTrailer(override val belongPage: InnoDbPage) :  PageObject {
+class FileTrailer(override val belongPage: InnoDbPage) : PageObject {
 
     val source = belongPage.source.slice(ConstantSize.FILE_TRAILER.offset, ConstantSize.FILE_TRAILER.size)
 
