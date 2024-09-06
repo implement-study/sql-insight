@@ -1,28 +1,27 @@
 package tech.insight.engine.innodb.page
 
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
-import tech.insight.buffer.byteBuf
+import tech.insight.buffer.wrappedBuf
+import kotlin.test.assertEquals
 
 
 class PageDirectoryTest {
 
+
+    val page = InnoDbPage(wrappedBuf(initPageArray()), mock()).apply {
+        pageDirectory.insert(0, 1)
+        pageDirectory.insert(0, 10)
+    }
+   
+    
     @Test
-    fun split() {
-        val dir = mock<PageDirectory>()
-        val byteBuf = run {
-            byteBuf()
-                .writeShort(50)
-                .writeShort(40)
-                .writeShort(30)
-                .writeShort(20)
-                .writeShort(10)
-        }
-        val shortArray = shortArrayOf(10, 20, 30, 40, 50)
-        whenever(dir.source).doReturn(byteBuf)
-        whenever(dir.slots).doReturn(shortArray)
+    fun testInsert() {
+        val page = InnoDbPage(wrappedBuf(initPageArray()), mock())
+        assertEquals(
+            page.pageDirectory.slots.map { it.offset }.toList(),
+            listOf(Supremum.OFFSET_IN_PAGE, 10, 1, Infimum.OFFSET_IN_PAGE)
+        )
 
     }
 

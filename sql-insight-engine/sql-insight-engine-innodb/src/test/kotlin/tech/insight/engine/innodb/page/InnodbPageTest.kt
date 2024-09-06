@@ -52,9 +52,9 @@ class InnodbPageTest {
 
         for (i in 0 until 500) {
             val record = mockUserRecord(i, table)
-            val targetSlot = innodbPage.findTargetSlot(record)
-            val big = innodbPage.getUserRecordByOffset(innodbPage.pageDirectory.slots[targetSlot].toInt())
-            val small = innodbPage.getUserRecordByOffset(innodbPage.pageDirectory.slots[targetSlot + 1].toInt())
+            val targetSlot = innodbPage.pageDirectory.findTargetIn(record)
+            val big = targetSlot.maxRecord()
+            val small = targetSlot.smaller().maxRecord()
             assert(big >= record)
             assert(small < record)
         }
@@ -72,8 +72,8 @@ class InnodbPageTest {
         }
         innodbPage.coverRecords(recordList)
         assertEquals(2, innodbPage.pageDirectory.slots.size)
-        assertEquals(innodbPage.supremum.absoluteOffset().toShort(), innodbPage.pageDirectory.slots[0])
-        assertEquals(innodbPage.infimum.absoluteOffset().toShort(), innodbPage.pageDirectory.slots[1])
+        assertEquals(innodbPage.supremum.absoluteOffset(), innodbPage.pageDirectory.slots[0].offset)
+        assertEquals(innodbPage.infimum.absoluteOffset(), innodbPage.pageDirectory.slots[1].offset)
         val supremumOffset = innodbPage.supremum.absoluteOffset()
 
         for (id in 6..15) {
@@ -82,17 +82,16 @@ class InnodbPageTest {
         innodbPage = InnoDbPage(wrappedBuffer(pageBytes), table.indexList[0] as InnodbIndex)
         innodbPage.coverRecords(recordList)
         assertEquals(3, innodbPage.pageDirectory.slots.size)
-        assertEquals(innodbPage.supremum.absoluteOffset().toShort(), innodbPage.pageDirectory.slots[0])
-        assertEquals(innodbPage.infimum.absoluteOffset().toShort(), innodbPage.pageDirectory.slots[2])
+        assertEquals(innodbPage.supremum.absoluteOffset(), innodbPage.pageDirectory.slots[0].offset)
+        assertEquals(innodbPage.infimum.absoluteOffset(), innodbPage.pageDirectory.slots[2].offset)
 
         recordList.add(mockUserRecord(16, table))
         innodbPage = InnoDbPage(wrappedBuf(pageBytes), table.indexList[0] as InnodbIndex)
 
         innodbPage.coverRecords(recordList)
         assertEquals(4, innodbPage.pageDirectory.slots.size)
-        assertEquals(supremumOffset, innodbPage.pageDirectory.slots[0].toInt())
-        assertEquals(innodbPage.infimum.absoluteOffset().toShort(), innodbPage.pageDirectory.slots[3])
-    }
+        assertEquals(supremumOffset, innodbPage.pageDirectory.slots[0].offset)
+        assertEquals(innodbPage.infimum.absoluteOffset(), innodbPage.pageDirectory.slots[3].offset)    }
 
     private fun mockUserRecord(id: Int, table: Table): InnodbUserRecord {
         return mock<InnodbUserRecord> {

@@ -16,7 +16,7 @@
 package tech.insight.engine.innodb.page
 
 import io.netty.buffer.ByteBuf
-import java.nio.ByteBuffer
+import tech.insight.buffer.getLength
 
 /**
  * a page has N * group.
@@ -31,70 +31,22 @@ import java.nio.ByteBuffer
  */
 class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
 
+    /**
+     * page directory may change frequently.
+     * So source not actually dir data. The head will carry some free space.
+     *
+     */
     var source: ByteBuf = pageBuff()
-
 
     /**
      * order AES in order to support binary search
      */
-    var slots = ShortArray(belongPage.pageHeader.slotCount) {
-        val offset: Int = belongPage.pageHeader.slotCount * Short.SIZE_BYTES - (it + 1) * Short.SIZE_BYTES
-        source.getShort(offset)
+    internal val slots = MutableList(belongPage.pageHeader.slotCount) {
+        val offsetInPage: Int = belongPage.pageHeader.slotCount * Short.SIZE_BYTES - (it + 1) * Short.SIZE_BYTES
+        val recordOffset = source.getShort(offsetInPage)
+        PageSlot(recordOffset.toInt(), it, this)
     }
 
-    /**
-     * page directory split.
-     * @param splitSlotIndex split slot index. min slot is 0
-     * @param newGroupMaxOffset new group max offset.  the new group max should be in [splitSlotIndex] before split
-     */
-    fun split(splitSlotIndex: Int, newGroupMaxOffset: Short) {
-        slots = ShortArray(slots.size + 1) {
-            if (it <= splitSlotIndex) {
-                slots[it]
-            } else if (it == splitSlotIndex + 1) {
-                newGroupMaxOffset
-            } else {
-                slots[it - 1]
-            }
-        }
-    }
-
-
-    /**
-     * @param removedIndex min slot is 0
-     */
-    fun removeSlot(removedIndex: Int) {
-        require(removedIndex > 0 && removedIndex < slots.size - 1) {
-            "removed index must in 1...${slots.size - 1} infimum and supremum can't remove"
-        }
-        this.source.setShort(0, 0)
-        slots = ShortArray(slots.size - 1) {
-            if (it < removedIndex) {
-                slots[it]
-            } else {
-                val newOffset = slots[it + 1]
-                this.source.setShort(this.source.capacity() - (it + 1) * Short.SIZE_BYTES, newOffset.toInt())
-                newOffset
-            }
-        }
-        this.belongPage.pageHeader.slotCount--
-    }
-
-    fun replace(oldOffset: Int, newOffset: Int) {
-        val targetIndex = findTargetOffsetIndex(oldOffset)
-        slots[targetIndex] = newOffset.toShort()
-        source.setShort((slots.size - targetIndex - 1) * Short.SIZE_BYTES, newOffset)
-    }
-
-    /**
-     * such as [List.get]
-     * param index is slot index.
-     * the min slot index is 0
-     * @return offset that max record in group
-     */
-    operator fun get(index: Int): Int {
-        return slots[index].toInt()
-    }
 
     /**
      * insert a slot into page directory.
@@ -114,53 +66,112 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
         require(offset > 0 && offset < ConstantSize.PAGE.size) {
             "offset must in 0...${ConstantSize.PAGE.size}"
         }
-        slots = ShortArray(slots.size + 1) {
-            if (it < index) {
-                slots[it]
-            } else if (it == index) {
-                offset.toShort()
-            } else {
-                slots[it - 1]
-            }
-        }
-        val pageSource = belongPage.source
-        for (i in index..<slots.size) {
-            pageSource.setShort(ConstantSize.FILE_TRAILER.offset - (i + 1) * Short.SIZE_BYTES, slots[i].toInt())
-        }
+        flushSourceIfNecessary()
+        slots.add(index, PageSlot(offset, index, this))
+        val bytes = belongPage.source.getLength(offsetInPage(), (slots.size - index) * Short.SIZE_BYTES)
+        belongPage.source.setBytes(offsetInPage() - Short.SIZE_BYTES, bytes)
+        belongPage.source.setByte((ConstantSize.FILE_TRAILER.offset - index - 1) * Short.SIZE_BYTES, offset)
         this.belongPage.pageHeader.slotCount++
     }
 
-
-    fun preTargetOffset(thisOffset: Int): Int {
-        return findTargetOffsetIndex(thisOffset) - 1
+    /**
+     * @param removedIndex min slot is 0
+     */
+    fun removeSlot(removedIndex: Int) {
+        require(removedIndex > 0 && removedIndex < slots.size - 1) {
+            "removed index must in 1...${slots.size - 1} infimum and supremum can't remove"
+        }
+        val bytes = belongPage.source.getLength(offsetInPage(), (slots.size - removedIndex - 1) * Short.SIZE_BYTES)
+        belongPage.source.setBytes(offsetInPage() + Short.SIZE_BYTES, bytes)
+        belongPage.source.setByte(offsetInPage(), 0)
+        this.source.setShort(0, 0)
+        this.slots.removeAt(removedIndex)
+        this.belongPage.pageHeader.slotCount--
     }
 
-    fun nextTargetOffset(thisOffset: Int): Int {
-        return findTargetOffsetIndex(thisOffset) + 1
+    fun replace(oldOffset: Int, newOffset: Int) {
+        val index = slots.indexOfFirst { it.offset == oldOffset }
+        require(index != -1) {
+            "old offset [$oldOffset] is not in slot"
+        }
+        slots[index] = PageSlot(newOffset, index, this)
+        source.setShort((slots.size - index - 1) * Short.SIZE_BYTES, newOffset)
+    }
+
+    /**
+     * such as [List.get]
+     * param index is slot index.
+     * the min slot index is 0
+     * @return offset that max record in group
+     */
+    fun getByOffset(offset: Int): PageSlot {
+        return slots.first { it.offset == offset }
+    }
+
+    /**
+     * Finds the PageSlot in the parent PageDirectory with the given offset.
+     *
+     * @param offset the offset to search for
+     * @return the PageSlot with the given offset
+     * @throws IllegalArgumentException if the offset is not found in the slots array
+     */
+    fun requireSlotByOffset(offset: Int): PageSlot {
+        return slots.find { it.offset == offset } ?: throw IllegalArgumentException("offset $offset is not in slot")
+    }
+
+    /**
+     * find target offset should be in slot.
+     *
+     * @return the slot record must be greater than target record ,
+     * so never return `slot.length -1 ` because it is the infimum
+     */
+    fun findTargetIn(userRecord: InnodbUserRecord): PageSlot {
+        if (slots.size == 2) {
+            return slots[0]
+        }
+        val maxExcludeSupremum = belongPage.getUserRecordByOffset(slots[1].offset)
+        if (this.belongPage.compare(maxExcludeSupremum, userRecord) < 0) {
+            return slots[1]
+        }
+        var left = slots.first().bigger()
+        var result = slots.last()
+        var right = result.smaller()
+        while (left <= right) {
+            val mid = slots[left.index + ((right.index - left.index) shr 1)]
+            val midRecord = mid.maxRecord()
+            val compare = belongPage.compare(userRecord, midRecord)
+            if (compare == 0) {
+                return mid
+            }
+            if (compare > 0) {
+                result = mid
+                right = mid.smaller()
+            } else {
+                left = mid.bigger()
+            }
+        }
+        return result
     }
 
     internal fun clear() {
-        this.source.writerIndex(0)
-        for (i in 0 until this.slots.size) {
-            this.source.writeShort(0)
+        belongPage.source.setZero(offsetInPage(), length())
+        this.belongPage.pageHeader.slotCount = 2
+        this.slots.clear()
+        slots.add(PageSlot(Infimum.OFFSET_IN_PAGE, 0, this))
+        slots.add(PageSlot(Supremum.OFFSET_IN_PAGE, 1, this))
+        this.source = pageBuff()
+    }
+
+    private fun flushSourceIfNecessary() {
+        if (this.source.capacity() == slots.size * Short.SIZE_BYTES) {
+            this.source = pageBuff()
         }
-        this.source.setShort(this.source.capacity() - Short.SIZE_BYTES, Infimum.OFFSET_IN_PAGE)
-        this.source.setShort(this.source.capacity() - Short.SIZE_BYTES * 2, Supremum.OFFSET_IN_PAGE)
-        this.slots = shortArrayOf(Infimum.OFFSET_IN_PAGE.toShort(), Supremum.OFFSET_IN_PAGE.toShort())
     }
 
     private fun pageBuff(): ByteBuf {
         val slotCount = belongPage.pageHeader.slotCount
-        val slotLength = slotCount * Short.SIZE_BYTES
+        val slotLength = slotCount * Short.SIZE_BYTES + INIT_FREE_SPACE
         return belongPage.source.slice(ConstantSize.FILE_TRAILER.offset - slotLength, slotLength)
-    }
-
-    private fun findTargetOffsetIndex(offset: Int): Int {
-        val targetIndex = this.slots.binarySearch(offset.toShort())
-        require(targetIndex != -1) {
-            "target offset [$offset] is not in slot"
-        }
-        return targetIndex
     }
 
     override fun length(): Int {
@@ -168,23 +179,17 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
     }
 
     override fun toBytes(): ByteArray {
-        val buffer = ByteBuffer.allocate(length())
-        for (slot in slots) {
-            buffer.putShort(slot)
-        }
-        return buffer.array()
+        return source.getLength(offsetInPage(), length())
     }
 
-    fun indexSlot(index: Int): Short {
-        return slots[index]
+
+    private fun offsetInPage(): Int {
+        return ConstantSize.FILE_TRAILER.offset - belongPage.pageHeader.slotCount * Short.SIZE_BYTES
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is PageDirectory) return false
-
-        if (!slots.contentEquals(other.slots)) return false
-
         return true
     }
 
@@ -196,23 +201,56 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
         return "PageDirectory(slot size: ${slots.size})"
     }
 
-    companion object PageDirectoryFactory {
+    data class PageSlot(val offset: Int, val index: Int, val parent: PageDirectory) {
 
         /**
-         * non params constructor create a contains infimum and supremum offset slot.
+         * Returns the previous slot in the parent PageDirectory.
+         *
+         * @return the previous PageSlot
          */
-        fun create(belongPage: InnoDbPage) = PageDirectory(belongPage).apply {
-            slots = shortArrayOf(ConstantSize.SUPREMUM.offset.toShort(), ConstantSize.INFIMUM.offset.toShort())
+        fun smaller(): PageSlot {
+            require(index > 0) {
+                "this slot is infimum, can't find smaller"
+            }
+            return parent.slots[index - 1]
         }
 
-        fun wrap(slots: ShortArray, belongPage: InnoDbPage) = PageDirectory(belongPage).apply {
-            require(slots.size >= 2) { "slots size must be greater than 2" }
-            require(slots[0] == ConstantSize.SUPREMUM.offset.toShort()) { "first slot must be supremum" }
-            require(slots[slots.size - 1] == ConstantSize.INFIMUM.offset.toShort()) { "last slot must be infimum" }
-            this.slots = slots
+        /**
+         * Returns the next slot in the parent PageDirectory.
+         *
+         * @return the next PageSlot
+         */
+        fun bigger(): PageSlot {
+            require(index < parent.slots.size - 1) {
+                "this slot is supremum, can't find bigger"
+            }
+            return parent.slots[index + 1]
         }
 
+        fun maxRecord(): InnodbUserRecord {
+            return this.parent.belongPage.getUserRecordByOffset(offset)
+        }
 
+        fun minRecord(): InnodbUserRecord {
+            if (this.index == 0) {
+                return parent.belongPage.infimum
+            }
+            return this.smaller().maxRecord()
+        }
+
+        operator fun compareTo(other: PageSlot): Int {
+            require(this.parent === other.parent) {
+                "The two slots to be compared must belong to the same PageDirectory"
+            }
+            return this.index.compareTo(other.index)
+        }
+
+        fun remove() {
+            this.parent.removeSlot(this.index)
+        }
     }
 
+    companion object {
+        const val INIT_FREE_SPACE = 32 * Short.SIZE_BYTES
+    }
 }

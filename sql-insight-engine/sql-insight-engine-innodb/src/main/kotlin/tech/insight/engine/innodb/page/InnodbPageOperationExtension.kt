@@ -33,7 +33,7 @@ fun InnoDbPage.replace(oldCompact: Compact, newCompact: Compact) {
         heapTop += newCompact.length()
         absoluteRecordCount += 1
         garbage += oldCompact.length()
-        oldCompact.recordHeader.nextRecordOffset = free
-        free = oldCompact.offsetInPage
+        oldCompact.recordHeader.nextRecordOffset = deleteStart
+        deleteStart = oldCompact.offsetInPage
     }
 }

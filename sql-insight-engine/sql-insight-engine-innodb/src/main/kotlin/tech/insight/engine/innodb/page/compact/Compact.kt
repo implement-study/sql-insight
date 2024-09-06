@@ -110,6 +110,7 @@ open class Compact : InnodbUserRecord {
         if (this.recordHeader.recordType == RecordType.PAGE) {
             return this
         }
+        //  belong 
         val indexCompact = Compact()
         indexCompact.sourceRow = indexRow()
         indexCompact.recordHeader = RecordHeader.copy(recordHeader)
@@ -123,7 +124,29 @@ open class Compact : InnodbUserRecord {
     }
 
     override fun remove() {
+        if(this.recordHeader.deleteMask){
+            //  todo  index node recursive 
+            return
+        }
         this.recordHeader.deleteMask = true
+        val preRecord = this.preRecord()
+        val nextRecord = this.nextRecord()
+        preRecord.recordHeader.nextRecordOffset = nextRecord.absoluteOffset() - preRecord.absoluteOffset()
+        if (this.recordHeader.nOwned == 1) {
+            belongPage.pageDirectory.requireSlotByOffset(this.absoluteOffset()).remove()
+        } else if (this.recordHeader.nOwned > 1) {
+            preRecord.recordHeader.nOwned = this.recordHeader.nOwned - 1
+            belongPage.pageDirectory.replace(this.absoluteOffset(), preRecord.absoluteOffset())
+        }
+        belongPage.pageHeader.recordCount--
+        belongPage.pageHeader.garbage += this.length()
+        if (belongPage.pageHeader.deleteStart != 0) {
+            recordHeader.nextRecordOffset = belongPage.pageHeader.deleteStart - this.absoluteOffset()
+        } else {
+            recordHeader.nextRecordOffset = 0
+        }
+        belongPage.pageHeader.deleteStart = this.absoluteOffset()
+        indexNode().remove()
     }
 
     override fun groupMax(): InnodbUserRecord {
@@ -164,17 +187,20 @@ open class Compact : InnodbUserRecord {
     }
 
     override fun nextRecord(): InnodbUserRecord {
+        if (this.recordHeader.deleteMask && nextRecordOffset() == 0) {
+            throw NoSuchElementException("next record not found")
+        }
         return this.belongPage.getUserRecordByOffset(this.absoluteOffset() + nextRecordOffset())
     }
 
     override fun preRecord(): InnodbUserRecord {
         val groupMaxRecord = groupMax()
-        val preGroupMaxOffset = belongPage.pageDirectory.preTargetOffset(groupMaxRecord.absoluteOffset())
-        var pre = this.belongPage.getUserRecordByOffset(preGroupMaxOffset)
-        while (pre.nextRecordOffset() + pre.absoluteOffset() != groupMaxRecord.absoluteOffset()) {
-            pre = pre.nextRecord()
+        val slot = belongPage.pageDirectory.requireSlotByOffset(groupMaxRecord.absoluteOffset())
+        var candidate = slot.minRecord()
+        while (candidate.nextRecordOffset() + candidate.absoluteOffset() != this.absoluteOffset()) {
+            candidate = candidate.nextRecord()
         }
-        return pre
+        return candidate
     }
 
     override fun toString(): String {
@@ -184,16 +210,7 @@ open class Compact : InnodbUserRecord {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Compact) return false
-
-        return (variables != other.variables ||
-                nullList != other.nullList ||
-                recordHeader != other.recordHeader ||
-                !body.contentEquals(other.body) ||
-                rowId != other.rowId ||
-                transactionId != other.transactionId ||
-                rollPointer != other.rollPointer ||
-                sourceRow != other.sourceRow ||
-                offsetInPage != other.offsetInPage)
+        return this.belongPage === other.belongPage && this.offsetInPage == other.offsetInPage
     }
 
     override fun hashCode(): Int {

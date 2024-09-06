@@ -24,6 +24,7 @@ import tech.insight.engine.innodb.page.Supremum
  * @author gongxuanzhangmelt@gmail.com
  */
 object RowComparator {
+    //   todo InnodbUserRecord#compareTo ?
     fun primaryKeyComparator(): Comparator<InnodbUserRecord> {
         return baseComparator().thenComparing { innodbUserRecord: InnodbUserRecord ->
             val table: Table = innodbUserRecord.belongTo()

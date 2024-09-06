@@ -20,7 +20,7 @@ import tech.insight.engine.innodb.page.type.PageType
  * @author gxz gongxuanzhangmelt@gmail.com
  */
 class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), PageObject,
-    Iterable<InnodbUserRecord> {
+    Iterable<InnodbUserRecord>, Comparator<InnodbUserRecord> {
 
     init {
         require(source.capacity() == ConstantSize.PAGE.size) {
@@ -125,130 +125,19 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
      */
     private fun doInsertData(data: InnodbUserRecord) {
         InnodbSessionContext.getInnodbSessionContext().modifyPage(this)
-        val (pre, next) = findPreAndNext(data)
+        var preCandidate = pageDirectory.findTargetIn(data).minRecord()
+        var nextCandidate = preCandidate.nextRecord()
+        //   <= ? <  this data already existed
+        while (nextCandidate <= data) {
+            preCandidate = nextCandidate
+            nextCandidate = preCandidate.nextRecord()
+        }
         val preFree = this.freeSpace
-        linkedAndAdjust(pre, data, next)
+        linkedAndAdjust(preCandidate, data, nextCandidate)
         val after = this.freeSpace
         val diff = preFree - after
-        debug { " data: ${data.toBytes().size} diff: $diff pre: $preFree after: $after " }
+        debug { "data: ${data.toBytes().size} diff: $diff pre: $preFree after: $after " }
         pageSplitIfNecessary()
-    }
-
-    /**
-     * find location where the record linked in page and return pre and next.
-     * search only,don't affect the page .
-     * @param userRecord target record
-     * @param skipMe will throw Error when find a record equals [userRecord] and this param is true
-     */
-    fun findPreAndNext(
-        userRecord: InnodbUserRecord,
-        skipMe: Boolean = false
-    ): Pair<InnodbUserRecord, InnodbUserRecord> {
-        val targetSlot = findTargetSlot(userRecord)
-        var pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot + 1).toInt())
-        var next = pre.nextRecord()
-        while (true) {
-            val compare = this.pageType().compare(userRecord, next)
-            if (compare < 0) {
-                break
-            }
-            if (compare > 0) {
-                pre = next
-                next = pre.nextRecord()
-                continue
-            }
-            if (skipMe) {
-                val myNext = next.nextRecord()
-                return Pair(pre, myNext)
-            }
-            throw Error("find a record equals target record")
-        }
-        return Pair(pre, next)
-    }
-
-    /**
-     * get the first user record in  page directory slot .
-     * @param targetSlot which slot in page directory
-     */
-    fun targetSlotMinUserRecord(targetSlot: Int): InnodbUserRecord {
-        val pre = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot + 1).toInt())
-        return getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
-    }
-
-    /**
-     * find the slot where the target record is located
-     *
-     *
-     * return 0 means supremum
-     *
-     * @return slot index is user record inserted never return `slot.length -1 ` because slot.length - 1 is the
-     * infimum
-     */
-    fun findTargetSlot(userRecord: InnodbUserRecord): Int {
-        if (pageDirectory.slots.size == 2) {
-            return 0
-        }
-        val maxExcludeSupremum = getUserRecordByOffset(pageDirectory.slots[1].toInt())
-        if (this.pageType().compare(maxExcludeSupremum, userRecord) < 0) {
-            return 0
-        }
-        var left = 1
-        var right = pageHeader.slotCount - 1
-        while (left < right) {
-            val mid = left + ((right - left) shr 1)
-            val offset: Short = pageDirectory.slots[mid]
-            val base = getUserRecordByOffset(offset.toInt())
-            val compare = pageType().compare(userRecord, base)
-            if (compare == 0) {
-                return mid
-            }
-            if (compare > 0) {
-                right = mid - 1
-                continue
-            }
-            if (left == mid) {
-                break
-            }
-            left = mid
-        }
-        if (pageType().compare(userRecord, getUserRecordByOffset(pageDirectory.slots[right].toInt())) <= 0) {
-            return right
-        }
-        return left
-    }
-
-    //   todo 
-    fun delete(deletedRow: InnodbUserRecord) {
-        val isFirstRecord = getFirstUserRecord().absoluteOffset() == deletedRow.absoluteOffset()
-        val targetSlot = findTargetSlot(deletedRow)
-        val preRecord = run {
-            val slotMinRecord = targetSlotMinUserRecord(targetSlot)
-            if (slotMinRecord.absoluteOffset() == deletedRow.absoluteOffset()) {
-                return@run getUserRecordByOffset(pageDirectory.indexSlot(targetSlot + 1).toInt())
-            }
-            var pre = slotMinRecord
-            while (pre.nextRecordOffset() + pre.absoluteOffset() != deletedRow.absoluteOffset()) {
-                pre = getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
-            }
-            pre
-        }
-        val maxSlotRecord = getUserRecordByOffset(pageDirectory.indexSlot(targetSlot).toInt())
-
-        if (maxSlotRecord.absoluteOffset() == deletedRow.absoluteOffset()) {
-            if (deletedRow.recordHeader.nOwned == 0) {
-                pageDirectory.removeSlot(targetSlot)
-            } else {
-                preRecord.recordHeader.nOwned = deletedRow.recordHeader.nOwned - 1
-                pageDirectory.slots[targetSlot] = preRecord.absoluteOffset().toShort()
-            }
-        }
-        maxSlotRecord.recordHeader.nOwned--
-        val nextAbsoluteOffset = deletedRow.nextRecordOffset() + deletedRow.absoluteOffset()
-        preRecord.recordHeader.nextRecordOffset = (nextAbsoluteOffset - preRecord.absoluteOffset())
-        //  todo Link the deleted row to the deleted linked list.
-        if (isFirstRecord) {
-            this.ext.parent?.delete(deletedRow.indexNode())
-        }
     }
 
 
@@ -367,22 +256,6 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
         return getUserRecordByOffset(infimum.absoluteOffset() + infimum.nextRecordOffset())
     }
 
-    fun getPreUserRecord(userRecord: InnodbUserRecord): InnodbUserRecord {
-        check(userRecord !is Infimum) {
-            "infimum has no pre"
-        }
-        val targetSlot = findTargetSlot(userRecord)
-        val slotFirstRecord = targetSlotMinUserRecord(targetSlot)
-        if (slotFirstRecord.absoluteOffset() == userRecord.absoluteOffset()) {
-            return getUserRecordByOffset(pageDirectory.indexSlot(targetSlot + 1).toInt())
-        }
-        var pre = slotFirstRecord
-        while (pre.nextRecordOffset() + pre.absoluteOffset() != userRecord.absoluteOffset()) {
-            pre = getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
-        }
-        return pre
-    }
-
     /**
      * @param offset record offset, the record header offset = offset - record header size
      * @return record
@@ -419,7 +292,7 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
         userRecords.addRecord(insertRecord)
         pageHeader.absoluteRecordCount++
         pageHeader.recordCount++
-        pageHeader.heapTop = pageHeader.heapTop + insertRecord.length()
+        pageHeader.heapTop += insertRecord.length()
         pageHeader.lastInsertOffset = insertRecord.absoluteOffset()
         var groupMax = next
         //  adjust group
@@ -432,17 +305,20 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
             return
         }
         debug { "occurred group split ..." }
-        val nextGroupIndex = pageDirectory.slots.indexOfFirst { it.toInt() == groupMax.absoluteOffset() }
-        var preMaxRecord = getUserRecordByOffset(pageDirectory.slots[nextGroupIndex + 1].toInt())
+        val splitSlot = pageDirectory.getByOffset(groupMax.absoluteOffset())
         val leftGroupCount = Constant.SLOT_MAX_COUNT shr 1
         val rightGroupCount = Constant.SLOT_MAX_COUNT - leftGroupCount + 1
-        repeat(leftGroupCount) {
-            preMaxRecord = getUserRecordByOffset(preMaxRecord.absoluteOffset() + preMaxRecord.nextRecordOffset())
+        val leftMaxRecord = run {
+            var preMaxRecord = getUserRecordByOffset(splitSlot.smaller().offset.toInt())
+            repeat(leftGroupCount) {
+                preMaxRecord = preMaxRecord.nextRecord()
+            }
+            preMaxRecord.recordHeader.nOwned = leftGroupCount
+            preMaxRecord
         }
-        preMaxRecord.recordHeader.nOwned = leftGroupCount
         groupMax.recordHeader.nOwned = rightGroupCount
-        this.pageHeader.slotCount += 1
-        pageDirectory.split(nextGroupIndex, preMaxRecord.absoluteOffset().toShort())
+        pageHeader.slotCount += 1
+        pageDirectory.insert(splitSlot.index, leftMaxRecord.absoluteOffset())
     }
 
 
@@ -490,30 +366,15 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is InnoDbPage) return false
-
-        if (fileHeader != other.fileHeader) return false
-        if (pageHeader != other.pageHeader) return false
-        if (infimum != other.infimum) return false
-        if (supremum != other.supremum) return false
-        if (userRecords != other.userRecords) return false
-        if (pageDirectory != other.pageDirectory) return false
-        if (fileTrailer != other.fileTrailer) return false
-        if (ext != other.ext) return false
-
         return true
     }
 
     override fun hashCode(): Int {
-        var result = fileHeader.hashCode()
-        result = 31 * result + pageHeader.hashCode()
-        result = 31 * result + infimum.hashCode()
-        result = 31 * result + supremum.hashCode()
-        result = 31 * result + userRecords.hashCode()
-        result = 31 * result + pageDirectory.hashCode()
-        result = 31 * result + fileTrailer.hashCode()
-        result = 31 * result + ext.hashCode()
-        return result
+        return fileHeader.spaceId + 31 * fileHeader.offset
+    }
+
+    override fun compare(o1: InnodbUserRecord, o2: InnodbUserRecord): Int {
+        return this.pageType().compare(o1, o2)
     }
 
 

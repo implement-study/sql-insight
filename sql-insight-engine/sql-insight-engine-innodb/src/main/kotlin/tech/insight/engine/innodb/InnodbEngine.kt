@@ -87,7 +87,7 @@ class InnodbEngine : Logging(), StorageEngine {
         require(deletedRow is InnodbUserRecord) {
             "innodb engine only support innodb user record"
         }
-        deletedRow.belongPage.delete(deletedRow)
+        deletedRow.remove()
     }
 
     override fun refresh(table: Table) {

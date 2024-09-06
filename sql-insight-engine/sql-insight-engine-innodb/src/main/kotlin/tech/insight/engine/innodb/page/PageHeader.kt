@@ -80,10 +80,11 @@ class PageHeader(override val belongPage: InnoDbPage) : PageObject {
         }
 
     /**
-     * the first deleted record in page. use next_record field can find delete linked list, init is 0
+     * the first deleted record in page. use next_record field can find delete linked list, init is 0.
+     * in mysql named "free"
      * 2 bytes
      */
-    var free: Int = source.readUShort().toInt()
+    var deleteStart: Int = source.readUShort().toInt()
         set(value) {
             if (field == value) {
                 return

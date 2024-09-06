@@ -91,7 +91,7 @@ class UserRecords(override val belongPage: InnoDbPage) : PageObject {
             heapTop = EMPTY_PAGE_HEAP_TOP
             absoluteRecordCount = 2
             recordCount = 0
-            free = 0
+            deleteStart = 0
             garbage = 0
             lastInsertOffset = 0
             direction = 0

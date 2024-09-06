@@ -134,7 +134,7 @@ class RecordHeader(private val source: ByteArray) : SerializableObject, Lengthab
 
         private val HEAP_NO_RANGE = IntRange(0, (1 shl 13) - 1)
         private val OWNED_RANGE = IntRange(0, (1 shl 4) - 1)
-        private val NEXT_RECORD_RANGE = IntRange(0, UShort.MAX_VALUE.toInt())
+        private val NEXT_RECORD_RANGE = IntRange(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt())
 
         fun create(type: RecordType) = RecordHeader(type.arraySupplier())
 
