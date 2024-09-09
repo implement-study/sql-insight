@@ -262,7 +262,7 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
      */
     fun readRecordHeader(offset: Int): RecordHeader {
         val recordHeaderSize: Int = ConstantSize.RECORD_HEADER.size
-        return RecordHeader(source.getLength(offset - recordHeaderSize, recordHeaderSize))
+        return RecordHeader(source.slice(offset - recordHeaderSize, recordHeaderSize))
     }
 
     /**

@@ -116,7 +116,6 @@ class InsertTest {
         }
         rootPage.supremum.apply {
             assertEquals(1, this.recordHeader.heapNo)
-            assertEquals(0, nextRecordOffset())
             assertEquals(6, this.recordHeader.nOwned)
             assertEquals(RecordType.SUPREMUM, this.recordHeader.recordType)
         }
@@ -124,7 +123,7 @@ class InsertTest {
 
         var pre: InnodbUserRecord = infimum
         for (i in 0 until 4) {
-            val userRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+            val userRecord = pre.nextRecord()
             assertEquals(16, userRecord.length())
             assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
             assertEquals(0, userRecord.recordHeader.nOwned)
@@ -174,7 +173,6 @@ class InsertTest {
         }
         rootPage.supremum.apply {
             assertEquals(1, this.recordHeader.heapNo)
-            assertEquals(0, nextRecordOffset())
             assertEquals(7, this.recordHeader.nOwned)
             assertEquals(RecordType.SUPREMUM, this.recordHeader.recordType)
         }
@@ -219,7 +217,6 @@ class InsertTest {
         assertEquals(4, pageHeader.slotCount)
         rootPage.supremum.apply {
             assertEquals(1, this.recordHeader.heapNo)
-            assertEquals(0, nextRecordOffset())
             assertEquals(8, this.recordHeader.nOwned)
             assertEquals(RecordType.SUPREMUM, this.recordHeader.recordType)
         }

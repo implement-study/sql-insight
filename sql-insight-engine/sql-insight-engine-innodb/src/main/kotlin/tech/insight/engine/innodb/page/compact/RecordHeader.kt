@@ -1,9 +1,11 @@
 package tech.insight.engine.innodb.page.compact
 
+import io.netty.buffer.ByteBuf
 import tech.insight.buffer.SerializableObject
 import tech.insight.buffer.byteArray
-import tech.insight.buffer.compose
+import tech.insight.buffer.copyBuf
 import tech.insight.buffer.coverBits
+import tech.insight.buffer.getAllBytes
 import tech.insight.buffer.isOne
 import tech.insight.buffer.setOne
 import tech.insight.buffer.setZero
@@ -27,87 +29,82 @@ import tech.insight.engine.innodb.page.ConstantSize
  *
  * @author gongxuanzhangmelt@gmail.com
  */
-class RecordHeader(private val source: ByteArray) : SerializableObject, Lengthable {
+class RecordHeader(private val source: ByteBuf) : SerializableObject, Lengthable {
 
     init {
-        require(source.size == ConstantSize.RECORD_HEADER.size) {
+        require(source.readableBytes() == ConstantSize.RECORD_HEADER.size) {
             "source size must be ${ConstantSize.RECORD_HEADER.size}"
         }
     }
 
-    var deleteMask: Boolean = source[0].isOne(5)
+    var deleteMask: Boolean = source.getByte(0).isOne(5)
         set(value) {
             if (field == value) {
                 return
             }
             field = value
             if (value) {
-                source[0] = source[0].setOne(5)
+                source.setByte(0, source.getByte(0).setOne(5).toInt())
             } else {
-                source[0] = source[0].setZero(5)
+                source.setByte(0, source.getByte(0).setZero(5).toInt())
             }
         }
 
     @Unused
-    var minRec: Boolean = source[0].isOne(4)
+    var minRec: Boolean = source.getByte(0).isOne(4)
         set(value) {
             if (field == value) {
                 return
             }
             field = value
             if (value) {
-                source[0] = source[0].setOne(4)
+                source.setByte(0, source.getByte(0).setOne(4).toInt())
             } else {
-                source[0] = source[0].setZero(4)
+                source.setByte(0, source.getByte(0).setZero(4).toInt())
             }
         }
 
-    var nOwned: Int = source[0].subByte(4)
+    var nOwned: Int = source.getByte(0).subByte(4)
         set(value) {
             if (field == value) {
                 return
             }
             require(value in OWNED_RANGE) { "nOwned must in $OWNED_RANGE" }
             field = value
-            source[0] = source[0].coverBits(value, 4)
+            source.setByte(0, source.getByte(0).coverBits(value, 4).toInt())
         }
 
-    var heapNo: Int = compose(source[1], source[2]).subShort(3, 16)
+    var heapNo: Int = source.getShort(1).subShort(3, 16)
         set(value) {
             if (field == value) {
                 return
             }
-            require(value in HEAP_NO_RANGE) { "heapNo must in $HEAP_NO_RANGE" } 
+            require(value in HEAP_NO_RANGE) { "heapNo must in $HEAP_NO_RANGE" }
             field = value
-            val newByteArray = compose(source[1], source[2]).coverBits(value, 3, 16).byteArray()
-            source[1] = newByteArray[0]
-            source[2] = newByteArray[1]
+            source.setShort(1, source.getShort(1).coverBits(value, 3, 16).toInt())
         }
 
-    var recordType: RecordType = RecordType.valueOf(source[2].subByte(3))
-        set(value) {
-            if (value == field) {
+    var recordType: RecordType = RecordType.valueOf(source.getByte(2).subByte(3))
+        set(newType) {
+            if (newType == field) {
                 return
             }
-            field = value
-            source[2] = source[2].coverBits(value.value, 3)
+            field = newType
+            source.setByte(2,source.getByte(2).coverBits(newType.value, 3).toInt())
         }
 
-    var nextRecordOffset: Int = compose(source[3], source[4]).toInt()
+    var nextRecordOffset: Int = source.getShort(3).toInt()
         set(value) {
             if (field == value) {
                 return
             }
             require(value in NEXT_RECORD_RANGE) { "nextRecordOffset must in $NEXT_RECORD_RANGE" }
             field = value
-            val newByteArray = value.toShort().byteArray()
-            source[3] = newByteArray[0]
-            source[4] = newByteArray[1]
-            return
+            source.setShort(3, value)
         }
-    
+
     override fun toBytes(): ByteArray {
-        return source
+        return source.getAllBytes()
     }
 
     override fun equals(other: Any?): Boolean {
@@ -118,16 +115,16 @@ class RecordHeader(private val source: ByteArray) : SerializableObject, Lengthab
             return false
         }
         val that = other as RecordHeader
-        return source.contentEquals(that.source)
+        return heapNo == that.heapNo && nextRecordOffset == that.nextRecordOffset
     }
 
     override fun hashCode(): Int {
-        return source.contentHashCode()
+        return source.hashCode()
     }
 
 
     override fun length(): Int {
-        return source.size
+        return ConstantSize.RECORD_HEADER.size
     }
 
     companion object {
@@ -136,9 +133,9 @@ class RecordHeader(private val source: ByteArray) : SerializableObject, Lengthab
         private val OWNED_RANGE = IntRange(0, (1 shl 4) - 1)
         private val NEXT_RECORD_RANGE = IntRange(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt())
 
-        fun create(type: RecordType) = RecordHeader(type.arraySupplier())
+        fun create(type: RecordType) = RecordHeader(copyBuf(type.arraySupplier()))
 
-        fun copy(source: RecordHeader) = RecordHeader(source.toBytes().copyOf())
+        fun copy(source: RecordHeader) = RecordHeader(copyBuf(source.toBytes()))
 
     }
 }

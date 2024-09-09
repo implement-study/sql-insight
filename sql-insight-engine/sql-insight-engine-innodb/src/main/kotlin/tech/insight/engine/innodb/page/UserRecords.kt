@@ -115,8 +115,7 @@ class UserRecords(override val belongPage: InnoDbPage) : PageObject {
     }
 
     override fun toString(): String {
-        //  todo
-        return "UserRecords(length=${source.readableBytes()})"
+        return "UserRecords(length=${this.length()})"
     }
 
 }

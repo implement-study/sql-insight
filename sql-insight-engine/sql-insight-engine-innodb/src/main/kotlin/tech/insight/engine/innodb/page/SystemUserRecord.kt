@@ -60,7 +60,7 @@ class Supremum(override val belongPage: InnoDbPage) : SystemUserRecord {
     /**
      * 5 bytes
      */
-    override val recordHeader = RecordHeader(source.slice(0, ConstantSize.RECORD_HEADER.size).getAllBytes())
+    override val recordHeader = RecordHeader(source.slice(0, ConstantSize.RECORD_HEADER.size))
 
     /**
      * 8 bytes as "supremum"
@@ -167,7 +167,7 @@ class Infimum(override val belongPage: InnoDbPage) : SystemUserRecord {
     /**
      * 5 bytes.
      */
-    override val recordHeader = RecordHeader(source.slice(0, ConstantSize.RECORD_HEADER.size).getAllBytes())
+    override val recordHeader = RecordHeader(source.slice(0, ConstantSize.RECORD_HEADER.size))
 
     /**
      * fixed 8 bytes. "infimum" is 7 bytes . fill 0 zero occupy the space
