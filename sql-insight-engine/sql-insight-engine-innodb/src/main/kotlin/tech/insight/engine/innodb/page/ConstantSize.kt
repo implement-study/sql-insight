@@ -29,7 +29,7 @@ enum class ConstantSize {
     SUPREMUM(13, FILE_HEADER.size + PAGE_HEADER.size + INFIMUM.size),
     SUPREMUM_BODY(8, SUPREMUM.offset + RECORD_HEADER.size),
     INFIMUM_BODY(8, INFIMUM.offset + RECORD_HEADER.size),
-    USER_RECORDS(-1, SUPREMUM.offset + SUPREMUM_BODY.size),
+    USER_RECORDS(-1, SUPREMUM_BODY.offset + SUPREMUM_BODY.size),
     FILE_TRAILER(8, PAGE.size - 8),
     COMPACT_NULL(8);
 

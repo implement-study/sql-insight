@@ -42,7 +42,7 @@ val initSupremumRecordHeader: () -> ByteArray = {
     byteBuf(ConstantSize.RECORD_HEADER.size).apply {
         writeByte(1)
         writeByte(0)
-        writeByte((1 shl 3) and RecordType.SUPREMUM.value)
+        writeByte((1 shl 3) or RecordType.SUPREMUM.value)
         writeShort(0)
     }.array()
 }

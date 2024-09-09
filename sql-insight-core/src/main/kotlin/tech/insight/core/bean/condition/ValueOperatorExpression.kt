@@ -28,11 +28,9 @@ import tech.insight.core.bean.value.ValueBoolean
  */
 sealed class ValueOperatorExpression(protected val left: Expression, protected val right: Expression) : Expression {
 
-
     protected val identifiers = mutableSetOf<String>()
 
     protected abstract val operatorType: OperatorType
-
 
     init {
         identifiers.addAll(left.identifierNames())
@@ -50,11 +48,9 @@ sealed class ValueOperatorExpression(protected val left: Expression, protected v
         return operator(left.getExpressionValue(row), right.getExpressionValue(row))
     }
 
-
     override fun identifierNames(): Set<String> {
         return identifiers
     }
-
 }
 
 class AddExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
@@ -162,7 +158,6 @@ class LessEqualsExpression(left: Expression, right: Expression) : ValueOperatorE
     }
 }
 
-
 class EqualsExpression(left: Expression, right: Expression) : ValueOperatorExpression(left, right) {
 
     override val operatorType: OperatorType = OperatorType.EQUAL
@@ -188,7 +183,3 @@ class NotEqualsExpression(left: Expression, right: Expression) : ValueOperatorEx
         return "${left.originExpressionString()} != ${right.originExpressionString()}"
     }
 }
-
-
-
-

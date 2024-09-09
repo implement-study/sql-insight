@@ -18,12 +18,10 @@ package tech.insight.core.bean.value
 import java.nio.charset.Charset
 import tech.insight.buffer.ObjectReader
 import tech.insight.buffer.SerializableObject
-import tech.insight.buffer.byteBuf
-import tech.insight.buffer.getAllBytes
-import tech.insight.buffer.readLengthAndString
 import tech.insight.buffer.byteArray
+import tech.insight.buffer.readLengthAndString
+import tech.insight.buffer.toInt
 import tech.insight.buffer.wrappedBuf
-import tech.insight.buffer.writeLengthAndString
 
 
 /**
@@ -113,7 +111,7 @@ class ValueChar(value: String, length: Int) : Value<String> {
     }
 
     override fun toBytes(): ByteArray {
-        return byteBuf().writeByte(2).writeInt(length).writeBytes(source.toByteArray()).getAllBytes()
+        return source.toByteArray()
     }
 
     override fun plus(other: Value<*>): Value<String> {
@@ -128,6 +126,14 @@ class ValueChar(value: String, length: Int) : Value<String> {
         }
     }
 
+    companion object ValueCharReader : ObjectReader<ValueChar> {
+
+        override fun readObject(bytes: ByteArray): ValueChar {
+            return ValueChar(String(bytes), bytes.size)
+        }
+
+    }
+
 }
 
 data class ValueVarchar(override val source: String) : Value<String> {
@@ -139,7 +145,7 @@ data class ValueVarchar(override val source: String) : Value<String> {
 
 
     override fun toBytes(): ByteArray {
-        return byteBuf().writeByte(5).writeLengthAndString(source).getAllBytes()
+        return source.toByteArray()
     }
 
     override fun compareTo(other: Value<*>): Int {
@@ -157,6 +163,13 @@ data class ValueVarchar(override val source: String) : Value<String> {
     override fun toString(): String {
         return this.source
     }
+    
+    companion object ValueVarcharReader : ObjectReader<ValueVarchar> {
+
+        override fun readObject(bytes: ByteArray): ValueVarchar {
+            return ValueVarchar(String(bytes))
+        }
+    }
 }
 
 data class ValueInt(override val source: Int) : Value<Int> {
@@ -165,7 +178,7 @@ data class ValueInt(override val source: Int) : Value<Int> {
 
 
     override fun toBytes(): ByteArray {
-        return byteArrayOf(3) + source.byteArray()
+        return source.byteArray()
     }
 
     override fun toString(): String {
@@ -201,6 +214,13 @@ data class ValueInt(override val source: Int) : Value<Int> {
         require(other is ValueInt) { "number can't plus a ${other.javaClass}" }
         return ValueInt(this.source / other.source)
     }
+    
+    companion object ValueIntReader : ObjectReader<ValueInt> {
+
+        override fun readObject(bytes: ByteArray): ValueInt {
+            return ValueInt(bytes.toInt())
+        }
+    }
 }
 
 open class ValueBoolean(override val source: Boolean) : Value<Boolean> {
@@ -209,7 +229,7 @@ open class ValueBoolean(override val source: Boolean) : Value<Boolean> {
 
 
     override fun toBytes(): ByteArray {
-        return byteArrayOf(1, if (source) 1 else 0)
+        return byteArrayOf(if (source) 1 else 0)
     }
 
 
@@ -238,6 +258,13 @@ open class ValueBoolean(override val source: Boolean) : Value<Boolean> {
         result = 31 * result + isDynamic.hashCode()
         return result
     }
+    
+    companion object ValueBooleanReader : ObjectReader<ValueBoolean> {
+
+        override fun readObject(bytes: ByteArray): ValueBoolean {
+            return if (bytes[0] == 1.toByte()) ValueTrue else ValueFalse
+        }
+    }
 
 
 }
@@ -253,7 +280,7 @@ data object ValueNull : Value<Unit> {
 
 
     override fun toBytes(): ByteArray {
-        return byteArrayOf(4)
+        return byteArrayOf()
     }
 
     override fun compareTo(other: Value<*>): Int {

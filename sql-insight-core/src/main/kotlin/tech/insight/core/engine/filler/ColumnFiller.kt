@@ -25,6 +25,7 @@ class ColumnFiller(val col: Column) : BeanFiller<Column> {
         x.comment?.accept(CommentVisitor { col.comment = it })
         x.defaultExpr?.accept(ValueVisitor {
             col.defaultValue = it
+            col.hasDefault = true
         })
     }
 

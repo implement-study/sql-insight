@@ -65,6 +65,10 @@ open class Compact : InnodbUserRecord {
     lateinit var belongIndex: InnodbIndex
 
     override lateinit var belongPage: InnoDbPage
+    
+    fun directReference(){
+        
+    }
 
     override fun rowBytes(): ByteArray {
         return byteBuf()
@@ -238,7 +242,6 @@ open class Compact : InnodbUserRecord {
         return variables
     }
 
-
     /**
      * null list that the compact transfer to index node
      */
@@ -271,7 +274,6 @@ open class Compact : InnodbUserRecord {
         return ReadRow(indexValue, sourceRow.rowId).apply {
             this.table = sourceRow.belongTo()
         }
-
     }
 
 }

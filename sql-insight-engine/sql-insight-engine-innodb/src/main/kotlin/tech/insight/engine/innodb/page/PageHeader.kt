@@ -238,6 +238,7 @@ class PageHeader(override val belongPage: InnoDbPage) : PageObject {
         this.absoluteRecordCount++
         this.recordCount++
         this.heapTop += userRecord.length()
+        this.lastInsertOffset = userRecord.absoluteOffset()
     }
 
     companion object {

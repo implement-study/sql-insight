@@ -81,7 +81,7 @@ fun Short.coverBits(cover: Int, from: Int, to: Int): Short {
     val fromBase = (1 shl from) - 1
     val midBase = toBase xor fromBase
     val thisRemain = midBase.inv() and this.toUShort().toInt()
-    val coverRemain = cover and midBase
+    val coverRemain = (cover shl from) and midBase
     return (thisRemain or coverRemain).toShort()
 }
 

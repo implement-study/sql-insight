@@ -241,7 +241,6 @@ class InsertFiller : ExplainableFiller<InsertCommand>() {
         return false
     }
 
-
     /**
      * visit values clause must after visit table because insert row should have complete table info before visit
      * values clause

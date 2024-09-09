@@ -20,7 +20,6 @@ fun interface MergeStrategy {
 
     companion object MergeStrategyFactory {
 
-
         private val strategyMap =
             EnumMap<IdentifierSelectType, EnumMap<IdentifierSelectType, MergeStrategy>>(IdentifierSelectType::class.java)
 
@@ -50,7 +49,6 @@ fun interface MergeStrategy {
             return strategyMap[type]?.getValue(otherType)!!
         }
     }
-
 }
 
 
@@ -180,4 +178,3 @@ object RangeMergeRange : MergeStrategy {
         return RangeIdentifierDetails(aDetails.name, newRange)
     }
 }
-

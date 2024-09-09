@@ -17,6 +17,7 @@ package tech.insight.core.bean.value
 
 import com.alibaba.druid.sql.ast.expr.SQLCharExpr
 import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr
+import com.alibaba.druid.sql.ast.expr.SQLNullExpr
 import com.alibaba.druid.sql.visitor.SQLASTVisitor
 
 /**
@@ -33,5 +34,9 @@ class ValueVisitor(private val valueAction: (Value<*>) -> Unit) : SQLASTVisitor 
 
     override fun endVisit(x: SQLIntegerExpr) {
         valueAction.invoke(ValueInt(x.number.toInt()))
+    }
+
+    override fun endVisit(x: SQLNullExpr) {
+        valueAction.invoke(ValueNull)
     }
 }

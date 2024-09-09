@@ -20,5 +20,3 @@ class PrimaryKey(value: Value<*>) : SingleKey(value, true)
 
 
 class MultiColumnKey(values: Array<Value<*>>)
-
-

@@ -75,7 +75,6 @@ class AndExpression(left: Expression, right: Expression) : BaseBooleanExpression
         identifiers.addAll(right.identifierNames())
     }
 
-
     override fun impossible(): Boolean {
         return impossible
     }
@@ -94,7 +93,6 @@ class AndExpression(left: Expression, right: Expression) : BaseBooleanExpression
         }
         return left.getBooleanValue(row) && right.getBooleanValue(row)
     }
-
 }
 
 class OrExpression(left: Expression, right: Expression) : BaseBooleanExpression(left, right) {
@@ -125,7 +123,3 @@ class OrExpression(left: Expression, right: Expression) : BaseBooleanExpression(
     }
 
 }
-
-
-
-

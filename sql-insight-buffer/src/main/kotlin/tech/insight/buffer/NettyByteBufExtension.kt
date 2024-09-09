@@ -84,7 +84,6 @@ fun ByteBuf.writeLengthAndBytes(bytes: ByteArray): ByteBuf {
 
 fun ByteBuf.readLengthAndBytes(): ByteArray {
     return readLength(readInt())
-
 }
 
 fun ByteBuf.getLength(index: Int, length: Int): ByteArray {

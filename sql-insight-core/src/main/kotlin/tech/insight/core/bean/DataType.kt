@@ -15,17 +15,24 @@
  */
 package tech.insight.core.bean
 
+import tech.insight.buffer.ObjectReader
 import tech.insight.buffer.SerializableObject
+import tech.insight.core.bean.value.Value
+import tech.insight.core.bean.value.ValueBoolean
+import tech.insight.core.bean.value.ValueChar
+import tech.insight.core.bean.value.ValueInt
+import tech.insight.core.bean.value.ValueVarchar
 
 
 /**
  * Currently supported data types
  * @author gongxuanzhangmelt@gmail.com
  */
-enum class DataType(val defaultLength: Int) : SerializableObject {
-    INT(4),
-    VARCHAR(255),
-    CHAR(255);
+enum class DataType(val defaultLength: Int, val reader: ObjectReader<Value<*>>) : SerializableObject {
+    INT(4, ValueInt.ValueIntReader),
+    VARCHAR(255, ValueVarchar.ValueVarcharReader),
+    CHAR(255, ValueChar.ValueCharReader),
+    BOOLEAN(1, ValueBoolean.ValueBooleanReader);
 
 
     override fun toBytes(): ByteArray {

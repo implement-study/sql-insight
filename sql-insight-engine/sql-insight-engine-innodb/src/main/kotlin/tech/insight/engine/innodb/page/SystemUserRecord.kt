@@ -77,15 +77,14 @@ class Supremum(override val belongPage: InnoDbPage) : SystemUserRecord {
     }
 
     override fun absoluteOffset(): Int {
-        return ConstantSize.SUPREMUM.offset
+        return ConstantSize.SUPREMUM.offset + ConstantSize.RECORD_HEADER.size
     }
 
     /**
      * supremum next is infimum
-     * todo next offset is ?
      */
     override fun nextRecordOffset(): Int {
-        throw UnsupportedOperationException("supremum next is infimum")
+        return Infimum.OFFSET_IN_PAGE - OFFSET_IN_PAGE
     }
 
     override fun nextRecord(): InnodbUserRecord {
@@ -143,7 +142,6 @@ class Supremum(override val belongPage: InnoDbPage) : SystemUserRecord {
         return source.hashCode()
     }
 
-
     companion object {
 
         const val SUPREMUM_BODY = "supremum"
@@ -157,14 +155,12 @@ class Supremum(override val belongPage: InnoDbPage) : SystemUserRecord {
 
 }
 
-
 /**
  * min record in group
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
 class Infimum(override val belongPage: InnoDbPage) : SystemUserRecord {
-
 
     val source: ByteBuf = belongPage.source.slice(ConstantSize.INFIMUM.offset, ConstantSize.INFIMUM.size)
 
@@ -248,7 +244,6 @@ class Infimum(override val belongPage: InnoDbPage) : SystemUserRecord {
         return "[body:$INFIMUM_BODY]"
     }
 
-
     companion object {
 
         const val INFIMUM_BODY = "infimum"
@@ -257,10 +252,6 @@ class Infimum(override val belongPage: InnoDbPage) : SystemUserRecord {
 
         val INFIMUM_BODY_ARRAY: ByteArray =
             byteBuf(ConstantSize.SUPREMUM_BODY.size).writeBytes(INFIMUM_BODY.toByteArray()).writeByte(0).array()
-
-        fun wrap(bytes: ByteArray, belongToPage: InnoDbPage) = Infimum(belongToPage)
-
     }
-
 }
 

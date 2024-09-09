@@ -52,5 +52,6 @@ class ShortExtensionKtTest {
         assertEquals(0x8000.toShort(), 0xffff.toShort().coverBits(0, 15))
         assertEquals(0b1111_1111_1111_0000_0011.toShort(), 0xffff.toShort().coverBits(0, 2, 8))
         assertEquals(0b0011.toShort(), 0xffff.toShort().coverBits(0, 2, 16))
+        assertEquals(0b0000_0000_0001_0111.toShort(), 0xffff.toShort().coverBits(0b10, 3, 16))
     }
 }

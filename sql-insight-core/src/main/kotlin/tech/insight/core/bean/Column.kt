@@ -18,7 +18,9 @@ package tech.insight.core.bean
 import tech.insight.buffer.ObjectReader
 import tech.insight.buffer.SerializableObject
 import tech.insight.buffer.byteBuf
+import tech.insight.buffer.getAllBytes
 import tech.insight.buffer.isOne
+import tech.insight.buffer.readLength
 import tech.insight.buffer.readLengthAndBytes
 import tech.insight.buffer.readLengthAndString
 import tech.insight.buffer.setBoolean
@@ -40,6 +42,7 @@ class Column : SQLBean, SerializableObject {
     var notNull = false
     var primaryKey = false
     var unique = false
+    var hasDefault = false
     var defaultValue: Value<*> = ValueNull
     var comment: String? = null
     var variable = false
@@ -61,14 +64,19 @@ class Column : SQLBean, SerializableObject {
             .setBoolean(2, primaryKey)
             .setBoolean(3, unique)
             .setBoolean(4, variable)
-        return byteBuf()
+            .setBoolean(5, hasDefault)
+        val buffer = byteBuf()
+            .writeByte(flag.toInt())
             .writeLengthAndString(name)
             .writeBytes(dataType.toBytes())
             .writeInt(length)
             .writeLengthAndString(comment)
-            .writeLengthAndBytes(defaultValue.toBytes())
-            .writeByte(flag.toInt())
-            .array()
+        if (defaultValue is ValueNull) {
+            buffer.writeInt(-1)
+        } else {
+            buffer.writeLengthAndBytes(defaultValue.toBytes())
+        }
+        return buffer.getAllBytes()
     }
 
 
@@ -81,11 +89,6 @@ class Column : SQLBean, SerializableObject {
         override fun readObject(bytes: ByteArray): Column {
             val column = Column()
             val buf = wrappedBuf(bytes)
-            column.name = buf.readLengthAndString() ?: throw IllegalArgumentException("column name can't be null")
-            column.dataType = DataType.entries[buf.readByte().toInt()]
-            column.length = buf.readInt()
-            column.comment = buf.readLengthAndString()
-            buf.readLengthAndBytes().apply { column.defaultValue = Value.readObject(this) }
             buf.readByte().apply {
                 column.autoIncrement = this.isOne(0)
                 column.notNull = this.isOne(1)
@@ -93,10 +96,18 @@ class Column : SQLBean, SerializableObject {
                 column.unique = this.isOne(3)
                 column.variable = this.isOne(4)
             }
+            column.name = buf.readLengthAndString() ?: throw IllegalArgumentException("column name can't be null")
+            column.dataType = DataType.entries[buf.readByte().toInt()]
+            column.length = buf.readInt()
+            column.comment = buf.readLengthAndString()
+            val length = buf.readInt()
+            if(length == -1){
+                column.defaultValue = ValueNull
+                return column
+            }
+            val valueBytes = buf.readLength(length)
+            column.defaultValue = column.dataType.reader.readObject(valueBytes)
             return column
         }
-
-
     }
-
 }

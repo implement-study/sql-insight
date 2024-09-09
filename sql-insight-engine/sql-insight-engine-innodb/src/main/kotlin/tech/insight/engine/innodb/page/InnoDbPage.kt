@@ -152,7 +152,7 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
         var base: InnodbUserRecord = infimum
         var allLength = 0
         while (true) {
-            base = getUserRecordByOffset(base.absoluteOffset() + base.nextRecordOffset())
+            base = base.nextRecord()
             if (base === supremum) {
                 break
             }
@@ -281,43 +281,30 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
     }
 
     private fun linkedAndAdjust(pre: InnodbUserRecord, insertRecord: InnodbUserRecord, next: InnodbUserRecord) {
-        insertRecord.apply {
-            setAbsoluteOffset(pageHeader.heapTop + insertRecord.beforeSplitOffset())
-            this.recordHeader.heapNo = pageHeader.absoluteRecordCount
-            this.recordHeader.nextRecordOffset = next.absoluteOffset() - insertRecord.absoluteOffset()
-        }
-        pre.recordHeader.nextRecordOffset = (insertRecord.absoluteOffset() - pre.absoluteOffset())
-
-        //  adjust page
+        insertRecord.setAbsoluteOffset(belongPage.pageHeader.heapTop + insertRecord.beforeSplitOffset())
+        insertRecord.linkRecord(next)
+        //  insert record not direct link page source, we should adjust the record header before add it to user records
         userRecords.addRecord(insertRecord)
-        pageHeader.absoluteRecordCount++
-        pageHeader.recordCount++
-        pageHeader.heapTop += insertRecord.length()
-        pageHeader.lastInsertOffset = insertRecord.absoluteOffset()
-        var groupMax = next
-        //  adjust group
-        while (groupMax.recordHeader.nOwned == 0) {
-            groupMax = getUserRecordByOffset(groupMax.absoluteOffset() + groupMax.nextRecordOffset())
-        }
-        val groupMaxHeader = groupMax.recordHeader
-        groupMaxHeader.nOwned += 1
-        if (groupMax.recordHeader.nOwned <= Constant.SLOT_MAX_COUNT) {
+        pre.linkRecord(insertRecord)
+        
+        val groupMax = next.groupMax()
+        if (++groupMax.recordHeader.nOwned <= Constant.SLOT_MAX_COUNT) {
             return
         }
         debug { "occurred group split ..." }
         val splitSlot = pageDirectory.getByOffset(groupMax.absoluteOffset())
+        //   todo group split strategy
         val leftGroupCount = Constant.SLOT_MAX_COUNT shr 1
-        val rightGroupCount = Constant.SLOT_MAX_COUNT - leftGroupCount + 1
         val leftMaxRecord = run {
-            var preMaxRecord = getUserRecordByOffset(splitSlot.smaller().offset.toInt())
+            var candidate = splitSlot.smaller().maxRecord()
             repeat(leftGroupCount) {
-                preMaxRecord = preMaxRecord.nextRecord()
+                candidate = candidate.nextRecord()
             }
-            preMaxRecord.recordHeader.nOwned = leftGroupCount
-            preMaxRecord
+            candidate.apply {
+                recordHeader.nOwned = leftGroupCount
+            }
         }
-        groupMax.recordHeader.nOwned = rightGroupCount
-        pageHeader.slotCount += 1
+        groupMax.recordHeader.nOwned = Constant.SLOT_MAX_COUNT - leftGroupCount + 1
         pageDirectory.insert(splitSlot.index, leftMaxRecord.absoluteOffset())
     }
 
@@ -342,7 +329,7 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
                 pageDirectory.insert(pageHeader.slotCount - 2, currentOffset)
             }
         }
-        pre.recordHeader.nextRecordOffset = ConstantSize.SUPREMUM.offset - pre.absoluteOffset()
+        pre.linkRecord(supremum)
         this.userRecords.addRecords(records)
     }
 

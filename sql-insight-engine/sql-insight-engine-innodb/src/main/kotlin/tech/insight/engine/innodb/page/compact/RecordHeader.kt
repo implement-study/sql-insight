@@ -77,14 +77,14 @@ class RecordHeader(private val source: ByteArray) : SerializableObject, Lengthab
             if (field == value) {
                 return
             }
-            require(value in HEAP_NO_RANGE) { "heapNo must in $HEAP_NO_RANGE" }
+            require(value in HEAP_NO_RANGE) { "heapNo must in $HEAP_NO_RANGE" } 
             field = value
             val newByteArray = compose(source[1], source[2]).coverBits(value, 3, 16).byteArray()
             source[1] = newByteArray[0]
             source[2] = newByteArray[1]
         }
 
-    var recordType: RecordType = RecordType.UNKNOWN
+    var recordType: RecordType = RecordType.valueOf(source[2].subByte(3))
         set(value) {
             if (value == field) {
                 return
@@ -105,7 +105,7 @@ class RecordHeader(private val source: ByteArray) : SerializableObject, Lengthab
             source[4] = newByteArray[1]
             return
         }
-
+    
     override fun toBytes(): ByteArray {
         return source
     }
@@ -137,10 +137,6 @@ class RecordHeader(private val source: ByteArray) : SerializableObject, Lengthab
         private val NEXT_RECORD_RANGE = IntRange(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt())
 
         fun create(type: RecordType) = RecordHeader(type.arraySupplier())
-
-        fun wrap(source: ByteArray) = RecordHeader(source).apply {
-            ConstantSize.RECORD_HEADER.checkSize(source)
-        }
 
         fun copy(source: RecordHeader) = RecordHeader(source.toBytes().copyOf())
 
