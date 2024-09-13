@@ -57,6 +57,13 @@ interface InnodbUserRecord : UserRecord, PageObject {
      */
     fun preRecord(): InnodbUserRecord
 
+    /**
+     * @return this record is group max record,in other words record header n_own is not zero
+     */
+    fun isGroupMax(): Boolean {
+        return this.recordHeader.nOwned != 0
+    }
+
     fun linkRecord(nextRecord: InnodbUserRecord) {
         this.recordHeader.nextRecordOffset = nextRecord.absoluteOffset() - this.absoluteOffset()
     }

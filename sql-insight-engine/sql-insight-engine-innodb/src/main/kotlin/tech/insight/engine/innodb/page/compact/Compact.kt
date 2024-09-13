@@ -65,9 +65,9 @@ open class Compact : InnodbUserRecord {
     lateinit var belongIndex: InnodbIndex
 
     override lateinit var belongPage: InnoDbPage
-    
-    fun directReference(){
-        
+
+    fun directReference() {
+
     }
 
     override fun rowBytes(): ByteArray {
@@ -128,7 +128,7 @@ open class Compact : InnodbUserRecord {
     }
 
     override fun remove() {
-        if(this.recordHeader.deleteMask){
+        if (this.recordHeader.deleteMask) {
             //  todo  index node recursive 
             return
         }

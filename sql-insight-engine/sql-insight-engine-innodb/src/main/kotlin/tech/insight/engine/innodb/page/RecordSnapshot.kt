@@ -10,6 +10,6 @@ package tech.insight.engine.innodb.page
  **/
 //  todo 
 interface RecordSnapshot {
-    
+
 
 }

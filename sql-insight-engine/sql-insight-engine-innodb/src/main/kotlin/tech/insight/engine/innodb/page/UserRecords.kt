@@ -18,7 +18,6 @@ package tech.insight.engine.innodb.page
 import io.netty.buffer.ByteBuf
 import tech.insight.buffer.getAllBytes
 import tech.insight.engine.innodb.page.PageHeader.Companion.EMPTY_PAGE_HEAP_TOP
-import tech.insight.engine.innodb.page.compact.RecordHeader
 
 /**
  *
@@ -41,17 +40,23 @@ class UserRecords(override val belongPage: InnoDbPage) : PageObject {
     /**
      * this method will adjust inner data from page.
      * invoker should ensure the this page can add record
-     * 
+     *
      * param user record not direct reference innodb page source
+     * after add use return record
+     * @return record in page,
      */
-    fun addRecord(userRecord: InnodbUserRecord) {
+    fun addRecord(userRecord: InnodbUserRecord): InnodbUserRecord {
         check(belongPage.remainSpace() >= userRecord.length() + Short.SIZE_BYTES) {
             "this page dont have more space "
         }
-        userRecord.setAbsoluteOffset(belongPage.pageHeader.heapTop + userRecord.beforeSplitOffset())
         userRecord.recordHeader.heapNo = belongPage.pageHeader.absoluteRecordCount
         this.source.setBytes(belongPage.pageHeader.heapTop, userRecord.toBytes())
-        this.belongPage.pageHeader.addRecord(userRecord)
+        this.belongPage.apply {
+            val recordInPage = pageHeader.heapTop + userRecord.beforeSplitOffset()
+            userRecord.setAbsoluteOffset(recordInPage)
+            pageHeader.addRecord(userRecord)
+            return getUserRecordByOffset(recordInPage)
+        }
     }
 
     fun addRecords(userRecords: List<InnodbUserRecord>) {

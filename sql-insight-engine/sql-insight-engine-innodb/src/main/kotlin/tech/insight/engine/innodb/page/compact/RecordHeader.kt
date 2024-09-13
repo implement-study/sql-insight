@@ -2,7 +2,6 @@ package tech.insight.engine.innodb.page.compact
 
 import io.netty.buffer.ByteBuf
 import tech.insight.buffer.SerializableObject
-import tech.insight.buffer.byteArray
 import tech.insight.buffer.copyBuf
 import tech.insight.buffer.coverBits
 import tech.insight.buffer.getAllBytes
@@ -90,7 +89,7 @@ class RecordHeader(private val source: ByteBuf) : SerializableObject, Lengthable
                 return
             }
             field = newType
-            source.setByte(2,source.getByte(2).coverBits(newType.value, 3).toInt())
+            source.setByte(2, source.getByte(2).coverBits(newType.value, 3).toInt())
         }
 
     var nextRecordOffset: Int = source.getShort(3).toInt()

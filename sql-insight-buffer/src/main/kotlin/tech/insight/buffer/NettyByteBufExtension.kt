@@ -88,7 +88,7 @@ fun ByteBuf.readLengthAndBytes(): ByteArray {
 
 fun ByteBuf.getLength(index: Int, length: Int): ByteArray {
     val bytes = ByteArray(length)
-    getBytes(index,bytes)
+    getBytes(index, bytes)
     return bytes
 }
 

@@ -273,7 +273,7 @@ class InsertTest {
         SqlPipeline.executeSql(insertDataCount(tableName, dbName, 1000))
         assertNotNull(TableManager.require(testDb, test_table))
         for (i in 0..10) {
-            val select =  SqlPipeline.executeSql(selectWhereId(i * 100, tableName, dbName))
+            val select = SqlPipeline.executeSql(selectWhereId(i * 100, tableName, dbName))
             println(select)
         }
     }
@@ -284,7 +284,7 @@ class InsertTest {
         SqlPipeline.executeSql(insertBigDataCount(tableName, dbName, 3000))
         assertNotNull(TableManager.require(testDb, test_table))
         for (i in 0..30) {
-            val select =  SqlPipeline.executeSql(selectWhereId(i, tableName, dbName))
+            val select = SqlPipeline.executeSql(selectWhereId(i, tableName, dbName))
             println(select)
         }
 

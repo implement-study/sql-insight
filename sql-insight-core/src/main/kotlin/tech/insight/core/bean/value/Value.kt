@@ -163,7 +163,7 @@ data class ValueVarchar(override val source: String) : Value<String> {
     override fun toString(): String {
         return this.source
     }
-    
+
     companion object ValueVarcharReader : ObjectReader<ValueVarchar> {
 
         override fun readObject(bytes: ByteArray): ValueVarchar {
@@ -214,7 +214,7 @@ data class ValueInt(override val source: Int) : Value<Int> {
         require(other is ValueInt) { "number can't plus a ${other.javaClass}" }
         return ValueInt(this.source / other.source)
     }
-    
+
     companion object ValueIntReader : ObjectReader<ValueInt> {
 
         override fun readObject(bytes: ByteArray): ValueInt {
@@ -258,7 +258,7 @@ open class ValueBoolean(override val source: Boolean) : Value<Boolean> {
         result = 31 * result + isDynamic.hashCode()
         return result
     }
-    
+
     companion object ValueBooleanReader : ObjectReader<ValueBoolean> {
 
         override fun readObject(bytes: ByteArray): ValueBoolean {

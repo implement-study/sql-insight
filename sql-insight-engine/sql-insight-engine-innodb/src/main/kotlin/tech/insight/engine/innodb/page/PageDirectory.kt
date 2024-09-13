@@ -197,7 +197,7 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
     override fun toString(): String {
         return "PageDirectory(slot size: ${slots.size})"
     }
-    
+
     @ConsistentCopyVisibility
     data class PageSlot internal constructor(val offset: Int, val index: Int, val parent: PageDirectory) {
 

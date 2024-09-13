@@ -23,13 +23,13 @@ class SelectPlan(
     override val engine: StorageEngine = command.table.engine
 
     override fun run(): ResultInterface {
-        val cursor =  engine.cursor(assignIndex, command.queryCondition.where, explainType)
+        val cursor = engine.cursor(assignIndex, command.queryCondition.where, explainType)
         var skipped = 0
         val rows = arrayListOf<Row>()
         val limit = command.queryCondition.limit
         val where = where()
 
-        TimeReport.timeReport("scan", TimeUnit.NANOSECONDS){
+        TimeReport.timeReport("scan", TimeUnit.NANOSECONDS) {
             //   todo where cover the index?
             while (rows.size < limit.rowCount && cursor.hasNext()) {
                 val next: Row = cursor.next()
@@ -43,7 +43,7 @@ class SelectPlan(
             }
             cursor.close()
         }
-        
+
         command.queryCondition.orderBy?.run { rows.sortWith(this) }
         return SelectResult(rows)
     }

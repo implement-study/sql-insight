@@ -280,12 +280,9 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
     }
 
     private fun linkedAndAdjust(pre: InnodbUserRecord, insertRecord: InnodbUserRecord, next: InnodbUserRecord) {
-        insertRecord.setAbsoluteOffset(belongPage.pageHeader.heapTop + insertRecord.beforeSplitOffset())
-        insertRecord.linkRecord(next)
-        //  insert record not direct link page source, we should adjust the record header before add it to user records
-        userRecords.addRecord(insertRecord)
-        pre.linkRecord(insertRecord)
-
+        val recordInPage = userRecords.addRecord(insertRecord)
+        pre.linkRecord(recordInPage)
+        recordInPage.linkRecord(next)
         val groupMax = next.groupMax()
         if (++groupMax.recordHeader.nOwned <= Constant.SLOT_MAX_COUNT) {
             return

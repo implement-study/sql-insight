@@ -13,8 +13,8 @@ class PageDirectoryTest {
         pageDirectory.insert(0, 1)
         pageDirectory.insert(0, 10)
     }
-   
-    
+
+
     @Test
     fun testInsert() {
         val page = InnoDbPage(wrappedBuf(initPageArray()), mock())

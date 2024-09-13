@@ -21,7 +21,6 @@ import tech.insight.buffer.byteBuf
 import tech.insight.buffer.getAllBytes
 import tech.insight.buffer.isOne
 import tech.insight.buffer.readLength
-import tech.insight.buffer.readLengthAndBytes
 import tech.insight.buffer.readLengthAndString
 import tech.insight.buffer.setBoolean
 import tech.insight.buffer.wrappedBuf
@@ -101,7 +100,7 @@ class Column : SQLBean, SerializableObject {
             column.length = buf.readInt()
             column.comment = buf.readLengthAndString()
             val length = buf.readInt()
-            if(length == -1){
+            if (length == -1) {
                 column.defaultValue = ValueNull
                 return column
             }

@@ -24,10 +24,12 @@ fun InnoDbPage.replace(oldCompact: Compact, newCompact: Compact) {
     newCompact.offsetInPage = this.pageHeader.heapTop + newCompact.beforeSplitOffset()
     val pre = oldCompact.preRecord()
     val next = oldCompact.nextRecord()
-    this.pageDirectory.replace(oldCompact.offsetInPage, newCompact.offsetInPage)
-    userRecords.addRecord(newCompact)
-    pre.linkRecord(newCompact)
-    newCompact.linkRecord(next)
+    if(oldCompact.isGroupMax()){
+        this.pageDirectory.replace(oldCompact.offsetInPage, newCompact.offsetInPage)
+    }
+    val newCompactInPage = userRecords.addRecord(newCompact)
+    newCompactInPage.linkRecord(next)
+    pre.linkRecord(newCompactInPage)
     oldCompact.recordHeader.deleteMask = true
     oldCompact.recordHeader.nextRecordOffset = pageHeader.deleteStart - oldCompact.offsetInPage
     pageHeader.garbage += oldCompact.length()
