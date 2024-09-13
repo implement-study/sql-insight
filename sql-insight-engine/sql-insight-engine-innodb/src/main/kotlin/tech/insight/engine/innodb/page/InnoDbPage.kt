@@ -1,7 +1,6 @@
 package tech.insight.engine.innodb.page
 
 import io.netty.buffer.ByteBuf
-import tech.insight.buffer.getLength
 import tech.insight.core.annotation.Temporary
 import tech.insight.core.bean.condition.Expression
 import tech.insight.core.logging.Logging
@@ -286,13 +285,13 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
         //  insert record not direct link page source, we should adjust the record header before add it to user records
         userRecords.addRecord(insertRecord)
         pre.linkRecord(insertRecord)
-        
+
         val groupMax = next.groupMax()
         if (++groupMax.recordHeader.nOwned <= Constant.SLOT_MAX_COUNT) {
             return
         }
         debug { "occurred group split ..." }
-        val splitSlot = pageDirectory.getByOffset(groupMax.absoluteOffset())
+        val splitSlot = pageDirectory.requireSlotByOffset(groupMax.absoluteOffset())
         //   todo group split strategy
         val leftGroupCount = Constant.SLOT_MAX_COUNT shr 1
         val leftMaxRecord = run {
@@ -311,26 +310,8 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
 
     fun coverRecords(records: List<InnodbUserRecord>) {
         this.clear()
-        with(pageHeader) {
-            recordCount = records.size
-            absoluteRecordCount = records.size + 2
-            slotCount = (records.size / Constant.SLOT_MAX_COUNT) + 2
-        }
-        var pre: InnodbUserRecord = this.infimum
-        var preOffset = pre.absoluteOffset()
-        records.forEachIndexed { index, record ->
-            val currentOffset: Int = pageHeader.heapTop + record.beforeSplitOffset()
-            record.setAbsoluteOffset(currentOffset)
-            pageHeader.heapTop += record.length()
-            pre.recordHeader.nextRecordOffset = currentOffset - preOffset
-            pre = record
-            preOffset = currentOffset
-            if ((index + 1) % Constant.SLOT_MAX_COUNT == 0) {
-                pageDirectory.insert(pageHeader.slotCount - 2, currentOffset)
-            }
-        }
-        pre.linkRecord(supremum)
-        this.userRecords.addRecords(records)
+        records.forEach { this.insertData(it) }
+        //   todo batch insert 
     }
 
     /**
@@ -351,17 +332,20 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
         return Itr()
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        return true
-    }
-
     override fun hashCode(): Int {
         return fileHeader.spaceId + 31 * fileHeader.offset
     }
 
     override fun compare(o1: InnodbUserRecord, o2: InnodbUserRecord): Int {
         return this.pageType().compare(o1, o2)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is InnoDbPage) return false
+
+        if (fileHeader != other.fileHeader) return false
+        return true
     }
 
 

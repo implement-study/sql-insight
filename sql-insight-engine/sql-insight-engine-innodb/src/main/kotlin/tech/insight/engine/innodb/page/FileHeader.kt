@@ -141,7 +141,7 @@ class FileHeader(override val belongPage: InnoDbPage) : PageObject {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is FileHeader) return false
-        return this.source == other.source
+        return this.offset == other.offset && this.spaceId == other.spaceId
     }
 
     override fun hashCode(): Int {

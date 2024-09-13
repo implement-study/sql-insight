@@ -17,6 +17,7 @@ import tech.insight.share.data.insertBigDataCount
 import tech.insight.share.data.insertData
 import tech.insight.share.data.insertDataCount
 import tech.insight.share.data.insertOneData
+import tech.insight.share.data.selectWhereId
 import tech.insight.share.data.testDb
 import tech.insight.share.data.test_table
 import kotlin.test.assertEquals
@@ -225,7 +226,7 @@ class InsertTest {
         var pre: InnodbUserRecord = rootPage.infimum
         //  first group 1-4  count:4
         for (i in 0 until 4) {
-            val userRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+            val userRecord = pre.nextRecord()
             assertEquals(17, userRecord.length())
             assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
             assertEquals(if (i == 3) 4 else 0, userRecord.recordHeader.nOwned)
@@ -236,7 +237,7 @@ class InsertTest {
 
         //  second group 5-8 count:4
         for (i in 0 until 4) {
-            val userRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+            val userRecord = pre.nextRecord()
             assertEquals(17, userRecord.length())
             assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
             assertEquals(if (i == 3) 4 else 0, userRecord.recordHeader.nOwned)
@@ -247,7 +248,7 @@ class InsertTest {
 
         //  third group 9-15 count 8(include supremum)
         for (i in 0 until 7) {
-            val userRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+            val userRecord = pre.nextRecord()
             assertEquals(if (i == 0) 17 else 18, userRecord.length())
             assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
             assertEquals(0, userRecord.recordHeader.nOwned)
@@ -256,7 +257,7 @@ class InsertTest {
             pre = userRecord
         }
 
-        val lastUserRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+        val lastUserRecord = pre.nextRecord()
         assert(lastUserRecord is Supremum)
         assertEquals(13, lastUserRecord.length())
         assertEquals(RecordType.SUPREMUM, lastUserRecord.recordHeader.recordType)
@@ -271,6 +272,10 @@ class InsertTest {
         CreateTableTest().correctTest()
         SqlPipeline.executeSql(insertDataCount(tableName, dbName, 1000))
         assertNotNull(TableManager.require(testDb, test_table))
+        for (i in 0..10) {
+            val select =  SqlPipeline.executeSql(selectWhereId(i * 100, tableName, dbName))
+            println(select)
+        }
     }
 
     @Test
@@ -278,6 +283,11 @@ class InsertTest {
         CreateTableTest().correctTest()
         SqlPipeline.executeSql(insertBigDataCount(tableName, dbName, 3000))
         assertNotNull(TableManager.require(testDb, test_table))
+        for (i in 0..30) {
+            val select =  SqlPipeline.executeSql(selectWhereId(i, tableName, dbName))
+            println(select)
+        }
+
     }
 
 

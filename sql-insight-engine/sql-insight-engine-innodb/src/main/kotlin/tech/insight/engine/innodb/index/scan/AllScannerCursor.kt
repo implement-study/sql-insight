@@ -4,7 +4,6 @@ import java.nio.ByteBuffer
 import tech.insight.core.bean.Row
 import tech.insight.core.plan.ExplainType
 import tech.insight.engine.innodb.index.InnodbIndex
-import tech.insight.engine.innodb.page.ConstantSize
 import tech.insight.engine.innodb.page.InnoDbPage
 import tech.insight.engine.innodb.page.InnoDbPage.Companion.findPageByOffset
 import tech.insight.engine.innodb.page.InnodbUserRecord
@@ -57,7 +56,7 @@ class AllScannerCursor(override val index: InnodbIndex) : ScannerCursor {
             val result = currentRow!!
             currentRow = null
             nextOffset = result.absoluteOffset() + result.nextRecordOffset()
-            return (result as Compact)/*.sourceRow*/
+            return (result as Compact)
         }
         findNext()
         if (currentRow == null) {
@@ -66,7 +65,7 @@ class AllScannerCursor(override val index: InnodbIndex) : ScannerCursor {
         val result = currentRow!!
         currentRow = null
         nextOffset = result.absoluteOffset() + result.nextRecordOffset()
-        return (result as Compact)/*.sourceRow*/
+        return (result as Compact)
     }
 
     private fun findNext() {
@@ -83,7 +82,7 @@ class AllScannerCursor(override val index: InnodbIndex) : ScannerCursor {
             nextOffset = row.absoluteOffset()
             return
         }
-        if (nextOffset == ConstantSize.SUPREMUM.offset) {
+        if (nextOffset == currentPage.supremum.absoluteOffset()) {
             if (currentPage.fileHeader.next == 0) {
                 return
             }

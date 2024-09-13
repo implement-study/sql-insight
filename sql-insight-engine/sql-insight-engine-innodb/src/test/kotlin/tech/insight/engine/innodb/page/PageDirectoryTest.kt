@@ -19,7 +19,7 @@ class PageDirectoryTest {
     fun testInsert() {
         val page = InnoDbPage(wrappedBuf(initPageArray()), mock())
         assertEquals(
-            page.pageDirectory.slots.map { it.offset }.toList(),
+            page.pageDirectory.slots.toList(),
             listOf(Supremum.OFFSET_IN_PAGE, 10, 1, Infimum.OFFSET_IN_PAGE)
         )
 

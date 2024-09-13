@@ -92,7 +92,7 @@ class Supremum(override val belongPage: InnoDbPage) : SystemUserRecord {
     }
 
     override fun preRecord(): InnodbUserRecord {
-        var candidate = belongPage.pageDirectory.slots.last().smaller().maxRecord()
+        var candidate = belongPage.pageDirectory.supremumSlot().smaller().maxRecord()
         while (candidate.nextRecordOffset() + candidate.absoluteOffset() != this.absoluteOffset()) {
             candidate = candidate.nextRecord()
         }

@@ -42,9 +42,12 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
      * order AES in order to support binary search
      */
     internal val slots = MutableList(belongPage.pageHeader.slotCount) {
-        val offsetInPage: Int = belongPage.pageHeader.slotCount * Short.SIZE_BYTES - (it + 1) * Short.SIZE_BYTES
-        val recordOffset = source.getShort(offsetInPage)
-        PageSlot(recordOffset.toInt(), it, this)
+        val offsetInPage = source.capacity() - (it + 1) * Short.SIZE_BYTES
+        source.getShort(offsetInPage).toInt()
+    }
+
+    fun supremumSlot(): PageSlot {
+        return PageSlot(Supremum.OFFSET_IN_PAGE, slots.size - 1, this)
     }
 
 
@@ -67,10 +70,10 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
             "offset must in 0...${ConstantSize.PAGE.size}"
         }
         flushSourceIfNecessary()
-        slots.add(index, PageSlot(offset, index, this))
+        slots.add(index, offset)
         val bytes = belongPage.source.getLength(offsetInPage(), (slots.size - index) * Short.SIZE_BYTES)
         belongPage.source.setBytes(offsetInPage() - Short.SIZE_BYTES, bytes)
-        belongPage.source.setByte((ConstantSize.FILE_TRAILER.offset - index - 1) * Short.SIZE_BYTES, offset)
+        belongPage.source.setByte(ConstantSize.FILE_TRAILER.offset - ((index + 1) * Short.SIZE_BYTES), offset)
         this.belongPage.pageHeader.slotCount++
     }
 
@@ -90,22 +93,12 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
     }
 
     fun replace(oldOffset: Int, newOffset: Int) {
-        val index = slots.indexOfFirst { it.offset == oldOffset }
+        val index = slots.indexOfFirst { it == oldOffset }
         require(index != -1) {
             "old offset [$oldOffset] is not in slot"
         }
-        slots[index] = PageSlot(newOffset, index, this)
+        slots[index] = newOffset
         source.setShort((slots.size - index - 1) * Short.SIZE_BYTES, newOffset)
-    }
-
-    /**
-     * such as [List.get]
-     * param index is slot index.
-     * the min slot index is 0
-     * @return offset that max record in group
-     */
-    fun getByOffset(offset: Int): PageSlot {
-        return slots.first { it.offset == offset }
     }
 
     /**
@@ -116,7 +109,11 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
      * @throws IllegalArgumentException if the offset is not found in the slots array
      */
     fun requireSlotByOffset(offset: Int): PageSlot {
-        return slots.find { it.offset == offset } ?: throw IllegalArgumentException("offset $offset is not in slot")
+        val index = slots.indexOfFirst { it == offset }
+        require(index != -1) {
+            "offset [$offset] is not in slot"
+        }
+        return PageSlot(offset, index, this)
     }
 
     /**
@@ -127,38 +124,38 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
      */
     fun findTargetIn(userRecord: InnodbUserRecord): PageSlot {
         if (slots.size == 2) {
-            return slots[0]
+            return PageSlot(Supremum.OFFSET_IN_PAGE, 1, this)
         }
-        val maxExcludeSupremum = belongPage.getUserRecordByOffset(slots[1].offset)
+        val maxExcludeSupremum = belongPage.getUserRecordByOffset(slots[1])
         if (this.belongPage.compare(maxExcludeSupremum, userRecord) < 0) {
-            return slots[1]
+            return PageSlot(slots[1], 1, this)
         }
-        var left = slots.first().bigger()
+        var left = 1
+        var right = slots.size - 2
         var result = slots.last()
-        var right = result.smaller()
         while (left <= right) {
-            val mid = slots[left.index + ((right.index - left.index) shr 1)]
-            val midRecord = mid.maxRecord()
+            val mid = left + ((right - left) shr 1)
+            val midRecord = belongPage.getUserRecordByOffset(slots[mid])
             val compare = belongPage.compare(userRecord, midRecord)
             if (compare == 0) {
-                return mid
+                return PageSlot(slots[mid], mid, this)
             }
             if (compare > 0) {
                 result = mid
-                right = mid.smaller()
+                right = mid - 1
             } else {
-                left = mid.bigger()
+                left = mid + 1
             }
         }
-        return result
+        return PageSlot(slots[result], result, this)
     }
 
     internal fun clear() {
         belongPage.source.setZero(offsetInPage(), length())
         this.belongPage.pageHeader.slotCount = 2
         this.slots.clear()
-        slots.add(PageSlot(Infimum.OFFSET_IN_PAGE, 0, this))
-        slots.add(PageSlot(Supremum.OFFSET_IN_PAGE, 1, this))
+        slots.add(Infimum.OFFSET_IN_PAGE)
+        slots.add(Supremum.OFFSET_IN_PAGE)
         this.source = pageBuff()
     }
 
@@ -200,8 +197,9 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
     override fun toString(): String {
         return "PageDirectory(slot size: ${slots.size})"
     }
-
-    data class PageSlot(val offset: Int, val index: Int, val parent: PageDirectory) {
+    
+    @ConsistentCopyVisibility
+    data class PageSlot internal constructor(val offset: Int, val index: Int, val parent: PageDirectory) {
 
         /**
          * Returns the previous slot in the parent PageDirectory.
@@ -212,7 +210,7 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
             require(index > 0) {
                 "this slot is infimum, can't find smaller"
             }
-            return parent.slots[index - 1]
+            return PageSlot(parent.slots[index - 1], index - 1, parent)
         }
 
         /**
@@ -224,7 +222,7 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
             require(index < parent.slots.size - 1) {
                 "this slot is supremum, can't find bigger"
             }
-            return parent.slots[index + 1]
+            return PageSlot(parent.slots[index + 1], index + 1, parent)
         }
 
         fun maxRecord(): InnodbUserRecord {
