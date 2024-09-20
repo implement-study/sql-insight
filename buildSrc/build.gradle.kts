@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    implementation("net.bytebuddy:byte-buddy:1.15.0")
 }
 
 

@@ -81,7 +81,7 @@ class UserRecords(override val belongPage: InnoDbPage) : PageObject {
             nextRecord.linkRecord(nextRecord)
             belongPage.pageDirectory.replace(oldRecord.absoluteOffset(), newRecord.absoluteOffset())
         }
-        this.belongPage.source.setBytes(oldRecord.absoluteOffset(), newRecord.toBytes())
+        this.belongPage.source.setBytes(oldRecord.absoluteOffset() - oldRecord.beforeSplitOffset(), newRecord.toBytes())
     }
 
 

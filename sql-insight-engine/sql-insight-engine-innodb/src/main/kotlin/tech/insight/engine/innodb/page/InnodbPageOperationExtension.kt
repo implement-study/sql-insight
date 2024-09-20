@@ -19,12 +19,13 @@ import tech.insight.engine.innodb.page.compact.Compact
  */
 fun InnoDbPage.replace(oldCompact: Compact, newCompact: Compact) {
     if (oldCompact.length() >= newCompact.length()) {
+        newCompact.recordHeader.copyOf(oldCompact.recordHeader)
         return userRecords.coverRecord(oldCompact, newCompact)
     }
     newCompact.offsetInPage = this.pageHeader.heapTop + newCompact.beforeSplitOffset()
     val pre = oldCompact.preRecord()
     val next = oldCompact.nextRecord()
-    if(oldCompact.isGroupMax()){
+    if (oldCompact.isGroupMax()) {
         this.pageDirectory.replace(oldCompact.offsetInPage, newCompact.offsetInPage)
     }
     val newCompactInPage = userRecords.addRecord(newCompact)

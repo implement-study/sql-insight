@@ -126,6 +126,14 @@ class RecordHeader(private val source: ByteBuf) : SerializableObject, Lengthable
         return ConstantSize.RECORD_HEADER.size
     }
 
+    fun copyOf(recordHeader: RecordHeader) {
+        this.nextRecordOffset = recordHeader.nextRecordOffset
+        this.nOwned = recordHeader.nOwned
+        this.minRec = recordHeader.minRec
+        this.recordType = recordHeader.recordType
+        this.deleteMask = recordHeader.deleteMask
+    }
+
     companion object {
 
         private val HEAP_NO_RANGE = IntRange(0, (1 shl 13) - 1)
