@@ -1,5 +1,6 @@
 package tech.insight.core.command
 
+import com.alibaba.druid.sql.SQLUtils
 import com.alibaba.druid.sql.ast.SQLObject
 import com.alibaba.druid.sql.ast.SQLStatement
 import com.alibaba.druid.sql.ast.statement.SQLCreateDatabaseStatement
@@ -43,7 +44,7 @@ data object UnknownCommand : Command {
 
 sealed class DDLCommand(override val sql: String, override val statement: SQLStatement) : Command {
     override fun toString(): String {
-        return sql
+        return SQLUtils.formatMySql(sql)
     }
 }
 
@@ -53,7 +54,7 @@ sealed class DMLCommand(override val sql: String, override val statement: SQLObj
     var isExplain = false
 
     override fun toString(): String {
-        return truncateStringIfTooLong(sql)
+        return truncateStringIfTooLong(SQLUtils.formatMySql(sql))
     }
 }
 

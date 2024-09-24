@@ -32,7 +32,7 @@ object TimeReport : Logging() {
                 val startTime = System.currentTimeMillis()
                 val result = action.invoke()
                 if (console) {
-                    info("$actionName cost ${System.currentTimeMillis() - startTime} ms")
+                    info("[$actionName] cost [${System.currentTimeMillis() - startTime} ms]")
                 }
                 result
             }

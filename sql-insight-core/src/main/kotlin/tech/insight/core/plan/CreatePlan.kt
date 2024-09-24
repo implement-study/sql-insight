@@ -35,6 +35,10 @@ class CreateDatabasePlan(private val command: CreateDatabase) : DDLExecutionPlan
         }
         return MessageResult("skip the create because database ${command.dbName} exists")
     }
+
+    override fun toString(): String {
+        return command.toString()
+    }
 }
 
 class CreateTablePlan(private val command: CreateTable) : DDLExecutionPlan(command) {

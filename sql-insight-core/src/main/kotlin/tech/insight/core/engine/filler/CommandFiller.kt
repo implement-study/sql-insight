@@ -45,7 +45,7 @@ import tech.insight.core.exception.InsertException
 interface CommandFiller<in C : Command> : Filler<C> {
 
     /**
-     * fill field after create a empty command.
+     * fill field after create an empty command.
      */
     override fun fill(command: C)
 
