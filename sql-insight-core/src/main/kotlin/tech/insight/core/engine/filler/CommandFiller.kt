@@ -15,10 +15,11 @@ import com.alibaba.druid.sql.ast.statement.SQLUpdateSetItem
 import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement
 import com.alibaba.druid.sql.ast.statement.SQLUseStatement
 import com.alibaba.druid.sql.visitor.SQLASTVisitor
-import tech.insight.core.bean.Column
 import tech.insight.core.bean.ExpressionVisitor
 import tech.insight.core.bean.InsertRow
 import tech.insight.core.bean.Table
+import tech.insight.core.bean.desc.ColumnDesc
+import tech.insight.core.bean.desc.TableDesc
 import tech.insight.core.command.AlterCommand
 import tech.insight.core.command.Command
 import tech.insight.core.command.CreateCommand
@@ -36,8 +37,6 @@ import tech.insight.core.command.SelectCommand
 import tech.insight.core.command.UnknownCommand
 import tech.insight.core.command.UpdateCommand
 import tech.insight.core.command.UseDatabaseCommand
-import tech.insight.core.environment.DatabaseManager
-import tech.insight.core.environment.EngineManager
 import tech.insight.core.environment.TableManager
 import tech.insight.core.exception.InsertException
 
@@ -135,46 +134,37 @@ class CreateDatabaseFiller : BaseFiller<CreateDatabase>() {
 }
 
 class CreateTableFiller : BaseFiller<CreateTable>() {
-    override fun fill(command: CreateTable) {
-        command.table = Table()
-        super.fill(command)
-    }
 
     override fun endVisit(x: SQLCreateTableStatement) {
         command.ifNotExists = x.isIfNotExists
-        x.accept(TableCreateFiller { command.table = it })
+        x.accept(TableCreateFiller { command.tableDesc = it })
     }
 
-    inner class TableCreateFiller(private val tableAction: (Table) -> Unit) : BeanFiller<Table> {
-        val table: Table = Table()
+    inner class TableCreateFiller(private val tableAction: (TableDesc) -> Unit) : BeanFiller<Table> {
+        private val tableDesc = TableDesc()
 
         override fun visit(x: SQLColumnDefinition): Boolean {
-            val column = Column()
-            x.accept(ColumnFiller(column))
-            table.columnList.add(column)
+            val columnDesc = ColumnDesc()
+            x.accept(ColumnFiller(columnDesc))
+            tableDesc.columnList.add(columnDesc)
             return true
         }
 
 
         override fun visit(x: SQLCreateTableStatement): Boolean {
-            x.comment?.accept(CommentVisitor { table.comment = it })
-            if (x.engine == null) {
-                table.engine = EngineManager.selectEngine(null)
-                return true
-            }
-            x.engine.accept(EngineVisitor { table.engine = it })
+            x.comment?.accept(CommentVisitor { tableDesc.comment = it })
+            x.engine?.accept(EngineVisitor { tableDesc.engine = it })
             return true
         }
 
         override fun endVisit(x: SQLCreateTableStatement?) {
-            table.checkMyself()
-            tableAction.invoke(table)
+            tableAction.invoke(tableDesc)
         }
 
         override fun visit(x: SQLExprTableSource): Boolean {
             x.accept(TableNameVisitor { databaseName, tableName ->
-                table.database = DatabaseManager.require(databaseName)
-                table.name = tableName
+                tableDesc.databaseName = databaseName
+                tableDesc.name = tableName
             })
             return true
         }
@@ -254,7 +244,6 @@ class InsertFiller : ExplainableFiller<InsertCommand>() {
             val row = InsertRow(rowIndex++, command.table)
             command.insertRows.add(row)
             x.accept(InsertRowFiller(command.insertColumns, row))
-            row.checkMyself()
         }
     }
 
@@ -274,11 +263,6 @@ class InsertFiller : ExplainableFiller<InsertCommand>() {
 
 
 class UpdateFiller : ExplainableFiller<UpdateCommand>() {
-
-    override fun fill(command: UpdateCommand) {
-        command.table = Table()
-        super.fill(command)
-    }
 
     override fun visit(x: SQLUpdateStatement): Boolean {
         x.tableSource.accept(TableSelectVisitor(true) { command.table = it!! })

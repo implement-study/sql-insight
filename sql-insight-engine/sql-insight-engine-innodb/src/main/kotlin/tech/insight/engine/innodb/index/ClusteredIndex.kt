@@ -34,13 +34,13 @@ import tech.insight.engine.innodb.page.compact.RowFormatFactory
  */
 class ClusteredIndex(table: Table) : InnodbIndex() {
 
-    init {
-        this.table = table
-    }
-
     override val file: File by lazy {
         val dbFolder = table.database.dbFolder
         File(dbFolder, table.name + ".idb")
+    }
+
+    init {
+        this.table = table
     }
 
     private lateinit var autoIncrementKeyCounter: AutoIncrementKeyCounter
@@ -85,4 +85,13 @@ class ClusteredIndex(table: Table) : InnodbIndex() {
     }
 
 
+    override fun hashCode(): Int {
+        return belongTo().hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ClusteredIndex) return false
+        return this.belongTo() == other.belongTo()
+    }
 }

@@ -30,7 +30,7 @@ class DropTableEvent(table: Table) : InsightEvent(table) {
     val table: Table
         get() = source as Table
     val databaseName: String
-        get() = table.databaseName
+        get() = table.database.name
     val tableName: String
         get() = table.name
 }

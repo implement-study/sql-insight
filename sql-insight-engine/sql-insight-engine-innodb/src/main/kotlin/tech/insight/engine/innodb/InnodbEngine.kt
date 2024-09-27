@@ -43,7 +43,6 @@ class InnodbEngine : Logging(), StorageEngine {
         if (table.indexList.isEmpty()) {
             val file = File(table.database.dbFolder, "${table.name}.inf")
             val clusteredIndex = ClusteredIndex(table)
-            table.indexList.add(clusteredIndex)
             try {
                 val lines = Files.readAllLines(file.toPath())
                 //  todo load index

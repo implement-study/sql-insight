@@ -16,6 +16,7 @@ import tech.insight.core.bean.Table
 import tech.insight.core.bean.Where
 import tech.insight.core.bean.condition.Expression
 import tech.insight.core.bean.condition.QueryCondition
+import tech.insight.core.bean.desc.TableDesc
 import tech.insight.core.util.truncateStringIfTooLong
 
 
@@ -74,7 +75,7 @@ class CreateDatabase(sql: String, statement: SQLCreateDatabaseStatement) : Creat
 
 class CreateTable(sql: String, statement: SQLCreateTableStatement) : CreateCommand(sql, statement) {
     var ifNotExists = false
-    lateinit var table: Table
+    var tableDesc = TableDesc()
 }
 
 class DropDatabase(sql: String, statement: SQLDropDatabaseStatement) : DropCommand(sql, statement) {

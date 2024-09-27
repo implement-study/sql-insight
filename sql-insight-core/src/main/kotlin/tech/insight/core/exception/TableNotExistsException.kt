@@ -22,5 +22,5 @@ import tech.insight.core.bean.Table
  * @author gongxuanzhangmelt@gmail.com
  */
 class TableNotExistsException(message: String) : SqlInsightException(message) {
-    constructor(table: Table) : this("${table.databaseName}.${table.name}] not exists")
+    constructor(table: Table) : this("${table.database.name}.${table.name}] not exists")
 }

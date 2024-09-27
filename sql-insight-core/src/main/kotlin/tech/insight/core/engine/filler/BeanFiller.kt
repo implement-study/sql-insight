@@ -10,8 +10,6 @@ import tech.insight.core.bean.ExpressionVisitor
 import tech.insight.core.bean.Never
 import tech.insight.core.bean.SQLBean
 import tech.insight.core.bean.Where
-import tech.insight.core.engine.storage.StorageEngine
-import tech.insight.core.environment.EngineManager
 
 
 interface BeanFiller<in B : SQLBean> : SQLASTVisitor
@@ -23,10 +21,9 @@ class CommentVisitor(private val commentAction: (String) -> Unit) : SQLASTVisito
     }
 }
 
-class EngineVisitor(private val engineAction: (StorageEngine) -> Unit) : SQLASTVisitor {
+class EngineVisitor(private val engineNameAction: (String) -> Unit) : SQLASTVisitor {
     override fun endVisit(x: SQLCharExpr) {
-        val engine = EngineManager.selectEngine(x.text)
-        engineAction.invoke(engine)
+        engineNameAction.invoke(x.text)
     }
 }
 

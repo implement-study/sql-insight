@@ -72,11 +72,12 @@ class JsonEngine : Logging(), StorageEngine, MultipleEventListener {
             return
         }
         val jsonPkIndex = JsonPkIndex(table)
-        table.indexList.add(jsonPkIndex)
-        tableCache.computeIfAbsent(table) {
-            val jsonFile = JsonEngineSupport.getJsonFile(table)
-            jsonFile.readLines().toMutableList()
-        }
+        //        table.indexList.add(jsonPkIndex)
+        //        tableCache.computeIfAbsent(table) {
+        //            val jsonFile = JsonEngineSupport.getJsonFile(table)
+        //            jsonFile.readLines().toMutableList()
+        //        }
+        TODO("json engine can't use")
 
     }
 

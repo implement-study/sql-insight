@@ -2,17 +2,17 @@ package tech.insight.core.plan
 
 import java.io.File
 import tech.insight.core.bean.Database
-import tech.insight.core.bean.Table
 import tech.insight.core.command.CreateDatabase
 import tech.insight.core.command.CreateTable
+import tech.insight.core.environment.DatabaseManager
 import tech.insight.core.environment.DefaultProperty
+import tech.insight.core.environment.EngineManager
 import tech.insight.core.environment.GlobalContext
 import tech.insight.core.environment.TableLoader
 import tech.insight.core.event.CreateDatabaseEvent
 import tech.insight.core.event.CreateTableEvent
 import tech.insight.core.event.EventPublisher
 import tech.insight.core.exception.DatabaseExistsException
-import tech.insight.core.exception.DatabaseNotExistsException
 import tech.insight.core.exception.TableExistsException
 import tech.insight.core.result.MessageResult
 import tech.insight.core.result.ResultInterface
@@ -42,24 +42,24 @@ class CreateDatabasePlan(private val command: CreateDatabase) : DDLExecutionPlan
 }
 
 class CreateTablePlan(private val command: CreateTable) : DDLExecutionPlan(command) {
-    private val table: Table = command.table
+    private val tableDesc = command.tableDesc
 
     override fun run(): ResultInterface {
-        val dbFolder: File = table.database.dbFolder
-        if (!dbFolder.exists() || !dbFolder.isDirectory()) {
-            throw DatabaseNotExistsException(table.databaseName)
-        }
-        val frmFile = File(dbFolder, "${table.name}.frm")
+        tableDesc.checkMySelf()
+        val dbFolder = DatabaseManager.require(tableDesc.databaseName!!).dbFolder
+        val frmFile = dbFolder.resolve("${tableDesc.name}.frm")
         if (frmFile.createNewFile()) {
-            table.engine.createTable(table)
+            val engine = EngineManager.selectEngine(tableDesc.engine)
+            val table = tableDesc.build()
+            engine.createTable(table)
             TableLoader.writeTableMeta(table)
             EventPublisher.publishEvent { CreateTableEvent(table) }
-            return MessageResult("success create table ${table.name}")
+            return MessageResult("success create table ${tableDesc.name}")
         }
         if (!command.ifNotExists) {
-            throw TableExistsException(table)
+            throw TableExistsException(tableDesc.name!!)
         }
-        return MessageResult("skip the create because table ${table.name} exists")
+        return MessageResult("skip the create because table ${tableDesc.name} exists")
     }
 
 

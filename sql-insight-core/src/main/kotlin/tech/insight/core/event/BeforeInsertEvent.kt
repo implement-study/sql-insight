@@ -25,7 +25,7 @@ class BeforeInsertEvent(row: InsertRow) : InsightEvent(row) {
         get() = source as InsertRow
 
     fun databaseName(): String {
-        return row.table.databaseName
+        return row.table.database.name
     }
 
     fun tableName(): String {

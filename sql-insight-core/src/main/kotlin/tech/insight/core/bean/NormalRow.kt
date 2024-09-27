@@ -48,6 +48,7 @@ open class NormalRow(override val rowId: Long, val belongTo: Table) : Row, SQLBe
         }
     }
 
+
     override fun toString(): String {
         val stringJoiner = StringJoiner("|", "|", "|")
         for (value in values) {

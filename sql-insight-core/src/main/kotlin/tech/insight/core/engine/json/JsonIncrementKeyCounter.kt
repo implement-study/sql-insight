@@ -44,7 +44,7 @@ object JsonIncrementKeyCounter : Logging(), AutoIncrementKeyCounter {
         if (autoColIndex < 0) {
             return false
         }
-        val databaseName = row.table.databaseName
+        val databaseName = row.table.database.name
         val atomicLong = loadMaxAutoIncrementKey(row.table)
         val autoIncrementValue = row.values[autoColIndex]
         if (autoIncrementValue is ValueNull) {
@@ -69,7 +69,7 @@ object JsonIncrementKeyCounter : Logging(), AutoIncrementKeyCounter {
     }
 
     private fun loadMaxAutoIncrementKey(table: Table): AtomicLong {
-        val database: String = table.databaseName
+        val database: String = table.database.name
         val tableName: String = table.name
         return keyTable.computeIfAbsent(database) { ConcurrentHashMap() }
             .computeIfAbsent(tableName) { loadFromDisk(table) }

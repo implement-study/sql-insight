@@ -10,57 +10,47 @@ import com.alibaba.druid.sql.visitor.SQLASTVisitor
 import java.util.*
 import tech.insight.core.bean.Column
 import tech.insight.core.bean.DataType
+import tech.insight.core.bean.desc.ColumnDesc
 import tech.insight.core.bean.value.ValueVisitor
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class ColumnFiller(val col: Column) : BeanFiller<Column> {
+class ColumnFiller(val columnDesc: ColumnDesc) : BeanFiller<Column> {
 
 
     override fun endVisit(x: SQLColumnDefinition) {
-        col.name = x.columnName
-        col.autoIncrement = x.isAutoIncrement
+        columnDesc.name = x.columnName
+        columnDesc.autoIncrement = x.isAutoIncrement
         x.accept(ColConstraintVisitor())
-        x.comment?.accept(CommentVisitor { col.comment = it })
+        x.comment?.accept(CommentVisitor { columnDesc.comment = it })
         x.defaultExpr?.accept(ValueVisitor {
-            col.defaultValue = it
-            col.hasDefault = true
+            columnDesc.defaultValue = it
         })
     }
 
     override fun endVisit(x: SQLDataType) {
-        col.dataType = DataType.valueOf(x.name.uppercase(Locale.getDefault()))
-        if (col.dataType == DataType.VARCHAR) {
-            col.variable = true
-        }
-        col.length = col.dataType.defaultLength
+        columnDesc.dataType = DataType.valueOf(x.name.uppercase(Locale.getDefault()))
     }
 
     override fun endVisit(x: SQLCharacterDataType) {
-        col.dataType = DataType.valueOf(x.name.uppercase(Locale.getDefault()))
-        if (col.dataType == DataType.VARCHAR) {
-            col.variable = true
-        }
-        col.length = x.length
-        if (col.length < 0) {
-            col.length = col.dataType.defaultLength
-        }
+        columnDesc.dataType = DataType.valueOf(x.name.uppercase(Locale.getDefault()))
+        columnDesc.length = x.length
     }
 
     inner class ColConstraintVisitor : SQLASTVisitor {
         override fun endVisit(x: SQLColumnUniqueKey) {
-            col.unique = true
+            columnDesc.unique = true
         }
 
         override fun endVisit(x: SQLNotNullConstraint) {
-            col.notNull = true
+            columnDesc.notNull = true
         }
 
         override fun endVisit(x: SQLColumnPrimaryKey) {
-            col.primaryKey = true
-            col.unique = true
-            col.notNull = true
+            columnDesc.primaryKey = true
+            columnDesc.unique = true
+            columnDesc.notNull = true
         }
     }
 

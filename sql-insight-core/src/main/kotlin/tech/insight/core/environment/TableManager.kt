@@ -34,11 +34,11 @@ object TableManager : Logging(), MultipleEventListener {
     }
 
     private fun load(table: Table) {
-        tableInfoCache.put(table.databaseName, table.name, table)
+        tableInfoCache.put(table.database.name, table.name, table)
     }
 
     private fun unload(table: Table) {
-        tableInfoCache.remove(table.databaseName, table.name)
+        tableInfoCache.remove(table.database.name, table.name)
     }
 
     private fun unload(database: Database) {

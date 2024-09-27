@@ -35,6 +35,10 @@ interface Context {
      */
     operator fun set(key: String, value: String)
 
+    operator fun set(key: DefaultProperty, value: String) {
+        set(key.key, value)
+    }
+
     /**
      * get value from context
      *
@@ -64,6 +68,7 @@ interface Context {
  */
 abstract class AbstractMapContext(protected val container: MutableMap<String, String> = ConcurrentHashMap()) :
     Logging(), Context {
+
     override fun set(key: String, value: String) {
         container[key] = value
     }

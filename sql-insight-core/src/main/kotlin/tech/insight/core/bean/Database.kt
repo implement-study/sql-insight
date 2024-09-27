@@ -24,7 +24,7 @@ import tech.insight.core.environment.GlobalContext
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-class Database(val name: String) : SerializableObject {
+class Database(val name: String) : SQLBean, SerializableObject {
 
     val dbFolder: File
         @JsonIgnore
@@ -39,6 +39,10 @@ class Database(val name: String) : SerializableObject {
 
     override fun toBytes(): ByteArray {
         return name.toByteArray()
+    }
+
+    override fun parent(): SQLBean? {
+        return null
     }
 
     override fun equals(other: Any?): Boolean {

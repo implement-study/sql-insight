@@ -1,16 +1,13 @@
 package tech.insight.core.logging
 
 import java.util.concurrent.TimeUnit
-import jdk.jfr.internal.Utils.formatDuration
-import org.slf4j.LoggerFactory
-import kotlin.time.Duration.Companion.milliseconds
 
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
 object TimeReport : Logging() {
-    
+
     fun <T> timeReport(
         actionName: String,
         timeUnit: TimeUnit = TimeUnit.MILLISECONDS,

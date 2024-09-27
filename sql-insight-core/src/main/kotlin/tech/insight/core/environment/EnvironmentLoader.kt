@@ -5,6 +5,10 @@ import java.io.FileInputStream
 import java.io.InputStream
 import java.net.URL
 import java.util.*
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.decodeFromByteArray
+import kotlinx.serialization.encodeToByteArray
+import kotlinx.serialization.protobuf.ProtoBuf
 import tech.insight.core.annotation.Temporary
 import tech.insight.core.bean.Database
 import tech.insight.core.bean.Table
@@ -31,14 +35,17 @@ object TableLoader {
         return tableList
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     private fun loadTableMeta(frmFile: File): Table {
         val frmBytes = FileInputStream(frmFile).readAllBytes()
-        return Table.readObject(frmBytes)
+        return ProtoBuf.decodeFromByteArray(frmBytes)
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     fun writeTableMeta(table: Table) {
         val frm = File(table.database.dbFolder, "${table.name}.frm")
-        frm.writeBytes(table.toBytes())
+        val byteArray = ProtoBuf.encodeToByteArray(table)
+        frm.writeBytes(byteArray)
     }
 
 }
