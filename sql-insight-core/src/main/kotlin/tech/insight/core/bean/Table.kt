@@ -15,7 +15,12 @@
  */
 package tech.insight.core.bean
 
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonIgnore
+import tech.insight.buffer.SerializableObject
+import tech.insight.buffer.byteBuf
+import tech.insight.buffer.getAllBytes
+import tech.insight.buffer.writeCollection
+import tech.insight.buffer.writeLengthAndString
 import tech.insight.core.bean.desc.TableExt
 import tech.insight.core.engine.storage.StorageEngine
 import tech.insight.core.exception.UnknownColumnException
@@ -24,7 +29,6 @@ import tech.insight.core.exception.UnknownColumnException
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-@Serializable
 class Table(
     val database: Database,
     val name: String,
@@ -32,9 +36,8 @@ class Table(
     val indexList: List<Index>,
     val engine: StorageEngine,
     val comment: String? = null
-
-) : SQLBean {
-
+) : SQLBean, SerializableObject {
+    @JsonIgnore
     val ext = TableExt(this)
 
     fun getColumnIndexByName(colName: String): Int {
@@ -47,6 +50,16 @@ class Table(
 
     override fun parent(): SQLBean {
         return database
+    }
+
+    override fun toBytes(): ByteArray {
+        return byteBuf()
+            .writeLengthAndString(name)
+            .writeLengthAndString(database.name)
+            .writeCollection(columnList)
+            .writeLengthAndString(engine.name)
+            .writeLengthAndString(comment)
+            .getAllBytes()
     }
 
     override fun toString(): String {

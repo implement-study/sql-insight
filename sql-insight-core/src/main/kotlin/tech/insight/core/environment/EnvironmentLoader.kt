@@ -1,5 +1,7 @@
 package tech.insight.core.environment
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -12,6 +14,7 @@ import kotlinx.serialization.protobuf.ProtoBuf
 import tech.insight.core.annotation.Temporary
 import tech.insight.core.bean.Database
 import tech.insight.core.bean.Table
+import tech.insight.core.bean.desc.TableDesc
 import tech.insight.core.engine.storage.StorageEngine
 
 
@@ -35,17 +38,15 @@ object TableLoader {
         return tableList
     }
 
-    @OptIn(ExperimentalSerializationApi::class)
     private fun loadTableMeta(frmFile: File): Table {
         val frmBytes = FileInputStream(frmFile).readAllBytes()
-        return ProtoBuf.decodeFromByteArray(frmBytes)
+        val desc = TableDesc.reader.readObject(frmBytes)
+        return desc.build()
     }
 
-    @OptIn(ExperimentalSerializationApi::class)
     fun writeTableMeta(table: Table) {
         val frm = File(table.database.dbFolder, "${table.name}.frm")
-        val byteArray = ProtoBuf.encodeToByteArray(table)
-        frm.writeBytes(byteArray)
+        frm.writeBytes(table.toBytes())
     }
 
 }

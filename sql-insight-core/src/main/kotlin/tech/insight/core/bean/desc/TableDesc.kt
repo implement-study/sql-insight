@@ -16,13 +16,9 @@
 package tech.insight.core.bean.desc
 
 import tech.insight.buffer.ObjectReader
-import tech.insight.buffer.byteBuf
-import tech.insight.buffer.getAllBytes
 import tech.insight.buffer.readCollection
 import tech.insight.buffer.readLengthAndString
 import tech.insight.buffer.wrappedBuf
-import tech.insight.buffer.writeCollection
-import tech.insight.buffer.writeLengthAndString
 import tech.insight.core.bean.Description
 import tech.insight.core.bean.Table
 import tech.insight.core.environment.DatabaseManager
@@ -42,7 +38,9 @@ class TableDesc : Description<Table> {
 
     override fun checkMySelf() {
         check(name != null) { "table name is null" }
-        this.columnList.forEach { it.checkMySelf() }
+        this.columnList.forEach {
+            it.checkMySelf()
+        }
     }
 
     override fun build(): Table {
@@ -51,23 +49,12 @@ class TableDesc : Description<Table> {
             name = name!!,
             columnList = columnList.map { it.build() },
             indexList = emptyList(),
-            engine = EngineManager.selectEngine(engine!!),
+            engine = EngineManager.selectEngine(engine),
             comment = comment
         )
     }
 
-    override fun toBytes(): ByteArray {
-        return byteBuf()
-            .writeLengthAndString(name)
-            .writeLengthAndString(databaseName)
-            .writeCollection(columnList)
-            .writeLengthAndString(engine)
-            .writeLengthAndString(comment)
-            .getAllBytes()
-    }
-
     companion object {
-
         val reader = ObjectReader { bytes: ByteArray ->
             val tableDesc = TableDesc()
             val buf = wrappedBuf(bytes)

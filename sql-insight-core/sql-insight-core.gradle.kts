@@ -26,3 +26,9 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
+
+tasks.withType<Test> {
+    forkEvery = 1 
+    maxParallelForks = Runtime.getRuntime().availableProcessors()
+}
+

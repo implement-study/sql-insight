@@ -16,15 +16,10 @@
 package tech.insight.core.bean.desc
 
 import tech.insight.buffer.ObjectReader
-import tech.insight.buffer.byteBuf
-import tech.insight.buffer.getAllBytes
 import tech.insight.buffer.isOne
 import tech.insight.buffer.readLength
 import tech.insight.buffer.readLengthAndString
-import tech.insight.buffer.setBoolean
 import tech.insight.buffer.wrappedBuf
-import tech.insight.buffer.writeLengthAndBytes
-import tech.insight.buffer.writeLengthAndString
 import tech.insight.core.bean.Column
 import tech.insight.core.bean.DataType
 import tech.insight.core.bean.Description
@@ -45,15 +40,18 @@ class ColumnDesc : Description<Column> {
     var unique = false
     var defaultValue: Value<*>? = null
     var comment: String? = null
+    var tableName: String? = null
 
 
     override fun checkMySelf() {
         check(name != null) { "col name can't be null" }
         check(dataType != null) { "col dataType can't be null" }
-        if (length == null) {
+        if (length == null || length!! <= 0) {
             length = dataType!!.defaultLength
         }
-        check(length!! > 0 && length!! <= UShort.MAX_VALUE.toInt()) { "col length must between 0 and ${UShort.MAX_VALUE}" }
+        check(length!! > 0 && length!! <= UShort.MAX_VALUE.toInt()) {
+            "col length must between 0 and ${UShort.MAX_VALUE}"
+        }
         if (this.primaryKey) {
             check(defaultValue == null) { "Invalid default value for '$name'" }
         }
@@ -78,25 +76,6 @@ class ColumnDesc : Description<Column> {
         )
     }
 
-    override fun toBytes(): ByteArray {
-        val flag = 0.toByte()
-            .setBoolean(0, autoIncrement)
-            .setBoolean(1, notNull)
-            .setBoolean(2, primaryKey)
-            .setBoolean(3, unique)
-        val buffer = byteBuf()
-            .writeByte(flag.toInt())
-            .writeLengthAndString(name)
-            .writeBytes(dataType!!.toBytes())
-            .writeInt(length!!)
-            .writeLengthAndString(comment)
-        if (defaultValue == null || defaultValue is ValueNull) {
-            buffer.writeInt(-1)
-        } else {
-            buffer.writeLengthAndBytes(defaultValue!!.toBytes())
-        }
-        return buffer.getAllBytes()
-    }
 
     companion object {
         val reader = ObjectReader { bytes: ByteArray ->

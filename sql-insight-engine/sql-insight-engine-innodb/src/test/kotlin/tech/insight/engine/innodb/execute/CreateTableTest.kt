@@ -1,13 +1,16 @@
 package tech.insight.engine.innodb.execute
 
-import org.junit.jupiter.api.AfterEach
+import java.io.File
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 import tech.insight.core.bean.DataType
 import tech.insight.core.bean.value.ValueNull
 import tech.insight.core.bean.value.ValueVarchar
 import tech.insight.core.engine.SqlPipeline
 import tech.insight.core.environment.DatabaseManager
+import tech.insight.core.environment.DefaultProperty
+import tech.insight.core.environment.GlobalContext
 import tech.insight.core.environment.TableManager
 import tech.insight.core.exception.DatabaseExistsException
 import tech.insight.core.result.ExceptionResult
@@ -29,8 +32,15 @@ class CreateTableTest : SqlTestCase {
 
     private val comment = "用户表"
 
+    @TempDir
+    private var tempDir: File? = null
+
     @BeforeEach
-    @AfterEach
+    fun setHome() {
+        GlobalContext[DefaultProperty.DATA_DIR] = tempDir!!.path
+    }
+
+    @BeforeEach
     fun clear() {
         dropDb(dbName)
     }

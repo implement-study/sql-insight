@@ -1,7 +1,5 @@
 package tech.insight.core.bean
 
-import tech.insight.buffer.SerializableObject
-
 
 /**
  *
@@ -10,7 +8,7 @@ import tech.insight.buffer.SerializableObject
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  **/
-interface Description<T> : SerializableObject {
+interface Description<T>  {
 
     /**
      * check desc is valid.if not throw exception.

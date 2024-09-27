@@ -15,7 +15,14 @@
  */
 package tech.insight.core.bean
 
+import tech.insight.buffer.SerializableObject
+import tech.insight.buffer.byteBuf
+import tech.insight.buffer.getAllBytes
+import tech.insight.buffer.setBoolean
+import tech.insight.buffer.writeLengthAndBytes
+import tech.insight.buffer.writeLengthAndString
 import tech.insight.core.bean.value.Value
+import tech.insight.core.bean.value.ValueNull
 
 
 /**
@@ -32,12 +39,32 @@ class Column constructor(
     val hasDefault: Boolean,
     val defaultValue: Value<*>,
     val comment: String? = null,
-    val nullListIndex: Int = -1 //  greater -1 means the column can be null
-) : SQLBean {
+    val nullListIndex: Int = -1, //  greater -1 means the column can be null
+) : SQLBean, SerializableObject {
     val variable = dataType == DataType.VARCHAR
 
     override fun parent(): SQLBean? {
-        TODO("Not yet implemented")
+        return null
+    }
+
+    override fun toBytes(): ByteArray {
+        val flag = 0.toByte()
+            .setBoolean(0, autoIncrement)
+            .setBoolean(1, notNull)
+            .setBoolean(2, primaryKey)
+            .setBoolean(3, unique)
+        val buffer = byteBuf()
+            .writeByte(flag.toInt())
+            .writeLengthAndString(name)
+            .writeBytes(dataType.toBytes())
+            .writeInt(length)
+            .writeLengthAndString(comment)
+        if (defaultValue is ValueNull) {
+            buffer.writeInt(-1)
+        } else {
+            buffer.writeLengthAndBytes(defaultValue.toBytes())
+        }
+        return buffer.getAllBytes()
     }
 
 
