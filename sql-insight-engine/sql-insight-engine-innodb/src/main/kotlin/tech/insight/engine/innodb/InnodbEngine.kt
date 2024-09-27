@@ -42,7 +42,6 @@ class InnodbEngine : Logging(), StorageEngine {
     override fun openTable(table: Table) {
         if (table.indexList.isEmpty()) {
             val file = File(table.database.dbFolder, "${table.name}.inf")
-            val clusteredIndex = ClusteredIndex(table)
             try {
                 val lines = Files.readAllLines(file.toPath())
                 //  todo load index
@@ -61,6 +60,8 @@ class InnodbEngine : Logging(), StorageEngine {
         if (!primaryFile.createNewFile()) {
             warn("${primaryFile.getAbsoluteFile()} already exists , execute create table will overwrite file")
         }
+        clusteredIndex.rndInit()
+        table.indexList.add(clusteredIndex)
         val root = InnoDbPage(wrappedBuf(initPageArray()), clusteredIndex)
         Files.write(primaryFile.toPath(), root.toBytes())
         info("create table ${table.name} with innodb,create ibd file")

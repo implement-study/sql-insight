@@ -16,11 +16,15 @@
 package tech.insight.core.bean
 
 import java.io.File
+import tech.insight.buffer.SerializableObject
+import tech.insight.buffer.byteBuf
+import tech.insight.buffer.getAllBytes
+import tech.insight.buffer.writeLengthAndString
 
 /**
  * @author gongxuanzhangmelt@gmail.com
  */
-interface Index {
+interface Index : SerializableObject {
     /**
      * before search init method
      */
@@ -58,4 +62,13 @@ interface Index {
      * index relative columns
      */
     fun columns(): List<Column>
+
+    override fun toBytes(): ByteArray {
+        val buf = byteBuf()
+        buf.writeLengthAndString(name)
+        columns().map { it.name }.forEach {
+            buf.writeLengthAndString(it)
+        }
+        return buf.getAllBytes()
+    }
 }

@@ -32,8 +32,8 @@ import tech.insight.core.exception.UnknownColumnException
 class Table(
     val database: Database,
     val name: String,
-    val columnList: List<Column>,
-    val indexList: List<Index>,
+    val columnList: MutableList<Column>,
+    val indexList: MutableList<Index>,
     val engine: StorageEngine,
     val comment: String? = null
 ) : SQLBean, SerializableObject {

@@ -1,9 +1,12 @@
 package tech.insight.engine.innodb.execute
 
-import org.junit.jupiter.api.AfterEach
+import java.io.File
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 import tech.insight.core.engine.SqlPipeline
+import tech.insight.core.environment.DefaultProperty
+import tech.insight.core.environment.GlobalContext
 import tech.insight.core.environment.TableManager
 import tech.insight.engine.innodb.core.buffer.BufferPool
 import tech.insight.engine.innodb.dropDb
@@ -34,8 +37,15 @@ class InsertTest {
 
     private val tableName = "test_table"
 
+    @TempDir
+    private var tempDir: File? = null
+
     @BeforeEach
-    @AfterEach
+    fun setHome() {
+        GlobalContext[DefaultProperty.DATA_DIR] = tempDir!!.path
+    }
+
+    @BeforeEach
     fun clear() {
         dropDb(dbName)
     }

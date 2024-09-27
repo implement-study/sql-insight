@@ -47,8 +47,8 @@ class TableDesc : Description<Table> {
         return Table(
             database = DatabaseManager.require(databaseName!!),
             name = name!!,
-            columnList = columnList.map { it.build() },
-            indexList = emptyList(),
+            columnList = columnList.map { it.build() }.toMutableList(),
+            indexList = mutableListOf(),
             engine = EngineManager.selectEngine(engine),
             comment = comment
         )
