@@ -25,9 +25,9 @@ import tech.insight.core.annotation.Unused
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class FileHeader(override val belongPage: InnoDbPage) : PageObject {
+class FileHeader(override val parentPage: InnoDbPage) : PageObject {
 
-    val source: ByteBuf = belongPage.source.slice(ConstantSize.FILE_HEADER.offset, ConstantSize.FILE_HEADER.size)
+    val source: ByteBuf = parentPage.source.slice(ConstantSize.FILE_HEADER.offset, ConstantSize.FILE_HEADER.size)
 
     /**
      * use it with [FileTrailer.checkSum]

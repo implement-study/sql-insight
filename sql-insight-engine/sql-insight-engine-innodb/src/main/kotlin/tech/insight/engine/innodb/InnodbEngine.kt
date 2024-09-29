@@ -79,7 +79,7 @@ class InnodbEngine : Logging(), StorageEngine {
 
 
     override fun update(oldRow: Row, update: UpdateCommand) {
-        val page = (oldRow as Compact).belongPage
+        val page = (oldRow as Compact).parentPage
         page.update(oldRow, update.updateField)
     }
 

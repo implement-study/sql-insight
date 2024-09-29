@@ -58,17 +58,13 @@ open class Compact : InnodbUserRecord {
     @Unused
     var rollPointer: Long = 0
 
-    lateinit var sourceRow: Row
+    var offset: Int = -1
 
-    var offsetInPage = -1
+    lateinit var sourceRow: Row
 
     lateinit var belongIndex: InnodbIndex
 
-    override lateinit var belongPage: InnoDbPage
-
-    fun directReference() {
-
-    }
+    override lateinit var parentPage: InnoDbPage
 
     override fun rowBytes(): ByteArray {
         return byteBuf()
@@ -129,27 +125,26 @@ open class Compact : InnodbUserRecord {
 
     override fun remove() {
         if (this.recordHeader.deleteMask) {
-            //  todo  index node recursive 
             return
         }
         this.recordHeader.deleteMask = true
         val preRecord = this.preRecord()
         val nextRecord = this.nextRecord()
-        preRecord.recordHeader.nextRecordOffset = nextRecord.absoluteOffset() - preRecord.absoluteOffset()
+        preRecord.recordHeader.nextRecordOffset = nextRecord.offsetInPage() - preRecord.offsetInPage()
         if (this.recordHeader.nOwned == 1) {
-            belongPage.pageDirectory.requireSlotByOffset(this.absoluteOffset()).remove()
+            parentPage.pageDirectory.requireSlotByOffset(this.offsetInPage()).remove()
         } else if (this.recordHeader.nOwned > 1) {
             preRecord.recordHeader.nOwned = this.recordHeader.nOwned - 1
-            belongPage.pageDirectory.replace(this.absoluteOffset(), preRecord.absoluteOffset())
+            parentPage.pageDirectory.replace(this.offsetInPage(), preRecord.offsetInPage())
         }
-        belongPage.pageHeader.recordCount--
-        belongPage.pageHeader.garbage += this.length()
-        if (belongPage.pageHeader.deleteStart != 0) {
-            recordHeader.nextRecordOffset = belongPage.pageHeader.deleteStart - this.absoluteOffset()
+        parentPage.pageHeader.recordCount--
+        parentPage.pageHeader.garbage += this.length()
+        if (parentPage.pageHeader.deleteStart != 0) {
+            recordHeader.nextRecordOffset = parentPage.pageHeader.deleteStart - this.offsetInPage()
         } else {
             recordHeader.nextRecordOffset = 0
         }
-        belongPage.pageHeader.deleteStart = this.absoluteOffset()
+        parentPage.pageHeader.deleteStart = this.offsetInPage()
         indexNode().remove()
     }
 
@@ -173,13 +168,13 @@ open class Compact : InnodbUserRecord {
     }
 
 
-    override fun absoluteOffset(): Int {
-        require(offsetInPage != -1) { "unknown offset" }
-        return offsetInPage
+    override fun offsetInPage(): Int {
+        require(offset != -1) { "unknown offset" }
+        return offset
     }
 
-    override fun setAbsoluteOffset(offset: Int) {
-        offsetInPage = offset
+    override fun setOffsetInPage(offset: Int) {
+        this.offset = offset
     }
 
     override fun nextRecordOffset(): Int {
@@ -194,14 +189,14 @@ open class Compact : InnodbUserRecord {
         if (this.recordHeader.deleteMask && nextRecordOffset() == 0) {
             throw NoSuchElementException("next record not found")
         }
-        return this.belongPage.getUserRecordByOffset(this.absoluteOffset() + nextRecordOffset())
+        return this.parentPage.getUserRecordByOffset(this.offsetInPage() + nextRecordOffset())
     }
 
     override fun preRecord(): InnodbUserRecord {
         val groupMaxRecord = groupMax()
-        val slot = belongPage.pageDirectory.requireSlotByOffset(groupMaxRecord.absoluteOffset())
+        val slot = parentPage.pageDirectory.requireSlotByOffset(groupMaxRecord.offsetInPage())
         var candidate = slot.minRecord()
-        while (candidate.nextRecordOffset() + candidate.absoluteOffset() != this.absoluteOffset()) {
+        while (candidate.nextRecordOffset() + candidate.offsetInPage() != this.offsetInPage()) {
             candidate = candidate.nextRecord()
         }
         return candidate
@@ -214,7 +209,7 @@ open class Compact : InnodbUserRecord {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Compact) return false
-        return this.belongPage === other.belongPage && this.offsetInPage == other.offsetInPage
+        return this.parentPage === other.parentPage && this.offset == other.offset
     }
 
     override fun hashCode(): Int {
@@ -226,7 +221,7 @@ open class Compact : InnodbUserRecord {
         result = 31 * result + transactionId.hashCode()
         result = 31 * result + rollPointer.hashCode()
         result = 31 * result + sourceRow.hashCode()
-        result = 31 * result + offsetInPage
+        result = 31 * result + offset
         return result
     }
 
@@ -265,7 +260,7 @@ open class Compact : InnodbUserRecord {
         }.forEach {
             bodyBuffer.writeBytes(it)
         }
-        bodyBuffer.writeInt(belongPage.fileHeader.offset)
+        bodyBuffer.writeInt(parentPage.fileHeader.offset)
         return bodyBuffer.getAllBytes()
     }
 

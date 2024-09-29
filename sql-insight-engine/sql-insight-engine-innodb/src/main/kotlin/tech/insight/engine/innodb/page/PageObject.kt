@@ -29,6 +29,6 @@ interface PageObject : Lengthable, SerializableObject {
     /**
      *  page that the object belongs to
      */
-    val belongPage: InnoDbPage
+    val parentPage: InnoDbPage
 
 }

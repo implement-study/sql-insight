@@ -86,12 +86,12 @@ class ClusteredIndex(table: Table) : InnodbIndex() {
 
 
     override fun hashCode(): Int {
-        return belongTo().hashCode()
+        return table().hashCode()
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ClusteredIndex) return false
-        return this.belongTo() == other.belongTo()
+        return this.table() == other.table()
     }
 }

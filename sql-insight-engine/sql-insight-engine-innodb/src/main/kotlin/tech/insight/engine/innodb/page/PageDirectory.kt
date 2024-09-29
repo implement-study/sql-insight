@@ -29,7 +29,7 @@ import tech.insight.buffer.getLength
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
+class PageDirectory(override val parentPage: InnoDbPage) : PageObject {
 
     /**
      * page directory may change frequently.
@@ -41,7 +41,7 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
     /**
      * order AES in order to support binary search
      */
-    internal val slots = MutableList(belongPage.pageHeader.slotCount) {
+    internal val slots = MutableList(parentPage.pageHeader.slotCount) {
         val offsetInPage = source.capacity() - (it + 1) * Short.SIZE_BYTES
         source.getShort(offsetInPage).toInt()
     }
@@ -71,10 +71,10 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
         }
         flushSourceIfNecessary()
         slots.add(index, offset)
-        val bytes = belongPage.source.getLength(offsetInPage(), (slots.size - index) * Short.SIZE_BYTES)
-        belongPage.source.setBytes(offsetInPage() - Short.SIZE_BYTES, bytes)
-        belongPage.source.setByte(ConstantSize.FILE_TRAILER.offset - ((index + 1) * Short.SIZE_BYTES), offset)
-        this.belongPage.pageHeader.slotCount++
+        val bytes = parentPage.source.getLength(offsetInPage(), (slots.size - index) * Short.SIZE_BYTES)
+        parentPage.source.setBytes(offsetInPage() - Short.SIZE_BYTES, bytes)
+        parentPage.source.setByte(ConstantSize.FILE_TRAILER.offset - ((index + 1) * Short.SIZE_BYTES), offset)
+        this.parentPage.pageHeader.slotCount++
     }
 
     /**
@@ -84,12 +84,12 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
         require(removedIndex > 0 && removedIndex < slots.size - 1) {
             "removed index must in 1...${slots.size - 1} infimum and supremum can't remove"
         }
-        val bytes = belongPage.source.getLength(offsetInPage(), (slots.size - removedIndex - 1) * Short.SIZE_BYTES)
-        belongPage.source.setBytes(offsetInPage() + Short.SIZE_BYTES, bytes)
-        belongPage.source.setByte(offsetInPage(), 0)
+        val bytes = parentPage.source.getLength(offsetInPage(), (slots.size - removedIndex - 1) * Short.SIZE_BYTES)
+        parentPage.source.setBytes(offsetInPage() + Short.SIZE_BYTES, bytes)
+        parentPage.source.setByte(offsetInPage(), 0)
         this.source.setShort(0, 0)
         this.slots.removeAt(removedIndex)
-        this.belongPage.pageHeader.slotCount--
+        this.parentPage.pageHeader.slotCount--
     }
 
     fun replace(oldOffset: Int, newOffset: Int) {
@@ -126,8 +126,8 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
         if (slots.size == 2) {
             return PageSlot(Supremum.OFFSET_IN_PAGE, 1, this)
         }
-        val maxExcludeSupremum = belongPage.getUserRecordByOffset(slots[1])
-        if (this.belongPage.compare(maxExcludeSupremum, userRecord) < 0) {
+        val maxExcludeSupremum = parentPage.getUserRecordByOffset(slots[1])
+        if (this.parentPage.compare(maxExcludeSupremum, userRecord) < 0) {
             return PageSlot(slots[1], 1, this)
         }
         var left = 1
@@ -135,8 +135,8 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
         var result = slots.last()
         while (left <= right) {
             val mid = left + ((right - left) shr 1)
-            val midRecord = belongPage.getUserRecordByOffset(slots[mid])
-            val compare = belongPage.compare(userRecord, midRecord)
+            val midRecord = parentPage.getUserRecordByOffset(slots[mid])
+            val compare = parentPage.compare(userRecord, midRecord)
             if (compare == 0) {
                 return PageSlot(slots[mid], mid, this)
             }
@@ -151,8 +151,8 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
     }
 
     internal fun clear() {
-        belongPage.source.setZero(offsetInPage(), length())
-        this.belongPage.pageHeader.slotCount = 2
+        parentPage.source.setZero(offsetInPage(), length())
+        this.parentPage.pageHeader.slotCount = 2
         this.slots.clear()
         slots.add(Infimum.OFFSET_IN_PAGE)
         slots.add(Supremum.OFFSET_IN_PAGE)
@@ -166,9 +166,9 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
     }
 
     private fun pageBuff(): ByteBuf {
-        val slotCount = belongPage.pageHeader.slotCount
+        val slotCount = parentPage.pageHeader.slotCount
         val slotLength = slotCount * Short.SIZE_BYTES + INIT_FREE_SPACE
-        return belongPage.source.slice(ConstantSize.FILE_TRAILER.offset - slotLength, slotLength)
+        return parentPage.source.slice(ConstantSize.FILE_TRAILER.offset - slotLength, slotLength)
     }
 
     override fun length(): Int {
@@ -181,7 +181,7 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
 
 
     private fun offsetInPage(): Int {
-        return ConstantSize.FILE_TRAILER.offset - belongPage.pageHeader.slotCount * Short.SIZE_BYTES
+        return ConstantSize.FILE_TRAILER.offset - parentPage.pageHeader.slotCount * Short.SIZE_BYTES
     }
 
     override fun equals(other: Any?): Boolean {
@@ -226,12 +226,12 @@ class PageDirectory(override val belongPage: InnoDbPage) : PageObject {
         }
 
         fun maxRecord(): InnodbUserRecord {
-            return this.parent.belongPage.getUserRecordByOffset(offset)
+            return this.parent.parentPage.getUserRecordByOffset(offset)
         }
 
         fun minRecord(): InnodbUserRecord {
             if (this.index == 0) {
-                return parent.belongPage.infimum
+                return parent.parentPage.infimum
             }
             return this.smaller().maxRecord()
         }

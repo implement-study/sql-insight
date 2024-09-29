@@ -24,8 +24,8 @@ import tech.insight.core.annotation.Unused
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class PageHeader(override val belongPage: InnoDbPage) : PageObject {
-    val source = belongPage.source.slice(ConstantSize.PAGE_HEADER.offset, ConstantSize.PAGE_HEADER.size)
+class PageHeader(override val parentPage: InnoDbPage) : PageObject {
+    val source = parentPage.source.slice(ConstantSize.PAGE_HEADER.offset, ConstantSize.PAGE_HEADER.size)
 
     /**
      * page slot count
@@ -238,7 +238,7 @@ class PageHeader(override val belongPage: InnoDbPage) : PageObject {
         this.absoluteRecordCount++
         this.recordCount++
         this.heapTop += userRecord.length()
-        this.lastInsertOffset = userRecord.absoluteOffset()
+        this.lastInsertOffset = userRecord.offsetInPage()
     }
 
     companion object {

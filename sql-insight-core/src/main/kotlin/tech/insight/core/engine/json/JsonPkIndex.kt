@@ -22,7 +22,7 @@ class JsonPkIndex(private val table: Table) : Index {
     override val id: Int
         get() = 1
 
-    override fun belongTo(): Table {
+    override fun table(): Table {
         return table
     }
 

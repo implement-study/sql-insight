@@ -23,9 +23,9 @@ import tech.insight.core.annotation.Unused
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class FileTrailer(override val belongPage: InnoDbPage) : PageObject {
+class FileTrailer(override val parentPage: InnoDbPage) : PageObject {
 
-    val source = belongPage.source.slice(ConstantSize.FILE_TRAILER.offset, ConstantSize.FILE_TRAILER.size)
+    val source = parentPage.source.slice(ConstantSize.FILE_TRAILER.offset, ConstantSize.FILE_TRAILER.size)
 
     /**
      * use it with [FileHeader.checkSum]

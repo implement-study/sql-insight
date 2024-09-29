@@ -65,7 +65,7 @@ interface InnodbUserRecord : UserRecord, PageObject {
     }
 
     fun linkRecord(nextRecord: InnodbUserRecord) {
-        this.recordHeader.nextRecordOffset = nextRecord.absoluteOffset() - this.absoluteOffset()
+        this.recordHeader.nextRecordOffset = nextRecord.offsetInPage() - this.offsetInPage()
     }
 
     override fun compareTo(other: Row): Int {

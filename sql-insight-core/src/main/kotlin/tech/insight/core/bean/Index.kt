@@ -39,7 +39,7 @@ interface Index : SerializableObject {
     /**
      * which table index belong to
      */
-    fun belongTo(): Table
+    fun table(): Table
 
     /**
      * index name

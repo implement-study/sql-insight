@@ -71,15 +71,15 @@ class IndexPage(override val page: InnoDbPage) : PageType {
 
 
     override fun convertUserRecord(offsetInPage: Int): InnodbUserRecord {
-        if (page.infimum.absoluteOffset() == offsetInPage) {
+        if (page.infimum.offsetInPage() == offsetInPage) {
             return page.infimum
         }
-        if (page.supremum.absoluteOffset() == offsetInPage) {
+        if (page.supremum.offsetInPage() == offsetInPage) {
             return page.supremum
         }
         val belongIndex = page.ext.belongIndex
         val compact = Compact()
-        compact.offsetInPage = (offsetInPage)
+        compact.offset = (offsetInPage)
         compact.recordHeader = page.readRecordHeader(offsetInPage)
         fillNullAndVar(page, offsetInPage, compact, belongIndex)
         val variableLength: Int = compact.variables.variableLength()
@@ -102,8 +102,8 @@ class IndexPage(override val page: InnoDbPage) : PageType {
         compact.body = Arrays.copyOfRange(page.toBytes(), offsetInPage, offsetInPage + bodyLength)
         compact.sourceRow = (compactIndexReadRow(compact, belongIndex))
         compact.belongIndex = belongIndex
-        compact.belongPage = this.page
-        compact.setAbsoluteOffset(offsetInPage)
+        compact.parentPage = this.page
+        compact.setOffsetInPage(offsetInPage)
         return compact
     }
 
@@ -170,7 +170,7 @@ class IndexPage(override val page: InnoDbPage) : PageType {
         var preRecord = firstIndex
         //   todo Whether it is better to allow nodes to implement comparison functions?
         while (compare(userRecord, preRecord) > 0) {
-            val nextOffset = preRecord.absoluteOffset() + preRecord.nextRecordOffset()
+            val nextOffset = preRecord.offsetInPage() + preRecord.nextRecordOffset()
             val nextRecord = page.getUserRecordByOffset(nextOffset)
             if (nextRecord is SystemUserRecord) {
                 break
@@ -207,7 +207,7 @@ class IndexPage(override val page: InnoDbPage) : PageType {
             valueList.add(addedValue)
         }
         val row = ReadRow(valueList, -1)
-        row.table = index.belongTo()
+        row.table = index.table()
         return row
     }
 

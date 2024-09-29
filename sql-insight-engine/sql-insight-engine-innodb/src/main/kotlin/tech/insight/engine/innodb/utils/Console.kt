@@ -96,8 +96,8 @@ object Console {
         for (record in innoDbPage) {
             val groupMax = record.recordHeader.nOwned != 0
             val sb = StringBuilder("heapNo:${record.recordHeader.heapNo}")
-                .append("  offset:${record.absoluteOffset()}")
-                .append("  nextOffset:${record.absoluteOffset() + record.nextRecordOffset()}  ")
+                .append("  offset:${record.offsetInPage()}")
+                .append("  nextOffset:${record.offsetInPage() + record.nextRecordOffset()}  ")
                 .append(record)
                 .append(BLANK.repeat(3))
                 .append(record.toBytes().contentToString())

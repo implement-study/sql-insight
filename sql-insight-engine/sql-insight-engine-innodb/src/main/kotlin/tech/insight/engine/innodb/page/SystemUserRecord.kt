@@ -28,7 +28,7 @@ sealed interface SystemUserRecord : InnodbUserRecord {
         systemUserRecordUnsupported()
     }
 
-    override fun setAbsoluteOffset(offset: Int) {
+    override fun setOffsetInPage(offset: Int) {
         throw UnsupportedOperationException("infimum and supremum can't set offset ")
     }
 
@@ -53,9 +53,9 @@ sealed interface SystemUserRecord : InnodbUserRecord {
     }
 }
 
-class Supremum(override val belongPage: InnoDbPage) : SystemUserRecord {
+class Supremum(override val parentPage: InnoDbPage) : SystemUserRecord {
 
-    val source: ByteBuf = belongPage.source.slice(ConstantSize.SUPREMUM.offset, ConstantSize.SUPREMUM.size)
+    val source: ByteBuf = parentPage.source.slice(ConstantSize.SUPREMUM.offset, ConstantSize.SUPREMUM.size)
 
     /**
      * 5 bytes
@@ -76,7 +76,7 @@ class Supremum(override val belongPage: InnoDbPage) : SystemUserRecord {
         return source.array()
     }
 
-    override fun absoluteOffset(): Int {
+    override fun offsetInPage(): Int {
         return ConstantSize.SUPREMUM.offset + ConstantSize.RECORD_HEADER.size
     }
 
@@ -88,12 +88,12 @@ class Supremum(override val belongPage: InnoDbPage) : SystemUserRecord {
     }
 
     override fun nextRecord(): InnodbUserRecord {
-        return this.belongPage.infimum
+        return this.parentPage.infimum
     }
 
     override fun preRecord(): InnodbUserRecord {
-        var candidate = belongPage.pageDirectory.supremumSlot().smaller().maxRecord()
-        while (candidate.nextRecordOffset() + candidate.absoluteOffset() != this.absoluteOffset()) {
+        var candidate = parentPage.pageDirectory.supremumSlot().smaller().maxRecord()
+        while (candidate.nextRecordOffset() + candidate.offsetInPage() != this.offsetInPage()) {
             candidate = candidate.nextRecord()
         }
         return candidate
@@ -104,7 +104,7 @@ class Supremum(override val belongPage: InnoDbPage) : SystemUserRecord {
     }
 
     override fun belongIndex(): InnodbIndex {
-        return belongPage.ext.belongIndex
+        return parentPage.ext.belongIndex
     }
 
     override fun indexNode(): InnodbUserRecord {
@@ -160,9 +160,9 @@ class Supremum(override val belongPage: InnoDbPage) : SystemUserRecord {
  *
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class Infimum(override val belongPage: InnoDbPage) : SystemUserRecord {
+class Infimum(override val parentPage: InnoDbPage) : SystemUserRecord {
 
-    val source: ByteBuf = belongPage.source.slice(ConstantSize.INFIMUM.offset, ConstantSize.INFIMUM.size)
+    val source: ByteBuf = parentPage.source.slice(ConstantSize.INFIMUM.offset, ConstantSize.INFIMUM.size)
 
     /**
      * 5 bytes.
@@ -187,7 +187,7 @@ class Infimum(override val belongPage: InnoDbPage) : SystemUserRecord {
     }
 
     override fun belongIndex(): InnodbIndex {
-        return belongPage.ext.belongIndex
+        return parentPage.ext.belongIndex
     }
 
     override fun indexNode(): InnodbUserRecord {
@@ -203,7 +203,7 @@ class Infimum(override val belongPage: InnoDbPage) : SystemUserRecord {
     }
 
     override fun nextRecord(): InnodbUserRecord {
-        return this.belongPage.getUserRecordByOffset(this.absoluteOffset() + nextRecordOffset())
+        return this.parentPage.getUserRecordByOffset(this.offsetInPage() + nextRecordOffset())
     }
 
     override fun preRecord(): InnodbUserRecord {
@@ -211,7 +211,7 @@ class Infimum(override val belongPage: InnoDbPage) : SystemUserRecord {
     }
 
 
-    override fun absoluteOffset(): Int {
+    override fun offsetInPage(): Int {
         return ConstantSize.INFIMUM.offset + ConstantSize.RECORD_HEADER.size
     }
 

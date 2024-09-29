@@ -37,7 +37,7 @@ class JsonCursor(private val reader: BufferedReader, private val index: JsonPkIn
                 if (line.isEmpty()) {
                     continue
                 }
-                current = JsonEngineSupport.getPhysicRowFromJson(line.tree(), index.belongTo())
+                current = JsonEngineSupport.getPhysicRowFromJson(line.tree(), index.table())
                 return true
             } catch (e: Exception) {
                 throw e

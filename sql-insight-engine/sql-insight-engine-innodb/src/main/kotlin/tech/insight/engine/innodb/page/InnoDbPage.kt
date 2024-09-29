@@ -18,7 +18,7 @@ import tech.insight.engine.innodb.page.type.PageType
  * source is 16K bytes
  * @author gxz gongxuanzhangmelt@gmail.com
  */
-class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), PageObject,
+class InnoDbPage (internal val source: ByteBuf, index: InnodbIndex) : Logging(), PageObject,
     Iterable<InnodbUserRecord>, Comparator<InnodbUserRecord> {
 
     init {
@@ -235,15 +235,15 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
      * @return user record
      */
     fun getUserRecordByOffset(offsetInPage: Int): InnodbUserRecord {
-        if (offsetInPage == this.infimum.absoluteOffset()) {
+        if (offsetInPage == this.infimum.offsetInPage()) {
             return infimum
         }
-        if (offsetInPage == this.supremum.absoluteOffset()) {
+        if (offsetInPage == this.supremum.offsetInPage()) {
             return supremum
         }
         return this.pageType().convertUserRecord(offsetInPage)
     }
-
+    
 
     /**
      * get the first user record in page user records linked.
@@ -252,7 +252,7 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
         if (this.pageHeader.recordCount == 0) {
             throw NoSuchElementException("page is empty")
         }
-        return getUserRecordByOffset(infimum.absoluteOffset() + infimum.nextRecordOffset())
+        return getUserRecordByOffset(infimum.offsetInPage() + infimum.nextRecordOffset())
     }
 
     /**
@@ -288,7 +288,7 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
             return
         }
         debug { "occurred group split ..." }
-        val splitSlot = pageDirectory.requireSlotByOffset(groupMax.absoluteOffset())
+        val splitSlot = pageDirectory.requireSlotByOffset(groupMax.offsetInPage())
         //   todo group split strategy
         val leftGroupCount = Constant.SLOT_MAX_COUNT shr 1
         val leftMaxRecord = run {
@@ -301,7 +301,7 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
             }
         }
         groupMax.recordHeader.nOwned = Constant.SLOT_MAX_COUNT - leftGroupCount + 1
-        pageDirectory.insert(splitSlot.index, leftMaxRecord.absoluteOffset())
+        pageDirectory.insert(splitSlot.index, leftMaxRecord.offsetInPage())
     }
 
 
@@ -323,7 +323,7 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
         return ConstantSize.PAGE.size
     }
 
-    override val belongPage: InnoDbPage = this
+    override val parentPage: InnoDbPage = this
 
     override fun iterator(): Iterator<InnodbUserRecord> {
         return Itr()
@@ -347,7 +347,7 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
 
 
     inner class Itr : Iterator<InnodbUserRecord> {
-        private var cursor = getUserRecordByOffset(infimum.nextRecordOffset() + infimum.absoluteOffset())
+        private var cursor = getUserRecordByOffset(infimum.nextRecordOffset() + infimum.offsetInPage())
         override fun hasNext(): Boolean {
             return cursor !== supremum
         }
@@ -357,7 +357,7 @@ class InnoDbPage(internal val source: ByteBuf, index: InnodbIndex) : Logging(), 
                 throw NoSuchElementException()
             }
             val result = cursor
-            cursor = getUserRecordByOffset(cursor.nextRecordOffset() + cursor.absoluteOffset())
+            cursor = getUserRecordByOffset(cursor.nextRecordOffset() + cursor.offsetInPage())
             return result
         }
 

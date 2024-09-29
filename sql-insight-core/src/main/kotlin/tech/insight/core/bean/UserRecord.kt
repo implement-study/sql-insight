@@ -18,14 +18,14 @@ interface UserRecord : SerializableObject, Row {
     /**
      * absolute offset in page， field not in page , application calculate
      */
-    fun absoluteOffset(): Int
+    fun offsetInPage(): Int
 
     /**
      * [offset]
      * absolute offset in page don't in source.
      * require set up
      */
-    fun setAbsoluteOffset(offset: Int)
+    fun setOffsetInPage(offset: Int)
 
     /**
      * next node relative offset

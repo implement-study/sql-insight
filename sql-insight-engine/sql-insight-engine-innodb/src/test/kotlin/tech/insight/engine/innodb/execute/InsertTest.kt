@@ -80,7 +80,7 @@ class InsertTest {
             val userRecord = this.nextRecord()
             assertEquals(17, userRecord.length())
             assertEquals(
-                rootPage.supremum.absoluteOffset() - userRecord.absoluteOffset(),
+                rootPage.supremum.offsetInPage() - userRecord.offsetInPage(),
                 userRecord.nextRecordOffset()
             )
             assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
@@ -142,15 +142,15 @@ class InsertTest {
             assertEquals(false, userRecord.recordHeader.deleteMask)
             pre = userRecord
         }
-        val lastUserRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+        val lastUserRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.offsetInPage())
         assertEquals(16, lastUserRecord.length())
         assertEquals(RecordType.NORMAL, lastUserRecord.recordHeader.recordType)
         assertEquals(0, lastUserRecord.recordHeader.nOwned)
         assertEquals(6, lastUserRecord.recordHeader.heapNo)
         assertEquals(false, lastUserRecord.recordHeader.deleteMask)
         assertEquals(
-            rootPage.supremum.absoluteOffset(),
-            lastUserRecord.nextRecordOffset() + lastUserRecord.absoluteOffset()
+            rootPage.supremum.offsetInPage(),
+            lastUserRecord.nextRecordOffset() + lastUserRecord.offsetInPage()
         )
     }
 
@@ -191,7 +191,7 @@ class InsertTest {
 
         var pre: InnodbUserRecord = infimum
         for (i in 0 until 9) {
-            val userRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+            val userRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.offsetInPage())
             assertEquals(17, userRecord.length())
             assertEquals(RecordType.NORMAL, userRecord.recordHeader.recordType)
             assertEquals(if (i == 3) 4 else 0, userRecord.recordHeader.nOwned)
@@ -199,15 +199,15 @@ class InsertTest {
             assertEquals(false, userRecord.recordHeader.deleteMask)
             pre = userRecord
         }
-        val lastUserRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.absoluteOffset())
+        val lastUserRecord = rootPage.getUserRecordByOffset(pre.nextRecordOffset() + pre.offsetInPage())
         assertEquals(18, lastUserRecord.length())
         assertEquals(RecordType.NORMAL, lastUserRecord.recordHeader.recordType)
         assertEquals(0, lastUserRecord.recordHeader.nOwned)
         assertEquals(11, lastUserRecord.recordHeader.heapNo)
         assertEquals(false, lastUserRecord.recordHeader.deleteMask)
         assertEquals(
-            rootPage.supremum.absoluteOffset(),
-            lastUserRecord.nextRecordOffset() + lastUserRecord.absoluteOffset()
+            rootPage.supremum.offsetInPage(),
+            lastUserRecord.nextRecordOffset() + lastUserRecord.offsetInPage()
         )
     }
 

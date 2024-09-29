@@ -25,12 +25,12 @@ import tech.insight.engine.innodb.page.PageHeader.Companion.EMPTY_PAGE_HEAP_TOP
  * contains all userRecords (include delete mask record) and free space
  * @author gongxuanzhangmelt@gmail.com
  */
-class UserRecords(override val belongPage: InnoDbPage) : PageObject {
+class UserRecords(override val parentPage: InnoDbPage) : PageObject {
 
-    val source: ByteBuf = belongPage.source
+    val source: ByteBuf = parentPage.source
 
     override fun toBytes(): ByteArray {
-        val length = belongPage.pageHeader.heapTop - ConstantSize.USER_RECORDS.offset
+        val length = parentPage.pageHeader.heapTop - ConstantSize.USER_RECORDS.offset
         source.slice(ConstantSize.USER_RECORDS.offset, length).let {
             val bytes = it.getAllBytes()
             return bytes
@@ -39,34 +39,34 @@ class UserRecords(override val belongPage: InnoDbPage) : PageObject {
 
     /**
      * this method will adjust inner data from page.
-     * invoker should ensure the this page can add record
+     * invoker should ensure the this page can add record.
      *
      * param user record not direct reference innodb page source
      * after add use return record
      * @return record in page,
      */
     fun addRecord(userRecord: InnodbUserRecord): InnodbUserRecord {
-        check(belongPage.remainSpace() >= userRecord.length() + Short.SIZE_BYTES) {
+        check(parentPage.remainSpace() >= userRecord.length() + Short.SIZE_BYTES) {
             "this page dont have more space "
         }
-        userRecord.recordHeader.heapNo = belongPage.pageHeader.absoluteRecordCount
-        this.source.setBytes(belongPage.pageHeader.heapTop, userRecord.toBytes())
-        this.belongPage.apply {
+        userRecord.recordHeader.heapNo = parentPage.pageHeader.absoluteRecordCount
+        this.source.setBytes(parentPage.pageHeader.heapTop, userRecord.toBytes())
+        this.parentPage.apply {
             val recordInPage = pageHeader.heapTop + userRecord.beforeSplitOffset()
-            userRecord.setAbsoluteOffset(recordInPage)
+            userRecord.setOffsetInPage(recordInPage)
             pageHeader.addRecord(userRecord)
             return getUserRecordByOffset(recordInPage)
         }
     }
 
     fun addRecords(userRecords: List<InnodbUserRecord>) {
-        check(belongPage.remainSpace() >= userRecords.sumOf { it.length() } + Short.SIZE_BITS * userRecords.size / 4) {
+        check(parentPage.remainSpace() >= userRecords.sumOf { it.length() } + Short.SIZE_BITS * userRecords.size / 4) {
             "this page dont have more space "
         }
         //  todo batch insert
         userRecords.forEach { record ->
             this.source.writeBytes(record.toBytes())
-            this.belongPage.pageHeader.addRecord(record)
+            this.parentPage.pageHeader.addRecord(record)
         }
     }
 
@@ -79,20 +79,20 @@ class UserRecords(override val belongPage: InnoDbPage) : PageObject {
             val nextRecord = oldRecord.nextRecord()
             preRecord.linkRecord(newRecord)
             nextRecord.linkRecord(nextRecord)
-            belongPage.pageDirectory.replace(oldRecord.absoluteOffset(), newRecord.absoluteOffset())
+            parentPage.pageDirectory.replace(oldRecord.offsetInPage(), newRecord.offsetInPage())
         }
-        this.belongPage.source.setBytes(oldRecord.absoluteOffset() - oldRecord.beforeSplitOffset(), newRecord.toBytes())
+        this.parentPage.source.setBytes(oldRecord.offsetInPage() - oldRecord.beforeSplitOffset(), newRecord.toBytes())
     }
 
 
     fun clear() {
-        belongPage.infimum.recordHeader.nextRecordOffset = Supremum.OFFSET_IN_PAGE - Infimum.OFFSET_IN_PAGE
-        belongPage.supremum.apply {
+        parentPage.infimum.recordHeader.nextRecordOffset = Supremum.OFFSET_IN_PAGE - Infimum.OFFSET_IN_PAGE
+        parentPage.supremum.apply {
             recordHeader.nextRecordOffset = 0
             recordHeader.nOwned = 1
         }
-        belongPage.pageDirectory.clear()
-        belongPage.pageHeader.apply {
+        parentPage.pageDirectory.clear()
+        parentPage.pageHeader.apply {
             slotCount = 2
             heapTop = EMPTY_PAGE_HEAP_TOP
             absoluteRecordCount = 2
@@ -106,7 +106,7 @@ class UserRecords(override val belongPage: InnoDbPage) : PageObject {
     }
 
     override fun length(): Int {
-        return belongPage.pageHeader.heapTop - ConstantSize.USER_RECORDS.offset
+        return parentPage.pageHeader.heapTop - ConstantSize.USER_RECORDS.offset
     }
 
     override fun equals(other: Any?): Boolean {
